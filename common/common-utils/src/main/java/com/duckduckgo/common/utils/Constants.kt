@@ -33,3 +33,8 @@ const val KAHF_GUARD_DEFAULT = "Low"
 // SafeGaze (image blur) Settings
 const val SAFE_GAZE_DEFAULT = "Off"
 const val SAFE_GAZE_MODE = "safe_gaze_mode"
+
+// SafeGaze Quota Count
+const val SAFE_GAZE_LAST_RESET_DATE = "SafeGazeLastResetDate"
+const val SAFE_GAZE_API_CALLS_COUNT = "SafeGazeAPICallsCount"
+const val SAFE_GAZE_QUOTA_LIMIT = 60
