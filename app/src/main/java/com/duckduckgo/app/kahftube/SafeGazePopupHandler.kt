@@ -237,34 +237,24 @@ class SafeGazePopupHandler(
         editor.apply()
     }
 
-    private fun loadImageWithBlur(blurRadius: Int, imageView: ImageView) {
+    private fun loadImageWithBlur(intensity: Int, imageView: ImageView) {
         val bitmap = BitmapFactory.decodeResource(binding.root.context.resources, R.drawable.full_image_blur)
 
-        // Convert blurRadius to a 0-1 scale to match the JS blurIntensity
-        val blurIntensity = blurRadius / 100f
-
-        // Calculate blur value between 2px and 8px
-        val blurValue = 2 + (blurIntensity * 6)
-
-        // Calculate brightness value between 200% and 800%
-        val brightnessValue = 2 + (blurIntensity * 6)
-
-        // Apply blur
+        // Apply blur (4px to 8px)
+        val blurValue = linearInterpolation(intensity.toFloat(), outputRange = Pair(4f, 8f)).toInt()
         val blurredBitmap = HokoBlur.with(binding.root.context)
-            .radius(blurValue.toInt())
+            .radius(blurValue)
             .sampleFactor(1.0f)
             .forceCopy(false)
             .processor()
             .blur(bitmap)
 
-        // Apply grayscale, contrast, and brightness
-        val colorMatrix = ColorMatrix()
-
         // Grayscale (100%)
+        val colorMatrix = ColorMatrix()
         colorMatrix.setSaturation(0f)
 
         // Contrast (500%)
-        val scale = 5f
+        val scale = linearInterpolation(intensity.toFloat(), outputRange = Pair(8.5f, 10f))
         val translate = (-.5f * scale + .5f) * 255f
         colorMatrix.postConcat(
             ColorMatrix(
@@ -277,7 +267,8 @@ class SafeGazePopupHandler(
             ),
         )
 
-        // Brightness
+        // Brightness (45% to 60%)
+        val brightnessValue = linearInterpolation(intensity.toFloat(), outputRange = Pair(0.45f, 0.6f))
         colorMatrix.postConcat(
             ColorMatrix(
                 floatArrayOf(
@@ -292,5 +283,16 @@ class SafeGazePopupHandler(
         val colorFilter = ColorMatrixColorFilter(colorMatrix)
         imageView.colorFilter = colorFilter
         imageView.setImageBitmap(blurredBitmap)
+    }
+
+    private fun linearInterpolation(
+        value: Float,
+        inputRange: Pair<Float, Float> = Pair(0f, 100f),
+        outputRange: Pair<Float, Float> = Pair(2f, 8f)
+    ): Float {
+        // Calculate the ratio of the value within the input range
+        val ratio = (value - inputRange.first) / (inputRange.second - inputRange.first)
+        // Map the ratio to the output range
+        return outputRange.first + ratio * (outputRange.second - outputRange.first)
     }
 }
