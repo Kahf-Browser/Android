@@ -252,6 +252,7 @@ import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
+import com.duckduckgo.common.utils.extensions.isDataUri
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.toDesktopUri
 import com.duckduckgo.di.scopes.FragmentScope
@@ -950,7 +951,7 @@ class BrowserTabViewModel @Inject constructor(
 
                 if (privateDnsEnabled) {
                     runBlocking {
-                        if (!isKahfBlockedUrl(urlToNavigate)) {
+                        if (!isKahfBlockedUrl(urlToNavigate) && !urlToNavigate.isDataUri()) {
                             val originalUrl = String(urlToNavigate.toCharArray())
                             val ip = dnsResolver.resolveDomain(urlToNavigate.toUri())
 

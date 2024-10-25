@@ -85,9 +85,13 @@ class CustomDnsResolver(
     suspend fun resolveDomain(domain: android.net.Uri, visitedDomains: MutableSet<String> = mutableSetOf()): Pair<String, String>? {
         val host = (domain.host ?: domain.toString()).removeSuffix(".").plus(".")
 
-        return checkCacheAndSendRequest(host, Type.A, createDnsQuery(host, Type.A), visitedDomains)
-            ?: checkCacheAndSendRequest(host, Type.AAAA, createDnsQuery(host, Type.AAAA), visitedDomains)
-            ?: checkCacheAndSendRequest(host, Type.CNAME, createDnsQuery(host, Type.CNAME), visitedDomains)
+        return try {
+            checkCacheAndSendRequest(host, Type.A, createDnsQuery(host, Type.A), visitedDomains)
+                ?: checkCacheAndSendRequest(host, Type.AAAA, createDnsQuery(host, Type.AAAA), visitedDomains)
+                ?: checkCacheAndSendRequest(host, Type.CNAME, createDnsQuery(host, Type.CNAME), visitedDomains)
+        } catch (e: Exception) {
+            null
+        }
     }
 
     private suspend fun checkCacheAndSendRequest(

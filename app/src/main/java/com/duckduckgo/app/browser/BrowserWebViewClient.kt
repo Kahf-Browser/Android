@@ -87,6 +87,7 @@ import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
 import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
 import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
+import com.duckduckgo.common.utils.extensions.isDataUri
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.history.api.NavigationHistory
@@ -578,7 +579,7 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): WebResourceResponse? {
         val url = request.url.toString()
-        if (request.url.host == KAHF_GUARD_BLOCKED_URL) return null
+        if (request.url.host == KAHF_GUARD_BLOCKED_URL || !url.isDataUri()) return null
         val privateDnsMode = sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: KAHF_GUARD_DEFAULT
         val privateDnsEnabled = PrivateDnsLevel.isEnabled(privateDnsMode)
 

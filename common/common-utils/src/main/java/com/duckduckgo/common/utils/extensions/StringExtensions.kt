@@ -63,6 +63,10 @@ fun String.toTldPlusOne(): String? {
     return runCatching { publicSuffixDatabase.getEffectiveTldPlusOne(this) }.getOrNull()
 }
 
+fun String.isDataUri(): Boolean {
+    return startsWith("data:")
+}
+
 /**
  * Compares the current semantic version string with the target semantic version string.
  *
