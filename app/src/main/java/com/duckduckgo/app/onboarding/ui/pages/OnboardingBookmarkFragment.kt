@@ -114,20 +114,37 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
 
     private fun setupButtonClicks() {
         binding.btnSkip.setOnClickListener {
-            (requireActivity() as KahfOnboardingActivity).onContinueClicked()
-        }
-
-        binding.btnSetBookmark.setOnClickListener {
             CoroutineScope(dispatcherProvide.io()).launch {
-                rvAdapter.getItems().forEach {
-                    if (it.selected) {
-                        savedSitesRepository.insertFavorite(url = it.url, title = it.title)
-                    }
-                }
+                addBookmarks(false)
 
                 withContext(dispatcherProvide.main()) {
                     (requireActivity() as KahfOnboardingActivity).onContinueClicked()
                 }
+            }
+        }
+
+        binding.btnSetBookmark.setOnClickListener {
+            CoroutineScope(dispatcherProvide.io()).launch {
+                addBookmarks(true)
+
+                withContext(dispatcherProvide.main()) {
+                    (requireActivity() as KahfOnboardingActivity).onContinueClicked()
+                }
+            }
+        }
+    }
+
+    private fun addBookmarks(continueClicked: Boolean) {
+        val selectedBookmarks = if (continueClicked)
+            rvAdapter.getItems().filter { it.selected }
+        else emptyList()
+
+        selectedBookmarks.toMutableList().let {
+            it.add(PredefinedBookmark(R.drawable.ic_youtube,"Islam QA", "https://islamqa.info/en"))
+            it.add(PredefinedBookmark(R.drawable.ic_youtube,"Quran.com", "https://quran.com/"))
+
+            it.forEach { bookmark ->
+                savedSitesRepository.insertFavorite(url = bookmark.url, title = bookmark.title)
             }
         }
     }
