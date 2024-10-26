@@ -3,7 +3,9 @@ package com.duckduckgo.app.browser.safe_gaze
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
+import android.util.Base64
 import android.webkit.JavascriptInterface
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -15,11 +17,14 @@ import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SAFE_GAZE_MIN_IMG_SIZE
 // import com.duckduckgo.app.safegaze.personDetection.PersonDetector
 import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
+import com.google.common.hash.Hashing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
@@ -58,9 +63,10 @@ class SafeGazeJsInterface(
     ): Boolean {
         return suspendCoroutine { continuation ->
             mScope.launch {
-                val bitmap = loadImageBitmapFromUrl(url, context)
+                val bitmap = getBitmapFromUrl(url)
+                val hashedUrl = hash(url)
 
-                if (bitmap != null) {
+                if (bitmap!= null && bitmap.height >= SAFE_GAZE_MIN_IMG_SIZE && bitmap.width >= SAFE_GAZE_MIN_IMG_SIZE) {
                     // NOTE: Person detection is disabled for now
                     //     if (isPersonCheck) {
                     //         val containsHuman = personDetector.hasPerson(bitmap)
@@ -78,7 +84,7 @@ class SafeGazeJsInterface(
                             // Insert to local DB
                             kahfImageBlockedDao.insert(
                                 KahfImageBlocked(
-                                    imageUrl = url,
+                                    imageUrl = hashedUrl,
                                     tag = "female",
                                     score = genderPrediction.femaleConfidence.toDouble(),
                                 ),
@@ -95,7 +101,7 @@ class SafeGazeJsInterface(
                             // Insert to local DB
                             kahfImageBlockedDao.insert(
                                 KahfImageBlocked(
-                                    imageUrl = url,
+                                    imageUrl = hashedUrl,
                                     tag = it.first,
                                     score = it.second.toDouble(),
                                 ),
@@ -112,7 +118,17 @@ class SafeGazeJsInterface(
         }
     }
 
-    private suspend fun loadImageBitmapFromUrl(
+    private suspend fun getBitmapFromUrl(url: String): Bitmap? {
+        return if (url.startsWith("data:image")) {
+            val base64Image = url.substringAfter(",")  // Remove the 'data:image/jpeg;base64,' prefix
+            val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
+        } else {
+            downloadBitmap(url, context)
+        }
+    }
+
+    private suspend fun downloadBitmap(
         url: String,
         context: Context
     ): Bitmap? {
@@ -165,8 +181,10 @@ class SafeGazeJsInterface(
             val parts = message.split("/-/")
             val imageUrl = if (parts.size >= 2) parts[1] else ""
             val uid = (if (parts.size >= 2) parts[2] else "0")
-            if (onDeviceModelCachedResults.containsKey(imageUrl)) {
-                callSafegazeOnDeviceModelHandler(onDeviceModelCachedResults[imageUrl]!!, uid, counter.isQuotaExceeded())
+            val hashedUrl = hash(imageUrl)
+
+            if (onDeviceModelCachedResults.containsKey(hashedUrl)) {
+                callSafegazeOnDeviceModelHandler(onDeviceModelCachedResults[hashedUrl]!!, uid, counter.isQuotaExceeded())
             } else {
                 addTaskToQueue(imageUrl, uid)
             }
@@ -196,7 +214,7 @@ class SafeGazeJsInterface(
                         counter.incrementDailyQuota(shouldBlur)
                         counter.incrementSessionAndAllTimeCount(shouldBlur)
 
-                        onDeviceModelCachedResults[it.url] = shouldBlur
+                        onDeviceModelCachedResults[hash(it.url)] = shouldBlur
                         callSafegazeOnDeviceModelHandler(shouldBlur, it.uid, counter.isQuotaExceeded())
                     }
                 }
@@ -225,4 +243,20 @@ class SafeGazeJsInterface(
             }
         }
     }
+
+    private fun hash(content: String) =
+        Hashing.murmur3_128().hashString(content, Charsets.UTF_8).toString()
+
+    private suspend fun loadCacheFromDisk() {
+        kahfImageBlockedDao.getAllBlockedImageDetails().first().forEach { kahfImageBlocked->
+            onDeviceModelCachedResults[kahfImageBlocked.imageUrl] = true
+        }
+
+        Timber.d("kLog loading cache to disk from memory(${onDeviceModelCachedResults.size})")
+
+        if (onDeviceModelCachedResults.isEmpty()) {
+            onDeviceModelCachedResults["--"] = false
+        }
+    }
 }
+
