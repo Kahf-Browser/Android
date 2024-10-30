@@ -27,11 +27,11 @@ import com.duckduckgo.app.kahftube.PrivateDnsLevel.Medium
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 
-sealed class PrivateDnsLevel(val name: String, val url: String) {
-    data object High : PrivateDnsLevel("High", "https://high.kahfguard.com/dns-query")
-    data object Medium : PrivateDnsLevel("Medium", "https://medium.kahfguard.com/dns-query")
-    data object Low : PrivateDnsLevel("Low", "https://low.kahfguard.com/dns-query")
-    data object Off : PrivateDnsLevel("Off", "https://dns.google/dns-query")
+sealed class PrivateDnsLevel(val name: String, val url: String, val dnsServerIps: Array<String>) {
+    data object High : PrivateDnsLevel("High", "https://high.kahfguard.com/dns-query", arrayOf("51.142.0.101", "51.142.0.102"))
+    data object Medium : PrivateDnsLevel("Medium", "https://medium.kahfguard.com/dns-query", arrayOf("51.142.0.99", "51.142.0.100"))
+    data object Low : PrivateDnsLevel("Low", "https://low.kahfguard.com/dns-query", arrayOf("51.142.0.97", "51.142.0.98"))
+    data object Off : PrivateDnsLevel("Off", "https://dns.google/dns-query", arrayOf("8.8.8.8", "8.8.4.4"))
 
     companion object {
         fun get(name: String) = when (name) {
