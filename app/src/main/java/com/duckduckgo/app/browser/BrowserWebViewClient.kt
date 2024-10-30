@@ -579,7 +579,7 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): WebResourceResponse? {
         val url = request.url.toString()
-        if (request.url.host == KAHF_GUARD_BLOCKED_URL || !url.isDataUri()) return null
+        if (request.url.host == KAHF_GUARD_BLOCKED_URL || url.isDataUri()) return null
         val privateDnsMode = sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: KAHF_GUARD_DEFAULT
         val privateDnsEnabled = PrivateDnsLevel.isEnabled(privateDnsMode)
 

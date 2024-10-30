@@ -85,13 +85,13 @@ class CustomDnsResolver(
     suspend fun resolveDomain(domain: android.net.Uri, visitedDomains: MutableSet<String> = mutableSetOf()): Pair<String, String>? {
         val host = (domain.host ?: domain.toString()).removeSuffix(".").plus(".")
 
-        return try {
-            checkCacheAndSendRequest(host, Type.A, createDnsQuery(host, Type.A), visitedDomains)
-                ?: checkCacheAndSendRequest(host, Type.AAAA, createDnsQuery(host, Type.AAAA), visitedDomains)
-                ?: checkCacheAndSendRequest(host, Type.CNAME, createDnsQuery(host, Type.CNAME), visitedDomains)
-        } catch (e: Exception) {
-            null
-        }
+        val resolvedIp = checkCacheAndSendRequest(host, Type.A, createDnsQuery(host, Type.A), visitedDomains)
+            ?: checkCacheAndSendRequest(host, Type.AAAA, createDnsQuery(host, Type.AAAA), visitedDomains)
+            ?: checkCacheAndSendRequest(host, Type.CNAME, createDnsQuery(host, Type.CNAME), visitedDomains)
+
+        Timber.d("tpLog resolvedIp: ${if (resolvedIp != null) "$host $resolvedIp" else "null"}")
+
+        return resolvedIp
     }
 
     private suspend fun checkCacheAndSendRequest(
