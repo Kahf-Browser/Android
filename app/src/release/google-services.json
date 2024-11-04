@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "994768194050",
+    "project_id": "kahf-browser",
+    "storage_bucket": "kahf-browser.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994768194050:android:2683d54dc4d9da381db51b",
+        "android_client_info": {
+          "package_name": "org.halalz.kahfbrowser"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWx99bEMU7n3jOc068gHw182LMjSJGVfw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994768194050:android:c6cd3011d5689a691db51b",
+        "android_client_info": {
+          "package_name": "org.halalz.kahfbrowser.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWx99bEMU7n3jOc068gHw182LMjSJGVfw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
