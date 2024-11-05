@@ -586,11 +586,9 @@ class BrowserWebViewClient @Inject constructor(
         return runBlocking {
             withContext(dispatcherProvider.io()) {
                 try {
-                    if (privateDnsEnabled && resolveDns(Uri.parse(url)).second == KAHF_GUARD_BLOCKED_URL) {
-                        if (request.isForMainFrame) {
-                            withContext(dispatcherProvider.main()) {
-                                webViewClientListener?.onUrlBlocked(url)
-                            }
+                    if (privateDnsEnabled && request.isForMainFrame && resolveDns(Uri.parse(url)).second == KAHF_GUARD_BLOCKED_URL) {
+                        withContext(dispatcherProvider.main()) {
+                            webViewClientListener?.onUrlBlocked(url)
                         }
                         WebResourceResponse(null, null, null)
                     } else {
