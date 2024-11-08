@@ -211,7 +211,7 @@ class PrayersTimeFragment : DuckDuckGoFragment(R.layout.prayers_landing_fragment
         if (savedLatitude != null && savedLongitude != null) {
             coordinates = Coordinates(savedLatitude.toDouble(), savedLongitude.toDouble())
             // coordinates = Coordinates(23.8041, 90.4152) // To test with Dhaka coordinates
-            prepareData(initialCall = true)
+            prepareData()
         } else {
             checkLocationPermissionAndService()
         }
@@ -355,22 +355,24 @@ class PrayersTimeFragment : DuckDuckGoFragment(R.layout.prayers_landing_fragment
                 }
             }
 
-            prepareData(initialCall = true)
+            prepareData()
 
             // show toast that location is updated
             if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
                 Toast.makeText(requireContext(), R.string.kahf_location_updated, Toast.LENGTH_SHORT).show()
             }
         } catch (error: Exception) {
-            prepareData(initialCall = true)
+            prepareData()
             println("geocoder error " + error.message)
         }
     }
 
-    private fun prepareData(initialCall: Boolean = false) {
+    private fun prepareData() {
         val prayers = mutableListOf<PrayerModelView>()
 
-        getDataFromApi()
+        if (!getDataFromApi()) {
+            return
+        }
 
         val prayerTimes = when (dateIndex) {
             0 -> yesterdayPrayerTimes
@@ -510,7 +512,11 @@ class PrayersTimeFragment : DuckDuckGoFragment(R.layout.prayers_landing_fragment
         return timeDifference in 0..twentyMinutesInMillis
     }
 
-    private fun getDataFromApi() {
+    private fun getDataFromApi(): Boolean {
+        if (!::coordinates.isInitialized) {
+            return false
+        }
+
         val savedCalculationMethod = sharedPreferences?.getString(CALCULATION_METHOD_KEY.value, defaultCalculationMethod) ?: defaultCalculationMethod
         val calculationMethod = CalculationMethod.valueOf(savedCalculationMethod)
         val savedMadhabMethod = sharedPreferences?.getString(MADHAB_METHOD_KEY.value, defaultMadhabMethod) ?: defaultMadhabMethod
@@ -521,6 +527,8 @@ class PrayersTimeFragment : DuckDuckGoFragment(R.layout.prayers_landing_fragment
         yesterdayPrayerTimes = PrayerTimes(coordinates, DateComponents.from(getNDaysBeforeOrAfter(-1)), params)
         todayPrayerTimes = PrayerTimes(coordinates, DateComponents.from(Date()), params)
         tomorrowPrayerTimes = PrayerTimes(coordinates, DateComponents.from(getNDaysBeforeOrAfter(1)), params)
+
+        return true
     }
 
     private fun initViews() {
