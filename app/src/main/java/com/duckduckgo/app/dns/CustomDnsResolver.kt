@@ -43,6 +43,7 @@ class CustomDnsResolver(
 
     companion object {
         private const val SO_TIMEOUT = 2000 // 2 seconds
+        private const val MAX_RETRY = 2
         private val cache = ConcurrentHashMap<String, CachedDnsResponse>()
     }
 
@@ -177,8 +178,8 @@ class CustomDnsResolver(
     }
 
     private suspend fun sendDoTQuery(query: Message, retry: Int = 0): Message? {
-        if (retry > 2) {
-            return null // Max retry reached
+        if (retry > MAX_RETRY) {
+            return null
         }
 
         val queryBytes = query.toWire()
