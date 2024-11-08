@@ -1030,6 +1030,7 @@ class BrowserTabFragment :
                         startActivity(Intent.createChooser(shareIntent, "Share via"))
                     },
                     onSupportClicked = {
+                        popupWindow.dismiss()
                         viewModel.onUserSubmittedQuery("https://www.patreon.com/SafeGaze")
                     },
                     onThemeChanged = {
