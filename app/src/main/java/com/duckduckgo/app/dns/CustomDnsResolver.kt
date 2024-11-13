@@ -50,34 +50,39 @@ class CustomDnsResolver(
     init {
         val currentMode = sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: KAHF_GUARD_DEFAULT
         privateDns = PrivateDnsLevel.get(currentMode)
-        socket = initSocket()
+
+        runBlocking {
+            socket = initSocket()
+        }
     }
 
-    private fun initSocket(): SSLSocket {
-        val socketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
-        val sslSocket = socketFactory.createSocket(privateDns.dnsServerIps.first(), 853) as SSLSocket
-        sslSocket.keepAlive = true
-        sslSocket.soTimeout = SO_TIMEOUT
+    private suspend fun initSocket(): SSLSocket {
+        return withContext(dispatcher.io()) {
+            val socketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
+            val sslSocket = socketFactory.createSocket(privateDns.dnsServerIps.first(), 853) as SSLSocket
+            sslSocket.keepAlive = true
+            sslSocket.soTimeout = SO_TIMEOUT
 
-        // Set the TLS host header
-        sslSocket.sslParameters = sslSocket.sslParameters.apply {
-            serverNames = listOf(javax.net.ssl.SNIHostName(privateDns.url))
+            // Set the TLS host header
+            sslSocket.sslParameters = sslSocket.sslParameters.apply {
+                serverNames = listOf(javax.net.ssl.SNIHostName(privateDns.url))
 
-            if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
-                applicationProtocols = arrayOf("http/1.1")
-            } else {
-                try {
-                    val method = this::class.java.getMethod("setApplicationProtocols", Array<String>::class.java)
-                    method.invoke(this, arrayOf("http/1.1"))
-                } catch (e: Exception) {
-                    Timber.e("tpLog Error setting application protocols: ${e.message}")
+                if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
+                    applicationProtocols = arrayOf("http/1.1")
+                } else {
+                    try {
+                        val method = this::class.java.getMethod("setApplicationProtocols", Array<String>::class.java)
+                        method.invoke(this, arrayOf("http/1.1"))
+                    } catch (e: Exception) {
+                        Timber.e("tpLog Error setting application protocols: ${e.message}")
+                    }
                 }
             }
+
+            sslSocket.startHandshake()
+
+            sslSocket
         }
-
-        sslSocket.startHandshake()
-
-        return sslSocket
     }
 
     private fun isSocketUsable(): Boolean {
@@ -187,7 +192,7 @@ class CustomDnsResolver(
         return withContext(dispatcher.io()) {
             try {
                 if (!isSocketUsable()) {
-                    socket = initSocket()
+                    socket = runBlocking { initSocket() }
                 }
 
                 // Write length-prefixed DNS query without closing the stream
@@ -209,25 +214,31 @@ class CustomDnsResolver(
         }
     }
 
-    private fun closeConnection() {
+    private suspend fun closeConnection() {
         try {
-            socket.outputStream.close()
-            socket.inputStream.close()
-            socket.close()
-            Timber.d("tpLog Socket connection closed successfully.")
+            withContext(dispatcher.io()) {
+                socket.outputStream.close()
+                socket.inputStream.close()
+                socket.close()
+                Timber.d("tpLog Socket connection closed successfully.")
+            }
         } catch (e: IOException) {
             Timber.e("tpLog Error closing socket connection: ${e.message}")
         }
     }
 
     fun updateDohServerUrl(privateDnsLevel: PrivateDnsLevel) {
-        closeConnection()
+        runBlocking {
+            closeConnection()
+        }
+
         cache.clear()
-
         privateDns = privateDnsLevel
-        socket = initSocket()
 
-        Timber.d("tpLog DoH URL set to: ${privateDnsLevel.url}")
+        runBlocking {
+            socket = initSocket()
+            Timber.d("tpLog DoH URL set to: ${privateDnsLevel.url}")
+        }
     }
 }
 
