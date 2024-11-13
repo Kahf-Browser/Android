@@ -1,0 +1,27 @@
+task downloadPosenetModel(type: DownloadUrlTask) {
+    def modelPosenetDownloadUrl = "https://storage.googleapis.com/download.tensorflow.org/models/tflite/posenet_mobilenet_v1_100_257x257_multi_kpt_stripped.tflite"
+    doFirst {
+        println "Downloading ${modelPosenetDownloadUrl}"
+    }
+    sourceUrl = "${modelPosenetDownloadUrl}"
+    target = file("src/main/ml/posenet.tflite")
+}
+
+task downloadModel {
+    dependsOn downloadPosenetModel
+}
+
+class DownloadUrlTask extends DefaultTask {
+    @Input
+    String sourceUrl
+
+    @OutputFile
+    File target
+
+    @TaskAction
+    void download() {
+        ant.get(src: sourceUrl, dest: target)
+    }
+}
+
+preBuild.dependsOn downloadModel

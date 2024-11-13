@@ -181,6 +181,8 @@ fladle {
     }
 }
 
+apply from:"download.gradle"
+
 dependencies {
 	implementation project(":custom-tabs-impl")
 	implementation project(":custom-tabs-api")
