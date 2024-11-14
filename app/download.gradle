@@ -1,13 +1,18 @@
-task downloadPosenetModel(type: DownloadUrlTask) {
+tasks.register('downloadPosenetModel', DownloadUrlTask) {
     def modelPosenetDownloadUrl = "https://storage.googleapis.com/download.tensorflow.org/models/tflite/posenet_mobilenet_v1_100_257x257_multi_kpt_stripped.tflite"
+    def targetFile = file("src/main/ml/posenet.tflite")
     doFirst {
+        if (targetFile.exists()) {
+            println "File already exists: ${targetFile}"
+            return
+        }
         println "Downloading ${modelPosenetDownloadUrl}"
     }
     sourceUrl = "${modelPosenetDownloadUrl}"
-    target = file("src/main/ml/posenet.tflite")
+    target = targetFile
 }
 
-task downloadModel {
+tasks.register('downloadModel') {
     dependsOn downloadPosenetModel
 }
 
