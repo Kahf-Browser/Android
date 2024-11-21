@@ -7,8 +7,8 @@ import timber.log.Timber
 class FirebaseAnalyticsService(private val firebaseAnalytics: FirebaseAnalytics) : AnalyticsService {
 
     override fun logEvent(
-        eventName: String,
-        params: Map<String, String>?
+        event: AnalyticsEvent,
+        params: Map<AnalyticsParam, String>?
     ) {
         if (!isLoggingEnabled) {
             return
@@ -16,11 +16,27 @@ class FirebaseAnalyticsService(private val firebaseAnalytics: FirebaseAnalytics)
 
         val bundle = Bundle()
         params?.forEach { (key, value) ->
-            bundle.putString(key, value)
+            if (value == "true" || value == "false") {
+                bundle.putBoolean(key.name, value.toBoolean())
+                return@forEach
+            }
+            if (value.toDoubleOrNull() != null) {
+                bundle.putDouble(key.name, value.toDouble())
+                return@forEach
+            }
+            if (value.toLongOrNull() != null) {
+                bundle.putLong(key.name, value.toLong())
+                return@forEach
+            }
+            if (value.toIntOrNull() != null) {
+                bundle.putInt(key.name, value.toInt())
+                return@forEach
+            }
+            bundle.putString(key.name, value)
         }
-        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.ADD_TO_CART, bundle)
+        firebaseAnalytics.logEvent(event.name, bundle)
 
-        Timber.d("analog -- successfully logged event: $eventName")
+        Timber.d("AnalyticsService -- successfully logged event: ${event.name}")
     }
 
     override fun setUserProperty(

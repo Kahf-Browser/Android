@@ -51,6 +51,9 @@ import androidx.webkit.JavaScriptReplyProxy
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsParam
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
@@ -386,6 +389,7 @@ class BrowserTabViewModel @Inject constructor(
     private val commandActionMapper: CommandActionMapper,
     private val dnsResolver: CustomDnsResolver,
     private val harmfulSiteBlockedDao: HarmfulSiteBlockedDao,
+    private val analyticsService: AnalyticsService,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -964,6 +968,8 @@ class BrowserTabViewModel @Inject constructor(
                                         harmfulSiteBlockedDao.insert(HarmfulSiteBlocked(siteUrl = urlToNavigate, mode = ""))
                                     }
                                 }
+
+                                analyticsService.logEvent(AnalyticsEvent.PageBlocked, mapOf(AnalyticsParam.Url to originalUrl))
                             }
                         }
 

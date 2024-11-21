@@ -122,6 +122,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsParam
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
@@ -217,9 +220,9 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.kahftube.SafeGazePopupHandler
 import com.duckduckgo.app.kahftube.PrivateDnsLevel
 import com.duckduckgo.app.kahftube.SafeGazeLevel
+import com.duckduckgo.app.kahftube.SafeGazePopupHandler
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
@@ -231,7 +234,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
-import com.duckduckgo.app.trackerdetection.db.HarmfulSiteBlocked
 import com.duckduckgo.app.trackerdetection.db.HarmfulSiteBlockedDao
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
@@ -294,10 +296,10 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
-import com.duckduckgo.common.utils.SAFE_GAZE_BLUR_PROGRESS
-import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_BLUR_VALUE
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
+import com.duckduckgo.common.utils.SAFE_GAZE_BLUR_PROGRESS
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
+import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_BLUR_VALUE
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
 import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
@@ -585,6 +587,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var harmfulSiteBlockedDao: HarmfulSiteBlockedDao
+
+    @Inject
+    lateinit var analyticsService: AnalyticsService
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1015,10 +1020,26 @@ class BrowserTabFragment :
                                 (requireActivity() as BrowserActivity).relaunchCurrentTab(url)
                             }
                         }
+
+                        if (it == PrivateDnsLevel.Off) {
+                            analyticsService.logEvent(
+                                AnalyticsEvent.SafeInternetToggled,
+                                mapOf(AnalyticsParam.IsEnabled to "false")
+                            )
+                        } else {
+                            analyticsService.logEvent(
+                                AnalyticsEvent.SafeInternetToggled,
+                                mapOf(AnalyticsParam.IsEnabled to "true", AnalyticsParam.Mode to it.name)
+                            )
+                        }
                     },
                     onSafeGazeModeChanged = {
                         val updated = updateSafeGazeSettings(it)
                         if (updated) {
+                            analyticsService.logEvent(
+                                AnalyticsEvent.DecentInternetToggled,
+                                mapOf(AnalyticsParam.IsEnabled to (it != SafeGazeLevel.Off).toString())
+                            )
                             popupWindow.dismiss()
                             webView?.reload()
                         }
@@ -1065,6 +1086,8 @@ class BrowserTabFragment :
                 pointerArrowParams.rightMargin = leftOverDevicePixel - 113
                 pointerArrow.layoutParams = pointerArrowParams
             }
+
+            analyticsService.logEvent(AnalyticsEvent.SettingsClicked)
         }
     }
 
@@ -2445,6 +2468,7 @@ class BrowserTabFragment :
                 timeMenuItem.visibility = VISIBLE
                 timeMenuItem.setOnClickListener {
                     if (!viewState.prayerTimeShowing) {
+                        analyticsService.logEvent(AnalyticsEvent.PrayerTimeOpened)
                         viewModel.onPrayerTimeClicked()
                     }
                 }
