@@ -29,6 +29,7 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
 import com.duckduckgo.app.accessibility.AccessibilityScreens
+import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.appearance.AppearanceScreenNoParams
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R

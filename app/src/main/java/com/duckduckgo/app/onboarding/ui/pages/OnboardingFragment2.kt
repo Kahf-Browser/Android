@@ -9,6 +9,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboarding2Binding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -27,6 +29,9 @@ class OnboardingFragment2 : DuckDuckGoFragment(R.layout.fragment_onboarding2) {
 
     @Inject
     lateinit var defaultWebBrowserCapability: DefaultBrowserDetector
+
+    @Inject
+    lateinit var analytics: AnalyticsService
 
     lateinit var binding: FragmentOnboarding2Binding
 
@@ -65,6 +70,13 @@ class OnboardingFragment2 : DuckDuckGoFragment(R.layout.fragment_onboarding2) {
         }
 
         return binding.root
+    }
+
+    override fun onResume() {
+        if (userTriedToSetDDGAsDefault && defaultWebBrowserCapability.isDefaultBrowser()) {
+            analytics.logEvent(AnalyticsEvent.SetAsDefaultBrowser)
+        }
+        super.onResume()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
