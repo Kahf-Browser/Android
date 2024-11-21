@@ -1,7 +1,6 @@
 package com.duckduckgo.app.browser.safe_gaze
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
@@ -18,8 +17,6 @@ import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SAFE_GAZE_MIN_IMG_SIZE
-// import com.duckduckgo.app.safegaze.personDetection.PersonDetector
-import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
 import com.google.common.hash.Hashing
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -46,20 +43,16 @@ class SafeGazeJsInterface(
     private val onUpdateBlur: (blur: Float) -> Unit,
     private val onImageClassified: (isExist: Boolean, uid: String, quotaExceeded: Boolean) -> Unit
 ) {
-    private val preferences: SharedPreferences = context.getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
     private val onDeviceModelCachedResults = mutableMapOf<String, Boolean>()
-    // private val personDetector = PersonDetector(context)
 
     private val urlQueue: ConcurrentLinkedQueue<UrlInfo> = ConcurrentLinkedQueue()
     private var processingJob: Job? = null
     private val scope = CoroutineScope(dispatcher.io() + Job())
-    val counter = UnifiedCounter(preferences)
     private var paused: AtomicBoolean = AtomicBoolean(false)
 
     private suspend fun shouldBlurImage(
         url: String,
         mScope: CoroutineScope,
-        isPersonCheck: Boolean
     ): Boolean {
         return suspendCoroutine { continuation ->
             mScope.launch {
@@ -67,11 +60,6 @@ class SafeGazeJsInterface(
                 val hashedUrl = hash(url)
 
                 if (bitmap!= null && bitmap.height >= SAFE_GAZE_MIN_IMG_SIZE && bitmap.width >= SAFE_GAZE_MIN_IMG_SIZE) {
-                    // NOTE: Person detection is disabled for now
-                    //     if (isPersonCheck) {
-                    //         val containsHuman = personDetector.hasPerson(bitmap)
-                    //         continuation.resume(containsHuman)
-                    //     } else {
                     val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
 
                     if (nsfwPrediction.isSafe()) {
@@ -80,7 +68,6 @@ class SafeGazeJsInterface(
                         if (genderPrediction.hasFemale) {
                             Timber.d("kLog Female (${genderPrediction.femaleConfidence}) $url")
 
-                            // TODO Have to consider images blocked by remote model
                             // Insert to local DB
                             kahfImageBlockedDao.insert(
                                 KahfImageBlocked(
@@ -151,7 +138,9 @@ class SafeGazeJsInterface(
                                 continuation.resume(null)
                             }
 
-                            override fun onLoadCleared(placeholder: Drawable?) {}
+                            override fun onLoadCleared(placeholder: Drawable?) {
+                                // No op
+                            }
                         },
                     )
             } catch (e: Exception) {
@@ -184,13 +173,10 @@ class SafeGazeJsInterface(
             val hashedUrl = hash(imageUrl)
 
             if (onDeviceModelCachedResults.containsKey(hashedUrl)) {
-                callSafegazeOnDeviceModelHandler(onDeviceModelCachedResults[hashedUrl]!!, uid, counter.isQuotaExceeded())
+                callSafegazeOnDeviceModelHandler(onDeviceModelCachedResults[hashedUrl]!!, uid, true)
             } else {
                 addTaskToQueue(imageUrl, uid)
             }
-        }
-        if (message.contains("page_refresh")) {
-            counter.resetSession()
         }
     }
 
@@ -209,13 +195,10 @@ class SafeGazeJsInterface(
                     val task = urlQueue.poll()
 
                     task?.let {
-                        counter.checkAndResetQuota()
-                        val shouldBlur = shouldBlurImage(it.url, this, true)
-                        counter.incrementDailyQuota(shouldBlur)
-                        counter.incrementSessionAndAllTimeCount(shouldBlur)
+                        val shouldBlur = shouldBlurImage(it.url, this)
 
                         onDeviceModelCachedResults[hash(it.url)] = shouldBlur
-                        callSafegazeOnDeviceModelHandler(shouldBlur, it.uid, counter.isQuotaExceeded())
+                        callSafegazeOnDeviceModelHandler(shouldBlur, it.uid, true)
                     }
                 }
             }
@@ -223,14 +206,12 @@ class SafeGazeJsInterface(
     }
 
     fun cancelOngoingImageProcessing() {
-        counter.saveToPreferences()
         scope.cancel()
     }
 
     fun onTabPaused(tabId: String) {
         paused.set(true)
         processingJob?.cancel()
-        counter.saveToPreferences()
     }
 
     fun onTabResumed(tabId: String) {
