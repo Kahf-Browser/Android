@@ -181,7 +181,7 @@ fladle {
     }
 }
 
-apply from:"download.gradle"
+//apply from:"download.gradle"
 
 dependencies {
 	implementation project(":custom-tabs-impl")
@@ -463,6 +463,7 @@ dependencies {
     // firebase
     implementation platform('com.google.firebase:firebase-bom:33.5.1')
     implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
 
     // Hashing
     implementation 'com.google.guava:guava:32.1.2-android'

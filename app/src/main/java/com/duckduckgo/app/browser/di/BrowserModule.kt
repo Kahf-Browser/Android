@@ -23,7 +23,19 @@ import android.content.pm.PackageManager
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.browser.*
+import com.duckduckgo.app.analytics.AnalyticsService
+import com.duckduckgo.app.analytics.FirebaseAnalyticsService
+import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.LongPressHandler
+import com.duckduckgo.app.browser.RequestInterceptor
+import com.duckduckgo.app.browser.RequestRewriter
+import com.duckduckgo.app.browser.SpecialUrlDetector
+import com.duckduckgo.app.browser.SpecialUrlDetectorImpl
+import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.WebViewDataManager
+import com.duckduckgo.app.browser.WebViewLongPressHandler
+import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
 import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
@@ -33,11 +45,17 @@ import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
-import com.duckduckgo.app.browser.downloader.*
+import com.duckduckgo.app.browser.downloader.BlobConverterInjector
+import com.duckduckgo.app.browser.downloader.BlobConverterInjectorJs
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.logindetection.*
+import com.duckduckgo.app.browser.logindetection.BrowserTabFireproofDialogsEventHandler
+import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
+import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
+import com.duckduckgo.app.browser.logindetection.JsLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NextPageLoginDetection
 import com.duckduckgo.app.browser.mediaplayback.store.ALL_MIGRATIONS
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDao
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDatabase
@@ -54,7 +72,11 @@ import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
-import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.fire.AuthDatabaseLocator
+import com.duckduckgo.app.fire.DatabaseCleaner
+import com.duckduckgo.app.fire.DatabaseCleanerHelper
+import com.duckduckgo.app.fire.DatabaseLocator
+import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -91,13 +113,13 @@ import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
-import timber.log.Timber
+import javax.inject.Named
 
 @Module
 class BrowserModule {
@@ -368,5 +390,12 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun providesKahfSharedPreference(context: Context): SharedPreferences {
         return context.getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideAnalyticsService(context: Context): AnalyticsService {
+        val f = FirebaseAnalytics.getInstance(context.applicationContext)
+        return FirebaseAnalyticsService(f)
     }
 }
