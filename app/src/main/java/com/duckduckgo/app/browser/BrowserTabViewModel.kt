@@ -2076,6 +2076,8 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun onPrayerTimeClicked() {
+        analyticsService.logEvent(AnalyticsEvent.PrayerTimeOpened)
+
         browserViewState.value = currentBrowserViewState().copy(
             prayerTimeShowing = currentBrowserViewState().prayerTimeShowing.not()
         )
@@ -2403,6 +2405,8 @@ class BrowserTabViewModel @Inject constructor(
     suspend fun openInNewBackgroundTab(url: String) {
         tabRepository.addNewTabAfterExistingTab(url, tabId)
         command.value = OpenInNewBackgroundTab(url)
+
+        analyticsService.logEvent(AnalyticsEvent.NewTabOpened, mapOf(AnalyticsParam.Url to (url.toUri().host ?: "")))
     }
 
     fun onFindInPageSelected() {
@@ -2597,6 +2601,7 @@ class BrowserTabViewModel @Inject constructor(
         if (longPress) {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_LONG_PRESSED)
         }
+        analyticsService.logEvent(AnalyticsEvent.NewTabOpened)
     }
 
     fun onCtaShown() {

@@ -22,6 +22,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -40,6 +42,7 @@ class TabSwitcherViewModel @Inject constructor(
     private val adClickManager: AdClickManager,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val analyticsService: AnalyticsService,
 ) : ViewModel() {
 
     var tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
@@ -62,6 +65,8 @@ class TabSwitcherViewModel @Inject constructor(
         } else {
             pixel.fire(AppPixelName.TAB_MANAGER_NEW_TAB_CLICKED)
         }
+
+        analyticsService.logEvent(AnalyticsEvent.NewTabOpened)
     }
 
     suspend fun onTabSelected(tab: TabEntity) {

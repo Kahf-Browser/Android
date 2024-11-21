@@ -2468,7 +2468,6 @@ class BrowserTabFragment :
                 timeMenuItem.visibility = VISIBLE
                 timeMenuItem.setOnClickListener {
                     if (!viewState.prayerTimeShowing) {
-                        analyticsService.logEvent(AnalyticsEvent.PrayerTimeOpened)
                         viewModel.onPrayerTimeClicked()
                     }
                 }
