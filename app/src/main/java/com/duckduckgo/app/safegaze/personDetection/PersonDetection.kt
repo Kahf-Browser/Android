@@ -1,4 +1,4 @@
-package com.duckduckgo.app.safegaze.personDetection
+/*package com.duckduckgo.app.safegaze.personDetection
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -23,4 +23,4 @@ class PersonDetector(val context: Context) {
     fun dispose() {
         model.close()
     }
-}
+}*/

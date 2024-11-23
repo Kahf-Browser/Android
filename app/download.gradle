@@ -1,19 +1,63 @@
 tasks.register('downloadPosenetModel', DownloadUrlTask) {
-    def modelPosenetDownloadUrl = "https://storage.googleapis.com/download.tensorflow.org/models/tflite/posenet_mobilenet_v1_100_257x257_multi_kpt_stripped.tflite"
+    def downloadUrl = "https://storage.googleapis.com/download.tensorflow.org/models/tflite/posenet_mobilenet_v1_100_257x257_multi_kpt_stripped.tflite"
     def targetFile = file("src/main/ml/posenet.tflite")
     doFirst {
         if (targetFile.exists()) {
             println "File already exists: ${targetFile}"
             return
         }
-        println "Downloading ${modelPosenetDownloadUrl}"
+        println "Downloading ${downloadUrl}"
     }
-    sourceUrl = "${modelPosenetDownloadUrl}"
+    sourceUrl = "${downloadUrl}"
+    target = targetFile
+}
+
+tasks.register('downloadMovenetModel', DownloadUrlTask) {
+    def downloadUrl = "https://www.dropbox.com/scl/fi/e0cur8pgoavls2ro7hmyr/movenet_multipose_fp16.tflite?rlkey=q7miy0rfmrt4neef3j7wvf79p&st=paf3fnvo&dl=1"
+    def targetFile = file("src/main/ml/movenet_multipose_fp16.tflite")
+    doFirst {
+        if (targetFile.exists()) {
+            println "File already exists: ${targetFile}"
+            return
+        }
+        println "Downloading ${downloadUrl}"
+    }
+    sourceUrl = "${downloadUrl}"
+    target = targetFile
+}
+
+tasks.register('downloadNsfwModel', DownloadUrlTask) {
+    def downloadUrl = "https://www.dropbox.com/scl/fi/a7uemzh6gfgne5dygvxjd/nsfw.tflite?rlkey=gweab7ztkwz6g8q5xm85z215w&st=hu656c38&dl=1"
+    def targetFile = file("src/main/ml/nsfw.tflite")
+    doFirst {
+        if (targetFile.exists()) {
+            println "File already exists: ${targetFile}"
+            return
+        }
+        println "Downloading ${downloadUrl}"
+    }
+    sourceUrl = "${downloadUrl}"
+    target = targetFile
+}
+
+tasks.register('downloadGenderModel', DownloadUrlTask) {
+    def downloadUrl = "https://www.dropbox.com/scl/fi/abdu3001nvwf0c1kxz2x3/mobilenet_v2_gender.tflite?rlkey=c52n1ucn28iuex2cuzcksww14&st=aaoc5bm0&dl=1"
+    def targetFile = file("src/main/ml/mobilenet_v2_gender.tflite")
+    doFirst {
+        if (targetFile.exists()) {
+            println "File already exists: ${targetFile}"
+            return
+        }
+        println "Downloading ${downloadUrl}"
+    }
+    sourceUrl = "${downloadUrl}"
     target = targetFile
 }
 
 tasks.register('downloadModel') {
-    dependsOn downloadPosenetModel
+    dependsOn downloadMovenetModel
+    dependsOn downloadNsfwModel
+    dependsOn downloadGenderModel
 }
 
 class DownloadUrlTask extends DefaultTask {

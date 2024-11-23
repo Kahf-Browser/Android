@@ -229,6 +229,7 @@ import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
+import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -578,6 +579,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var genderDetector: GenderDetector
+
+    @Inject
+    lateinit var poseDetector: MoveNetMultiPose
 
     @Inject
     lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
@@ -2603,7 +2607,7 @@ class BrowserTabFragment :
 
         webView?.let {
             safeGazeInterface = SafeGazeJsInterface(
-                requireContext(), nsfwDetector, genderDetector, kahfImageBlockedDao, dispatchers,
+                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatchers,
                 onUpdateBlur = { blur ->
                     val trimmedBlur = blur / 100
                     val jsFunction = "window.blurIntensity = $trimmedBlur; updateBluredImageOpacity();"
@@ -2611,8 +2615,8 @@ class BrowserTabFragment :
                         webView?.evaluateJavascript(jsFunction, null)
                     }
                 },
-                onImageClassified = { isExist, uid, quotaExceeded ->
-                    val jsFunctionCall = "safegazeOnDeviceModelHandler($isExist, '$uid', $quotaExceeded);"
+                onImageClassified = { uid, detectionResultJson ->
+                    val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson');"
                     webView?.post {
                         webView?.evaluateJavascript(jsFunctionCall, null)
                     }

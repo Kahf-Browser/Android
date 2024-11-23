@@ -87,6 +87,9 @@ import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
 import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
+import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
+import com.duckduckgo.app.safegaze.poseDetection.TrackerType.BOUNDING_BOX
+import com.duckduckgo.app.safegaze.poseDetection.Type
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -384,6 +387,14 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun providesGenderDetector(context: Context): GenderDetector {
         return GenderDetector(context)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providePoseDetector(context: Context): MoveNetMultiPose {
+        return MoveNetMultiPose.create(context, Type.Dynamic).apply {
+            setTracker(BOUNDING_BOX)
+        }
     }
 
     @Provides

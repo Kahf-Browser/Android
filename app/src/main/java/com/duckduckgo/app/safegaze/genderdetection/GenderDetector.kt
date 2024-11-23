@@ -2,8 +2,7 @@ package com.duckduckgo.app.safegaze.genderdetection
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Rect
-import com.duckduckgo.common.utils.SAFE_GAZE_MIN_FACE_SIZE
+import com.duckduckgo.app.safegaze.poseDetection.VisualizationUtils
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
@@ -41,7 +40,7 @@ class GenderDetector (val context: Context) {
 
     private fun initializeModel() {
         try {
-            val model = context.assets.open("mobilenetv2_finetuned.tflite").use { it.readBytes() }
+            val model = context.assets.open("mobilenet_v2_gender.tflite").use { it.readBytes() }
             val modelBuffer = ByteBuffer.allocateDirect(model.size)
             modelBuffer.order(ByteOrder.nativeOrder())
             modelBuffer.put(model)
@@ -73,22 +72,15 @@ class GenderDetector (val context: Context) {
 
                 for (i in 0 until faces.size) {
                     val face = faces[i]
-                    val subjectFace = cropToBBox(bitmap, face.boundingBox) ?: continue
+                    val subjectFace = VisualizationUtils.cropToBBox(bitmap, face.boundingBox) ?: continue
 
-                    // val currentTime = System.currentTimeMillis()
                     val genderPredictions = getGenderPrediction(subjectFace)
-                    // Timber.d("kLog Time to detect gender: ${System.currentTimeMillis() - currentTime}")
+                    prediction.maleConfidence = genderPredictions
+                    prediction.femaleConfidence = 1 - genderPredictions
 
-                    val isMale = if (genderPredictions.first > 0.5) {
-                        prediction.maleConfidence = genderPredictions.first
-                        prediction.femaleConfidence = 1 - genderPredictions.first
-                        true
-                    } else {
-                        prediction.maleConfidence = 1 - genderPredictions.first
-                        prediction.femaleConfidence = genderPredictions.first
-                        false
-                    }
+                    val isMale = genderPredictions > 0.5
                     prediction.hasMale = prediction.hasMale || isMale
+                    prediction.boundingBox.add(face.boundingBox)
 
                     if (!isMale) {
                         prediction.hasFemale = true
@@ -104,7 +96,7 @@ class GenderDetector (val context: Context) {
         }
     }
 
-    private fun getGenderPrediction(bitmap: Bitmap): Pair<Float, Float> {
+    private fun getGenderPrediction(bitmap: Bitmap): Float {
         val inputFeature = TensorBuffer.createFixedSize(intArrayOf(1, inputImageSize, inputImageSize, 3), FLOAT32)
         val byteBuffer = TensorImage(FLOAT32).let {
             it.load(bitmap)
@@ -115,9 +107,9 @@ class GenderDetector (val context: Context) {
         return try {
             val outputBuffer = Array(1) { FloatArray(1) }
             interpreter?.run(byteBuffer, outputBuffer)
-            Pair(outputBuffer[0][0], 0f)
+            outputBuffer[0][0]
         } catch (e: Exception) {
-            Pair(0f, 0f)
+           0f
         }
     }
 
@@ -134,25 +126,6 @@ class GenderDetector (val context: Context) {
         interpreter?.run(dummyInput, outputBuffer)
 
         Timber.d("kLog Gender model wormed up")
-    }
-
-    private fun cropToBBox(image: Bitmap, boundingBox: Rect): Bitmap? {
-        // Ensure boundingBox coordinates are within the image bounds
-        val left = boundingBox.left.coerceAtLeast(0)
-        val top = boundingBox.top.coerceAtLeast(0)
-        val right = boundingBox.right.coerceAtMost(image.width)
-        val bottom = boundingBox.bottom.coerceAtMost(image.height)
-
-        // Calculate the width and height of the cropped area
-        val width = right - left
-        val height = bottom - top
-
-        if (width < SAFE_GAZE_MIN_FACE_SIZE || height < SAFE_GAZE_MIN_FACE_SIZE) {
-            return null
-        }
-
-        // Create and return the cropped bitmap
-        return Bitmap.createBitmap(image, left, top, width, height)
     }
 
     fun dispose() {
