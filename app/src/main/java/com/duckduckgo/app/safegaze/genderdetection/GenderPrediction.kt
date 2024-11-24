@@ -23,6 +23,6 @@ data class GenderPrediction(
     var hasMale: Boolean = false,
     var hasFemale: Boolean = false,
     var maleConfidence: Float = 0.0f,
-    var femaleConfidence: Float = 0.0f,
+    var genderScore: Float = 0.0f,
     var boundingBox: MutableList<Rect> = mutableListOf()
 )

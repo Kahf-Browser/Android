@@ -185,7 +185,7 @@ class MoveNetMultiPose(
                 Person(
                     keyPoints = keyPoints,
                     poseBox = boundingBox,
-                    score = personScore
+                    poseScore = personScore
                 )
             )
         }
@@ -222,7 +222,7 @@ class MoveNetMultiPose(
                         resizeY(boundingBox.bottom)
                     )
                 }
-                trackPersons.add(Person(it.id, resizeKeyPoint, resizeBoundingBox, it.score))
+                trackPersons.add(Person(it.id, resizeKeyPoint, resizeBoundingBox, it.poseScore))
             }
             return trackPersons
         }

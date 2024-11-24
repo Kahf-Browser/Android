@@ -162,7 +162,7 @@ class PoseNet(private val interpreter: Interpreter) :
             )
             totalScore += confidenceScores[idx]
         }
-        return Person(keyPoints = keypointList.toList(), score = totalScore / numKeypoints)
+        return Person(keyPoints = keypointList.toList(), poseScore = totalScore / numKeypoints)
     }
 
     override fun lastInferenceTimeNanos(): Long = lastInferenceTimeNanos

@@ -23,6 +23,9 @@ import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.RectF
 import com.duckduckgo.common.utils.SAFE_GAZE_MIN_FACE_SIZE
+import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
@@ -62,6 +65,40 @@ object VisualizationUtils {
         Pair(BodyPart.RIGHT_HIP, BodyPart.RIGHT_KNEE),
         Pair(BodyPart.RIGHT_KNEE, BodyPart.RIGHT_ANKLE)
     )
+
+    fun drawPoseAndFaceBox(
+        input: Bitmap,
+        faceBox: RectF?,
+        poseBox: RectF?
+    ): Bitmap {
+        val output = input.copy(Bitmap.Config.ARGB_8888, true)
+
+        if (faceBox != null) {
+            val paint = Paint().apply {
+                strokeWidth = 2f
+                color = Color.RED
+                style = Paint.Style.STROKE
+            }
+
+            val originalSizeCanvas = Canvas(output)
+
+            originalSizeCanvas.drawRect(faceBox, paint)
+        }
+
+        if (poseBox != null) {
+            val paint = Paint().apply {
+                strokeWidth = 2f
+                color = Color.GREEN
+                style = Paint.Style.STROKE
+            }
+
+            val originalSizeCanvas = Canvas(output)
+
+            originalSizeCanvas.drawRect(poseBox, paint)
+        }
+
+        return output
+    }
 
     // Draw line and point indicate body pose
     fun drawBodyKeypoints(
@@ -308,5 +345,50 @@ object VisualizationUtils {
         return sqrt(
             (point1.first - point2.first).pow(2) + (point1.second - point2.second).pow(2)
         )
+    }
+
+    fun toJson(gson: Gson, personList: List<Person>): String {
+        val resultArray = JsonArray()
+
+        personList.forEach { person ->
+            val jsonObject = JsonObject()
+
+            // Transform keyPoints
+            val keyPointsArray = JsonArray()
+            person.keyPoints.forEach { keyPoint ->
+                val keypointObject = JsonObject()
+                keypointObject.addProperty("score", keyPoint.score)
+                keypointObject.addProperty("name", keyPoint.bodyPart.name.lowercase())
+                keypointObject.addProperty("x", keyPoint.coordinate.x) // Adjust x as needed
+                keypointObject.addProperty("y", keyPoint.coordinate.y) // Adjust y as needed
+                keyPointsArray.add(keypointObject)
+            }
+            jsonObject.add("keypoints", keyPointsArray)
+
+            // Add poseScore
+            jsonObject.addProperty("poseScore", person.poseScore)
+
+            // Transform poseBox to faceBox
+            person.poseBox?.let {
+                val faceBoxObject = JsonObject()
+                faceBoxObject.addProperty("xMin", it.left)
+                faceBoxObject.addProperty("xMax", it.right)
+                faceBoxObject.addProperty("yMin", it.top)
+                faceBoxObject.addProperty("yMax", it.bottom)
+                faceBoxObject.addProperty("width", it.width())
+                faceBoxObject.addProperty("height", it.height())
+                jsonObject.add("faceBox", faceBoxObject)
+            }
+
+            // Add other properties
+            jsonObject.addProperty("isFemale", person.isFemale)
+            jsonObject.addProperty("genderScore", person.genderScore)
+
+            // Add to result array
+            resultArray.add(jsonObject)
+        }
+
+        // Serialize to JSON
+        return gson.toJson(resultArray)
     }
 }

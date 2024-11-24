@@ -6,8 +6,8 @@ data class Person(
     var id: Int = -1, // default id is -1
     val keyPoints: List<KeyPoint>,
     val poseBox: RectF? = null,
-    val score: Float,
+    val poseScore: Float,
     var isFemale: Boolean = true,
-    var femaleConfidence: Float = 0f,
+    var genderScore: Float = 0f,
     var faceBox: RectF? = null,
 )

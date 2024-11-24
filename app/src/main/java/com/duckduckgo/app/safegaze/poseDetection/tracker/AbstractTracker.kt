@@ -134,7 +134,7 @@ abstract class AbstractTracker(val config: TrackerConfig) {
                 id = id ?: nextTrackID(),
                 keyPoints = person.keyPoints,
                 poseBox = person.poseBox,
-                score = person.score
+                poseScore = person.poseScore
             ),
             lastTimestamp = timestamp
         )

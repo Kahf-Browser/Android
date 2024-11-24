@@ -76,7 +76,7 @@ class GenderDetector (val context: Context) {
 
                     val genderPredictions = getGenderPrediction(subjectFace)
                     prediction.maleConfidence = genderPredictions
-                    prediction.femaleConfidence = 1 - genderPredictions
+                    prediction.genderScore = 1f - genderPredictions
 
                     val isMale = genderPredictions > 0.5
                     prediction.hasMale = prediction.hasMale || isMale
