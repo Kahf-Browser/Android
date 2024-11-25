@@ -128,7 +128,7 @@ class SafeGazeJsInterface(
                             )
 
                             // Intentionally not returning the image
-                            continuation.resume(SafeGazeResult(true, emptyList(), bitmap.width, bitmap.height, null))
+                            continuation.resume(SafeGazeResult(true, emptyList(), bitmap.width, bitmap.height, VisualizationUtils.bitmapToBase64(bitmap)))
                         }
                     }
                 } else {
@@ -238,6 +238,8 @@ class SafeGazeJsInterface(
                         if (result.persons.isNotEmpty()) {
                             // debugDraw(it.url, result.persons)
                             callSafegazeOnDeviceModelHandler(it.uid, VisualizationUtils.toJson(gson, result), result.base64Image)
+                        } else if (result.base64Image.isNullOrEmpty()) {
+                            callSafegazeOnDeviceModelHandler(it.uid, "null", "null")
                         } else {
                             callSafegazeOnDeviceModelHandler(it.uid, nsfwJson(result.isNsfw), result.base64Image)
                         }
