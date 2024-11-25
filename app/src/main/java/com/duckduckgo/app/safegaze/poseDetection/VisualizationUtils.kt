@@ -21,7 +21,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import android.graphics.RectF
+import androidx.core.graphics.toRectF
+import com.duckduckgo.app.browser.safe_gaze.SafeGazeResult
 import com.duckduckgo.common.utils.SAFE_GAZE_MIN_FACE_SIZE
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -66,35 +67,60 @@ object VisualizationUtils {
         Pair(BodyPart.RIGHT_KNEE, BodyPart.RIGHT_ANKLE)
     )
 
-    fun drawPoseAndFaceBox(
-        input: Bitmap,
-        faceBox: RectF?,
-        poseBox: RectF?
+    fun debugDraw(
+        input: Bitmap?,
+        personList: List<Person>,
+        drawFace: Boolean = true,
+        drawPose: Boolean = true,
+        drawKeyPoint: Boolean = false,
     ): Bitmap {
-        val output = input.copy(Bitmap.Config.ARGB_8888, true)
-
-        if (faceBox != null) {
-            val paint = Paint().apply {
-                strokeWidth = 2f
-                color = Color.RED
-                style = Paint.Style.STROKE
-            }
-
-            val originalSizeCanvas = Canvas(output)
-
-            originalSizeCanvas.drawRect(faceBox, paint)
+        if (input == null) {
+            return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
         }
 
-        if (poseBox != null) {
-            val paint = Paint().apply {
-                strokeWidth = 2f
-                color = Color.GREEN
-                style = Paint.Style.STROKE
+        val output = input.copy(Bitmap.Config.ARGB_8888, true)
+        val originalSizeCanvas = Canvas(output)
+
+        val listOfTenColors = listOf(
+            Color.RED,
+            Color.GREEN,
+            Color.BLUE,
+            Color.YELLOW,
+            Color.CYAN,
+            Color.MAGENTA,
+            Color.WHITE,
+            Color.LTGRAY,
+            Color.DKGRAY,
+            Color.BLACK
+        )
+
+        personList.forEachIndexed { i, person ->
+
+            if (drawFace) {
+                person.faceBox?.let { faceBox ->
+                    val paint = Paint().apply {
+                        strokeWidth = 5f
+                        color = listOfTenColors[i % 10]
+                        style = Paint.Style.STROKE
+                    }
+                    originalSizeCanvas.drawRect(faceBox, paint)
+                }
             }
 
-            val originalSizeCanvas = Canvas(output)
+            if (drawPose) {
+                person.poseBox?.let { poseBox ->
+                    val paint = Paint().apply {
+                        strokeWidth = 5f
+                        color = listOfTenColors[i % 10]
+                        style = Paint.Style.STROKE
+                    }
+                    originalSizeCanvas.drawRect(poseBox, paint)
+                }
+            }
 
-            originalSizeCanvas.drawRect(poseBox, paint)
+            if (drawKeyPoint) {
+
+            }
         }
 
         return output
@@ -250,6 +276,11 @@ object VisualizationUtils {
         val source: String
     )
 
+    data class Match(
+        val pose: Person,
+        val face: FaceMatch?
+    )
+
     data class Box(
         val xMin: Float,
         val yMin: Float,
@@ -268,15 +299,25 @@ object VisualizationUtils {
         )
     }
 
-    fun getMatches(persons: List<Person>, mlfaces: List<Rect>): List<Person> {
-        val faces = mlfaces.map { rectToBox(it)!! }
-        val matches = mutableListOf<FaceMatch>()
+    fun boxToRect(box: Box?): Rect? {
+        if (box == null) return null
 
-        for (person in persons) {
+        return Rect(
+            box.xMin.toInt(),
+            box.yMin.toInt(),
+            (box.xMin + box.width).toInt(),
+            (box.yMin + box.height).toInt(),
+        )
+    }
+
+    fun matchFacesToPoses(personList: List<Person>, facesRect: List<Rect>): List<Person> {
+        val matches = mutableListOf<Match>()
+        val faces = facesRect.mapNotNull { rectToBox(it) }
+
+        for (person in personList) {
             val poseBasedFaceRegion = getFaceRegion(person)
-
             if (poseBasedFaceRegion == null) {
-                person.faceBox = null
+                matches.add(Match(person, null))
                 continue
             }
 
@@ -290,7 +331,7 @@ object VisualizationUtils {
 
             for (face in faces) {
                 // Skip if this face has already been matched
-                if (matches.any { it.box == face }) continue
+                if (matches.any { it.face?.box == face }) continue
 
                 val detectedFaceCenter = Pair(
                     face.xMin + face.width / 2,
@@ -329,16 +370,14 @@ object VisualizationUtils {
                 )
             }
 
-            matches.add(bestMatch)
-            person.faceBox = RectF(
-                bestMatch.box.xMin,
-                bestMatch.box.yMin,
-                bestMatch.box.xMin + bestMatch.box.width,
-                bestMatch.box.yMin + bestMatch.box.height
-            )
+            matches.add(Match(person, bestMatch))
         }
 
-        return persons
+        matches.forEach {
+            it.pose.faceBox = boxToRect(it.face?.box)?.toRectF()
+        }
+
+        return matches.map { it.pose }.toList()
     }
 
     private fun getDistance(point1: Pair<Float, Float>, point2: Pair<Float, Float>): Float {
@@ -347,10 +386,10 @@ object VisualizationUtils {
         )
     }
 
-    fun toJson(gson: Gson, personList: List<Person>): String {
+    fun toJson(gson: Gson, safeGazeResult: SafeGazeResult): String {
         val resultArray = JsonArray()
 
-        personList.forEach { person ->
+        safeGazeResult.persons.forEach { person ->
             val jsonObject = JsonObject()
 
             // Transform keyPoints
@@ -389,6 +428,12 @@ object VisualizationUtils {
         }
 
         // Serialize to JSON
-        return gson.toJson(resultArray)
+        val jsonResult = JsonObject().also {
+            it.addProperty("imageWidth", safeGazeResult.imageWidth)
+            it.addProperty("imageHeight", safeGazeResult.imageHeight)
+            it.add("persons", resultArray)
+        }
+
+        return gson.toJson(jsonResult)
     }
 }

@@ -16,13 +16,7 @@
 
 package com.duckduckgo.app.safegaze.genderdetection
 
-import android.graphics.Rect
-
 data class GenderPrediction(
-    var faceCount: Int = 0,
-    var hasMale: Boolean = false,
-    var hasFemale: Boolean = false,
-    var maleConfidence: Float = 0.0f,
+    var isMale: Boolean = false,
     var genderScore: Float = 0.0f,
-    var boundingBox: MutableList<Rect> = mutableListOf()
 )

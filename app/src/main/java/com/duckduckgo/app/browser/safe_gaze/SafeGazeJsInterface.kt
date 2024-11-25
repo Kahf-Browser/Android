@@ -7,12 +7,12 @@ import android.graphics.drawable.Drawable
 import android.util.Base64
 import android.webkit.JavascriptInterface
 import androidx.core.graphics.toRect
-import androidx.core.graphics.toRectF
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.duckduckgo.app.safegaze.genderdetection.FaceDetector
 import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
@@ -57,11 +57,12 @@ class SafeGazeJsInterface(
     private val scope = CoroutineScope(dispatcher.io() + Job())
     private var paused: AtomicBoolean = AtomicBoolean(false)
     private val gson = Gson()
+    private val faceDetector = FaceDetector(context)
 
     private suspend fun shouldBlurImage(
         url: String,
         mScope: CoroutineScope,
-    ): Pair<Boolean, List<Person>?> {
+    ): SafeGazeResult {
         return suspendCoroutine { continuation ->
             mScope.launch {
                 val bitmap = getBitmapFromUrl(url)
@@ -71,23 +72,26 @@ class SafeGazeJsInterface(
                     val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
 
                     if (nsfwPrediction.isSafe()) {
-                        movenet.estimatePoses(bitmap).let { personList ->
+                        val faceRectList = faceDetector.detectFaces(bitmap)
+
+                        movenet.estimatePoses(bitmap).let {
+                            val personList = VisualizationUtils.matchFacesToPoses(it, faceRectList)
+
                             personList.forEach { person ->
-                                person.poseBox?.let { boundingBox ->
-                                    val singlePersonBitmap = VisualizationUtils.cropToBBox(bitmap, boundingBox.toRect())
+                                person.faceBox?.let { faceBox ->
+                                    val faceBitmap = VisualizationUtils.cropToBBox(bitmap, faceBox.toRect())
 
-                                    if (singlePersonBitmap != null) {
-                                        val genderPrediction = genderDetector.predict(singlePersonBitmap)
+                                    if (faceBitmap != null) {
+                                        val genderPrediction = genderDetector.predictGender(faceBitmap)
 
-                                        person.isFemale = genderPrediction.hasFemale
+                                        person.isFemale = !genderPrediction.isMale
                                         person.genderScore = genderPrediction.genderScore
-                                        person.faceBox = genderPrediction.boundingBox.firstOrNull()?.toRectF()
 
                                         Timber.d("kLog genderPrediction 1: $genderPrediction ${person.id}")
                                     }
                                 }
                             }
-                            continuation.resume(Pair(false, personList))
+                            continuation.resume(SafeGazeResult(false, personList, bitmap.width, bitmap.height))
                         }
 
                         // TODO fallback to NSFW detection,
@@ -123,12 +127,11 @@ class SafeGazeJsInterface(
                                 ),
                             )
 
-                            continuation.resume(Pair(true, null))
+                            continuation.resume(SafeGazeResult(true, emptyList(), bitmap.width, bitmap.height))
                         }
                     }
-                    // }
                 } else {
-                    continuation.resume(Pair(false, null))
+                    continuation.resume(SafeGazeResult(false, emptyList(), 0, 0))
                 }
             }
         }
@@ -225,22 +228,29 @@ class SafeGazeJsInterface(
                     val task = urlQueue.poll()
 
                     task?.let {
-                        // callSafegazeOnDeviceModelHandler(it.uid, "[{\"keypoints\":[{\"score\":0.9997987747192383,\"name\":\"nose\",\"y\":330.93210126824886,\"x\":747.2617076435906},{\"y\":234.36786097589638,\"x\":833.0182262264801,\"name\":\"left_eye\",\"score\":0.9986704587936401},{\"y\":223.5193201948233,\"x\":681.5944915244552,\"name\":\"right_eye\",\"score\":0.9987133741378784},{\"y\":268.15913682874543,\"x\":926.8803307629746,\"name\":\"left_ear\",\"score\":0.610142171382904},{\"y\":261.1519626249136,\"x\":576.7359131356623,\"name\":\"right_ear\",\"score\":0.7610119581222534},{\"y\":664.3736544675866,\"x\":906.9267021542857,\"name\":\"left_shoulder\",\"score\":0.9164822697639465},{\"y\":762.9549825386316,\"x\":489.0956632673509,\"name\":\"right_shoulder\",\"score\":0.8185280561447144},{\"y\":1143.6312083530058,\"x\":973.6100069669435,\"name\":\"left_elbow\",\"score\":0.013435578905045986},{\"y\":1092.5218218940709,\"x\":442.38979004514823,\"name\":\"right_elbow\",\"score\":0.010079923085868359},{\"y\":1104.7147512695672,\"x\":933.3002393036966,\"name\":\"left_wrist\",\"score\":0.004424526821821928},{\"y\":1072.8138022255807,\"x\":453.2235134380801,\"name\":\"right_wrist\",\"score\":0.002776280976831913},{\"y\":1069.3186738722986,\"x\":730.7598022245712,\"name\":\"left_hip\",\"score\":0.002407087478786707},{\"y\":1062.5008605259404,\"x\":602.6102417526542,\"name\":\"right_hip\",\"score\":0.003100668080151081},{\"y\":1023.7212464484726,\"x\":817.4952083988413,\"name\":\"left_knee\",\"score\":0.0029775435104966164},{\"y\":1028.3141214151792,\"x\":539.4750167776175,\"name\":\"right_knee\",\"score\":0.004313590470701456},{\"y\":1072.1348315064547,\"x\":777.162782183881,\"name\":\"left_ankle\",\"score\":0.0019776015542447567},{\"y\":1031.7471672737183,\"x\":532.718031851698,\"name\":\"right_ankle\",\"score\":0.002423505298793316}],\"poseScore\":0.3618390217204304,\"faceBox\":{\"xMin\":553.6716552972794,\"xMax\":933.627791762352,\"yMin\":124.58239036798477,\"yMax\":504.5382652282715,\"width\":379.95613646507263,\"height\":379.9558748602867},\"isFemale\":true,\"genderScore\":0.9999994742598801}]")
                         val t1 = System.currentTimeMillis()
-                        val shouldBlur = shouldBlurImage(it.url, this)
+                        val result = shouldBlurImage(it.url, this)
                         val inferenceTime = System.currentTimeMillis() - t1
 
-                        onDeviceModelCachedResults[hash(it.url)] = shouldBlur.first
-                        if (shouldBlur.second?.isNotEmpty() == true) {
-                            callSafegazeOnDeviceModelHandler(it.uid, gson.toJson(shouldBlur.second))
+                        onDeviceModelCachedResults[hash(it.url)] = result.isNsfw
+                        if (result.persons.isNotEmpty()) {
+                            // debugDraw(it.url, result.persons)
+                            callSafegazeOnDeviceModelHandler(it.uid, VisualizationUtils.toJson(gson, result))
                         } else {
-                            callSafegazeOnDeviceModelHandler(it.uid, "{\"isNSFW\":${shouldBlur.first}}")
+                            callSafegazeOnDeviceModelHandler(it.uid, "{\"isNSFW\":${result.isNsfw}}")
                         }
                         Timber.d("kLog Inference time: $inferenceTime ms")
                     }
                 }
             }
         }
+    }
+
+    private suspend fun debugDraw(url: String, personList: List<Person>) {
+        val bitmap = getBitmapFromUrl(url)
+        val outputBitmap = VisualizationUtils.debugDraw(bitmap, personList)
+
+        Timber.d("$outputBitmap")
     }
 
     fun cancelOngoingImageProcessing() {
