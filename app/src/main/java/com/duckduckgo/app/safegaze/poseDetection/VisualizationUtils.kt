@@ -21,12 +21,14 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
+import android.util.Base64
 import androidx.core.graphics.toRectF
 import com.duckduckgo.app.browser.safe_gaze.SafeGazeResult
 import com.duckduckgo.common.utils.SAFE_GAZE_MIN_FACE_SIZE
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import java.io.ByteArrayOutputStream
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
@@ -455,5 +457,14 @@ object VisualizationUtils {
         }
 
         return gson.toJson(jsonResult)
+    }
+
+    fun bitmapToBase64(bitmap: Bitmap?, quality: Int = 100): String? {
+        if (bitmap == null) return ""
+
+        val outputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
+        val byteArray = outputStream.toByteArray()
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
 }

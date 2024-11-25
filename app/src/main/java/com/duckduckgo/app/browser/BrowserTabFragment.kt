@@ -2615,8 +2615,8 @@ class BrowserTabFragment :
                         webView?.evaluateJavascript(jsFunction, null)
                     }
                 },
-                onImageClassified = { uid, detectionResultJson ->
-                    val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson');"
+                onImageClassified = { uid, detectionResultJson, base64Image ->
+                    val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson', '$base64Image');"
                     webView?.post {
                         webView?.evaluateJavascript(jsFunctionCall, null)
                     }

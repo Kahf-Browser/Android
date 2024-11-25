@@ -48,7 +48,7 @@ class SafeGazeJsInterface(
     private val kahfImageBlockedDao: KahfImageBlockedDao,
     dispatcher: DispatcherProvider,
     private val onUpdateBlur: (blur: Float) -> Unit,
-    private val onImageClassified: (uid: String, detectionResultJson: String) -> Unit
+    private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?) -> Unit
 ) {
     private val onDeviceModelCachedResults = mutableMapOf<String, Boolean>()
 
@@ -91,7 +91,7 @@ class SafeGazeJsInterface(
                                     }
                                 }
                             }
-                            continuation.resume(SafeGazeResult(false, personList, bitmap.width, bitmap.height))
+                            continuation.resume(SafeGazeResult(false, personList, bitmap.width, bitmap.height, VisualizationUtils.bitmapToBase64(bitmap)))
                         }
 
                         // TODO fallback to NSFW detection,
@@ -127,11 +127,12 @@ class SafeGazeJsInterface(
                                 ),
                             )
 
-                            continuation.resume(SafeGazeResult(true, emptyList(), bitmap.width, bitmap.height))
+                            // Intentionally not returning the image
+                            continuation.resume(SafeGazeResult(true, emptyList(), bitmap.width, bitmap.height, null))
                         }
                     }
                 } else {
-                    continuation.resume(SafeGazeResult(false, emptyList(), 0, 0))
+                    continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
                 }
             }
         }
@@ -185,9 +186,10 @@ class SafeGazeJsInterface(
     @JavascriptInterface
     fun callSafegazeOnDeviceModelHandler(
         uid: String,
-        detectionResultJson: String
+        detectionResultJson: String,
+        base64Image: String?
     ) {
-        onImageClassified(uid, detectionResultJson)
+        onImageClassified(uid, detectionResultJson, base64Image)
     }
 
     @JavascriptInterface
@@ -235,9 +237,9 @@ class SafeGazeJsInterface(
                         onDeviceModelCachedResults[hash(it.url)] = result.isNsfw
                         if (result.persons.isNotEmpty()) {
                             // debugDraw(it.url, result.persons)
-                            callSafegazeOnDeviceModelHandler(it.uid, VisualizationUtils.toJson(gson, result))
+                            callSafegazeOnDeviceModelHandler(it.uid, VisualizationUtils.toJson(gson, result), result.base64Image)
                         } else {
-                            callSafegazeOnDeviceModelHandler(it.uid, "{\"isNSFW\":${result.isNsfw}}")
+                            callSafegazeOnDeviceModelHandler(it.uid, nsfwJson(result.isNsfw), result.base64Image)
                         }
                         Timber.d("kLog Inference time: $inferenceTime ms")
                     }
@@ -245,6 +247,8 @@ class SafeGazeJsInterface(
             }
         }
     }
+
+    private fun nsfwJson(isNsfw: Boolean) = "{\"isNSFW\":$isNsfw}"
 
     private suspend fun debugDraw(url: String, personList: List<Person>) {
         val bitmap = getBitmapFromUrl(url)
