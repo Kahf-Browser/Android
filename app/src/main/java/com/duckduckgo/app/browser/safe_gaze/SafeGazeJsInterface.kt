@@ -248,7 +248,7 @@ class SafeGazeJsInterface(
 
     private suspend fun debugDraw(url: String, personList: List<Person>) {
         val bitmap = getBitmapFromUrl(url)
-        val outputBitmap = VisualizationUtils.debugDraw(bitmap, personList)
+        val outputBitmap = VisualizationUtils.debugDraw(bitmap, personList, drawFace = false, drawPose = false, drawBodyMask = true)
 
         Timber.d("$outputBitmap")
     }

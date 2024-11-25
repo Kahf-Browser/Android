@@ -72,10 +72,21 @@ object VisualizationUtils {
         personList: List<Person>,
         drawFace: Boolean = true,
         drawPose: Boolean = true,
-        drawKeyPoint: Boolean = false,
+        drawBodyMask: Boolean = false,
     ): Bitmap {
         if (input == null) {
             return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+        }
+
+        val paintCircle = Paint().apply {
+            strokeWidth = calculateStrokeWidth(input.width.toFloat(), input.height.toFloat()).toFloat()
+            color = Color.GRAY
+            style = Paint.Style.FILL
+        }
+        val paintLine = Paint().apply {
+            strokeWidth = calculateStrokeWidth(input.width.toFloat(), input.height.toFloat()).toFloat()
+            color = Color.GRAY
+            style = Paint.Style.STROKE
         }
 
         val output = input.copy(Bitmap.Config.ARGB_8888, true)
@@ -118,71 +129,80 @@ object VisualizationUtils {
                 }
             }
 
-            if (drawKeyPoint) {
+            if (drawBodyMask) {
+                bodyJoints.forEach {
+                    val pointA = person.keyPoints[it.first.position].coordinate
+                    val pointB = person.keyPoints[it.second.position].coordinate
+                    originalSizeCanvas.drawLine(pointA.x, pointA.y, pointB.x, pointB.y, paintLine)
+                }
 
+                person.keyPoints.forEach { point ->
+                    originalSizeCanvas.drawCircle(
+                        point.coordinate.x,
+                        point.coordinate.y,
+                        CIRCLE_RADIUS,
+                        paintCircle
+                    )
+                }
             }
         }
 
         return output
     }
 
-    // Draw line and point indicate body pose
-    fun drawBodyKeypoints(
-        input: Bitmap,
-        persons: List<Person>,
-        isTrackerEnabled: Boolean = false
-    ): Bitmap {
-        val paintCircle = Paint().apply {
-            strokeWidth = CIRCLE_RADIUS
-            color = Color.RED
-            style = Paint.Style.FILL
-        }
-        val paintLine = Paint().apply {
-            strokeWidth = LINE_WIDTH
-            color = Color.RED
-            style = Paint.Style.STROKE
-        }
+    private fun calculateStrokeWidth(
+        bitmapWidth: Float,
+        bitmapHeight: Float,
+        mode: String = "standard",
+        gender: String = "female",
+        keyPoints: List<KeyPoint> = emptyList()
+    ): Int {
+        // Filter valid keypoints (with a score)
+        val validPoints = keyPoints.filter { it.score > 0 }
 
-        val paintText = Paint().apply {
-            textSize = PERSON_ID_TEXT_SIZE
-            color = Color.BLUE
-            textAlign = Paint.Align.LEFT
+        if (validPoints.isEmpty()) {
+            // Fallback to old calculation if no valid points
+            val smallerDimension = minOf(bitmapWidth, bitmapHeight)
+            return maxOf(2, (smallerDimension * if (gender == "female") 0.32 else 0.25).toInt())
         }
 
-        val output = input.copy(Bitmap.Config.ARGB_8888, true)
-        val originalSizeCanvas = Canvas(output)
-        persons.forEach { person ->
-            // draw person id if tracker is enable
-            if (isTrackerEnabled) {
-                person.poseBox?.let {
-                    val personIdX = max(0f, it.left)
-                    val personIdY = max(0f, it.top)
+        // Extract x and y values from keypoints
+        val xs = validPoints.map { it.coordinate.x }
+        val ys = validPoints.map { it.coordinate.y }
+        val minX = xs.minOrNull() ?: 0f
+        val maxX = xs.maxOrNull() ?: 0f
+        val minY = ys.minOrNull() ?: 0f
+        val maxY = ys.maxOrNull() ?: 0f
 
-                    originalSizeCanvas.drawText(
-                        person.id.toString(),
-                        personIdX,
-                        personIdY - PERSON_ID_MARGIN,
-                        paintText
-                    )
-                    originalSizeCanvas.drawRect(it, paintLine)
-                }
+        // Calculate pose dimensions
+        val poseWidth = maxX - minX
+        val poseHeight = maxY - minY
+
+        // Calculate pose size relative to the image
+        val widthRatio = poseWidth / bitmapWidth
+        val heightRatio = poseHeight / bitmapHeight
+        val poseSizeRatio = maxOf(widthRatio, heightRatio)
+
+        // Use the smaller of image or pose dimension for base calculation
+        val poseDimension = minOf(poseWidth, poseHeight)
+        val imageDimension = minOf(bitmapWidth, bitmapHeight) / 1.2f
+
+        // Blend between pose-based and image-based scaling based on pose size
+        val baseSize = poseDimension * (1 - poseSizeRatio) + imageDimension * poseSizeRatio
+        val multiplier = if (gender == "female") 0.3f else 0.25f
+
+        return when (mode) {
+            "standard" -> {
+                // Adjust base multiplier based on gender and pose size
+                maxOf(2, (baseSize * multiplier * poseSizeRatio).toInt())
             }
-            bodyJoints.forEach {
-                val pointA = person.keyPoints[it.first.position].coordinate
-                val pointB = person.keyPoints[it.second.position].coordinate
-                originalSizeCanvas.drawLine(pointA.x, pointA.y, pointB.x, pointB.y, paintLine)
+            "debug" -> 5
+            "detection" -> {
+                // Similarly adjust detection stroke width
+                maxOf(15, (baseSize * multiplier * poseSizeRatio).toInt())
             }
-
-            person.keyPoints.forEach { point ->
-                originalSizeCanvas.drawCircle(
-                    point.coordinate.x,
-                    point.coordinate.y,
-                    CIRCLE_RADIUS,
-                    paintCircle
-                )
-            }
+            else -> throw IllegalArgumentException("Unknown drawing mode: $mode")
         }
-        return output
     }
 
 
@@ -407,8 +427,8 @@ object VisualizationUtils {
             // Add poseScore
             jsonObject.addProperty("poseScore", person.poseScore)
 
-            // Transform poseBox to faceBox
-            person.poseBox?.let {
+            // Transform faceBox
+            person.faceBox?.let {
                 val faceBoxObject = JsonObject()
                 faceBoxObject.addProperty("xMin", it.left)
                 faceBoxObject.addProperty("xMax", it.right)
