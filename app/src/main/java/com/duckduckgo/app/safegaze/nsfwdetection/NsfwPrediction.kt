@@ -41,7 +41,7 @@ data class NsfwPrediction(val predictions: FloatArray) {
     fun unsafeScore() = hentai() + porn() + sexy()
 
     fun isSafe(): Boolean {
-        return safeScore() - unsafeScore() > 0.08
+        return unsafeScore() < 0.85
         // val x = predictions.indices.maxByOrNull { i -> predictions[i] } ?: -1
         // return x == 0 || x == 2
     }
