@@ -65,6 +65,11 @@ class SafeGazeJsInterface(
     ): SafeGazeResult {
         return suspendCoroutine { continuation ->
             mScope.launch {
+                if (isInvalidImageUrl(url)) {
+                    continuation.resume(SafeGazeResult(isNsfw = false, persons = emptyList()))
+                    return@launch
+                }
+
                 val bitmap = getBitmapFromUrl(url)
                 val hashedUrl = hash(url)
 
@@ -127,7 +132,6 @@ class SafeGazeJsInterface(
                                 ),
                             )
 
-                            // Intentionally not returning the image
                             continuation.resume(SafeGazeResult(true, emptyList(), bitmap.width, bitmap.height, VisualizationUtils.bitmapToBase64(bitmap)))
                         }
                     }
@@ -157,7 +161,7 @@ class SafeGazeJsInterface(
                 Glide.with(context)
                     .asBitmap()
                     .load(url)
-                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.DATA))
                     .into(
                         object : CustomTarget<Bitmap>() {
                             override fun onResourceReady(
@@ -238,12 +242,14 @@ class SafeGazeJsInterface(
                         if (result.persons.isNotEmpty()) {
                             // debugDraw(it.url, result.persons)
                             callSafegazeOnDeviceModelHandler(it.uid, VisualizationUtils.toJson(gson, result), result.base64Image)
+                            Timber.d("kLog Inference time: $inferenceTime ms -- ${it.url}")
                         } else if (result.base64Image.isNullOrEmpty()) {
+                            // Image download failed or image is too small or image is svg/gif
                             callSafegazeOnDeviceModelHandler(it.uid, "null", "null")
                         } else {
                             callSafegazeOnDeviceModelHandler(it.uid, nsfwJson(result.isNsfw), result.base64Image)
+                            Timber.d("kLog Inference time: $inferenceTime ms  --  ${it.url}")
                         }
-                        Timber.d("kLog Inference time: $inferenceTime ms")
                     }
                 }
             }
@@ -292,6 +298,11 @@ class SafeGazeJsInterface(
         if (onDeviceModelCachedResults.isEmpty()) {
             onDeviceModelCachedResults["--"] = false
         }
+    }
+
+    private fun isInvalidImageUrl(url: String): Boolean {
+        return url.endsWith(".svg") || url.endsWith(".gif") || url.contains("image/gif")
+            || url.contains("image/svg") || url.contains("/assets/thesun/images/teaser")
     }
 }
 
