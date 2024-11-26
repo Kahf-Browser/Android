@@ -39,7 +39,7 @@ class CustomDnsResolver(
     sharedPreferences: SharedPreferences
 ) : Dns {
     private var privateDns: PrivateDnsLevel
-    private var socket: SSLSocket
+    private var socket: SSLSocket? = null
 
     companion object {
         private const val SO_TIMEOUT = 2000 // 2 seconds
@@ -52,44 +52,49 @@ class CustomDnsResolver(
         privateDns = PrivateDnsLevel.get(currentMode)
 
         runBlocking {
-            socket = initSocket()
+            initSocket()?.let { socket = it }
         }
     }
 
-    private suspend fun initSocket(): SSLSocket {
+    private suspend fun initSocket(): SSLSocket? {
         return withContext(dispatcher.io()) {
-            val socketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
-            val sslSocket = socketFactory.createSocket(privateDns.dnsServerIps.first(), 853) as SSLSocket
-            sslSocket.keepAlive = true
-            sslSocket.soTimeout = SO_TIMEOUT
+            runCatching {
+                val socketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
+                val sslSocket = socketFactory.createSocket(privateDns.dnsServerIps.first(), 853) as SSLSocket
+                sslSocket.keepAlive = true
+                sslSocket.soTimeout = SO_TIMEOUT
 
-            // Set the TLS host header
-            sslSocket.sslParameters = sslSocket.sslParameters.apply {
-                serverNames = listOf(javax.net.ssl.SNIHostName(privateDns.url))
+                // Set the TLS host header
+                sslSocket.sslParameters = sslSocket.sslParameters.apply {
+                    serverNames = listOf(javax.net.ssl.SNIHostName(privateDns.url))
 
-                if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
-                    applicationProtocols = arrayOf("http/1.1")
-                } else {
-                    try {
-                        val method = this::class.java.getMethod("setApplicationProtocols", Array<String>::class.java)
-                        method.invoke(this, arrayOf("http/1.1"))
-                    } catch (e: Exception) {
-                        Timber.e("tpLog Error setting application protocols: ${e.message}")
+                    if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
+                        applicationProtocols = arrayOf("http/1.1")
+                    } else {
+                        try {
+                            val method = this::class.java.getMethod("setApplicationProtocols", Array<String>::class.java)
+                            method.invoke(this, arrayOf("http/1.1"))
+                        } catch (e: Exception) {
+                            Timber.e("tpLog Error setting application protocols: ${e.message}")
+                        }
                     }
                 }
+
+                sslSocket.startHandshake()
+
+                sslSocket
+            }.getOrElse { exception ->
+                Timber.e("tpLog Error initializing SSL socket: ${exception.message}")
+                null
             }
-
-            sslSocket.startHandshake()
-
-            sslSocket
         }
     }
 
     private fun isSocketUsable(): Boolean {
         val retVal = try {
-            socket.soTimeout = 100
+            socket?.soTimeout = 100
 
-            if (socket.inputStream.read() == -1) {
+            if (socket?.inputStream?.read() == -1) {
                 Timber.i("tpLog Socket is closed by the server.")
                 false
             } else {
@@ -105,7 +110,7 @@ class CustomDnsResolver(
 
         // Reset the timeout to the default value
         if (retVal) {
-            socket.soTimeout = SO_TIMEOUT
+            socket?.soTimeout = SO_TIMEOUT
         }
         return retVal
     }
@@ -192,17 +197,17 @@ class CustomDnsResolver(
         return withContext(dispatcher.io()) {
             try {
                 if (!isSocketUsable()) {
-                    socket = runBlocking { initSocket() }
+                    runBlocking { initSocket()?.let { socket = it } }
                 }
 
                 // Write length-prefixed DNS query without closing the stream
-                DataOutputStream(socket.outputStream).let {
+                DataOutputStream(socket?.outputStream).let {
                     it.writeShort(queryBytes.size)
                     it.write(queryBytes)
                     it.flush()
                 }
 
-                DataInputStream(socket.inputStream).let {
+                DataInputStream(socket?.inputStream).let {
                     val responseBytes = ByteArray(it.readUnsignedShort())
                     it.readFully(responseBytes)
                     Message(responseBytes)
@@ -217,9 +222,9 @@ class CustomDnsResolver(
     private suspend fun closeConnection() {
         try {
             withContext(dispatcher.io()) {
-                socket.outputStream.close()
-                socket.inputStream.close()
-                socket.close()
+                socket?.outputStream?.close()
+                socket?.inputStream?.close()
+                socket?.close()
                 Timber.d("tpLog Socket connection closed successfully.")
             }
         } catch (e: IOException) {
@@ -236,7 +241,7 @@ class CustomDnsResolver(
         privateDns = privateDnsLevel
 
         runBlocking {
-            socket = initSocket()
+            initSocket()?.let { socket = it }
             Timber.d("tpLog DoH URL set to: ${privateDnsLevel.url}")
         }
     }
