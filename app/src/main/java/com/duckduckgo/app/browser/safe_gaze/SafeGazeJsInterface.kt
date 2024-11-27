@@ -3,6 +3,7 @@ package com.duckduckgo.app.browser.safe_gaze
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.util.Base64
 import android.webkit.JavascriptInterface
@@ -24,7 +25,9 @@ import com.duckduckgo.common.utils.SAFE_GAZE_MIN_IMG_SIZE
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -85,9 +88,9 @@ class SafeGazeJsInterface(
                     }
                 }
 
-                val faceRectList = faceDetector.detectFaces(bitmap)
+                val (faceRectList, poseList) = runFaceAndPoseDetectionInParallel(bitmap)
 
-                movenet.estimatePoses(bitmap).let {
+                poseList.let {
                     val personList = VisualizationUtils.matchFacesToPoses(it, faceRectList)
 
                     personList.forEach { person ->
@@ -108,6 +111,16 @@ class SafeGazeJsInterface(
                 }
             }
         }
+    }
+
+    private suspend fun runFaceAndPoseDetectionInParallel(bitmap: Bitmap): Pair<List<Rect>, List<Person>> = coroutineScope {
+        val faceDetectionDeferred = async { faceDetector.detectFaces(bitmap) }
+        val poseDetectionDeferred = async { movenet.estimatePoses(bitmap) }
+
+        val faceList = faceDetectionDeferred.await()
+        val poseList = poseDetectionDeferred.await()
+
+        faceList to poseList
     }
 
     private suspend fun getBitmapFromUrl(url: String): Bitmap? {
