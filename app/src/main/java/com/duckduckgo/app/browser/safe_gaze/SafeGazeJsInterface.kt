@@ -57,6 +57,12 @@ class SafeGazeJsInterface(
     private val gson = Gson()
     private val faceDetector = FaceDetector(context)
 
+    init {
+        scope.launch {
+            movenet.warmup()
+        }
+    }
+
     private suspend fun shouldBlurImage(
         url: String,
         mScope: CoroutineScope,

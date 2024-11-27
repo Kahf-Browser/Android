@@ -49,6 +49,7 @@ class MoveNetMultiPose(
     private var scaleWidth: Int = 0
     private var lastInferenceTimeNanos: Long = -1
     private var tracker: AbstractTracker? = null
+    private var wormedUp = false
 
     companion object {
         private const val DYNAMIC_MODEL_TARGET_INPUT_SIZE = 256
@@ -275,6 +276,14 @@ class MoveNetMultiPose(
     override fun close() {
         interpreter.close()
         tracker = null
+    }
+
+    fun warmup() {
+        if (!wormedUp) {
+            val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+            estimatePoses(bitmap)
+            wormedUp = true
+        }
     }
 }
 
