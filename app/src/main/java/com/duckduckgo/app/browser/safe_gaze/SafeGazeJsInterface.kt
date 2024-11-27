@@ -69,11 +69,6 @@ class SafeGazeJsInterface(
     ): SafeGazeResult {
         return suspendCoroutine { continuation ->
             mScope.launch {
-                if (isInvalidImageUrl(url)) {
-                    continuation.resume(SafeGazeResult(isNsfw = false, persons = emptyList()))
-                    return@launch
-                }
-
                 val bitmap = getBitmapFromUrl(url)
                 if (bitmap == null || bitmap.height < SAFE_GAZE_MIN_IMG_SIZE || bitmap.width < SAFE_GAZE_MIN_IMG_SIZE) {
                     continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
@@ -182,15 +177,14 @@ class SafeGazeJsInterface(
             val uid = (if (parts.size >= 2) parts[2] else "0")
 
             if (onDeviceModelCachedResults.containsKey(imageUrl)) {
-                getDataFromCache(uid, imageUrl)
+                returnResultFromCache(uid, imageUrl)
             } else {
-                addTaskToQueue(imageUrl, uid)
+                addTaskToQueue(uid, imageUrl)
             }
-            addTaskToQueue(imageUrl, uid)
         }
     }
 
-    private fun getDataFromCache(uid: String, imageUrl: String) {
+    private fun returnResultFromCache(uid: String, imageUrl: String) {
         CoroutineScope(dispatcher.io()).launch {
             val bitmap = getBitmapFromUrl(imageUrl)
             val base64Image = VisualizationUtils.bitmapToBase64(bitmap) ?: "null"
@@ -204,11 +198,16 @@ class SafeGazeJsInterface(
     }
 
     private fun addTaskToQueue(
-        url: String,
-        uid: String
+        uid: String,
+        url: String
     ) {
         // If same url is already in queue, don't add it again
         if (urlQueue.any { it.url == url }) {
+            return
+        }
+        // Skip if image is svg, gif, placeholder
+        if (isInvalidImageUrl(url)) {
+            callSafegazeOnDeviceModelHandler(uid, nsfwJson(false), null)
             return
         }
 
@@ -223,6 +222,12 @@ class SafeGazeJsInterface(
                     val task = urlQueue.poll()
 
                     task?.let {
+                        // Again check on cache
+                        if (onDeviceModelCachedResults.containsKey(it.url)) {
+                            returnResultFromCache(it.url, it.uid)
+                            return@launch
+                        }
+
                         val t1 = System.currentTimeMillis()
                         val result = shouldBlurImage(it.url, this)
                         val inferenceTime = System.currentTimeMillis() - t1
@@ -291,9 +296,6 @@ class SafeGazeJsInterface(
             }
         }
     }
-
-    // private fun hash(content: String) =
-    //     Hashing.murmur3_128().hashString(content, Charsets.UTF_8).toString()
 
     private suspend fun loadCacheFromDisk() {
         kahfImageBlockedDao.getAllBlockedImageDetails().first().forEach { kahfImageBlocked->
