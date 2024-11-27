@@ -1012,7 +1012,6 @@ class BrowserTabFragment :
                 SafeGazePopupHandler(
                     binding = popupBinding,
                     sharedPreferences = sharedPreferences,
-                    safeGazeInterface = safeGazeInterface,
                     editor = editor,
                     onDnsModeChanged = {
                         val updated = updateDnsSettings(it)

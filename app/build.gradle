@@ -427,7 +427,6 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:_"
     implementation "com.github.bumptech.glide:okhttp3-integration:_"
     ksp "com.github.bumptech.glide:ksp:_"
-    implementation 'io.github.hokofly:hoko-blur:1.5.3'
 
     // MLKit
     // implementation "com.google.mlkit:object-detection:_"
@@ -464,9 +463,6 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:33.5.1')
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
-
-    // Hashing
-    implementation 'com.google.guava:guava:32.1.2-android'
 
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"
