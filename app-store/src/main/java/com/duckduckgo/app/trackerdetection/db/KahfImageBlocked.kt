@@ -23,6 +23,8 @@ import androidx.room.PrimaryKey
 data class KahfImageBlocked(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val imageUrl: String,
-    val tag: String, // nsfw | female | etc
-    val score: Double
+    val responseStr: String,
+    val isIndecent: Boolean, // nsfw or female content
+    val imageWidth: Float,
+    val imageHeight: Float,
 )

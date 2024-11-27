@@ -9,7 +9,6 @@ import android.webkit.JavascriptInterface
 import androidx.core.graphics.toRect
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.duckduckgo.app.safegaze.genderdetection.FaceDetector
@@ -22,7 +21,6 @@ import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SAFE_GAZE_MIN_IMG_SIZE
-import com.google.common.hash.Hashing
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -46,11 +44,11 @@ class SafeGazeJsInterface(
     private val genderDetector: GenderDetector,
     private val movenet: MoveNetMultiPose,
     private val kahfImageBlockedDao: KahfImageBlockedDao,
-    dispatcher: DispatcherProvider,
+    private val dispatcher: DispatcherProvider,
     private val onUpdateBlur: (blur: Float) -> Unit,
     private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?) -> Unit
 ) {
-    private val onDeviceModelCachedResults = mutableMapOf<String, Boolean>()
+    private val onDeviceModelCachedResults = mutableMapOf<String, String>()
 
     private val urlQueue: ConcurrentLinkedQueue<UrlInfo> = ConcurrentLinkedQueue()
     private var processingJob: Job? = null
@@ -71,72 +69,41 @@ class SafeGazeJsInterface(
                 }
 
                 val bitmap = getBitmapFromUrl(url)
-                val hashedUrl = hash(url)
+                if (bitmap == null || bitmap.height < SAFE_GAZE_MIN_IMG_SIZE || bitmap.width < SAFE_GAZE_MIN_IMG_SIZE) {
+                    continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
+                    return@launch
+                }
 
-                if (bitmap!= null && bitmap.height >= SAFE_GAZE_MIN_IMG_SIZE && bitmap.width >= SAFE_GAZE_MIN_IMG_SIZE) {
-                    val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
+                val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
 
-                    if (nsfwPrediction.isSafe()) {
-                        val faceRectList = faceDetector.detectFaces(bitmap)
+                if (!nsfwPrediction.isSafe()) {
+                    nsfwPrediction.getLabelWithConfidence().let {
+                        Timber.d("kLog Nsfw: ${it.first} (${it.second}) $url")
+                        continuation.resume(SafeGazeResult(true, emptyList(), bitmap.width, bitmap.height, VisualizationUtils.bitmapToBase64(bitmap)))
+                        return@launch
+                    }
+                }
 
-                        movenet.estimatePoses(bitmap).let {
-                            val personList = VisualizationUtils.matchFacesToPoses(it, faceRectList)
+                val faceRectList = faceDetector.detectFaces(bitmap)
 
-                            personList.forEach { person ->
-                                person.faceBox?.let { faceBox ->
-                                    val faceBitmap = VisualizationUtils.cropToBBox(bitmap, faceBox.toRect())
+                movenet.estimatePoses(bitmap).let {
+                    val personList = VisualizationUtils.matchFacesToPoses(it, faceRectList)
 
-                                    if (faceBitmap != null) {
-                                        val genderPrediction = genderDetector.predictGender(faceBitmap)
+                    personList.forEach { person ->
+                        person.faceBox?.let { faceBox ->
+                            val faceBitmap = VisualizationUtils.cropToBBox(bitmap, faceBox.toRect())
 
-                                        person.isFemale = !genderPrediction.isMale
-                                        person.genderScore = genderPrediction.genderScore
+                            if (faceBitmap != null) {
+                                val genderPrediction = genderDetector.predictGender(faceBitmap)
 
-                                        Timber.d("kLog genderPrediction 1: $genderPrediction ${person.id}")
-                                    }
-                                }
+                                person.isFemale = !genderPrediction.isMale
+                                person.genderScore = genderPrediction.genderScore
+
+                                Timber.d("kLog genderPrediction 1: $genderPrediction ${person.id}")
                             }
-                            continuation.resume(SafeGazeResult(false, personList, bitmap.width, bitmap.height, VisualizationUtils.bitmapToBase64(bitmap)))
-                        }
-
-                        // TODO fallback to NSFW detection,
-                        // TODO Save to local DB
-                        /*val genderPrediction = genderDetector.predict(bitmap)
-
-                        if (genderPrediction.hasFemale) {
-                            Timber.d("kLog Female (${genderPrediction.femaleConfidence}) $url")
-
-                            // Insert to local DB
-                            kahfImageBlockedDao.insert(
-                                KahfImageBlocked(
-                                    imageUrl = hashedUrl,
-                                    tag = "female",
-                                    score = genderPrediction.femaleConfidence.toDouble(),
-                                ),
-                            )
-                        } else {
-                            Timber.d("kLog SFW $url")
-                        }*/
-
-
-                    } else {
-                        nsfwPrediction.getLabelWithConfidence().let {
-                            Timber.d("kLog Nsfw: ${it.first} (${it.second}) $url")
-
-                            // Insert to local DB
-                            kahfImageBlockedDao.insert(
-                                KahfImageBlocked(
-                                    imageUrl = hashedUrl,
-                                    tag = it.first,
-                                    score = it.second.toDouble(),
-                                ),
-                            )
-
-                            continuation.resume(SafeGazeResult(true, emptyList(), bitmap.width, bitmap.height, VisualizationUtils.bitmapToBase64(bitmap)))
                         }
                     }
-                } else {
-                    continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
+                    continuation.resume(SafeGazeResult(false, personList, bitmap.width, bitmap.height, VisualizationUtils.bitmapToBase64(bitmap)))
                 }
             }
         }
@@ -161,7 +128,7 @@ class SafeGazeJsInterface(
                 Glide.with(context)
                     .asBitmap()
                     .load(url)
-                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.DATA))
+                    .diskCacheStrategy(DiskCacheStrategy.DATA)
                     .into(
                         object : CustomTarget<Bitmap>() {
                             override fun onResourceReady(
@@ -207,15 +174,26 @@ class SafeGazeJsInterface(
             val parts = message.split("/-/")
             val imageUrl = if (parts.size >= 2) parts[1] else ""
             val uid = (if (parts.size >= 2) parts[2] else "0")
-            val hashedUrl = hash(imageUrl)
 
-            // TODO turn off caching temporarily
-            /*if (onDeviceModelCachedResults.containsKey(hashedUrl)) {
-                callSafegazeOnDeviceModelHandler(onDeviceModelCachedResults[hashedUrl]!!, uid, true)
+            if (onDeviceModelCachedResults.containsKey(imageUrl)) {
+                getDataFromCache(uid, imageUrl)
             } else {
                 addTaskToQueue(imageUrl, uid)
-            }*/
+            }
             addTaskToQueue(imageUrl, uid)
+        }
+    }
+
+    private fun getDataFromCache(uid: String, imageUrl: String) {
+        CoroutineScope(dispatcher.io()).launch {
+            val bitmap = getBitmapFromUrl(imageUrl)
+            val base64Image = VisualizationUtils.bitmapToBase64(bitmap) ?: "null"
+
+            callSafegazeOnDeviceModelHandler(
+                uid,
+                detectionResultJson = onDeviceModelCachedResults[imageUrl] ?: "null",
+                base64Image = base64Image
+            )
         }
     }
 
@@ -223,6 +201,11 @@ class SafeGazeJsInterface(
         url: String,
         uid: String
     ) {
+        // If same url is already in queue, don't add it again
+        if (urlQueue.any { it.url == url }) {
+            return
+        }
+
         urlQueue.add(UrlInfo(url, uid))
         processQueue()
     }
@@ -238,18 +221,36 @@ class SafeGazeJsInterface(
                         val result = shouldBlurImage(it.url, this)
                         val inferenceTime = System.currentTimeMillis() - t1
 
-                        onDeviceModelCachedResults[hash(it.url)] = result.isNsfw
-                        if (result.persons.isNotEmpty()) {
-                            // debugDraw(it.url, result.persons)
-                            callSafegazeOnDeviceModelHandler(it.uid, VisualizationUtils.toJson(gson, result), result.base64Image)
-                            Timber.d("kLog Inference time: $inferenceTime ms -- ${it.url}")
-                        } else if (result.base64Image.isNullOrEmpty()) {
+                        val resultJson: String
+
+                        if (result.base64Image.isNullOrEmpty()) {
                             // Image download failed or image is too small or image is svg/gif
-                            callSafegazeOnDeviceModelHandler(it.uid, "null", "null")
+                            resultJson = "null"
+                            callSafegazeOnDeviceModelHandler(it.uid, resultJson, "null")
+                        } else if (result.persons.isNotEmpty()) {
+                            resultJson = VisualizationUtils.toJson(gson, result)
+                            callSafegazeOnDeviceModelHandler(it.uid, resultJson, result.base64Image)
+
+                            Timber.d("kLog Inference time: $inferenceTime ms -- ${it.url}")
                         } else {
-                            callSafegazeOnDeviceModelHandler(it.uid, nsfwJson(result.isNsfw), result.base64Image)
+                            resultJson = nsfwJson(result.isNsfw)
+                            callSafegazeOnDeviceModelHandler(it.uid, resultJson, result.base64Image)
+
                             Timber.d("kLog Inference time: $inferenceTime ms  --  ${it.url}")
                         }
+
+                        // Insert to local DB
+                        onDeviceModelCachedResults[it.url] = resultJson
+
+                        kahfImageBlockedDao.insert(
+                            KahfImageBlocked(
+                                imageUrl = it.url,
+                                responseStr = resultJson,
+                                isIndecent = result.isNsfw || result.persons.any { p -> p.isFemale },
+                                imageWidth = result.imageWidth.toFloat(),
+                                imageHeight = result.imageHeight.toFloat(),
+                            ),
+                        )
                     }
                 }
             }
@@ -285,24 +286,26 @@ class SafeGazeJsInterface(
         }
     }
 
-    private fun hash(content: String) =
-        Hashing.murmur3_128().hashString(content, Charsets.UTF_8).toString()
+    // private fun hash(content: String) =
+    //     Hashing.murmur3_128().hashString(content, Charsets.UTF_8).toString()
 
     private suspend fun loadCacheFromDisk() {
         kahfImageBlockedDao.getAllBlockedImageDetails().first().forEach { kahfImageBlocked->
-            onDeviceModelCachedResults[kahfImageBlocked.imageUrl] = true
+            onDeviceModelCachedResults[kahfImageBlocked.imageUrl] = kahfImageBlocked.responseStr
         }
 
         Timber.d("kLog loading cache to disk from memory(${onDeviceModelCachedResults.size})")
 
         if (onDeviceModelCachedResults.isEmpty()) {
-            onDeviceModelCachedResults["--"] = false
+            onDeviceModelCachedResults["--"] = ""
         }
     }
 
     private fun isInvalidImageUrl(url: String): Boolean {
-        return url.endsWith(".svg") || url.endsWith(".gif") || url.contains("image/gif")
-            || url.contains("image/svg") || url.contains("/assets/thesun/images/teaser")
+        return listOfEndsWith.any { url.endsWith(it) } || listOfContains.any { url.contains(it) }
     }
+
+    private val listOfContains = listOf("image/gif", "image/svg", "/assets/thesun/images/teaser", "grey-placeholder")
+    private val listOfEndsWith = listOf(".svg", ".gif")
 }
 
