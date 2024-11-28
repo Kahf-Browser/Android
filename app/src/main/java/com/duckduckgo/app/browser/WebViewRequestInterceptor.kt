@@ -101,7 +101,7 @@ class WebViewRequestInterceptor(
         SafeSearchCandidate("ask.com", queryParam = "q"),
         SafeSearchCandidate("search.yahoo.com", queryParam = "p"), // intentionally kept 'p'
         SafeSearchCandidate("search.brave.com", queryParam = ""), // not working even in system level private DNS
-        SafeSearchCandidate("youtube.com", exclude = listOf("youtubei/v1", "accounts.youtube.com/")),
+        // SafeSearchCandidate("youtube.com", exclude = listOf("youtubei/v1", "accounts.youtube.com/")),
     )
 
     override fun onPageStarted(url: String) {
