@@ -30,6 +30,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -62,8 +63,8 @@ class SafeGazeJsInterface(
 
     init {
         scope.launch {
-            movenet.warmup()
             loadCacheFromDisk()
+            movenet.warmup()
         }
     }
 
@@ -130,7 +131,12 @@ class SafeGazeJsInterface(
             val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
             BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
         } else {
-            downloadBitmap(url, context)
+            try {
+                downloadBitmap(url, context)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
         }
     }
 
@@ -138,34 +144,31 @@ class SafeGazeJsInterface(
         url: String,
         context: Context
     ): Bitmap? {
-        return suspendCoroutine { continuation ->
-            try {
-                Glide.with(context)
-                    .asBitmap()
-                    .load(url)
-                    .diskCacheStrategy(DiskCacheStrategy.DATA)
-                    .into(
-                        object : CustomTarget<Bitmap>() {
-                            override fun onResourceReady(
-                                resource: Bitmap,
-                                transition: Transition<in Bitmap>?
-                            ) {
-                                continuation.resume(resource)
-                            }
+        return suspendCancellableCoroutine { continuation ->
+            Glide.with(context)
+                .asBitmap()
+                .load(url)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?
+                    ) {
+                        if (continuation.isActive) {
+                            continuation.resume(resource)
+                        }
+                    }
 
-                            override fun onLoadFailed(errorDrawable: Drawable?) {
-                                continuation.resume(null)
-                            }
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        if (continuation.isActive) {
+                            continuation.resumeWith(Result.failure(Exception("Failed to load image")))
+                        }
+                    }
 
-                            override fun onLoadCleared(placeholder: Drawable?) {
-                                // No op
-                            }
-                        },
-                    )
-            } catch (e: Exception) {
-                e.printStackTrace()
-                continuation.resume(null)
-            }
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        // No need to resume the continuation here
+                    }
+                })
         }
     }
 
