@@ -1356,6 +1356,10 @@ class BrowserTabFragment :
             },
         )
 
+        viewModel.pageUpdatedLiveData.observe(viewLifecycleOwner) {
+            it?.let { safeGazeInterface.resetProcessingQueue() }
+        }
+
         addTabsObserver()
     }
 

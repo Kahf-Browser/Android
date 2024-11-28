@@ -295,6 +295,11 @@ class SafeGazeJsInterface(
         Timber.d("$outputBitmap")
     }
 
+    fun resetProcessingQueue() {
+        urlQueue.clear()
+        Timber.d("kLog cancel ongoing image processing")
+    }
+
     fun cancelOngoingImageProcessing() {
         scope.cancel()
     }
