@@ -17,9 +17,13 @@
 package com.duckduckgo.app.trackerdetection.db
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "kahf_image_blocked")
+@Entity(
+        tableName = "kahf_image_blocked",
+        indices = [Index(value = ["imageUrl"], unique = true)],
+)
 data class KahfImageBlocked(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val imageUrl: String,
@@ -27,4 +31,5 @@ data class KahfImageBlocked(
     val isIndecent: Boolean, // nsfw or female content
     val imageWidth: Float,
     val imageHeight: Float,
+    val modifiedAt: Long = 0
 )

@@ -70,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 56,
+    version = 57,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -706,6 +706,28 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    val MIGRATION_56_TO_57 = object : Migration(56, 57) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Add the new column 'modifiedAt' with a default value of 0 for existing entries
+            db.execSQL("ALTER TABLE kahf_image_blocked ADD COLUMN modifiedAt INTEGER NOT NULL DEFAULT 0")
+
+            // Remove duplicate rows, keeping only the first occurrence
+            db.execSQL(
+                """
+            DELETE FROM kahf_image_blocked
+            WHERE id NOT IN (
+                SELECT MIN(id)
+                FROM kahf_image_blocked
+                GROUP BY imageUrl
+            )
+            """,
+            )
+
+            // Add the unique constraint
+            db.execSQL("CREATE UNIQUE INDEX index_kahf_image_blocked_imageUrl ON kahf_image_blocked(imageUrl)")
+        }
+    }
+
 
     /**
      * WARNING ⚠️
@@ -788,6 +810,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_53_TO_54,
             MIGRATION_54_TO_55,
             MIGRATION_55_TO_56,
+            MIGRATION_56_TO_57
         )
 
     @Deprecated(

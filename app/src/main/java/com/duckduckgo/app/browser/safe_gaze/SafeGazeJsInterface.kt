@@ -63,6 +63,7 @@ class SafeGazeJsInterface(
     init {
         scope.launch {
             movenet.warmup()
+            loadCacheFromDisk()
         }
     }
 
@@ -273,6 +274,7 @@ class SafeGazeJsInterface(
                                 isIndecent = result.isNsfw || result.persons.any { p -> p.isFemale },
                                 imageWidth = result.imageWidth.toFloat(),
                                 imageHeight = result.imageHeight.toFloat(),
+                                modifiedAt = System.currentTimeMillis()
                             ),
                         )
                     }
