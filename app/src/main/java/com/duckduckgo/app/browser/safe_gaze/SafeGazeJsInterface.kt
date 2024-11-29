@@ -25,12 +25,14 @@ import com.duckduckgo.common.utils.SAFE_GAZE_MIN_IMG_SIZE
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -61,6 +63,10 @@ class SafeGazeJsInterface(
     private val gson = Gson()
     private val faceDetector = FaceDetector(context)
 
+    companion object {
+        private const val MAX_INFERENCE_TIME_MS = 1200L
+    }
+
     init {
         scope.launch {
             loadCacheFromDisk()
@@ -70,10 +76,9 @@ class SafeGazeJsInterface(
 
     private suspend fun shouldBlurImage(
         url: String,
-        mScope: CoroutineScope,
     ): SafeGazeResult {
         return suspendCoroutine { continuation ->
-            mScope.launch {
+            scope.launch {
                 val bitmap = getBitmapFromUrl(url)
                 if (bitmap == null || bitmap.height < SAFE_GAZE_MIN_IMG_SIZE || bitmap.width < SAFE_GAZE_MIN_IMG_SIZE) {
                     continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
@@ -246,8 +251,21 @@ class SafeGazeJsInterface(
                         }
 
                         val t1 = System.currentTimeMillis()
-                        val result = shouldBlurImage(it.url, this)
+                        val result = try {
+                            withTimeout(MAX_INFERENCE_TIME_MS) {
+                                shouldBlurImage(it.url)
+                            }
+                        } catch (e: TimeoutCancellationException) {
+                            Timber.e("kLog Timeout occurred while processing image: ${it.url}")
+                            null
+                        }
                         val inferenceTime = System.currentTimeMillis() - t1
+
+                        // If result is null, then timeout occurred. No need to process further or cache the result
+                        if (result == null) {
+                            callSafegazeOnDeviceModelHandler(it.uid, "null", "null")
+                            return@launch
+                        }
 
                         val resultJson: String
 
