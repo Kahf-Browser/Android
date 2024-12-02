@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
+import java.util.Timer
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
@@ -64,7 +65,7 @@ class SafeGazeJsInterface(
     private val faceDetector = FaceDetector(context)
 
     companion object {
-        private const val MAX_INFERENCE_TIME_MS = 1200L
+        private const val MAX_INFERENCE_TIME_MS = 2000L
     }
 
     init {
@@ -132,14 +133,19 @@ class SafeGazeJsInterface(
 
     private suspend fun getBitmapFromUrl(url: String): Bitmap? {
         return if (url.startsWith("data:image")) {
-            val base64Image = url.substringAfter(",")  // Remove the 'data:image/jpeg;base64,' prefix
-            val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
-            BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
+            try {
+                val base64Image = url.substringAfter(",")  // Remove the 'data:image/jpeg;base64,' prefix
+                val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
+                BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
+            } catch (e: Exception) {
+                Timber.e(e, "kLog Error decoding base64 image: $url")
+                null
+            }
         } else {
             try {
                 downloadBitmap(url, context)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Timber.e(e, "kLog Error downloading image: $url")
                 null
             }
         }
@@ -166,7 +172,7 @@ class SafeGazeJsInterface(
 
                     override fun onLoadFailed(errorDrawable: Drawable?) {
                         if (continuation.isActive) {
-                            continuation.resumeWith(Result.failure(Exception("Failed to load image")))
+                            continuation.resume(null)
                         }
                     }
 
