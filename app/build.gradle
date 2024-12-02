@@ -18,12 +18,12 @@ ext {
 
 android {
     defaultConfig {
-        applicationId "org.halalz.kahfbrowser"
+        applicationId "org.kahf.browser"
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
         versionCode 202411281
-        versionName "1.4.0"
+        versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "kahf_browser-$versionName"
         vectorDrawables.useSupportLibrary = true

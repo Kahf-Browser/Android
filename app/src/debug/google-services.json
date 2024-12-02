@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:994768194050:android:2683d54dc4d9da381db51b",
+        "mobilesdk_app_id": "1:994768194050:android:1112b04c583c54691db51b",
         "android_client_info": {
-          "package_name": "org.halalz.kahfbrowser"
+          "package_name": "org.kahf.browser"
         }
       },
       "oauth_client": [],
@@ -26,9 +26,9 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:994768194050:android:c6cd3011d5689a691db51b",
+        "mobilesdk_app_id": "1:994768194050:android:c4d07952d6c04ce41db51b",
         "android_client_info": {
-          "package_name": "org.halalz.kahfbrowser.debug"
+          "package_name": "org.kahf.browser.debug"
         }
       },
       "oauth_client": [],
