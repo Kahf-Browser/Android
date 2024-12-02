@@ -253,7 +253,8 @@ class SafeGazeJsInterface(
                         // Again check on cache
                         if (onDeviceModelCachedResults.containsKey(it.url)) {
                             returnResultFromCache(it.url, it.uid)
-                            return@launch
+                            Timber.d("kLog cache hit for ${it.url}")
+                            return@let
                         }
 
                         val t1 = System.currentTimeMillis()
@@ -270,7 +271,7 @@ class SafeGazeJsInterface(
                         // If result is null, then timeout occurred. No need to process further or cache the result
                         if (result == null) {
                             callSafegazeOnDeviceModelHandler(it.uid, "null", "null")
-                            return@launch
+                            return@let
                         }
 
                         val resultJson: String
@@ -279,6 +280,8 @@ class SafeGazeJsInterface(
                             // Image download failed or image is too small or image is svg/gif
                             resultJson = "null"
                             callSafegazeOnDeviceModelHandler(it.uid, resultJson, "null")
+
+                            Timber.d("kLog invalid or failed image: -- ${it.url}")
                         } else if (result.persons.isNotEmpty()) {
                             resultJson = VisualizationUtils.toJson(gson, result)
                             callSafegazeOnDeviceModelHandler(it.uid, resultJson, result.base64Image)
