@@ -70,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 55,
+    version = 57,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -677,6 +677,58 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_55_TO_56 = object : Migration(55, 56) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Rename the old table to a temporary name
+            db.execSQL("ALTER TABLE kahf_image_blocked RENAME TO kahf_image_blocked_old")
+
+            // Create the new table with the modified schema
+            db.execSQL("""
+            CREATE TABLE kahf_image_blocked (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                imageUrl TEXT NOT NULL,
+                isIndecent INTEGER NOT NULL DEFAULT 0,
+                responseStr TEXT NOT NULL,
+                imageWidth REAL NOT NULL,
+                imageHeight REAL NOT NULL
+            )
+        """.trimIndent())
+
+            // Copy the relevant data from the old table to the new table
+            db.execSQL("""
+            INSERT INTO kahf_image_blocked (id, imageUrl, isIndecent, responseStr, imageWidth, imageHeight)
+            SELECT id, imageUrl, 1, '{}', 0, 0
+            FROM kahf_image_blocked_old
+        """.trimIndent())
+
+            // Drop the old table
+            db.execSQL("DROP TABLE kahf_image_blocked_old")
+        }
+    }
+
+    val MIGRATION_56_TO_57 = object : Migration(56, 57) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Add the new column 'modifiedAt' with a default value of 0 for existing entries
+            db.execSQL("ALTER TABLE kahf_image_blocked ADD COLUMN modifiedAt INTEGER NOT NULL DEFAULT 0")
+
+            // Remove duplicate rows, keeping only the first occurrence
+            db.execSQL(
+                """
+            DELETE FROM kahf_image_blocked
+            WHERE id NOT IN (
+                SELECT MIN(id)
+                FROM kahf_image_blocked
+                GROUP BY imageUrl
+            )
+            """,
+            )
+
+            // Add the unique constraint
+            db.execSQL("CREATE UNIQUE INDEX index_kahf_image_blocked_imageUrl ON kahf_image_blocked(imageUrl)")
+        }
+    }
+
+
     /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
@@ -757,6 +809,8 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_52_TO_53,
             MIGRATION_53_TO_54,
             MIGRATION_54_TO_55,
+            MIGRATION_55_TO_56,
+            MIGRATION_56_TO_57
         )
 
     @Deprecated(

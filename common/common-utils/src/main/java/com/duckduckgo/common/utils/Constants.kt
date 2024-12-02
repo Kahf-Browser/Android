@@ -29,7 +29,7 @@ const val KAHF_GUARD_BLOCKED_URL = "blocked.kahfguard.com"
 
 // Private DNS Settings
 const val KAHF_GUARD_INTENSITY = "kahf_guard_intensity"
-const val KAHF_GUARD_DEFAULT = "Low"
+const val KAHF_GUARD_DEFAULT = "High"
 
 // SafeGaze (image blur) Settings
 const val SAFE_GAZE_DEFAULT = "Off"

@@ -42,8 +42,6 @@ data class NsfwPrediction(val predictions: FloatArray) {
 
     fun isSafe(): Boolean {
         return unsafeScore() < 0.85
-        // val x = predictions.indices.maxByOrNull { i -> predictions[i] } ?: -1
-        // return x == 0 || x == 2
     }
 
     override fun equals(other: Any?): Boolean {

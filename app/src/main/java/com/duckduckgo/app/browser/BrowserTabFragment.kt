@@ -1012,7 +1012,6 @@ class BrowserTabFragment :
                 SafeGazePopupHandler(
                     binding = popupBinding,
                     sharedPreferences = sharedPreferences,
-                    safeGazeInterface = safeGazeInterface,
                     editor = editor,
                     onDnsModeChanged = {
                         val updated = updateDnsSettings(it)
@@ -1356,6 +1355,10 @@ class BrowserTabFragment :
                 it.let { renderer.renderPrivacyShield(it) }
             },
         )
+
+        viewModel.pageUpdatedLiveData.observe(viewLifecycleOwner) {
+            it?.let { safeGazeInterface.resetProcessingQueue() }
+        }
 
         addTabsObserver()
     }

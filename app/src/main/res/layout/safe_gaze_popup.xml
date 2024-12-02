@@ -225,126 +225,13 @@
                         app:layout_constraintBottom_toBottomOf="@id/tvDecent"
                         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
-                    <androidx.constraintlayout.widget.Group
-                        android:id="@+id/safe_gaze_group"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:constraint_referenced_ids="ivHumanBlurContainer,ivFullBlurContainer,tvHumanOnly,tvHumanOnlyLine2, fullImageText, fullImageTextLine2, blurSeekbar, progress_bar, blueIndecentPhotosText"/>
-
-                    <FrameLayout
-                        android:id="@+id/ivHumanBlurContainer"
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/ivHumanBlur"
                         android:layout_width="85dp"
-                        android:layout_height="100dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_height="85dp"
+                        android:src="@drawable/human_only_blur"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/switch_safe_gaze">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/ivHumanBlur"
-                            android:layout_width="85dp"
-                            android:layout_height="85dp"
-                            android:src="@drawable/human_only_blur" />
-
-                        <ImageView
-                            android:id="@+id/iv_check_human"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="bottom|center"
-                            android:layout_marginBottom="0dp"
-                            android:contentDescription="@string/checkbox_label_title"
-                            android:elevation="5dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_check_green"
-                            android:visibility="gone" />
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:id="@+id/ivFullBlurContainer"
-                        android:layout_width="85dp"
-                        android:layout_height="100dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="10dp"
-                        app:layout_constraintEnd_toStartOf="@id/ivHumanBlurContainer"
-                        app:layout_constraintTop_toBottomOf="@id/switch_safe_gaze">
-
-                        <androidx.appcompat.widget.AppCompatImageView
-                            android:id="@+id/ivFullBlur"
-                            android:layout_width="85dp"
-                            android:layout_height="85dp"
-                            android:src="@drawable/full_image_blur" />
-
-                        <ImageView
-                            android:id="@+id/iv_check"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="bottom|center"
-                            android:layout_marginBottom="0dp"
-                            android:contentDescription="@string/checkbox_label_title"
-                            android:elevation="5dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_check_bordered"
-                            android:visibility="visible"
-                            tools:visibility="visible" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        android:id="@+id/tvHumanOnly"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/poppins_bold"
-                        android:gravity="center"
-                        android:text="@string/kahf_human_only"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="@id/ivHumanBlurContainer"
-                        app:layout_constraintTop_toBottomOf="@id/ivHumanBlurContainer"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                    <TextView
-                        android:id="@+id/tvHumanOnlyLine2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato"
-                        android:gravity="center"
-                        android:text="@string/kahf_premium"
-                        android:textColor="?attr/kahfSecondaryText"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="@id/ivHumanBlurContainer"
-                        app:layout_constraintTop_toBottomOf="@id/tvHumanOnly"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                    <TextView
-                        android:id="@+id/fullImageText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/poppins_bold"
-                        android:gravity="center"
-                        android:text="@string/kahf_full_image"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="@id/ivFullBlurContainer"
-                        app:layout_constraintStart_toStartOf="@id/ivFullBlurContainer"
-                        app:layout_constraintTop_toBottomOf="@id/ivFullBlurContainer"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                    <TextView
-                        android:id="@+id/fullImageTextLine2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato"
-                        android:gravity="center"
-                        android:text="@string/kahf_free"
-                        android:textColor="?attr/kahfSecondaryText"
-                        android:textSize="12sp"
-                        app:layout_constraintEnd_toEndOf="@id/ivFullBlurContainer"
-                        app:layout_constraintStart_toStartOf="@id/ivFullBlurContainer"
-                        app:layout_constraintTop_toBottomOf="@id/fullImageText"
-                        tools:ignore="DeprecatedWidgetInXml" />
+                        app:layout_constraintTop_toBottomOf="@id/switch_safe_gaze"/>
 
                     <TextView
                         android:id="@+id/blueIndecentPhotosText"
@@ -355,37 +242,11 @@
                         android:text="@string/kahf_desc_blur_full_image"
                         android:textColor="?attr/kahfPrimaryText"
                         android:textSize="14sp"
-                        app:layout_constraintEnd_toStartOf="@id/ivFullBlurContainer"
+                        android:layout_marginEnd="10dp"
+                        app:layout_constraintEnd_toStartOf="@id/ivHumanBlur"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tvDecent"
                         tools:ignore="DeprecatedWidgetInXml" />
-
-                    <ProgressBar
-                        android:id="@+id/progress_bar"
-                        style="@android:style/Widget.ProgressBar.Horizontal"
-                        android:layout_width="0dp"
-                        android:layout_height="10dp"
-                        android:layout_marginTop="10dp"
-                        tools:progress="73"
-                        android:progressDrawable="@drawable/progress_bar"
-                        app:layout_constraintEnd_toStartOf="@id/ivFullBlurContainer"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/blueIndecentPhotosText" />
-
-                    <SeekBar
-                        android:id="@+id/blurSeekbar"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:thumb="@drawable/progress_thumb"
-                        android:progressDrawable="@color/zxing_transparent"
-                        tools:progress="73"
-                        android:layout_marginTop="2dp"
-                        android:paddingStart="12dp"
-                        android:paddingEnd="12dp"
-                        app:layout_constraintEnd_toStartOf="@id/ivFullBlurContainer"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/blueIndecentPhotosText"/>
-
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

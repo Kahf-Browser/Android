@@ -34,6 +34,6 @@ interface KahfImageBlockedDao {
     @Query("SELECT * FROM kahf_image_blocked")
     fun getAllBlockedImageDetails(): Flow<List<KahfImageBlocked>>
 
-    @Query("SELECT COUNT(*) FROM kahf_image_blocked")
+    @Query("SELECT SUM(CASE WHEN isIndecent THEN 1 ELSE 0 END) FROM kahf_image_blocked")
     fun getTotalBlockCount(): Flow<Int>
 }

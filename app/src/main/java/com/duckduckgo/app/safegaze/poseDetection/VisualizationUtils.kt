@@ -28,6 +28,7 @@ import com.duckduckgo.common.utils.SAFE_GAZE_MIN_FACE_SIZE
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
+import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import kotlin.math.abs
 import kotlin.math.max
@@ -460,11 +461,16 @@ object VisualizationUtils {
     }
 
     fun bitmapToBase64(bitmap: Bitmap?, quality: Int = 100): String? {
-        if (bitmap == null) return ""
+        if (bitmap == null) return null
 
-        val outputStream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
-        val byteArray = outputStream.toByteArray()
-        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+        return try {
+            val outputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
+            val byteArray = outputStream.toByteArray()
+            Base64.encodeToString(byteArray, Base64.DEFAULT)
+        } catch (e: Exception) {
+            Timber.e(e, "Error converting bitmap to base64")
+            null
+        }
     }
 }

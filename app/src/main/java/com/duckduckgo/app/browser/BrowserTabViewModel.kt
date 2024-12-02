@@ -423,6 +423,7 @@ class BrowserTabViewModel @Inject constructor(
     val accessibilityViewState: MutableLiveData<AccessibilityViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
+    var pageUpdatedLiveData: MutableLiveData<Unit> = MutableLiveData()
     val privacyShieldViewState: MutableLiveData<PrivacyShieldViewState> = MutableLiveData()
 
     var privateDnsEnabled = true
@@ -1301,6 +1302,7 @@ class BrowserTabViewModel @Inject constructor(
         title: String?,
     ) {
         Timber.v("Page changed: $url")
+        pageUpdatedLiveData.value = Unit
         hasCtaBeenShownForCurrentPage.set(false)
         buildSiteFactory(url, title)
         setAdClickActiveTabData(url)
