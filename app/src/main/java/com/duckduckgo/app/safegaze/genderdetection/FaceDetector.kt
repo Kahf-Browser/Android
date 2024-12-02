@@ -29,8 +29,6 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class FaceDetector(val context: Context) {
-    private var interpreter: Interpreter? = null
-
     private val faceDetectorOptions = FaceDetectorOptions.Builder()
         .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_ACCURATE)
         .setMinFaceSize(80f)
@@ -40,27 +38,7 @@ class FaceDetector(val context: Context) {
 
     private val faceDetector = FaceDetection.getClient(faceDetectorOptions)
 
-    private fun initializeModel() {
-        try {
-            val model = context.assets.open("mobilenet_v2_gender.tflite").use { it.readBytes() }
-            val modelBuffer = ByteBuffer.allocateDirect(model.size)
-            modelBuffer.order(ByteOrder.nativeOrder())
-            modelBuffer.put(model)
-
-            val options = Interpreter.Options().apply{
-                this.setNumThreads(4)
-            }
-            interpreter = Interpreter(modelBuffer, options)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
-
     suspend fun detectFaces(bitmap: Bitmap): List<Rect> {
-        if (interpreter == null) {
-            initializeModel()
-        }
-
         return suspendCoroutine { continuation ->
             val image = InputImage.fromBitmap(bitmap, 0)
 
