@@ -168,12 +168,17 @@ class CustomDnsResolver(
                         if (record.type == Type.A) {
                             Pair(record.rdataToString(), record.name.toString(true))
                         } else {
-                            val cnameResponseMessage = checkCacheAndResolve(record.rdataToString())
-                            cnameResponseMessage?.getSection(Section.ANSWER)
-                                ?.find { it.type == Type.A }
-                                ?.let { cnameRecord ->
-                                    Pair(cnameRecord.rdataToString(), cnameRecord.name.toString(true))
-                                }
+                            // /*val cnameResponseMessage = checkCacheAndResolve(record.rdataToString())
+                            // cnameResponseMessage?.getSection(Section.ANSWER)
+                            //     ?.find { it.type == Type.A }
+                            //     ?.let { cnameRecord ->
+                            //         Pair(cnameRecord.rdataToString(), cnameRecord.name.toString(true))
+                            //     }*/
+
+                            val cnameResponseMessage = resolveCname(record.rdataToString())
+                            cnameResponseMessage?.let { resolvedPair ->
+                                Pair(resolvedPair.first, resolvedPair.second)
+                            }
                         }
                     }?.also { resolvedIp ->
                         // Save to cache with TTL
@@ -185,6 +190,33 @@ class CustomDnsResolver(
                 null
             }
         }
+    }
+
+    private suspend fun resolveCname(domain: String): Pair<String, String>? {
+        Timber.d("tpLog Resolving CNAME for $domain")
+        var currentDomain = domain
+        var attempts = 0
+
+        while (attempts < 2) {
+            val responseMessage = checkCacheAndResolve(currentDomain)
+            val answer = responseMessage?.getSection(Section.ANSWER)
+
+            val aRecord = answer?.find { it.type == Type.A }
+            if (aRecord != null) {
+                return Pair(aRecord.rdataToString(), aRecord.name.toString(true))
+            }
+
+            val cnameRecord = answer?.find { it.type == Type.CNAME }
+            if (cnameRecord != null) {
+                currentDomain = cnameRecord.rdataToString()
+            } else {
+                break
+            }
+
+            attempts++
+        }
+
+        return null
     }
 
     private suspend fun sendDoTQuery(query: Message, retry: Int = 0): Message? {
