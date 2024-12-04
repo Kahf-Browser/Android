@@ -21,6 +21,7 @@ import com.duckduckgo.app.safegaze.poseDetection.VisualizationUtils
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SAFE_GAZE_MAX_IMG_SIZE
 import com.duckduckgo.common.utils.SAFE_GAZE_MIN_IMG_SIZE
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
@@ -80,10 +81,21 @@ class SafeGazeJsInterface(
     ): SafeGazeResult {
         return suspendCoroutine { continuation ->
             scope.launch {
-                val bitmap = getBitmapFromUrl(url)
+                var bitmap = getBitmapFromUrl(url)
                 if (bitmap == null || bitmap.height < SAFE_GAZE_MIN_IMG_SIZE || bitmap.width < SAFE_GAZE_MIN_IMG_SIZE) {
                     continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
                     return@launch
+                }
+
+                // if image is too big, we need to resize it
+                if (bitmap.height > SAFE_GAZE_MAX_IMG_SIZE || bitmap.width > SAFE_GAZE_MAX_IMG_SIZE) {
+                    if (bitmap.height > bitmap.width) {
+                        val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.height
+                        bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * ratio).toInt(), SAFE_GAZE_MAX_IMG_SIZE, true)
+                    } else {
+                        val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.width
+                        bitmap = Bitmap.createScaledBitmap(bitmap, SAFE_GAZE_MAX_IMG_SIZE, (bitmap.height * ratio).toInt(), true)
+                    }
                 }
 
                 val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
