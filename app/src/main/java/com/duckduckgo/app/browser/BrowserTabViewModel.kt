@@ -3556,7 +3556,12 @@ class BrowserTabViewModel @Inject constructor(
                 return data
             }
 
-            val clipboardText = it.getItemAt(0).text.toString()
+            val clipboardText = try {
+                it.getItemAt(0)?.text?.toString() ?: ""
+            } catch (e: Exception) {
+                ""
+            }
+
             if (clipboardText.isEmpty()) {
                 return data
             }
