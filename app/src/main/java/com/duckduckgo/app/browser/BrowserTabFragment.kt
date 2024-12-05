@@ -1493,11 +1493,11 @@ class BrowserTabFragment :
 
         errorView.errorTitle.text = getString(string.webViewErrorTitle)
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
-        if (appTheme.isLightModeEnabled()) {
+        /*if (appTheme.isLightModeEnabled()) {
             errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_light)
         } else {
             errorView.yetiIcon.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_yeti_dark)
-        }
+        }*/
 
         errorView.errorLayout.show()
     }
