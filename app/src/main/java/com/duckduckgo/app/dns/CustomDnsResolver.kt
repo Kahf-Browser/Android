@@ -95,23 +95,27 @@ class CustomDnsResolver(
 
             try {
                 val responseMessage = checkCacheAndResolve(host)
+                val answers = responseMessage?.getSection(Section.ANSWER)
 
-                responseMessage?.getSection(Section.ANSWER)
-                    ?.find { it.type == Type.A || it.type == Type.CNAME }
-                    ?.let { record ->
-                        if (record.type == Type.A) {
-                            Pair(record.rdataToString(), record.name.toString(true))
-                        } else {
-                            val cnameResponseMessage = resolveCname(record.rdataToString())
-                            cnameResponseMessage?.let { resolvedPair ->
-                                Pair(resolvedPair.first, resolvedPair.second)
-                            }
-                        }
-                    }?.also { resolvedIp ->
-                        // Save to cache with TTL
+                val aRecord = answers?.find { it.type == Type.A }
+                if (aRecord != null) {
+                    cache[host] = CachedDnsResponse(responseMessage, System.currentTimeMillis() + 5 * 60 * 1000)
+                    val resolvedIp = Pair(aRecord.rdataToString(), aRecord.name.toString(true))
+                    Timber.d("tpLog Resolved IP: ${resolvedIp.first} ${resolvedIp.second}")
+                    return@withContext resolvedIp
+                }
+
+                val cnameRecord = answers?.find { it.type == Type.CNAME }
+                if (cnameRecord != null) {
+                    val cnameResponseMessage = resolveCname(cnameRecord.rdataToString())
+                    cnameResponseMessage?.let { pair ->
                         cache[host] = CachedDnsResponse(responseMessage, System.currentTimeMillis() + 5 * 60 * 1000)
-                        Timber.d("tpLog Resolved IP: ${resolvedIp.first} ${resolvedIp.second}")
+                        Timber.d("tpLog Resolved IP: ${pair.first} ${pair.second}")
+                        return@withContext pair
                     }
+                }
+
+                return@withContext null
             } catch (e: Exception) {
                 Timber.e("tpLog Error resolving domain: ${e.message}")
                 null
