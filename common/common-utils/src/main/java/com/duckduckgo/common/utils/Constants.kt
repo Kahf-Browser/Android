@@ -26,7 +26,9 @@ const val SAFE_GAZE_DEFAULT_BLUR_VALUE = 50
 const val SAFE_GAZE_MIN_FACE_SIZE = 15
 const val SAFE_GAZE_MIN_IMG_SIZE = 45
 const val SAFE_GAZE_MAX_IMG_SIZE= 800
+const val KAHF_GUARD_BLOCKED_WITH_DOT = "blocked.kahfguard.com."
 const val KAHF_GUARD_BLOCKED_URL = "blocked.kahfguard.com"
+const val KAHF_GUARD_BLOCKED_IP = "blocked.kahfguard.com"
 
 // Private DNS Settings
 const val KAHF_GUARD_INTENSITY = "kahf_guard_intensity"

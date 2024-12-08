@@ -5,6 +5,9 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.dns.socket_pool.SocketHelper
 import com.duckduckgo.app.kahftube.PrivateDnsLevel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_IP
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_WITH_DOT
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
 import kotlinx.coroutines.runBlocking
@@ -89,7 +92,9 @@ class CustomDnsResolver(
         }
     }
 
-    suspend fun resolveDomain(domain: android.net.Uri): Pair<String, String>? {
+    suspend fun resolveDomain(domain: android.net.Uri, attempt: Int = 0): Pair<String, String>? {
+        if (attempt > 2) return null
+
         return withContext(dispatcher.io()) {
             val host = (domain.host ?: domain.toString()).removeSuffix(".") + "."
 
@@ -107,10 +112,15 @@ class CustomDnsResolver(
 
                 val cnameRecord = answers?.find { it.type == Type.CNAME }
                 if (cnameRecord != null) {
-                    val cnameResponseMessage = resolveCname(cnameRecord.rdataToString())
+                    if (cnameRecord.rdataToString() == KAHF_GUARD_BLOCKED_WITH_DOT) {
+                        Timber.d("tpLog CNAME: $KAHF_GUARD_BLOCKED_URL")
+                        return@withContext Pair(KAHF_GUARD_BLOCKED_URL, KAHF_GUARD_BLOCKED_IP)
+                    }
+
+                    val cnameResponseMessage = resolveDomain(cnameRecord.rdataToString().toUri(), attempt + 1)
                     cnameResponseMessage?.let { pair ->
                         cache[host] = CachedDnsResponse(responseMessage, System.currentTimeMillis() + 5 * 60 * 1000)
-                        Timber.d("tpLog Resolved IP: ${pair.first} ${pair.second}")
+                        Timber.d("tpLog Resolved CNAME: ${pair.first} ${pair.second}")
                         return@withContext pair
                     }
                 }
@@ -121,33 +131,6 @@ class CustomDnsResolver(
                 null
             }
         }
-    }
-
-    private suspend fun resolveCname(domain: String): Pair<String, String>? {
-        Timber.d("tpLog Resolving CNAME for $domain")
-        var currentDomain = domain
-        var attempts = 0
-
-        while (attempts < 2) {
-            val responseMessage = checkCacheAndResolve(currentDomain)
-            val answer = responseMessage?.getSection(Section.ANSWER)
-
-            val aRecord = answer?.find { it.type == Type.A }
-            if (aRecord != null) {
-                return Pair(aRecord.rdataToString(), aRecord.name.toString(true))
-            }
-
-            val cnameRecord = answer?.find { it.type == Type.CNAME }
-            if (cnameRecord != null) {
-                currentDomain = cnameRecord.rdataToString()
-            } else {
-                break
-            }
-
-            attempts++
-        }
-
-        return null
     }
 
     private suspend fun sendDoTQuery(query: Message, retry: Int = 0): Message? {
