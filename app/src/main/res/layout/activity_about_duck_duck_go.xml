@@ -16,18 +16,22 @@
   ~ limitations under the License.
   -->
 
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.duckduckgo.app.about.AboutDuckDuckGoActivity">
 
     <include
         android:id="@+id/includeToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         layout="@layout/include_default_toolbar" />
 
-    <include
-        android:id="@+id/includeContent"
-        layout="@layout/content_about_duck_duck_go" />
+    <WebView
+        android:id="@+id/aboutWebView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</LinearLayout>
