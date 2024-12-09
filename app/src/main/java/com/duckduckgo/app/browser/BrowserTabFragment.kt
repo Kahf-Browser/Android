@@ -712,7 +712,7 @@ class BrowserTabFragment :
     }
 
     private val errorSnackbar: Snackbar by lazy {
-        binding.browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE)
+        binding.browserLayout.makeSnackbarWithNoBottomInset(R.string.crashedWebViewErrorMessage, Snackbar.LENGTH_INDEFINITE, showOverBottomNav = true)
             .setBehavior(NonDismissibleBehavior())
     }
 
@@ -1383,21 +1383,21 @@ class BrowserTabFragment :
 
     @SuppressLint("WrongConstant")
     private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
-        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH)?.show()
+        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH, showOverBottomNav = true)?.show()
     }
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
-        val downloadFailedSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG)
+        val downloadFailedSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId), Snackbar.LENGTH_LONG, showOverBottomNav = true)
         view?.postDelayed({ downloadFailedSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
-        val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG)
+        val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG, showOverBottomNav = true)
             ?.apply {
                 this.setAction(R.string.downloadsDownloadFinishedActionName) {
                     val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
                     if (!result) {
-                        view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
+                        view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG, showOverBottomNav = true).show()
                     }
                 }
             }
@@ -1935,6 +1935,7 @@ class BrowserTabFragment :
             binding.rootView.makeSnackbarWithNoBottomInset(
                 getString(R.string.aliasToClipboardMessage),
                 Snackbar.LENGTH_LONG,
+                showOverBottomNav = true,
             ).show()
         }
     }
@@ -2078,6 +2079,7 @@ class BrowserTabFragment :
             binding.rootView.makeSnackbarWithNoBottomInset(
                 getString(R.string.preciseLocationSnackbarMessage, domain.websiteFromGeoLocationsApiOrigin()),
                 Snackbar.LENGTH_SHORT,
+                showOverBottomNav = true,
             )
         snackbar.view.setOnClickListener {
             browserActivity?.launchSitePermissionsSettings()
@@ -2939,7 +2941,7 @@ class BrowserTabFragment :
     ) {
         lifecycleScope.launch(dispatchers.main()) {
             delay(delay)
-            val snackbar = binding.browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG)
+            val snackbar = binding.browserLayout.makeSnackbarWithNoBottomInset(messageResourceId, Snackbar.LENGTH_LONG, showOverBottomNav = true)
             if (includeShortcutToViewCredential) {
                 snackbar.setAction(R.string.autofillSnackbarAction) {
                     context?.let {
@@ -3179,6 +3181,7 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             message,
             Snackbar.LENGTH_LONG,
+            showOverBottomNav = true,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.undoDelete(savedSite)
         }
@@ -3201,6 +3204,7 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.fireproofWebsiteSnackbarConfirmation, entity.website()), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
+            showOverBottomNav = true,
         ).setAction(R.string.fireproofWebsiteSnackbarAction) {
             viewModel.onFireproofWebsiteSnackbarUndoClicked(entity)
         }.show()
@@ -3210,6 +3214,7 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             getString(R.string.fireproofDeleteConfirmationMessage),
             Snackbar.LENGTH_LONG,
+            showOverBottomNav = true,
         ).apply {
             setAction(R.string.fireproofWebsiteSnackbarAction) {
                 viewModel.onRemoveFireproofWebsiteSnackbarUndoClicked(entity)
@@ -3222,6 +3227,7 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionEnabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
+            showOverBottomNav = true,
         ).show()
     }
 
@@ -3229,6 +3235,7 @@ class BrowserTabFragment :
         binding.rootView.makeSnackbarWithNoBottomInset(
             HtmlCompat.fromHtml(getString(R.string.privacyProtectionDisabledConfirmationMessage, domain), FROM_HTML_MODE_LEGACY),
             Snackbar.LENGTH_LONG,
+            showOverBottomNav = true,
         ).show()
     }
 
@@ -3566,7 +3573,11 @@ class BrowserTabFragment :
                     downloadFile(requestUserConfirmation = true)
                 } else {
                     Timber.i("Write external storage permission refused")
-                    omnibar.toolbar.makeSnackbarWithNoBottomInset(R.string.permissionRequiredToDownload, Snackbar.LENGTH_LONG).show()
+                    omnibar.toolbar.makeSnackbarWithNoBottomInset(
+                        R.string.permissionRequiredToDownload,
+                        Snackbar.LENGTH_LONG,
+                        showOverBottomNav = true,
+                    ).show()
                 }
             }
 
