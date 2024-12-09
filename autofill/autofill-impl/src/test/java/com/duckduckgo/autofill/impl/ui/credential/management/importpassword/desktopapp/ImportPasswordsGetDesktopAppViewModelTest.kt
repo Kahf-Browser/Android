@@ -65,7 +65,7 @@ class ImportPasswordsGetDesktopAppViewModelTest {
         testee.onShareClicked()
         testee.commands.test {
             val command = awaitItem().assertIsShareLink()
-            assertEquals("https://duckduckgo.com/browser?origin=funnel_browser_android_sync", command.link)
+            assertEquals("https://kahfbrowser.com", command.link)
             cancelAndIgnoreRemainingEvents()
         }
     }
