@@ -209,6 +209,12 @@
                         app:layout_constraintStart_toStartOf="@id/clearTextButton"
                         android:importantForAccessibility="no"/>
 
+                    <androidx.constraintlayout.widget.Group
+                        android:id="@+id/buttonsVisibleWithBrowser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:constraint_referenced_ids="kahfShareButton" />
+
                     <ImageView
                         android:id="@+id/clearTextButton"
                         android:layout_width="wrap_content"
@@ -219,40 +225,33 @@
                         android:src="@drawable/ic_close_round"
                         android:visibility="gone"
                         app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/omnibar_buttons"
+                        app:layout_constraintEnd_toStartOf="@+id/kahfSettingsButton"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:visibility="visible" />
 
-                    <LinearLayout
-                        android:id="@+id/omnibar_buttons"
-                        android:orientation="horizontal"
+                    <ImageButton
+                        android:id="@+id/kahfSettingsButton"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
-                        android:gravity="center_vertical"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/app_bar_menu_share"
+                        android:paddingHorizontal="5dp"
+                        app:srcCompat="@drawable/ic_kahf"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/kahfShareButton"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <ImageButton
+                        android:id="@+id/kahfShareButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="?selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/app_bar_menu_share"
+                        android:paddingHorizontal="5dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageButton
-                            android:id="@+id/kahfSettingsButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:background="?selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/app_bar_menu_share"
-                            android:paddingHorizontal="5dp"
-                            app:srcCompat="@drawable/ic_kahf"/>
-
-                        <ImageButton
-                            android:id="@+id/kahfShareButton"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:background="?selectableItemBackgroundBorderless"
-                            android:contentDescription="@string/app_bar_menu_share"
-                            android:paddingHorizontal="5dp"
-                            app:srcCompat="@drawable/ic_share_control_normal_24dp"/>
-
-                    </LinearLayout>
-
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:srcCompat="@drawable/ic_share_control_normal_24dp" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

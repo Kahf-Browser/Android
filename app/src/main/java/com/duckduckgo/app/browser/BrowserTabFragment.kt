@@ -1017,9 +1017,9 @@ class BrowserTabFragment :
                         val updated = updateDnsSettings(it)
                         if (updated) {
                             dnsResolver.updateDohServerUrl(it)
+                            popupWindow.dismiss()
                             // Just reloading the WebView doesn't work. Relaunch the tab is required.
                             webView?.url?.let { url ->
-                                popupWindow.dismiss()
                                 (requireActivity() as BrowserActivity).relaunchCurrentTab(url)
                             }
                         }
@@ -4217,13 +4217,15 @@ class BrowserTabFragment :
                 omnibar.shieldIcon?.isInvisible = !viewState.showPrivacyShield.isEnabled() || viewState.showDaxIcon
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = viewState.showSearchIcon
-                omnibar.omnibarButtons.isVisible = !omnibar.omnibarTextInput.hasFocus()
+                omnibar.buttonsVisibleWithBrowser.isVisible = !omnibar.omnibarTextInput.hasFocus()
+                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus()
             } else {
                 omnibar.daxIcon.isVisible = false
                 omnibar.shieldIcon?.isVisible = false
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = true
-                omnibar.omnibarButtons.isVisible = false
+                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus()
+                omnibar.buttonsVisibleWithBrowser.isVisible = false
             }
 
             omnibar.spacer.isVisible = viewState.showClearButton && lastSeenBrowserViewState?.showVoiceSearch ?: false
