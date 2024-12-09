@@ -119,9 +119,9 @@ class SafeGazePopupHandler(
         setFontSize()
 
         // Set build number
-        binding.root.context.let {
+        /*binding.root.context.let {
             binding.tvBuildNumber.text = it.packageManager.getPackageInfo(it.packageName, 0).versionCode.toString()
-        }
+        }*/
     }
 
     private fun setFontSize() {
