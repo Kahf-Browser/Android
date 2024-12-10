@@ -117,6 +117,8 @@
     <attr name="kahfCardBackground" format="color"/>
     <attr name="kahfCardBackgroundInv" format="color"/>
     <attr name="kahfCardBackground2" format="color"/>
+    <attr name="kahfItemGradientTop" format="color"/>
+    <attr name="kahfItemGradientBottom" format="color"/>
 
     <!-- Design System Raw Colors -->
     <color name="red20">#F2A18A</color>
