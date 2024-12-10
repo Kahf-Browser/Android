@@ -43,7 +43,8 @@ import kotlin.coroutines.suspendCoroutine
 
 internal data class UrlInfo(
     val url: String,
-    val uid: String
+    val uid: String,
+    val imageData: String? = null
 )
 
 class SafeGazeJsInterface(
@@ -78,25 +79,33 @@ class SafeGazeJsInterface(
 
     private suspend fun shouldBlurImage(
         url: String,
+        imageData: String?
     ): SafeGazeResult {
         return suspendCoroutine { continuation ->
             scope.launch {
-                var bitmap = getBitmapFromUrl(url)
-                if (bitmap == null || bitmap.height < SAFE_GAZE_MIN_IMG_SIZE || bitmap.width < SAFE_GAZE_MIN_IMG_SIZE) {
-                    continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
-                    return@launch
-                }
+            var bitmap = if (imageData != null) {
+                val byteArrayImage = Base64.decode(imageData, Base64.DEFAULT)
+                val bitmapf = BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
+                bitmapf
+            } else {
+                getBitmapFromUrl(url)
+            }
 
-                // if image is too big, we need to resize it
-                if (bitmap.height > SAFE_GAZE_MAX_IMG_SIZE || bitmap.width > SAFE_GAZE_MAX_IMG_SIZE) {
-                    if (bitmap.height > bitmap.width) {
-                        val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.height
-                        bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * ratio).toInt(), SAFE_GAZE_MAX_IMG_SIZE, true)
-                    } else {
-                        val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.width
-                        bitmap = Bitmap.createScaledBitmap(bitmap, SAFE_GAZE_MAX_IMG_SIZE, (bitmap.height * ratio).toInt(), true)
-                    }
+            if (bitmap == null || bitmap.height < SAFE_GAZE_MIN_IMG_SIZE || bitmap.width < SAFE_GAZE_MIN_IMG_SIZE) {
+                continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
+                return@launch
+            }
+
+            // if image is too big, we need to resize it
+            if (bitmap.height > SAFE_GAZE_MAX_IMG_SIZE || bitmap.width > SAFE_GAZE_MAX_IMG_SIZE) {
+                if (bitmap.height > bitmap.width) {
+                    val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.height
+                    bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * ratio).toInt(), SAFE_GAZE_MAX_IMG_SIZE, true)
+                } else {
+                    val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.width
+                    bitmap = Bitmap.createScaledBitmap(bitmap, SAFE_GAZE_MAX_IMG_SIZE, (bitmap.height * ratio).toInt(), true)
                 }
+            }
 
                 val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
 
@@ -127,7 +136,8 @@ class SafeGazeJsInterface(
                             }
                         }
                     }
-                    continuation.resume(SafeGazeResult(false, personList, bitmap.width, bitmap.height, VisualizationUtils.bitmapToBase64(bitmap)))
+                    val imageDataFinal = imageData ?: VisualizationUtils.bitmapToBase64(bitmap)
+                    continuation.resume(SafeGazeResult(false, personList, bitmap.width, bitmap.height, imageDataFinal))
                 }
             }
         }
@@ -214,12 +224,17 @@ class SafeGazeJsInterface(
         if (message.startsWith("coreML/-/")) {
             val parts = message.split("/-/")
             val imageUrl = if (parts.size >= 2) parts[1] else ""
-            val uid = (if (parts.size >= 2) parts[2] else "0")
+            val uid = (if (parts.size >= 3) parts[2] else "0")
+            val imageData = if (parts.size >= 4) parts[3] else ""
 
             if (onDeviceModelCachedResults.containsKey(imageUrl)) {
                 returnResultFromCache(uid, imageUrl)
             } else {
-                addTaskToQueue(uid, imageUrl)
+                if (imageData.isEmpty()) {
+                    addTaskToQueue(uid, imageUrl)
+                } else {
+                    addTaskToQueue(uid, imageUrl, imageData)
+                }
             }
         }
     }
@@ -239,7 +254,8 @@ class SafeGazeJsInterface(
 
     private fun addTaskToQueue(
         uid: String,
-        url: String
+        url: String,
+        imageData: String? = null
     ) {
         // If same url is already in queue, don't add it again
         if (urlQueue.any { it.url == url }) {
@@ -251,7 +267,7 @@ class SafeGazeJsInterface(
             return
         }
 
-        urlQueue.add(UrlInfo(url, uid))
+        urlQueue.add(UrlInfo(url, uid, imageData))
         processQueue()
     }
 
@@ -272,7 +288,7 @@ class SafeGazeJsInterface(
                         val t1 = System.currentTimeMillis()
                         val result = try {
                             withTimeout(MAX_INFERENCE_TIME_MS) {
-                                shouldBlurImage(it.url)
+                                shouldBlurImage(it.url, it.imageData)
                             }
                         } catch (e: TimeoutCancellationException) {
                             Timber.e("kLog Timeout occurred while processing image: ${it.url}")
