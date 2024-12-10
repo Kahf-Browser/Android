@@ -60,7 +60,7 @@ class AndroidDefaultBrowserDetector @Inject constructor(
     override fun hasDefaultBrowser(): Boolean = defaultBrowserPackage() != null
 
     private fun defaultBrowserPackage(): String? {
-        val intent = Intent(ACTION_VIEW, Uri.parse("https://duckduckgo.com/"))
+        val intent = Intent(ACTION_VIEW, Uri.parse("https://kahfbrowser.com/"))
         intent.addCategory(Intent.CATEGORY_BROWSABLE)
         val resolutionInfo: ResolveInfo? = context.packageManager.resolveActivityCompat(intent, PackageManager.MATCH_DEFAULT_ONLY)
         return resolutionInfo?.activityInfo?.packageName

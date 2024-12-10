@@ -52,7 +52,7 @@ class SurveyEndpointInterceptor @Inject constructor(
     }
 
     companion object {
-        private const val SURVEY_HOST = "https://staticcdn.duckduckgo.com/survey"
+        private const val SURVEY_HOST = "https://staticcdn.kahfbrowser.com/survey"
         private const val SURVEY_SANDBOX_HOST = "ddg-sandbox.s3.amazonaws.com"
     }
 }

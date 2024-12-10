@@ -17,15 +17,9 @@
 package com.duckduckgo.app.about
 
 import android.os.Bundle
-import android.text.Annotation
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.SpannedString
-import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
-import android.text.style.ForegroundColorSpan
-import android.text.style.UnderlineSpan
-import android.view.View
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -37,11 +31,9 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAboutDuckDuckGoBinding
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.di.scopes.ActivityScope
-import com.duckduckgo.mobile.android.R.attr
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.launchIn
@@ -73,10 +65,9 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupWebView(binding.aboutWebView)
 
-        configureUiEventHandlers()
         observeViewModel()
-        configureClickableLinks()
     }
 
     override fun onResume() {
@@ -84,88 +75,12 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
         viewModel.resetEasterEggCounter()
     }
 
-    private fun configureClickableLinks() {
-        with(binding.includeContent.aboutText) {
-            text = addClickableLinks()
-            movementMethod = LinkMovementMethod.getInstance()
-        }
-    }
-
-    private fun addClickableLinks(): SpannableString {
-        val fullText = getText(R.string.aboutDescription) as SpannedString
-        val spannableString = SpannableString(fullText)
-        val annotations = fullText.getSpans(0, fullText.length, Annotation::class.java)
-
-        annotations?.find { it.value == PRIVACY_PROTECTION_ANNOTATION }?.let {
-            addSpannable(
-                spannableString,
-                object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.onPrivacyProtectionsLinkClicked()
-                    }
-                },
-                fullText,
-                it,
-            )
-        }
-
-        annotations?.find { it.value == LEARN_MORE_ANNOTATION }?.let {
-            addSpannable(
-                spannableString,
-                object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.onLearnMoreLinkClicked()
-                    }
-                },
-                fullText,
-                it,
-            )
-        }
-
-        return spannableString
-    }
-
-    private fun addSpannable(
-        spannableString: SpannableString,
-        clickableSpan: ClickableSpan,
-        fullText: SpannedString,
-        it: Annotation,
-    ) {
-        spannableString.apply {
-            setSpan(
-                clickableSpan,
-                fullText.getSpanStart(it),
-                fullText.getSpanEnd(it),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-            setSpan(
-                UnderlineSpan(),
-                fullText.getSpanStart(it),
-                fullText.getSpanEnd(it),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-            setSpan(
-                ForegroundColorSpan(
-                    getColorFromAttr(attr.daxColorAccentBlue),
-                ),
-                fullText.getSpanStart(it),
-                fullText.getSpanEnd(it),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-            )
-        }
-    }
-
-    private fun configureUiEventHandlers() {
-        binding.includeContent.aboutPrivacyPolicy.setClickListener {
-            viewModel.onPrivacyPolicyClicked()
-        }
-
-        binding.includeContent.aboutVersion.setClickListener {
-            viewModel.onVersionClicked()
-        }
-
-        binding.includeContent.aboutProvideFeedback.setClickListener {
-            viewModel.onProvideFeedbackClicked()
+    private fun setupWebView(aboutWebView: WebView) {
+        // Block the WebView from going to another page
+        aboutWebView.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                return request?.url?.host != "kahfbrowser.com"
+            }
         }
     }
 
@@ -174,7 +89,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { viewState ->
                 viewState.let {
-                    binding.includeContent.aboutVersion.setSecondaryText(it.version)
+                    binding.aboutWebView.loadUrl(ABOUT_US_URL)
                 }
             }.launchIn(lifecycleScope)
 
@@ -223,8 +138,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val PRIVACY_PROTECTION_ANNOTATION = "privacy_protection_link"
-        private const val LEARN_MORE_ANNOTATION = "learn_more_link"
+        private const val ABOUT_US_URL = "https://kahfbrowser.com/about/"
         private const val PRIVACY_POLICY_WEB_LINK = "https://asil.co/privacy"
         private const val PRIVACY_PROTECTIONS_WEB_LINK = "https://asil.co/asil-help-pages/privacy/web-tracking-protections/"
     }

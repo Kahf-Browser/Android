@@ -250,6 +250,7 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData.ReportFlow.MENU
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_IP
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.baseHost
@@ -960,7 +961,7 @@ class BrowserTabViewModel @Inject constructor(
                             val originalUrl = String(urlToNavigate.toCharArray())
                             val ip = dnsResolver.resolveDomain(urlToNavigate.toUri())
 
-                            if (ip?.first == "0.0.0.0" || ip?.second == KAHF_GUARD_BLOCKED_URL) {
+                            if (ip?.first == KAHF_GUARD_BLOCKED_IP || ip?.second == KAHF_GUARD_BLOCKED_URL) {
                                 urlToNavigate = "https://$KAHF_GUARD_BLOCKED_URL?url=$originalUrl"
 
                                 withContext(dispatchers.io()) {
@@ -3556,7 +3557,12 @@ class BrowserTabViewModel @Inject constructor(
                 return data
             }
 
-            val clipboardText = it.getItemAt(0).text.toString()
+            val clipboardText = try {
+                it.getItemAt(0)?.text?.toString() ?: ""
+            } catch (e: Exception) {
+                ""
+            }
+
             if (clipboardText.isEmpty()) {
                 return data
             }

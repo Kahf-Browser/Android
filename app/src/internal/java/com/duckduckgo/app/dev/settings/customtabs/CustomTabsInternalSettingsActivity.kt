@@ -80,7 +80,7 @@ class CustomTabsInternalSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun getDefaultBrowserLabel(): String? {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://duckduckgo.com/"))
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://kahfbrowser.com/"))
         val resolveInfo = packageManager.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)
 
         return resolveInfo?.let {

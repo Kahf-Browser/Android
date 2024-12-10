@@ -1,11 +1,13 @@
 package com.duckduckgo.app.dns
 
 import android.content.SharedPreferences
-import android.os.Build
-import android.os.Build.VERSION_CODES
 import androidx.core.net.toUri
+import com.duckduckgo.app.dns.socket_pool.SocketHelper
 import com.duckduckgo.app.kahftube.PrivateDnsLevel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_IP
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_WITH_DOT
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
 import kotlinx.coroutines.runBlocking
@@ -18,14 +20,9 @@ import org.xbill.DNS.Record
 import org.xbill.DNS.Section
 import org.xbill.DNS.Type
 import timber.log.Timber
-import java.io.DataInputStream
-import java.io.DataOutputStream
 import java.io.IOException
 import java.net.InetAddress
-import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap
-import javax.net.ssl.SSLSocket
-import javax.net.ssl.SSLSocketFactory
 
 data class CachedDnsResponse(
     val message: Message,
@@ -39,10 +36,9 @@ class CustomDnsResolver(
     sharedPreferences: SharedPreferences
 ) : Dns {
     private var privateDns: PrivateDnsLevel
-    private var socket: SSLSocket? = null
+    private var socketHelper: SocketHelper
 
     companion object {
-        private const val SO_TIMEOUT = 2000 // 2 seconds
         private const val MAX_RETRY = 2
         private val cache = ConcurrentHashMap<String, CachedDnsResponse>()
     }
@@ -52,67 +48,8 @@ class CustomDnsResolver(
         privateDns = PrivateDnsLevel.get(currentMode)
 
         runBlocking {
-            initSocket()?.let { socket = it }
+            socketHelper = SocketHelper.getInstance(privateDns.dnsServerIps.random(), 853, privateDns.url)
         }
-    }
-
-    private suspend fun initSocket(): SSLSocket? {
-        return withContext(dispatcher.io()) {
-            runCatching {
-                val socketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
-                val sslSocket = socketFactory.createSocket(privateDns.dnsServerIps.first(), 853) as SSLSocket
-                sslSocket.keepAlive = true
-                sslSocket.soTimeout = SO_TIMEOUT
-
-                // Set the TLS host header
-                sslSocket.sslParameters = sslSocket.sslParameters.apply {
-                    serverNames = listOf(javax.net.ssl.SNIHostName(privateDns.url))
-
-                    if (Build.VERSION.SDK_INT >= VERSION_CODES.Q) {
-                        applicationProtocols = arrayOf("http/1.1")
-                    } else {
-                        try {
-                            val method = this::class.java.getMethod("setApplicationProtocols", Array<String>::class.java)
-                            method.invoke(this, arrayOf("http/1.1"))
-                        } catch (e: Exception) {
-                            Timber.e("tpLog Error setting application protocols: ${e.message}")
-                        }
-                    }
-                }
-
-                sslSocket.startHandshake()
-
-                sslSocket
-            }.getOrElse { exception ->
-                Timber.e("tpLog Error initializing SSL socket: ${exception.message}")
-                null
-            }
-        }
-    }
-
-    private fun isSocketUsable(): Boolean {
-        val retVal = try {
-            socket?.soTimeout = 100
-
-            if (socket?.inputStream?.read() == -1) {
-                Timber.i("tpLog Socket is closed by the server.")
-                false
-            } else {
-                true
-            }
-        } catch (e: SocketTimeoutException) {
-            Timber.i("tpLog Socket is usable (no data received within timeout).")
-            true
-        } catch (e: IOException) {
-            Timber.i("tpLog Socket is not usable.")
-            false
-        }
-
-        // Reset the timeout to the default value
-        if (retVal) {
-            socket?.soTimeout = SO_TIMEOUT
-        }
-        return retVal
     }
 
     override fun lookup(hostname: String): List<InetAddress> {
@@ -123,7 +60,7 @@ class CustomDnsResolver(
                     listOf(InetAddress.getByName(it.first))
                 } ?: emptyList()
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Timber.e("tpLog Lookup error: ${e.message}")
             emptyList()
         }
@@ -155,31 +92,40 @@ class CustomDnsResolver(
         }
     }
 
-    suspend fun resolveDomain(domain: android.net.Uri): Pair<String, String>? {
+    suspend fun resolveDomain(domain: android.net.Uri, attempt: Int = 0): Pair<String, String>? {
+        if (attempt > 2) return null
+
         return withContext(dispatcher.io()) {
             val host = (domain.host ?: domain.toString()).removeSuffix(".") + "."
 
             try {
                 val responseMessage = checkCacheAndResolve(host)
+                val answers = responseMessage?.getSection(Section.ANSWER)
 
-                responseMessage?.getSection(Section.ANSWER)
-                    ?.find { it.type == Type.A || it.type == Type.CNAME }
-                    ?.let { record ->
-                        if (record.type == Type.A) {
-                            Pair(record.rdataToString(), record.name.toString(true))
-                        } else {
-                            val cnameResponseMessage = checkCacheAndResolve(record.rdataToString())
-                            cnameResponseMessage?.getSection(Section.ANSWER)
-                                ?.find { it.type == Type.A }
-                                ?.let { cnameRecord ->
-                                    Pair(cnameRecord.rdataToString(), cnameRecord.name.toString(true))
-                                }
-                        }
-                    }?.also { resolvedIp ->
-                        // Save to cache with TTL
-                        cache[host] = CachedDnsResponse(responseMessage, System.currentTimeMillis() + 5 * 60 * 1000)
-                        Timber.d("tpLog Resolved IP: ${resolvedIp.first} ${resolvedIp.second}")
+                val aRecord = answers?.find { it.type == Type.A }
+                if (aRecord != null) {
+                    cache[host] = CachedDnsResponse(responseMessage, System.currentTimeMillis() + 5 * 60 * 1000)
+                    val resolvedIp = Pair(aRecord.rdataToString(), aRecord.name.toString(true))
+                    Timber.d("tpLog Resolved IP: ${resolvedIp.first} ${resolvedIp.second}")
+                    return@withContext resolvedIp
+                }
+
+                val cnameRecord = answers?.find { it.type == Type.CNAME }
+                if (cnameRecord != null) {
+                    if (cnameRecord.rdataToString() == KAHF_GUARD_BLOCKED_WITH_DOT) {
+                        Timber.d("tpLog CNAME: $KAHF_GUARD_BLOCKED_URL")
+                        return@withContext Pair(KAHF_GUARD_BLOCKED_URL, KAHF_GUARD_BLOCKED_IP)
                     }
+
+                    val cnameResponseMessage = resolveDomain(cnameRecord.rdataToString().toUri(), attempt + 1)
+                    cnameResponseMessage?.let { pair ->
+                        cache[host] = CachedDnsResponse(responseMessage, System.currentTimeMillis() + 5 * 60 * 1000)
+                        Timber.d("tpLog Resolved CNAME: ${pair.first} ${pair.second}")
+                        return@withContext pair
+                    }
+                }
+
+                return@withContext null
             } catch (e: Exception) {
                 Timber.e("tpLog Error resolving domain: ${e.message}")
                 null
@@ -195,25 +141,20 @@ class CustomDnsResolver(
         val queryBytes = query.toWire()
 
         return withContext(dispatcher.io()) {
+            val socketClient = socketHelper.socket
+
             try {
-                if (!isSocketUsable()) {
-                    runBlocking { initSocket()?.let { socket = it } }
-                }
-
-                // Write length-prefixed DNS query without closing the stream
-                DataOutputStream(socket?.outputStream).let {
-                    it.writeShort(queryBytes.size)
-                    it.write(queryBytes)
-                    it.flush()
-                }
-
-                DataInputStream(socket?.inputStream).let {
-                    val responseBytes = ByteArray(it.readUnsignedShort())
-                    it.readFully(responseBytes)
-                    Message(responseBytes)
-                }
+                val ans = socketClient.execute(queryBytes)
+                val message = Message(ans)
+                socketHelper.returnSocket(socketClient)
+                message
             } catch (e: IOException) {
-                Timber.e("tpLog DoT query error: ${e.message ?: e.toString()}")
+                Timber.e("tpLog DoT query error 1: ${e.message ?: e.toString()}")
+                // socketHelper.returnSocket(socketClient) // intentionally not invalidating the socket here
+                sendDoTQuery(query, retry + 1)
+            } catch (e: Exception) {
+                Timber.e("tpLog DoT query error 2: ${e.message ?: e.toString()}")
+                socketHelper.invalidateSocket(socketClient)
                 sendDoTQuery(query, retry + 1)
             }
         }
@@ -222,12 +163,10 @@ class CustomDnsResolver(
     private suspend fun closeConnection() {
         try {
             withContext(dispatcher.io()) {
-                socket?.outputStream?.close()
-                socket?.inputStream?.close()
-                socket?.close()
+                socketHelper.shutDown()
                 Timber.d("tpLog Socket connection closed successfully.")
             }
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             Timber.e("tpLog Error closing socket connection: ${e.message}")
         }
     }
@@ -241,7 +180,7 @@ class CustomDnsResolver(
         privateDns = privateDnsLevel
 
         runBlocking {
-            initSocket()?.let { socket = it }
+            socketHelper = SocketHelper.getInstance(privateDns.dnsServerIps.random(), 853, privateDns.url)
             Timber.d("tpLog DoH URL set to: ${privateDnsLevel.url}")
         }
     }

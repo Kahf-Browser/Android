@@ -22,7 +22,7 @@ android {
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
-        versionCode 202411281
+        versionCode 202412081
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "kahf_browser-$versionName"
@@ -450,6 +450,7 @@ dependencies {
 
     // DNS resolver
     implementation "dnsjava:dnsjava:3.5.3"
+    implementation "org.apache.commons:commons-pool2:2.11.1"
 
     // Browser
     implementation "androidx.browser:browser:_"

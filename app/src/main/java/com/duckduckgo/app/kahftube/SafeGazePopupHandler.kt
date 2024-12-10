@@ -120,7 +120,9 @@ class SafeGazePopupHandler(
 
         // Set build number
         binding.root.context.let {
-            binding.tvBuildNumber.text = it.packageManager.getPackageInfo(it.packageName, 0).versionCode.toString()
+            val versionName = it.packageManager.getPackageInfo(it.packageName, 0).versionName.toString()
+            val buildNumber = it.packageManager.getPackageInfo(it.packageName, 0).versionCode.toString()
+            binding.tvBuildNumber.text = it.getString(R.string.settingsVersionFull, versionName, buildNumber)
         }
     }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@
     <string name="sitePermissionsDialogContent">Administrer tilladelser i indstillinger</string>
     <string name="sitePermissionsDialogDenyButton">Afvis</string>
     <string name="sitePermissionsDialogAllowButton">Tillad</string>
-    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Tillad DuckDuckGo at bede om adgang til kamera og mikrofon</string>
-    <string name="sitePermissionsCameraDeniedSnackBarMessage">Tillad DuckDuckGo at bede om adgang til kameraet</string>
-    <string name="sitePermissionsMicDeniedSnackBarMessage">Tillad DuckDuckGo at bede om adgang til mikrofonen</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Tillad Kahf at bede om adgang til kamera og mikrofon</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Tillad Kahf at bede om adgang til kameraet</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Tillad Kahf at bede om adgang til mikrofonen</string>
     <string name="sitePermissionsDeniedSnackBarAction">Tillad</string>
-    <string name="systemPermissionDialogCameraDeniedTitle">Tillad DuckDuckGo at bede om adgang til kameraet på denne enhed</string>
-    <string name="systemPermissionDialogCameraDeniedContent">Websteder kan kun bruge dit kamera, hvis du giver DuckDuckGo tilladelse til at bede om adgang.</string>
-    <string name="systemPermissionDialogAudioDeniedTitle">Tillad DuckDuckGo at bede om adgang til mikrofonen på denne enhed</string>
-    <string name="systemPermissionDialogAudioDeniedContent">Websteder kan kun bruge din mikrofon, hvis du giver DuckDuckGo tilladelse til at bede om adgang.</string>
-    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Tillad DuckDuckGo at bede om adgang til kameraet og mikrofonen på denne enhed</string>
-    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Websteder kan kun bruge dit kamera og din mikrofon, hvis du giver DuckDuckGo tilladelse til at bede om adgang.</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Tillad Kahf at bede om adgang til kameraet på denne enhed</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Websteder kan kun bruge dit kamera, hvis du giver Kahf tilladelse til at bede om adgang.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Tillad Kahf at bede om adgang til mikrofonen på denne enhed</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Websteder kan kun bruge din mikrofon, hvis du giver Kahf tilladelse til at bede om adgang.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Tillad Kahf at bede om adgang til kameraet og mikrofonen på denne enhed</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Websteder kan kun bruge dit kamera og din mikrofon, hvis du giver Kahf tilladelse til at bede om adgang.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Åbn indstillinger</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Afbestil</string>
 </resources>

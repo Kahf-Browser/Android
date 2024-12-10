@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@
     <string name="sitePermissionsDialogContent">Erteilte Berechtigungen in den Einstellungen verwalten</string>
     <string name="sitePermissionsDialogDenyButton">Ablehnen</string>
     <string name="sitePermissionsDialogAllowButton">Zulassen</string>
-    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">DuckDuckGo erlauben, um Zugriff auf Kamera und Mikrofon zu bitten</string>
-    <string name="sitePermissionsCameraDeniedSnackBarMessage">DuckDuckGo erlauben, um Zugriff auf die Kamera zu bitten</string>
-    <string name="sitePermissionsMicDeniedSnackBarMessage">DuckDuckGo erlauben, um Zugriff auf das Mikrofon zu bitten</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Kahf erlauben, um Zugriff auf Kamera und Mikrofon zu bitten</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Kahf erlauben, um Zugriff auf die Kamera zu bitten</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Kahf erlauben, um Zugriff auf das Mikrofon zu bitten</string>
     <string name="sitePermissionsDeniedSnackBarAction">Zulassen</string>
-    <string name="systemPermissionDialogCameraDeniedTitle">DuckDuckGo erlauben, um Zugriff auf die Kamera auf diesem Gerät zu bitten</string>
-    <string name="systemPermissionDialogCameraDeniedContent">Websites können deine Kamera nur verwenden, wenn du DuckDuckGo erlaubst, um Zugriff zu bitten.</string>
-    <string name="systemPermissionDialogAudioDeniedTitle">DuckDuckGo erlauben, um Zugriff auf das Mikrofon auf diesem Gerät zu bitten</string>
-    <string name="systemPermissionDialogAudioDeniedContent">Websites können dein Mikrofon nur verwenden, wenn du DuckDuckGo erlaubst, um Zugriff zu bitten.</string>
-    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">DuckDuckGo erlauben, um Zugriff auf Kamera und Mikrofon auf diesem Gerät zu bitten</string>
-    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Websites können deine Kamera und dein Mikrofon nur verwenden, wenn du DuckDuckGo erlaubst, um Zugriff zu bitten.</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Kahf erlauben, um Zugriff auf die Kamera auf diesem Gerät zu bitten</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Websites können deine Kamera nur verwenden, wenn du Kahf erlaubst, um Zugriff zu bitten.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Kahf erlauben, um Zugriff auf das Mikrofon auf diesem Gerät zu bitten</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Websites können dein Mikrofon nur verwenden, wenn du Kahf erlaubst, um Zugriff zu bitten.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Kahf erlauben, um Zugriff auf Kamera und Mikrofon auf diesem Gerät zu bitten</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Websites können deine Kamera und dein Mikrofon nur verwenden, wenn du Kahf erlaubst, um Zugriff zu bitten.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Einstellungen öffnen</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Abbrechen</string>
 </resources>

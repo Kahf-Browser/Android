@@ -106,7 +106,8 @@ class RxPixelSender @Inject constructor(
     }
 
     private fun sendAndDeletePixel(pixel: PixelEntity): Completable {
-        return sendPixel(pixel)
+        return Completable.complete()
+        /*return sendPixel(pixel)
             .andThen(deletePixel(pixel))
             .andThen {
                 with(pixel) {
@@ -117,7 +118,7 @@ class RxPixelSender @Inject constructor(
                 with(pixel) {
                     Timber.i("Pixel failed: $id $pixelName with params: $additionalQueryParams $encodedQueryParams")
                 }
-            }.onErrorComplete()
+            }.onErrorComplete()*/
     }
 
     override fun sendPixel(
@@ -126,7 +127,8 @@ class RxPixelSender @Inject constructor(
         encodedParameters: Map<String, String>,
         type: PixelType,
     ): Single<SendPixelResult> = Single.fromCallable {
-        runBlocking {
+        SendPixelResult.PIXEL_IGNORED
+        /*runBlocking {
             if (shouldFirePixel(pixelName, type)) {
                 api.fire(
                     pixelName,
@@ -141,7 +143,7 @@ class RxPixelSender @Inject constructor(
             } else {
                 SendPixelResult.PIXEL_IGNORED
             }
-        }
+        }*/
     }
 
     override fun enqueuePixel(
@@ -149,7 +151,8 @@ class RxPixelSender @Inject constructor(
         parameters: Map<String, String>,
         encodedParameters: Map<String, String>,
     ): Completable {
-        return Completable.fromCallable {
+        return Completable.complete()
+        /*return Completable.fromCallable {
             val pixelEntity = PixelEntity(
                 pixelName = pixelName,
                 atb = getAtbInfo(),
@@ -157,11 +160,12 @@ class RxPixelSender @Inject constructor(
                 encodedQueryParams = encodedParameters,
             )
             pendingPixelDao.insert(pixelEntity)
-        }
+        }*/
     }
 
     private fun sendPixel(pixelEntity: PixelEntity): Completable {
-        with(pixelEntity) {
+        return Completable.complete()
+        /*with(pixelEntity) {
             return api.fire(
                 this.pixelName,
                 getDeviceFactor(),
@@ -170,7 +174,7 @@ class RxPixelSender @Inject constructor(
                 this.encodedQueryParams,
                 devMode = shouldFirePixelsAsDev,
             )
-        }
+        }*/
     }
 
     private fun deletePixel(pixel: PixelEntity): Completable {

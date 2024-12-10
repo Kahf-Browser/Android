@@ -75,7 +75,7 @@ class ImportPasswordsGetDesktopAppViewModel @Inject constructor(
     }
 
     companion object {
-        private const val BASE_LINK = "https://duckduckgo.com/browser"
+        private const val BASE_LINK = "https://kahfbrowser.com"
         private const val ATTRIBUTION = "origin=funnel_browser_android_sync"
     }
 }

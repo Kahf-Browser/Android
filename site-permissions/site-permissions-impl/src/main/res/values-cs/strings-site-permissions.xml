@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@
     <string name="sitePermissionsDialogContent">Udělená oprávnění se dají změnit v nastaveních</string>
     <string name="sitePermissionsDialogDenyButton">Odmítnout</string>
     <string name="sitePermissionsDialogAllowButton">Povolit</string>
-    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Povolit DuckDuckGo žádat o přístup k fotoaparátu a mikrofonu</string>
-    <string name="sitePermissionsCameraDeniedSnackBarMessage">Povolit DuckDuckGo žádat o přístup k fotoaparátu</string>
-    <string name="sitePermissionsMicDeniedSnackBarMessage">Povolit DuckDuckGo žádat o přístup a mikrofonu</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Povolit Kahf žádat o přístup k fotoaparátu a mikrofonu</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Povolit Kahf žádat o přístup k fotoaparátu</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Povolit Kahf žádat o přístup a mikrofonu</string>
     <string name="sitePermissionsDeniedSnackBarAction">Povolit</string>
-    <string name="systemPermissionDialogCameraDeniedTitle">Povolit DuckDuckGo žádat na tomto zařízení o přístup k fotoaparátu</string>
-    <string name="systemPermissionDialogCameraDeniedContent">Weby můžou používat fotoaparát, jen když službě DuckDuckGo povolíš žádat o přístup.</string>
-    <string name="systemPermissionDialogAudioDeniedTitle">Povolit DuckDuckGo žádat na tomto zařízení o přístup k mikrofonu</string>
-    <string name="systemPermissionDialogAudioDeniedContent">Weby můžou používat mikrofon, jen když službě DuckDuckGo povolíš žádat o přístup.</string>
-    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Povolit DuckDuckGo žádat na tomto zařízení o přístup k fotoaparátu a mikrofonu</string>
-    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Weby můžou používat tvůj fotoaparát a mikrofon, jen když službě DuckDuckGo povolíš žádat o přístup.</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Povolit Kahf žádat na tomto zařízení o přístup k fotoaparátu</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Weby můžou používat fotoaparát, jen když službě Kahf povolíš žádat o přístup.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Povolit Kahf žádat na tomto zařízení o přístup k mikrofonu</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Weby můžou používat mikrofon, jen když službě Kahf povolíš žádat o přístup.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Povolit Kahf žádat na tomto zařízení o přístup k fotoaparátu a mikrofonu</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Weby můžou používat tvůj fotoaparát a mikrofon, jen když službě Kahf povolíš žádat o přístup.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Otevřít nastavení</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Zrušit</string>
 </resources>

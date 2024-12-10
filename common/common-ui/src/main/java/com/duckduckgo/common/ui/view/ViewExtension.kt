@@ -129,7 +129,7 @@ fun View.makeSnackbarWithNoBottomInset(
     if (showOverBottomNav) {
         val snackbarView = snackbar.view
         val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
-        val marginBottom = resources.getDimensionPixelSize(R.dimen.bottomNavHeight)
+        val marginBottom = resources.getDimensionPixelSize(R.dimen.bottomNavHeight) + snackbarView.dp2Px(10).toInt()
         params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, marginBottom)
         snackbarView.layoutParams = params
     }
@@ -148,7 +148,7 @@ fun View.makeSnackbarWithNoBottomInset(
     if (showOverBottomNav) {
         val snackbarView = snackbar.view
         val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
-        val marginBottom = resources.getDimensionPixelSize(R.dimen.bottomNavHeight)
+        val marginBottom = resources.getDimensionPixelSize(R.dimen.bottomNavHeight) + snackbarView.dp2Px(10).toInt()
         params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, marginBottom)
         snackbarView.layoutParams = params
     }

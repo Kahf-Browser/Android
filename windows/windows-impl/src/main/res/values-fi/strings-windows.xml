@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="windows_app">DuckDuckGo-sovellus Windowsille</string>
-    <string name="windows_title">Hanki DuckDuckGo Windowsille!</string>
-    <string name="windows_description">DuckDuckGon Windows-sovellus tarjoaa kaiken, mitä tarvitset selaamiseen yksityisemmin. Siinä on yksityinen haku, jäljittäjien esto, pakotettu salaus ja evästeiden ponnahdusikkunoiden esto, ja tulossa on vielä lisää luokkansa parhaita suojauksia.\n\nSiirry Windows-tietokoneella osoitteeseen:</string>
-    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_app">Kahf-sovellus Windowsille</string>
+    <string name="windows_title">Hanki Kahf Windowsille!</string>
+    <string name="windows_description">Kahf Windows-sovellus tarjoaa kaiken, mitä tarvitset selaamiseen yksityisemmin. Siinä on yksityinen haku, jäljittäjien esto, pakotettu salaus ja evästeiden ponnahdusikkunoiden esto, ja tulossa on vielä lisää luokkansa parhaita suojauksia.\n\nSiirry Windows-tietokoneella osoitteeseen:</string>
+    <string name="windows_description_link">kahfbrowser.com/windows</string>
     <string name="windows_share_title">Jaa linkki</string>
-    <string name="windows_share_text">Oletko valmis aloittamaan yksityisen selaamisen Windowsilla?Lataa sovellus Windows-laitteellesi osoitteesta:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Oletko valmis aloittamaan yksityisen selaamisen Windowsilla?Lataa sovellus Windows-laitteellesi osoitteesta:\nhttps://kahfbrowser.com/windows</string>
     <string name="windows_mac_link">Etsitkö Mac-versiota?</string>
 </resources>
