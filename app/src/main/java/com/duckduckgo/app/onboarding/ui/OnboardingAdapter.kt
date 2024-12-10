@@ -23,6 +23,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.duckduckgo.app.onboarding.ui.pages.OnboardingBookmarkFragment
 import com.duckduckgo.app.onboarding.ui.pages.OnboardingFragment1
 import com.duckduckgo.app.onboarding.ui.pages.OnboardingFragment2
+import com.duckduckgo.app.onboarding.ui.pages.OnboardingSafeGazeFragment
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 
 class OnboardingAdapter(
@@ -39,6 +40,7 @@ class OnboardingAdapter(
         }
 
         pages.add(OnboardingBookmarkFragment())
+        pages.add(OnboardingSafeGazeFragment())
     }
 
     override fun getItemCount(): Int {

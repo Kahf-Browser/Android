@@ -76,8 +76,8 @@ class AppShortcutCreator @Inject constructor(
             val shortcutList = mutableListOf<ShortcutInfo>()
 
             shortcutList.add(buildNewTabShortcut(context))
-            shortcutList.add(buildClearDataShortcut(context))
-            shortcutList.add(buildBookmarksShortcut(context))
+            // shortcutList.add(buildClearDataShortcut(context))
+            // shortcutList.add(buildBookmarksShortcut(context))
 
             val shortcutManager = context.getSystemService(ShortcutManager::class.java)
             kotlin.runCatching { shortcutManager.dynamicShortcuts = shortcutList }

@@ -281,8 +281,12 @@ class MoveNetMultiPose(
     fun warmup() {
         if (!wormedUp) {
             val bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-            estimatePoses(bitmap)
-            wormedUp = true
+            try {
+                estimatePoses(bitmap)
+                wormedUp = true
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

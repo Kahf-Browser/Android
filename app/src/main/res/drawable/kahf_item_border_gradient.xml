@@ -18,7 +18,7 @@
     android:shape="rectangle">
     <gradient
         android:angle="156.67"
-        android:startColor="#A66DFF"
-        android:endColor="#3F8DFF"
+        android:startColor="?attr/kahfItemGradientTop"
+        android:endColor="?attr/kahfItemGradientBottom"
         android:type="linear" />
 </shape>

@@ -218,6 +218,8 @@
         <item name="kahfCardBackground">#363636</item>
         <item name="kahfCardBackgroundInv">#FFFFFF</item>
         <item name="kahfCardBackground2">#080909</item>
+        <item name="kahfItemGradientTop">#76E4FF</item>
+        <item name="kahfItemGradientBottom">#FF76CA</item>
 
     </style>
 
@@ -308,7 +310,8 @@
         <item name="kahfCardBackground">@color/white</item>
         <item name="kahfCardBackgroundInv">#363636</item>
         <item name="kahfCardBackground2">#ECF4FF</item>
-    </style>
+        <item name="kahfItemGradientTop">#A66DFF</item>
+        <item name="kahfItemGradientBottom">#3F8DFF</item>    </style>
 
     <style name="Theme.DuckDuckGo.Survey" parent="Theme.DuckDuckGo.Light">
         <item name="android:windowBackground">@color/translucentDark</item>
