@@ -899,6 +899,9 @@
     <string name="kahf_onboarding_skip">Skip</string>
     <string name="kahf_onboarding_subtitle">Start exploring the halal web\nand browse the internet without\nworrying about haram content,\nharam ad and adult sites.</string>
     <string name="kahf_onboarding_title">Search \nquickly and \nprivately</string>
+    <string name="kahf_onboarding_sg_title">Blur\nIndecent\nPhotos</string>
+    <string name="kahf_onboarding_sg_subtitle">Enhance your browsing experience\nby blurring inappropriate images.\nAvoid major sins</string>
+    <string name="kahf_onboarding_sg_enable">Enable Image Blurring</string>
     <string name="kahf_onboarding_next">Next</string>
     <string name="kahf_onboarding_skip_now">Skip for now</string>
     <string name="kahf_onboarding_choose">Choose\nthe app you \nuse most</string>
