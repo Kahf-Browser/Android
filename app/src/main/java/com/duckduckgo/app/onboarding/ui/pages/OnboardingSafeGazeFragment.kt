@@ -1,5 +1,7 @@
 package com.duckduckgo.app.onboarding.ui.pages
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,17 +10,21 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboardingSafegazeBinding
+import com.duckduckgo.app.kahftube.SafeGazeLevel
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
+import com.duckduckgo.app.settings.db.SettingsSharedPreferences
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.utils.SAFE_GAZE_MODE
+import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
 import com.duckduckgo.di.scopes.FragmentScope
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
 class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboarding_safegaze) {
 
-    // @Inject
-    // lateinit var analytics: AnalyticsService
+    @Inject
+    lateinit var analytics: AnalyticsService
 
     lateinit var binding: FragmentOnboardingSafegazeBinding
 
@@ -48,13 +54,6 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
         return binding.root
     }
 
-    override fun onResume() {
-        if (userTriedToEnableSafeGaze) {
-            // analytics.logEvent(AnalyticsEvent.SetAsDefaultBrowser)
-        }
-        super.onResume()
-    }
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBoolean(SAVED_STATE_ENABLED_SG, userTriedToEnableSafeGaze)
@@ -66,7 +65,10 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
     }
 
     private fun onEnableSafeGazeClicked() {
+        val preferences = requireContext().getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
+        preferences.edit().putString(SAFE_GAZE_MODE, SafeGazeLevel.FullImage.name).apply()
 
+        (requireActivity() as KahfOnboardingActivity).onContinueClicked()
     }
 
     companion object {
