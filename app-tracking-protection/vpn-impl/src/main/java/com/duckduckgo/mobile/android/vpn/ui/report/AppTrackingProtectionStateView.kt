@@ -182,11 +182,11 @@ class AppTrackingProtectionStateView @JvmOverloads constructor(
     }
 }
 
-@ContributesActivePlugin(
+/*@ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageSectionPlugin::class,
-)
-class AppTrackingProtectionNewTabPageSectionPlugin @Inject constructor() : NewTabPageSectionPlugin {
+)*/
+class AppTrackingProtectionNewTabPageSectionPlugin /*@Inject constructor()*/ : NewTabPageSectionPlugin {
     override val name = NewTabPageSection.APP_TRACKING_PROTECTION.name
 
     override fun getView(context: Context): View {

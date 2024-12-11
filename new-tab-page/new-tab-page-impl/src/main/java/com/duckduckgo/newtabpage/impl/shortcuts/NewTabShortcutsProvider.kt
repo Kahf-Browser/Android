@@ -48,11 +48,11 @@ class RealNewTabPageShortcutProvider @Inject constructor(
 )
 private interface NewTabPageShortcutPluginPointTrigger
 
-@ContributesActivePlugin(
+/*@ContributesActivePlugin(
     AppScope::class,
     boundType = NewTabPageShortcutPlugin::class,
-)
-class AIChatNewTabShortcutPlugin @Inject constructor() : NewTabPageShortcutPlugin {
+)*/
+class AIChatNewTabShortcutPlugin /*@Inject constructor()*/ : NewTabPageShortcutPlugin {
     override fun getShortcut(): NewTabShortcut {
         return NewTabShortcut.Chat
     }
