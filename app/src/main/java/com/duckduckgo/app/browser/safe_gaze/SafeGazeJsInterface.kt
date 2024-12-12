@@ -35,7 +35,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
-import java.util.Timer
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
@@ -372,6 +371,50 @@ class SafeGazeJsInterface(
                 processQueue()
                 Timber.d("kLog processing job resumed for $tabId")
             }
+        }
+    }
+
+    /**
+     * Check if the hardware is compatible with running the on-device models
+     * We run the models on a test image and check if the inference time is within limits
+     * @return true if the hardware is compatible, false otherwise
+     */
+    suspend fun isHardwareCompatible(): Boolean {
+        Timber.d("kLog checking hardware compatibility")
+        
+        val bitmap = context.assets.open("test_image.webp").use {
+            BitmapFactory.decodeStream(it)
+        }
+
+        val t1 = System.currentTimeMillis()
+
+        val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
+        Timber.d("kLog nsfw classified. IsSafe: ${nsfwPrediction.isSafe()}")
+
+        val (faceRectList, poseList) = runFaceAndPoseDetectionInParallel(bitmap)
+        Timber.d("kLog ${faceRectList.size} faces and ${poseList.size} poses detected")
+
+        val personList = VisualizationUtils.matchFacesToPoses(poseList, faceRectList)
+        personList.forEach { person ->
+            person.faceBox?.let { faceRect ->
+                VisualizationUtils.cropToBBox(bitmap, faceRect.toRect())?.let { faceBmp ->
+                    val genderPrediction = genderDetector.predictGender(faceBmp)
+                    person.isFemale = !genderPrediction.isMale
+                    person.genderScore = genderPrediction.genderScore
+                }
+            }
+        }
+
+        Timber.d("kLog ${personList.count { it.isFemale }} females detected")
+
+        val inferenceTime = System.currentTimeMillis() - t1
+
+        return if (inferenceTime > 1000) {
+            Timber.e("kLog Will make it slower: $inferenceTime ms")
+            false
+        } else {
+            Timber.d("kLog Will run fine: $inferenceTime ms")
+            true
         }
     }
 
