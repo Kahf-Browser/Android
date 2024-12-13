@@ -65,18 +65,15 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
         binding = FragmentOnboardingSafegazeBinding.inflate(inflater, container, false)
 
         binding.btnSkip.setOnClickListener {
-            (requireActivity() as KahfOnboardingActivity).onContinueClicked()
+            if (hardwareCompatibilityChecked) {
+                (requireActivity() as KahfOnboardingActivity).onContinueClicked()
+            }
         }
 
         binding.btnDefaultBrowser.setOnClickListener {
-            onEnableSafeGazeClicked()
-        }
-
-        // To avoid the 'Skip' button being hidden behind the navigation bar
-        (requireActivity() as DuckDuckGoActivity).getNavigationBarHeight {
-            binding.guidelineBottom.setGuidelinePercent(
-                if (it > 100) 0.8f else 0.9f
-            )
+            if (hardwareCompatibilityChecked) {
+                onEnableSafeGazeClicked()
+            }
         }
 
         return binding.root
@@ -168,10 +165,6 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
     }
 
     private fun onEnableSafeGazeClicked() {
-        if (!hardwareCompatibilityChecked) {
-            return
-        }
-
         val preferences = requireContext().getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
         preferences.edit().putString(SAFE_GAZE_MODE, SafeGazeLevel.FullImage.name).apply()
 

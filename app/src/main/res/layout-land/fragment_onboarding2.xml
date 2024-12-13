@@ -108,8 +108,6 @@
         android:id="@+id/btnSkip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="30dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
@@ -119,10 +117,10 @@
         android:text="@string/kahf_onboarding_skip"
         android:textColor="@color/kahf_onboarding_skip"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/btnDefaultBrowser"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnDefaultBrowser"
+        app:layout_constraintStart_toEndOf="@id/btnDefaultBrowser"
+        app:layout_constraintTop_toTopOf="@id/btnDefaultBrowser"
         tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
