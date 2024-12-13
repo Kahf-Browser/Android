@@ -54,7 +54,9 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
     lateinit var binding: FragmentOnboardingSafegazeBinding
 
-    private var userTriedToEnableSafeGaze = false
+    private var hardwareCompatibilityChecked = false
+    private var textColor: Int = 0
+    private var text: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -80,12 +82,21 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
         return binding.root
     }
 
+    private fun setCompatibilityViewState() {
+        binding.progressLoader.visibility = if (hardwareCompatibilityChecked) View.GONE else View.VISIBLE
+
+        if (text != "") {
+            binding.tvCompatibility.text = text
+            binding.tvCompatibility.setTextColor(textColor)
+        }
+    }
+
     override fun onResume() {
         super.onResume()
-        if (!userTriedToEnableSafeGaze) {
+        if (!hardwareCompatibilityChecked) {
             checkImageBlurCompatibility()
-            userTriedToEnableSafeGaze = true
         }
+        setCompatibilityViewState()
     }
 
     private fun checkImageBlurCompatibility() {
@@ -97,12 +108,13 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
             Timber.e("kLog Error checking hardware compatibility")
 
             CoroutineScope(dispatcher.main()).launch {
-                binding.tvCompatibility.text = getString(R.string.kahf_onboarding_incompatible)
+                binding.tvCompatibility.text = getString(R.string.kahf_onboarding_incompatible).also { text = it }
                 binding.progressLoader.visibility = View.GONE
                 binding.tvCompatibility.setTextColor(
-                    ContextCompat.getColor(requireContext(), com.duckduckgo.mobile.android.R.color.kahf_red)
+                    ContextCompat.getColor(requireContext(), com.duckduckgo.mobile.android.R.color.kahf_red).also { textColor = it }
                 )
             }
+            hardwareCompatibilityChecked = true
         }
 
         CoroutineScope(dispatcher.io() + exceptionHandler).launch {
@@ -125,32 +137,41 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
                     } else {
                         R.string.kahf_onboarding_slow
                     }
-                )
+                ).also { text = it }
 
                 binding.tvCompatibility.setTextColor(
                     ContextCompat.getColor(requireContext(), if (result) {
                         com.duckduckgo.mobile.android.R.color.kahf_green
                     } else {
                         com.duckduckgo.mobile.android.R.color.kahf_orange
-                    })
+                    }).also { textColor = it }
                 )
 
                 binding.progressLoader.visibility = View.GONE
             }
+            hardwareCompatibilityChecked = true
         }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(SAVED_STATE_ENABLED_SG, userTriedToEnableSafeGaze)
+        outState.putBoolean(SAVED_STATE_COMP_CHECKED, hardwareCompatibilityChecked)
+        outState.putInt(SAVED_STATE_COMP_TEXT_COLOR, textColor)
+        outState.putString(SAVED_STATE_COMP_TEXT_LABEL, text)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        userTriedToEnableSafeGaze = savedInstanceState?.getBoolean(SAVED_STATE_ENABLED_SG) ?: false
+        hardwareCompatibilityChecked = savedInstanceState?.getBoolean(SAVED_STATE_COMP_CHECKED) ?: false
+        textColor = savedInstanceState?.getInt(SAVED_STATE_COMP_TEXT_COLOR) ?: 0
+        text = savedInstanceState?.getString(SAVED_STATE_COMP_TEXT_LABEL) ?: ""
     }
 
     private fun onEnableSafeGazeClicked() {
+        if (!hardwareCompatibilityChecked) {
+            return
+        }
+
         val preferences = requireContext().getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
         preferences.edit().putString(SAFE_GAZE_MODE, SafeGazeLevel.FullImage.name).apply()
 
@@ -158,6 +179,8 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
     }
 
     companion object {
-        private const val SAVED_STATE_ENABLED_SG = "SAVED_STATE_ENABLED_SG"
+        private const val SAVED_STATE_COMP_CHECKED = "SAVED_STATE_COMP_CHECKED"
+        private const val SAVED_STATE_COMP_TEXT_COLOR = "SAVED_STATE_COMP_TEXT_COLOR"
+        private const val SAVED_STATE_COMP_TEXT_LABEL = "SAVED_STATE_COMP_TEXT_LABEL"
     }
 }
