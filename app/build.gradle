@@ -25,7 +25,7 @@ android {
         versionCode 202412111
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        archivesBaseName = "kahf_browser-$versionName"
+        archivesBaseName = "kahf_browser_${versionName}_${versionCode}"
         vectorDrawables.useSupportLibrary = true
         javaCompileOptions {
             annotationProcessorOptions {
