@@ -83,9 +83,7 @@ class SafeGazeJsInterface(
         return suspendCoroutine { continuation ->
             scope.launch {
             var bitmap = if (imageData != null) {
-                val byteArrayImage = Base64.decode(imageData, Base64.DEFAULT)
-                val bitmapf = BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
-                bitmapf
+                base64ToBitmap(imageData)
             } else {
                 getBitmapFromUrl(url)
             }
@@ -154,14 +152,8 @@ class SafeGazeJsInterface(
 
     private suspend fun getBitmapFromUrl(url: String): Bitmap? {
         return if (url.startsWith("data:image")) {
-            try {
-                val base64Image = url.substringAfter(",")  // Remove the 'data:image/jpeg;base64,' prefix
-                val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
-                BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
-            } catch (e: Exception) {
-                Timber.e(e, "kLog Error decoding base64 image: $url")
-                null
-            }
+            val base64Image = url.substringAfter(",")  // Remove the 'data:image/jpeg;base64,' prefix
+            base64ToBitmap(base64Image)
         } else {
             try {
                 downloadBitmap(url, context)
@@ -169,6 +161,17 @@ class SafeGazeJsInterface(
                 Timber.e(e, "kLog Error downloading image: $url")
                 null
             }
+        }
+    }
+
+    // method to convert base64 to bitmap (handle possible exception when decoding base64)
+    private fun base64ToBitmap(base64Image: String): Bitmap? {
+        return try {
+            val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
+        } catch (e: Exception) {
+            Timber.e(e, "kLog Error decoding base64 image")
+            null
         }
     }
 
