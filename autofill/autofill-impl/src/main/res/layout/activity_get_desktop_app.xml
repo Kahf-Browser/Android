@@ -60,8 +60,8 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:src="@drawable/app_download_128"
                 android:layout_marginTop="@dimen/keyline_4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_width="128dp"
+                android:layout_height="128dp" />
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/title"
