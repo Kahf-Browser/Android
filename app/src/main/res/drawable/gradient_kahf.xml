@@ -17,7 +17,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient
-        android:angle="156.67"
+        android:angle="270"
         android:startColor="@color/kahf_gradient_80_start"
         android:endColor="@color/kahf_gradient_80_end"
         android:type="linear" />
