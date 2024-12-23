@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Zapisz hasło</string>
     <string name="saveLoginDialogNotNow">Nie zapisuj</string>
-    <string name="saveLoginDialogTitle">Czy chcesz zapisać hasło w DuckDuckGo?</string>
+    <string name="saveLoginDialogTitle">Czy chcesz zapisać hasło w Kahf?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Więcej opcji</string>
 
     <string name="useSavedLoginDialogTitle">Użyć zapisanego hasła?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Zaktualizuj nazwę użytkownika</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Zaktualizować hasło \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo zaktualizuje to zapisane hasło na Twoim urządzeniu.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf zaktualizuje to zapisane hasło na Twoim urządzeniu.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zamknij okno dialogowe autouzupełniania</string>
 
@@ -66,13 +66,13 @@
 
     <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
     <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
-    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
     <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Skopiowano nazwę użytkownika</string>
     <string name="autofillManagementPasswordCopied">Skopiowano hasło</string>
 
-    <string name="autofill_password_generation_offer_title">Użyć silnego hasła z DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_title">Użyć silnego hasła z Kahf?</string>
     <string name="autofill_password_generation_offer_accept">Użyj silnego hasła</string>
     <string name="autofill_password_generation_offer_decline">Utwórz własne</string>
 

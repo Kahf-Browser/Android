@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Wachtwoord opslaan</string>
     <string name="saveLoginDialogNotNow">Niet opslaan</string>
-    <string name="saveLoginDialogTitle">Wil je dat DuckDuckGo je wachtwoord opslaat?</string>
+    <string name="saveLoginDialogTitle">Wil je dat Kahf je wachtwoord opslaat?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Meer opties</string>
 
     <string name="useSavedLoginDialogTitle">Een opgeslagen wachtwoord gebruiken?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Gebruikersnaam bijwerken</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Wachtwoord bijwerken voor \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo werkt dit opgeslagen wachtwoord op je apparaat bij.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf werkt dit opgeslagen wachtwoord op je apparaat bij.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Dialoogvenster Automatisch invullen sluiten</string>
 
@@ -66,13 +66,13 @@
 
     <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
     <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
-    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
     <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Gebruikersnaam gekopieerd</string>
     <string name="autofillManagementPasswordCopied">Wachtwoord gekopieerd</string>
 
-    <string name="autofill_password_generation_offer_title">Een sterk wachtwoord van DuckDuckGo gebruiken?</string>
+    <string name="autofill_password_generation_offer_title">Een sterk wachtwoord van Kahf gebruiken?</string>
     <string name="autofill_password_generation_offer_accept">Sterk wachtwoord gebruiken</string>
     <string name="autofill_password_generation_offer_decline">Zelf wachtwoord aanmaken</string>
 
