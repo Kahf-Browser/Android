@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
-    <string name="sync_flows_disabled_new_version"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o DuckDuckGo para a versão mais recente para continuar.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o Kahf para a versão mais recente para continuar.</string>
     <string name="sync_create_account_disabled"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o DuckDuckGo para a versão mais recente para continuar.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sincronização e cópia de segurança indisponíveis</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o Kahf para a versão mais recente para continuar.</string>
     <string name="sync_disabled_authenticated_user"><b>Sincronização e cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Sincronização &amp; Cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o DuckDuckGo para a versão mais recente para continuar.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sincronização &amp; Cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança já não estão disponíveis nesta versão da aplicação. Atualiza o Kahf para a versão mais recente para continuar.</string>
     <string name="sync_paused_notification"><b>Sincronização e cópia de segurança em pausa</b>\nLamentamos, mas a sincronização e a cópia de segurança não estão disponíveis de momento. Tenta novamente mais tarde.</string>
     <string name="sync_error_notification"><b>Erro de sincronização</b>\nO Sync &amp; Backup está temporariamente indisponível.</string>
     <string name="sync_error_warning"><b>Erro de sincronização</b>\nO Sync &amp; Backup está temporariamente indisponível.</string>
@@ -34,12 +34,12 @@
     <string name="sync_setup_begin_syncing">Iniciar a sincronização</string>
     <string name="sync_setup_with_another_device_cta_title">Sincronizar com outro dispositivo</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Sincroniza os marcadores e palavras-passe entre os teus dispositivos em segurança.</string>
-    <string name="sync_off_hint">Os teus dados são encriptados de ponta a ponta e o DuckDuckGo não tem acesso à chave de encriptação.</string>
+    <string name="sync_off_hint">Os teus dados são encriptados de ponta a ponta e o Kahf não tem acesso à chave de encriptação.</string>
     <string name="sync_setup_single_device_title">Configuração de dispositivo único</string>
     <string name="sync_setup_single_recover_data_cta_title">Recuperar dados sincronizados</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sincronizar e fazer cópia de segurança deste dispositivo</string>
 
-    <string name="sync_off_encrypted_hint">Os teus dados são encriptados de ponta a ponta e o DuckDuckGo não tem acesso à chave de desencriptação.</string>
+    <string name="sync_off_encrypted_hint">Os teus dados são encriptados de ponta a ponta e o Kahf não tem acesso à chave de desencriptação.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">A configurar a sincronização e a cópia de segurança!</string>
@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Transferir automaticamente ícones para marcadores sincronizados.</string>
     <string name="sync_enable_connecting">A ligar…</string>
     <string name="sync_intro_enable_title">Sincronizar e fazer cópia de segurança deste dispositivo</string>
-    <string name="sync_intro_enable_content">Cria uma cópia de segurança encriptada dos teus marcadores e palavras-passe no servidor seguro do DuckDuckGo, que pode ser sincronizada com os teus restantes dispositivos. \n\n A chave de encriptação é armazenada apenas no teu dispositivo. O DuckDuckGo não consegue aceder à chave.…</string>
+    <string name="sync_intro_enable_content">Cria uma cópia de segurança encriptada dos teus marcadores e palavras-passe no servidor seguro do Kahf, que pode ser sincronizada com os teus restantes dispositivos. \n\n A chave de encriptação é armazenada apenas no teu dispositivo. O Kahf não consegue aceder à chave.…</string>
     <string name="sync_intro_enable_footer">Podes sincronizar com outros dispositivos mais tarde.</string>
     <string name="sync_intro_enable_cta">Ativar a sincronização e cópia de segurança</string>
     <string name="sync_intro_recover_title">Recuperar dados sincronizados</string>
@@ -64,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Ler código QR</string>
-    <string name="connect_screen_scan_qr_hint">Acede a <b>Definições &gt; Sincronização e cópia de segurança</b> no navegador DuckDuckGo noutro dispositivo e seleciona \"Sincronizar com outro dispositivo.\"</string>
+    <string name="connect_screen_scan_qr_hint">Acede a <b>Definições &gt; Sincronização e cópia de segurança</b> no navegador Kahf noutro dispositivo e seleciona \"Sincronizar com outro dispositivo.\"</string>
     <string name="connect_screen_enter_code_cta">Ou introduz manualmente o código</string>
     <string name="connect_screen_connect_qr_hint_title">Entre dispositivos móveis?</string>
     <string name="connect_screen_connect_qr_hint_content">Lê este código com outro dispositivo para sincronizar.</string>
@@ -72,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Introduzir manualmente o código</string>
-    <string name="sync_enter_code_hint">Acede a <b>Definições &gt; Sincronização e cópia de segurança &gt; Sincronização com outro dispositivo</b> e seleciona <b>Ver código de texto</b> na aplicação DuckDuckGo noutro dispositivo sincronizado e cola o código aqui para sincronizar este dispositivo.</string>
+    <string name="sync_enter_code_hint">Acede a <b>Definições &gt; Sincronização e cópia de segurança &gt; Sincronização com outro dispositivo</b> e seleciona <b>Ver código de texto</b> na aplicação Kahf noutro dispositivo sincronizado e cola o código aqui para sincronizar este dispositivo.</string>
     <string name="sync_enter_code_verifying">A verificar o código</string>
     <string name="sync_enter_code_invalid">⚠️ Código inválido</string>
     <string name="sync_enter_code_paste">Colar código</string>
@@ -97,7 +97,7 @@
 
     <string name="synced_devices_section_title">Dispositivos sincronizados</string>
     <string name="sync_new_device_section_title">Sincronizar dispositivo novo</string>
-    <string name="sync_new_device_hint">Acede a Definições &gt; Sincronização e cópia de segurança na aplicação DuckDuckGo num dispositivo diferente e lê para ligares instantaneamente.</string>
+    <string name="sync_new_device_hint">Acede a Definições &gt; Sincronização e cópia de segurança na aplicação Kahf num dispositivo diferente e lê para ligares instantaneamente.</string>
     <string name="sync_show_text_code_item">Mostrar código de texto</string>
     <string name="sync_show_qr_code_item">Ler código QR</string>
     <string name="sync_save_recovery_code_item">Guardar PDF de recuperação</string>
@@ -117,8 +117,8 @@
     <string name="sync_pdf_description">O código de recuperação permite sincronizar os teus marcadores em vários dispositivos e recuperar os dados sincronizados se perderes o acesso a um dispositivo.</string>
     <string name="sync_code_box_title">Guarda estas informações em segurança.</string>
     <string name="sync_instructions_title">Como funciona?</string>
-    <string name="sync_instructions_step1">Abre o DuckDuckGo noutro dispositivo e acede a Sincronização em Definições.</string>
-    <string name="sync_instructions_step2">Lê o código QR ou copia e cola o código de texto noutra aplicação DuckDuckGo.</string>
+    <string name="sync_instructions_step1">Abre o Kahf noutro dispositivo e acede a Sincronização em Definições.</string>
+    <string name="sync_instructions_step2">Lê o código QR ou copia e cola o código de texto noutra aplicação Kahf.</string>
     <string name="sync_instructions_step3">A sincronização será ativada e terás novamente acesso a todos os teus dados.</string>
     <string name="remove_device_dialog_title">Remover dispositivo?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" deixará de poder aceder aos teus dados sincronizados.</string>

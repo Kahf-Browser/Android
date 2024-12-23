@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
-    <string name="sync_flows_disabled_new_version"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj DuckDuckGo do najnowszej wersji.</string>
+    <string name="sync_flows_disabled_new_version"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj Kahf do najnowszej wersji.</string>
     <string name="sync_create_account_disabled"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj DuckDuckGo do najnowszej wersji.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Synchronizacja i kopia zapasowa niedostępna</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj Kahf do najnowszej wersji.</string>
     <string name="sync_disabled_authenticated_user"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj DuckDuckGo do najnowszej wersji.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa nie jest już dostępna w tej wersji aplikacji. Aby kontynuować, zaktualizuj Kahf do najnowszej wersji.</string>
     <string name="sync_paused_notification"><b>Synchronizacja i kopia zapasowa wstrzymana</b>\nNiestety synchronizacja i kopia zapasowa jest obecnie niedostępna. Spróbuj ponownie później.</string>
     <string name="sync_error_notification"><b>Błąd synchronizacji</b>\nFunkcja Sync &amp; Backup jest tymczasowo niedostępna.</string>
     <string name="sync_error_warning"><b>Błąd synchronizacji</b>\nFunkcja Sync &amp; Backup jest tymczasowo niedostępna.</string>
@@ -34,12 +34,12 @@
     <string name="sync_setup_begin_syncing">Rozpocznij synchronizację</string>
     <string name="sync_setup_with_another_device_cta_title">Synchronizuj z innym urządzeniem</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Bezpiecznie synchronizuj zakładki i hasła między swoimi urządzeniami.</string>
-    <string name="sync_off_hint">Twoje dane są kompleksowo szyfrowane, a DuckDuckGo nie ma dostępu do klucza szyfrowania.</string>
+    <string name="sync_off_hint">Twoje dane są kompleksowo szyfrowane, a Kahf nie ma dostępu do klucza szyfrowania.</string>
     <string name="sync_setup_single_device_title">Konfiguracja na jednym urządzeniu</string>
     <string name="sync_setup_single_recover_data_cta_title">Odzyskaj zsynchronizowane dane</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synchronizuj i twórz kopie zapasowe tego urządzenia</string>
 
-    <string name="sync_off_encrypted_hint">Twoje dane są kompleksowo szyfrowane, a DuckDuckGo nie ma dostępu do klucza odszyfrowania.</string>
+    <string name="sync_off_encrypted_hint">Twoje dane są kompleksowo szyfrowane, a Kahf nie ma dostępu do klucza odszyfrowania.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Konfigurowanie synchronizacji i kopii zapasowej!</string>
@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automatycznie pobieraj ikony dla zsynchronizowanych zakładek.</string>
     <string name="sync_enable_connecting">Łączenie...</string>
     <string name="sync_intro_enable_title">Synchronizuj i twórz kopie zapasowe tego urządzenia</string>
-    <string name="sync_intro_enable_content">Tworzy na bezpiecznym serwerze DuckDuckGo zaszyfrowaną kopię zapasową zakładek i haseł, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, DuckDuckGo nie może uzyskać do niego dostępu.…</string>
+    <string name="sync_intro_enable_content">Tworzy na bezpiecznym serwerze Kahf zaszyfrowaną kopię zapasową zakładek i haseł, którą można zsynchronizować z innymi urządzeniami. \n\n Klucz szyfrowania jest przechowywany tylko na urządzeniu użytkownika, Kahf nie może uzyskać do niego dostępu.…</string>
     <string name="sync_intro_enable_footer">Możesz później przeprowadzić synchronizację z innymi urządzeniami.</string>
     <string name="sync_intro_enable_cta">Włącz synchronizację i kopię zapasową</string>
     <string name="sync_intro_recover_title">Odzyskaj zsynchronizowane dane</string>
@@ -64,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Zeskanuj kod QR</string>
-    <string name="connect_screen_scan_qr_hint">Wybierz kolejno <b>Ustawienia › Synchronizacja i kopia zapasowa</b> w przeglądarce DuckDuckGo na innym urządzeniu i wybierz opcję „Synchronizuj z innym urządzeniem”.</string>
+    <string name="connect_screen_scan_qr_hint">Wybierz kolejno <b>Ustawienia › Synchronizacja i kopia zapasowa</b> w przeglądarce Kahf na innym urządzeniu i wybierz opcję „Synchronizuj z innym urządzeniem”.</string>
     <string name="connect_screen_enter_code_cta">Lub wprowadź kod ręcznie</string>
     <string name="connect_screen_connect_qr_hint_title">Z telefonu komórkowego na telefon komórkowy?</string>
     <string name="connect_screen_connect_qr_hint_content">Zeskanuj ten kod za pomocą innego urządzenia, aby zsynchronizować.</string>
@@ -72,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Wprowadź kod ręcznie</string>
-    <string name="sync_enter_code_hint">Wybierz kolejno <b>Ustawienia &gt; Synchronizacja i kopia zapasowa &gt; Synchronizuj z innym urządzeniem</b> i wybierz opcję <b>Wyświetl kod tekstowy</b> w aplikacji DuckDuckGo na innym zsynchronizowanym urządzeniu, a następnie wklej tutaj kod, aby zsynchronizować to urządzenie.</string>
+    <string name="sync_enter_code_hint">Wybierz kolejno <b>Ustawienia &gt; Synchronizacja i kopia zapasowa &gt; Synchronizuj z innym urządzeniem</b> i wybierz opcję <b>Wyświetl kod tekstowy</b> w aplikacji Kahf na innym zsynchronizowanym urządzeniu, a następnie wklej tutaj kod, aby zsynchronizować to urządzenie.</string>
     <string name="sync_enter_code_verifying">Weryfikacja kodu</string>
     <string name="sync_enter_code_invalid">⚠️ Nieprawidłowy kod</string>
     <string name="sync_enter_code_paste">Wklej kod</string>
@@ -97,7 +97,7 @@
 
     <string name="synced_devices_section_title">Zsynchronizowane urządzenia</string>
     <string name="sync_new_device_section_title">Synchronizuj nowe urządzenie</string>
-    <string name="sync_new_device_hint">Wybierz kolejno Ustawienia › Synchronizacja i kopia zapasowa w przeglądarce DuckDuckGo na innym urządzeniu i zeskanuj kod, aby natychmiast połączyć.</string>
+    <string name="sync_new_device_hint">Wybierz kolejno Ustawienia › Synchronizacja i kopia zapasowa w przeglądarce Kahf na innym urządzeniu i zeskanuj kod, aby natychmiast połączyć.</string>
     <string name="sync_show_text_code_item">Pokaż kod tekstowy</string>
     <string name="sync_show_qr_code_item">Zeskanuj kod QR</string>
     <string name="sync_save_recovery_code_item">Zapisz PDF odzyskiwania</string>
@@ -117,8 +117,8 @@
     <string name="sync_pdf_description">Kod odzyskiwania synchronizacji umożliwia synchronizację zakładek na wielu urządzeniach i odzyskanie zsynchronizowanych danych w przypadku utraty dostępu do urządzenia.</string>
     <string name="sync_code_box_title">Przechowuj te informacje w bezpiecznym miejscu.</string>
     <string name="sync_instructions_title">Jak to działa?</string>
-    <string name="sync_instructions_step1">Otwórz DuckDuckGo na innym urządzeniu i wybierz opcję Synchronizacja w menu Ustawienia.</string>
-    <string name="sync_instructions_step2">Zeskanuj kod QR lub skopiuj i wklej kod tekstowy do innej aplikacji DuckDuckGo.</string>
+    <string name="sync_instructions_step1">Otwórz Kahf na innym urządzeniu i wybierz opcję Synchronizacja w menu Ustawienia.</string>
+    <string name="sync_instructions_step2">Zeskanuj kod QR lub skopiuj i wklej kod tekstowy do innej aplikacji Kahf.</string>
     <string name="sync_instructions_step3">Synchronizacja zostanie aktywowana i ponownie będziesz mieć dostęp do wszystkich danych.</string>
     <string name="remove_device_dialog_title">Usunąć urządzenie?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s” nie będzie już mieć dostępu do zsynchronizowanych danych.</string>

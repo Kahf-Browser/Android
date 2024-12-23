@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami</b>\nAtsiprašome, bet šiuo metu sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami. Pabandykite dar kartą vėliau.</string>
-    <string name="sync_flows_disabled_new_version"><b>Sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šioje programos versijoje nebepasiekiami. Norėdami tęsti, atnaujinkite „DuckDuckGo“ į naujausią versiją.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šioje programos versijoje nebepasiekiami. Norėdami tęsti, atnaujinkite „Kahf“ į naujausią versiją.</string>
     <string name="sync_create_account_disabled"><b>Sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami</b>\nAtsiprašome, bet šiuo metu sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami. Pabandykite dar kartą vėliau.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šioje programos versijoje nebepasiekiami. Norėdami tęsti, atnaujinkite „DuckDuckGo“ į naujausią versiją.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sinchronizavimas ir atsarginės kopijos kūrimas nepasiekiami</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šioje programos versijoje nebepasiekiami. Norėdami tęsti, atnaujinkite „Kahf“ į naujausią versiją.</string>
     <string name="sync_disabled_authenticated_user"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šiuo metu nepasiekiami. Pabandykite dar kartą vėliau.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šioje programos versijoje nebepasiekiami. Norėdami tęsti, atnaujinkite „DuckDuckGo“ į naujausią versiją.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šioje programos versijoje nebepasiekiami. Norėdami tęsti, atnaujinkite „Kahf“ į naujausią versiją.</string>
     <string name="sync_paused_notification"><b>Sinchronizavimas ir atsarginės kopijos kūrimas pristabdyti</b>\nAtsiprašome, bet sinchronizavimas ir atsarginės kopijos kūrimas šiuo metu nepasiekiami. Pabandykite dar kartą vėliau.</string>
     <string name="sync_error_notification"><b>Sinchronizavimo klaida</b>\n„Sync &amp; Backup“ laikinai nepasiekiamas.</string>
     <string name="sync_error_warning"><b>Sinchronizavimo klaida</b>\n„Sync &amp; Backup“ laikinai nepasiekiamas.</string>
@@ -34,12 +34,12 @@
     <string name="sync_setup_begin_syncing">Pradėti sinchronizavimą</string>
     <string name="sync_setup_with_another_device_cta_title">Sinchronizuoti su kitu įrenginiu</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Saugiai sinchronizuokite žymes ir slaptažodžius tarp savo įrenginių.</string>
-    <string name="sync_off_hint">Jūsų duomenys šifruojami ištisiniu būdu, o „DuckDuckGo“ neturi prieigos prie šifravimo rakto.</string>
+    <string name="sync_off_hint">Jūsų duomenys šifruojami ištisiniu būdu, o „Kahf“ neturi prieigos prie šifravimo rakto.</string>
     <string name="sync_setup_single_device_title">Vieno įrenginio sąranka</string>
     <string name="sync_setup_single_recover_data_cta_title">Atkurti sinchronizuotus duomenis</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sinchronizuokite ir sukurkite atsarginę šio įrenginio kopiją</string>
 
-    <string name="sync_off_encrypted_hint">Jūsų duomenys šifruojami ištisiniu būdu, o „DuckDuckGo“ neturi prieigos prie iššifravimo rakto.</string>
+    <string name="sync_off_encrypted_hint">Jūsų duomenys šifruojami ištisiniu būdu, o „Kahf“ neturi prieigos prie iššifravimo rakto.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Nustatome sinchronizavimą ir atsarginės kopijos kūrimą!</string>
@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automatiškai atsisiųskite sinchronizuotų žymių piktogramas.</string>
     <string name="sync_enable_connecting">Jungiamasi...</string>
     <string name="sync_intro_enable_title">Sinchronizuokite ir sukurkite atsarginę šio įrenginio kopiją</string>
-    <string name="sync_intro_enable_content">Taip „DuckDuckGo“ saugiame serveryje sukuriama užšifruota atsarginė žymių ir slaptažodžių kopija, kurią galima sinchronizuoti su kitais įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „DuckDuckGo“ negali jo pasiekti...</string>
+    <string name="sync_intro_enable_content">Taip „Kahf“ saugiame serveryje sukuriama užšifruota atsarginė žymių ir slaptažodžių kopija, kurią galima sinchronizuoti su kitais įrenginiais. \n\n Šifravimo raktas saugomas tik jūsų įrenginyje, „Kahf“ negali jo pasiekti...</string>
     <string name="sync_intro_enable_footer">Vėliau galėsite sinchronizuoti su kitais įrenginiais.</string>
     <string name="sync_intro_enable_cta">Įjunkite sinchronizavimą ir atsarginės kopijos kūrimą</string>
     <string name="sync_intro_recover_title">Atkurti sinchronizuotus duomenis</string>
@@ -64,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Nuskaityti QR kodą</string>
-    <string name="connect_screen_scan_qr_hint">Eikite į <b>Nustatymai &gt; Sinchronizavimas ir atsarginės kopijos kūrimas</b> „DuckDuckGo“ naršyklėje kitame įrenginyje ir pasirinkite „Sinchronizuoti su kitu įrenginiu“.</string>
+    <string name="connect_screen_scan_qr_hint">Eikite į <b>Nustatymai &gt; Sinchronizavimas ir atsarginės kopijos kūrimas</b> „Kahf“ naršyklėje kitame įrenginyje ir pasirinkite „Sinchronizuoti su kitu įrenginiu“.</string>
     <string name="connect_screen_enter_code_cta">Arba įveskite kodą ranka</string>
     <string name="connect_screen_connect_qr_hint_title">Iš mobiliojo įrenginio į mobilųjį įrenginį?</string>
     <string name="connect_screen_connect_qr_hint_content">Norėdami sinchronizuoti, nuskaitykite šį kodą su kitu įrenginiu.</string>
@@ -72,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Įveskite kodą ranka</string>
-    <string name="sync_enter_code_hint">Eikite į <b>Nustatymai &gt; Sinchronizavimas ir atsarginės kopijos kūrimas &gt; Sinchronizuoti su kitu įrenginiu</b> ir pasirinkite <b>Rodyti teksto kodą</b> „DuckDuckGo“ programoje kitame sinchronizuotame įrenginyje ir įklijuokite čia kodą, kad sinchronizuotumėte šį įrenginį.</string>
+    <string name="sync_enter_code_hint">Eikite į <b>Nustatymai &gt; Sinchronizavimas ir atsarginės kopijos kūrimas &gt; Sinchronizuoti su kitu įrenginiu</b> ir pasirinkite <b>Rodyti teksto kodą</b> „Kahf“ programoje kitame sinchronizuotame įrenginyje ir įklijuokite čia kodą, kad sinchronizuotumėte šį įrenginį.</string>
     <string name="sync_enter_code_verifying">Tikrinamas kodas</string>
     <string name="sync_enter_code_invalid">⚠️ Netinkamas kodas</string>
     <string name="sync_enter_code_paste">Įklijuoti kodą</string>
@@ -97,7 +97,7 @@
 
     <string name="synced_devices_section_title">Sinchronizuoti įrenginiai</string>
     <string name="sync_new_device_section_title">Sinchronizuoti naują įrenginį</string>
-    <string name="sync_new_device_hint">Eikite į Nustatymai &gt; Sinchronizavimas ir atsarginės kopijos kūrimas „DuckDuckGo“ programoje kitame įrenginyje ir nuskaitykite, kad iš karto prisijungtumėte.</string>
+    <string name="sync_new_device_hint">Eikite į Nustatymai &gt; Sinchronizavimas ir atsarginės kopijos kūrimas „Kahf“ programoje kitame įrenginyje ir nuskaitykite, kad iš karto prisijungtumėte.</string>
     <string name="sync_show_text_code_item">Rodyti teksto kodą</string>
     <string name="sync_show_qr_code_item">Nuskaityti QR kodą</string>
     <string name="sync_save_recovery_code_item">Išsaugoti atkūrimo PDF</string>
@@ -117,8 +117,8 @@
     <string name="sync_pdf_description">Atkūrimo kodas leidžia sinchronizuoti žymes keliuose įrenginiuose ir atkurti sinchronizuotus duomenis, jei prarandate prieigą prie įrenginio.</string>
     <string name="sync_code_box_title">Saugokite šią informaciją.</string>
     <string name="sync_instructions_title">Kaip tai veikia?</string>
-    <string name="sync_instructions_step1">Atidarykite „DuckDuckGo“ kitame įrenginyje ir eikite į „Nustatymai“ skiltį „Sinchronizavimas“.</string>
-    <string name="sync_instructions_step2">Nuskaitykite QR kodą arba nukopijuokite ir įklijuokite teksto kodą į kitą „DuckDuckGo“ programą.</string>
+    <string name="sync_instructions_step1">Atidarykite „Kahf“ kitame įrenginyje ir eikite į „Nustatymai“ skiltį „Sinchronizavimas“.</string>
+    <string name="sync_instructions_step2">Nuskaitykite QR kodą arba nukopijuokite ir įklijuokite teksto kodą į kitą „Kahf“ programą.</string>
     <string name="sync_instructions_step3">Sinchronizavimas bus aktyvuotas ir vėl galėsite naudotis visais savo duomenimis.</string>
     <string name="remove_device_dialog_title">Pašalinti įrenginį?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s“ nebegalės pasiekti jūsų sinchronizuotų duomenų.</string>

@@ -19,11 +19,11 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sync &amp; Backup Unavailable</b>\nSorry, but Sync &amp; Backup is currently unavailable. Please try again later.</string>
-    <string name="sync_flows_disabled_new_version"><b>Sync &amp; Backup Unavailable</b>\nSorry, but Sync &amp; Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sync &amp; Backup Unavailable</b>\nSorry, but Sync &amp; Backup is no longer available in this app version. Please update Kahf to the latest version to continue.</string>
     <string name="sync_create_account_disabled"><b>Sync &amp; Backup Unavailable</b>\nSorry, but Sync &amp; Backup is currently unavailable. Please try again later.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Sync &amp; Backup Unavailable</b>\nSorry, but Sync &amp; Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sync &amp; Backup Unavailable</b>\nSorry, but Sync &amp; Backup is no longer available in this app version. Please update Kahf to the latest version to continue.</string>
     <string name="sync_disabled_authenticated_user"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is currently unavailable. Please try again later.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is no longer available in this app version. Please update DuckDuckGo to the latest version to continue.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is no longer available in this app version. Please update Kahf to the latest version to continue.</string>
     <string name="sync_paused_notification"><b>Sync &amp; Backup Paused</b>\nSorry, but Sync &amp; Backup is currently unavailable. Please try again later.</string>
     <string name="sync_error_notification"><b>Sync Error</b>\nSync &amp; Backup is temporarily unavailable.</string>
     <string name="sync_error_warning"><b>Sync Error</b>\nSync &amp; Backup is temporarily unavailable.</string>
@@ -34,12 +34,12 @@
     <string name="sync_setup_begin_syncing">Begin Syncing</string>
     <string name="sync_setup_with_another_device_cta_title">Sync With Another Device</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Securely sync bookmarks and passwords between your devices.</string>
-    <string name="sync_off_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the encryption key.</string>
+    <string name="sync_off_hint">Your data is end-to-end encrypted, and Kahf does not have access to the encryption key.</string>
     <string name="sync_setup_single_device_title">Single-Device Setup</string>
     <string name="sync_setup_single_recover_data_cta_title">Recover Synced Data</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sync and Back Up This Device</string>
 
-    <string name="sync_off_encrypted_hint">Your data is end-to-end encrypted, and DuckDuckGo does not have access to the decryption key.</string>
+    <string name="sync_off_encrypted_hint">Your data is end-to-end encrypted, and Kahf does not have access to the decryption key.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Setting Up Sync and Backup!</string>
@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automatically download icons for synced bookmarks.</string>
     <string name="sync_enable_connecting">Connecting…</string>
     <string name="sync_intro_enable_title">Sync and Back Up This Device</string>
-    <string name="sync_intro_enable_content">This creates an encrypted backup of your bookmarks and passwords on DuckDuckGo’s secure server, which can be synced with your other devices. \n\n The encryption key is only stored on your device, DuckDuckGo cannot access it.…</string>
+    <string name="sync_intro_enable_content">This creates an encrypted backup of your bookmarks and passwords on Kahf’s secure server, which can be synced with your other devices. \n\n The encryption key is only stored on your device, Kahf cannot access it.…</string>
     <string name="sync_intro_enable_footer">You can sync with your other devices later.</string>
     <string name="sync_intro_enable_cta">Turn on Sync &amp; Backup</string>
     <string name="sync_intro_recover_title">Recover Synced Data</string>
@@ -64,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scan QR Code</string>
-    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the DuckDuckGo Browser on another device and select \"Sync With Another Device.\"</string>
+    <string name="connect_screen_scan_qr_hint">Go to <b>Settings > Sync &amp; Back Up</b> in the Kahf Browser on another device and select \"Sync With Another Device.\"</string>
     <string name="connect_screen_enter_code_cta">Or Manually Enter Code</string>
     <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
     <string name="connect_screen_connect_qr_hint_content">Scan this code with another device to sync.</string>
@@ -72,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Manually Enter Code</string>
-    <string name="sync_enter_code_hint">Go to <b>Settings > Sync &amp; Backup > Sync With Another Device</b> and select <b>View Text Code</b> in the DuckDuckGo App on another synced device and paste the code here to sync this device.</string>
+    <string name="sync_enter_code_hint">Go to <b>Settings > Sync &amp; Backup > Sync With Another Device</b> and select <b>View Text Code</b> in the Kahf App on another synced device and paste the code here to sync this device.</string>
     <string name="sync_enter_code_verifying">Verifying code</string>
     <string name="sync_enter_code_invalid">⚠️ Invalid Code</string>
     <string name="sync_enter_code_paste">Paste Code</string>
@@ -97,7 +97,7 @@
 
     <string name="synced_devices_section_title">Synced Devices</string>
     <string name="sync_new_device_section_title">Sync New Device</string>
-    <string name="sync_new_device_hint">Go to Settings > Sync &amp; Back Up in the DuckDuckGo App on a different device and scan to connect instantly.</string>
+    <string name="sync_new_device_hint">Go to Settings > Sync &amp; Back Up in the Kahf App on a different device and scan to connect instantly.</string>
     <string name="sync_show_text_code_item">Show Text Code</string>
     <string name="sync_show_qr_code_item">Scan QR Code</string>
     <string name="sync_save_recovery_code_item">Save Recovery PDF</string>
@@ -117,8 +117,8 @@
     <string name="sync_pdf_description">The Recovery Code allows you to sync your bookmarks across multiple devices and recover your synced data if you lose access to a device.</string>
     <string name="sync_code_box_title">Keep this information safe and secure.</string>
     <string name="sync_instructions_title">How does this work?</string>
-    <string name="sync_instructions_step1">Open DuckDuckGo on another device and go to Sync in Settings.</string>
-    <string name="sync_instructions_step2">Scan the QR code or copy and paste the text code into another DuckDuckGo app.</string>
+    <string name="sync_instructions_step1">Open Kahf on another device and go to Sync in Settings.</string>
+    <string name="sync_instructions_step2">Scan the QR code or copy and paste the text code into another Kahf app.</string>
     <string name="sync_instructions_step3">Sync will be activated and you\'ll once again have access to all of your data.</string>
     <string name="remove_device_dialog_title">Remove device?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" will no longer be able to access your synced data.</string>

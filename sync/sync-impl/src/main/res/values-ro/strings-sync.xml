@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sincronizare și backup indisponibilă</b>\nNe pare rău, dar Sincronizare și backup nu este disponibilă în prezent. Încearcă din nou mai târziu.</string>
-    <string name="sync_flows_disabled_new_version"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibil în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibil în această versiune a aplicației. Actualizează Kahf la cea mai recentă versiune pentru a continua.</string>
     <string name="sync_create_account_disabled"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu este disponibil în prezent. Încearcă din nou mai târziu.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibil în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sincronizare și backup indisponibil</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibil în această versiune a aplicației. Actualizează Kahf la cea mai recentă versiune pentru a continua.</string>
     <string name="sync_disabled_authenticated_user"><b>Sincronizare și backup întreruptă temporar</b>\nNe pare rău, dar Sincronizare și backup este momentan indisponibilă. Încearcă din nou mai târziu.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Sincronizare și backup întreruptă temporar</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibilă în această versiune a aplicației. Actualizează DuckDuckGo la cea mai recentă versiune pentru a continua.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sincronizare și backup întreruptă temporar</b>\nNe pare rău, dar Sincronizare și backup nu mai este disponibilă în această versiune a aplicației. Actualizează Kahf la cea mai recentă versiune pentru a continua.</string>
     <string name="sync_paused_notification"><b>Sincronizare și backup întrerupt temporar</b>\nNe pare rău, dar Sincronizare și backup este momentan indisponibil. Încearcă din nou mai târziu.</string>
     <string name="sync_error_notification"><b>Eroare de sincronizare</b>\nSync &amp; Backup sunt temporar indisponibile.</string>
     <string name="sync_error_warning"><b>Eroare de sincronizare</b>\nSync &amp; Backup este indisponibil temporar.</string>
@@ -34,12 +34,12 @@
     <string name="sync_setup_begin_syncing">Începe sincronizarea</string>
     <string name="sync_setup_with_another_device_cta_title">Sincronizează cu un alt dispozitiv</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Sincronizează în siguranță marcajele și parolele între dispozitivele tale.</string>
-    <string name="sync_off_hint">Datele tale sunt criptate integral, iar DuckDuckGo nu are acces la cheia de criptare.</string>
+    <string name="sync_off_hint">Datele tale sunt criptate integral, iar Kahf nu are acces la cheia de criptare.</string>
     <string name="sync_setup_single_device_title">Configurare pe un singur dispozitiv</string>
     <string name="sync_setup_single_recover_data_cta_title">Recuperează datele sincronizate</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sincronizează și fă backup pentru acest dispozitiv</string>
 
-    <string name="sync_off_encrypted_hint">Datele tale sunt criptate integral, iar DuckDuckGo nu are acces la cheia de decriptare.</string>
+    <string name="sync_off_encrypted_hint">Datele tale sunt criptate integral, iar Kahf nu are acces la cheia de decriptare.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Se configurează Sincronizare și backup!</string>
@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Descarcă  automat pictograme pentru marcajele sincronizate.</string>
     <string name="sync_enable_connecting">Se conectează…</string>
     <string name="sync_intro_enable_title">Sincronizează și fă backup pentru acest dispozitiv</string>
-    <string name="sync_intro_enable_content">Aceasta creează o copie de backup criptată a marcajelor și a parolelor tale pe serverul securizat DuckDuckGo, care poate fi sincronizată cu celelalte dispozitive. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, DuckDuckGo nu o poate accesa...</string>
+    <string name="sync_intro_enable_content">Aceasta creează o copie de backup criptată a marcajelor și a parolelor tale pe serverul securizat Kahf, care poate fi sincronizată cu celelalte dispozitive. \n\n Cheia de criptare este stocată doar pe dispozitivul tău, Kahf nu o poate accesa...</string>
     <string name="sync_intro_enable_footer">Poți sincroniza mai târziu cu celelalte dispozitive ale tale.</string>
     <string name="sync_intro_enable_cta">Activează Sincronizare și backup</string>
     <string name="sync_intro_recover_title">Recuperează datele sincronizate</string>
@@ -64,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Scanează codul QR</string>
-    <string name="connect_screen_scan_qr_hint">Mergi la <b>Setări &gt; Sincronizare și backup</b> în browserul DuckDuckGo pe un alt dispozitiv și selectează „Sincronizează cu un alt dispozitiv”.</string>
+    <string name="connect_screen_scan_qr_hint">Mergi la <b>Setări &gt; Sincronizare și backup</b> în browserul Kahf pe un alt dispozitiv și selectează „Sincronizează cu un alt dispozitiv”.</string>
     <string name="connect_screen_enter_code_cta">Sau completează manual codul</string>
     <string name="connect_screen_connect_qr_hint_title">De la mobil la mobil?</string>
     <string name="connect_screen_connect_qr_hint_content">Scanează acest cod cu un alt dispozitiv pentru a sincroniza.</string>
@@ -72,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Completează manual codul</string>
-    <string name="sync_enter_code_hint">Accesează Setări <b>&gt; Sincronizare și backup &gt; Sincronizează cu un alt dispozitiv</b> și selectează <b>Vezi codul text</b> în aplicația DuckDuckGo pe un alt dispozitiv sincronizat și lipește codul aici pentru a sincroniza acest dispozitiv.</string>
+    <string name="sync_enter_code_hint">Accesează Setări <b>&gt; Sincronizare și backup &gt; Sincronizează cu un alt dispozitiv</b> și selectează <b>Vezi codul text</b> în aplicația Kahf pe un alt dispozitiv sincronizat și lipește codul aici pentru a sincroniza acest dispozitiv.</string>
     <string name="sync_enter_code_verifying">Se verifică codul</string>
     <string name="sync_enter_code_invalid">⚠️ Cod nevalid</string>
     <string name="sync_enter_code_paste">Lipește codul</string>
@@ -97,7 +97,7 @@
 
     <string name="synced_devices_section_title">Dispozitive sincronizate</string>
     <string name="sync_new_device_section_title">Sincronizează dispozitivul nou</string>
-    <string name="sync_new_device_hint">Accesează Setări &gt; Sincronizare și backup în aplicația DuckDuckGo pe un alt dispozitiv și scanează pentru a te conecta instantaneu.</string>
+    <string name="sync_new_device_hint">Accesează Setări &gt; Sincronizare și backup în aplicația Kahf pe un alt dispozitiv și scanează pentru a te conecta instantaneu.</string>
     <string name="sync_show_text_code_item">Afișează codul text</string>
     <string name="sync_show_qr_code_item">Scanează codul QR</string>
     <string name="sync_save_recovery_code_item">Salvează PDF de recuperare</string>
@@ -117,8 +117,8 @@
     <string name="sync_pdf_description">Codul de recuperare îți permite să sincronizezi marcajele pe mai multe dispozitive și să recuperezi datele sincronizate dacă pierzi accesul la un dispozitiv.</string>
     <string name="sync_code_box_title">Păstrează aceste informații în siguranță.</string>
     <string name="sync_instructions_title">Cum funcționează?</string>
-    <string name="sync_instructions_step1">Deschide DuckDuckGo pe un alt dispozitiv și mergi la Sincronizare în Setări.</string>
-    <string name="sync_instructions_step2">Scanează codul QR sau copiază și lipește codul text într-o altă aplicație DuckDuckGo.</string>
+    <string name="sync_instructions_step1">Deschide Kahf pe un alt dispozitiv și mergi la Sincronizare în Setări.</string>
+    <string name="sync_instructions_step2">Scanează codul QR sau copiază și lipește codul text într-o altă aplicație Kahf.</string>
     <string name="sync_instructions_step3">Sincronizarea va fi activată și vei avea din nou acces la toate datele tale.</string>
     <string name="remove_device_dialog_title">Elimini dispozitivul?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s„%%@” nu va mai putea accesa datele tale sincronizate.</string>

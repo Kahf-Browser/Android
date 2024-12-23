@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
-    <string name="sync_flows_disabled_new_version"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana vairs nav pieejama šajā lietotnes versijā. Lai turpinātu, lūdzu, atjaunini DuckDuckGo uz jaunāko versiju.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana vairs nav pieejama šajā lietotnes versijā. Lai turpinātu, lūdzu, atjaunini Kahf uz jaunāko versiju.</string>
     <string name="sync_create_account_disabled"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana vairs nav pieejama šajā lietotnes versijā. Lai turpinātu, lūdzu, atjaunini DuckDuckGo uz jaunāko versiju.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sinhronizācija un dublēšana nav pieejama</b>\nDiemžēl sinhronizācija un dublēšana vairs nav pieejama šajā lietotnes versijā. Lai turpinātu, lūdzu, atjaunini Kahf uz jaunāko versiju.</string>
     <string name="sync_disabled_authenticated_user"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana šajā lietotnes versijā vairs nav pieejama. Lai turpinātu, lūdzu, atjaunini DuckDuckGo uz jaunāko versiju.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana šajā lietotnes versijā vairs nav pieejama. Lai turpinātu, lūdzu, atjaunini Kahf uz jaunāko versiju.</string>
     <string name="sync_paused_notification"><b>Sinhronizācija un dublēšana pātraukta</b>\nDiemžēl sinhronizācija un dublēšana pašlaik nav pieejama. Lūdzu, mēģini vēlreiz vēlāk.</string>
     <string name="sync_error_notification"><b>Sinhronizācijas kļūda</b>\nSync &amp; Backup uz laiku nav pieejams.</string>
     <string name="sync_error_warning"><b>Sinhronizācijas kļūda</b>\nSync &amp; Backup uz laiku nav pieejams.</string>
@@ -34,12 +34,12 @@
     <string name="sync_setup_begin_syncing">Sinhronizācijas sākšana</string>
     <string name="sync_setup_with_another_device_cta_title">Sinhronizēt ar citu ierīci</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Droši sinhronizē grāmatzīmes un paroles starp ierīcēm.</string>
-    <string name="sync_off_hint">Tavi dati tiek šifrēti no gala līdz galam, un DuckDuckGo nav piekļuves šifrēšanas atslēgai.</string>
+    <string name="sync_off_hint">Tavi dati tiek šifrēti no gala līdz galam, un Kahf nav piekļuves šifrēšanas atslēgai.</string>
     <string name="sync_setup_single_device_title">Vienas ierīces iestatīšana</string>
     <string name="sync_setup_single_recover_data_cta_title">Sinhronizēto datu atgūšana</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Šīs ierīces sinhronizācija un dublēšana</string>
 
-    <string name="sync_off_encrypted_hint">Tavi dati ir šifrēti no gala līdz galam, un DuckDuckGo nav piekļuves atšifrēšanas atslēgai.</string>
+    <string name="sync_off_encrypted_hint">Tavi dati ir šifrēti no gala līdz galam, un Kahf nav piekļuves atšifrēšanas atslēgai.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Sinhronizācijas un dublēšanas iestatīšana!</string>
@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automātiski lejupielādēt ikonas sinhronizētām grāmatzīmēm.</string>
     <string name="sync_enable_connecting">Notiek savienojuma izveide…</string>
     <string name="sync_intro_enable_title">Šīs ierīces sinhronizācija un dublēšana</string>
-    <string name="sync_intro_enable_content">Tādējādi DuckDuckGo drošajā serverī tiek izveidota šifrēta grāmatzīmju un paroļu dublējumkopija, ko var sinhronizēt ar citām ierīcēm. \n\n Šifrēšanas atslēga tiek saglabāta tikai tavā ierīcē, DuckDuckGo tai nevar piekļūt...</string>
+    <string name="sync_intro_enable_content">Tādējādi Kahf drošajā serverī tiek izveidota šifrēta grāmatzīmju un paroļu dublējumkopija, ko var sinhronizēt ar citām ierīcēm. \n\n Šifrēšanas atslēga tiek saglabāta tikai tavā ierīcē, Kahf tai nevar piekļūt...</string>
     <string name="sync_intro_enable_footer">Vēlāk vari sinhronizēt ar citām ierīcēm.</string>
     <string name="sync_intro_enable_cta">Ieslēgt sinhronizāciju un dublēšanu</string>
     <string name="sync_intro_recover_title">Sinhronizēto datu atgūšana</string>
@@ -64,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Kvadrātkoda skenēšana</string>
-    <string name="connect_screen_scan_qr_hint">Dodies uz <b>Iestatījumi &gt; Sinhronizācija un dublēšana</b> DuckDuckGo pārlūkā citā ierīcē un izvēlies \"Sinhronizēt ar citu ierīci.\"</string>
+    <string name="connect_screen_scan_qr_hint">Dodies uz <b>Iestatījumi &gt; Sinhronizācija un dublēšana</b> Kahf pārlūkā citā ierīcē un izvēlies \"Sinhronizēt ar citu ierīci.\"</string>
     <string name="connect_screen_enter_code_cta">Vai manuāli ievadi kodu</string>
     <string name="connect_screen_connect_qr_hint_title">No mobilā uz mobilo?</string>
     <string name="connect_screen_connect_qr_hint_content">Lai sinhronizētu, skenē šo kodu ar citu ierīci.</string>
@@ -72,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Manuāla koda ievadīšana</string>
-    <string name="sync_enter_code_hint">Dodies uz <b>Iestatījumi &gt; Sinhronizācija un dublēšana &gt; Sinhronizācija ar citu ierīci</b> un izvēlies <b>Skatīt teksta kodu</b> DuckDuckGo lietotnē citā sinhronizētā ierīcē, un ielīmē kodu šeit, lai sinhronizētu šo ierīci.</string>
+    <string name="sync_enter_code_hint">Dodies uz <b>Iestatījumi &gt; Sinhronizācija un dublēšana &gt; Sinhronizācija ar citu ierīci</b> un izvēlies <b>Skatīt teksta kodu</b> Kahf lietotnē citā sinhronizētā ierīcē, un ielīmē kodu šeit, lai sinhronizētu šo ierīci.</string>
     <string name="sync_enter_code_verifying">Pārbauda kodu</string>
     <string name="sync_enter_code_invalid">⚠️ Nederīgs kods</string>
     <string name="sync_enter_code_paste">Ielīmē kodu</string>
@@ -97,7 +97,7 @@
 
     <string name="synced_devices_section_title">Sinhronizētās ierīces</string>
     <string name="sync_new_device_section_title">Sinhronizēt jaunu ierīci</string>
-    <string name="sync_new_device_hint">Dodies uz Iestatījumi &gt; Sinhronizācija un dublēšana DuckDuckGo lietotnē citā ierīcē un skenē, lai uzreiz izveidotu savienojumu.</string>
+    <string name="sync_new_device_hint">Dodies uz Iestatījumi &gt; Sinhronizācija un dublēšana Kahf lietotnē citā ierīcē un skenē, lai uzreiz izveidotu savienojumu.</string>
     <string name="sync_show_text_code_item">Rādīt teksta kodu</string>
     <string name="sync_show_qr_code_item">Kvadrātkoda skenēšana</string>
     <string name="sync_save_recovery_code_item">Saglabāt atgūšanas PDF</string>
@@ -117,8 +117,8 @@
     <string name="sync_pdf_description">Atgūšanas kods ļauj sinhronizēt grāmatzīmes vairākās ierīcēs un atjaunot sinhronizētos datus, ja zaudē piekļuvi kādai ierīcei.</string>
     <string name="sync_code_box_title">Glabā šo informāciju drošībā.</string>
     <string name="sync_instructions_title">Kā tas darbojas?</string>
-    <string name="sync_instructions_step1">Atver DuckDuckGo citā ierīcē un iestatījumos atver sadaļu Sinhronizācija.</string>
-    <string name="sync_instructions_step2">Skenējiet kvadrātkodu vai nokopē un ielīmē teksta kodu citā DuckDuckGo lietotnē.</string>
+    <string name="sync_instructions_step1">Atver Kahf citā ierīcē un iestatījumos atver sadaļu Sinhronizācija.</string>
+    <string name="sync_instructions_step2">Skenējiet kvadrātkodu vai nokopē un ielīmē teksta kodu citā Kahf lietotnē.</string>
     <string name="sync_instructions_step3">Sinhronizācija tiks aktivizēta, un tev atkal būs pieejami visi tavi dati.</string>
     <string name="remove_device_dialog_title">Noņemt ierīci?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" vairs nevarēs piekļūt taviem sinhronizētajiem datiem.</string>
