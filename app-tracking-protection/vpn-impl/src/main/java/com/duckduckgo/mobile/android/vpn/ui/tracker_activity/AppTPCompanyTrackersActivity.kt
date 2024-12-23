@@ -281,7 +281,7 @@ class AppTPCompanyTrackersActivity : DuckDuckGoActivity() {
         private const val EXTRA_PACKAGE_NAME = "EXTRA_PACKAGE_NAME"
         private const val EXTRA_APP_NAME = "EXTRA_APP_NAME"
         private const val EXTRA_DATE = "EXTRA_DATE"
-        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
+        private const val FAQ_WEBSITE = "https://help.kahfbrowser.com/kahfbrowser-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
         private const val MANAGE_APP_EXCLUSIONS = "manage_app_exclusion_link"
 
         internal fun intent(

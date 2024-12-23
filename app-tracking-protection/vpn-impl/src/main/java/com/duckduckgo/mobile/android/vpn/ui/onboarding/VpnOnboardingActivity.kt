@@ -303,6 +303,6 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val REQUEST_ASK_VPN_PERMISSION = 101
-        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
+        private const val FAQ_WEBSITE = "https://help.kahfbrowser.com/kahfbrowser-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
     }
 }

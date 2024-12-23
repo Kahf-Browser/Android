@@ -693,7 +693,7 @@ class DeviceShieldTrackerActivity :
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 5
         private const val TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG = "AppTPPromoteAlwaysOnDialog"
         private const val TAG_APPTP_ENABLED_CTA_DIALOG = "AppTpEnabledCta"
-        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
+        private const val FAQ_WEBSITE = "https://kahfbrowser.com/kahfbrowser-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
 
