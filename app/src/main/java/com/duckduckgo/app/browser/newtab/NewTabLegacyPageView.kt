@@ -89,6 +89,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
@@ -219,7 +220,7 @@ class NewTabLegacyPageView @JvmOverloads constructor(
     private fun render(viewState: ViewState) {
         Timber.d("New Tab: render $viewState")
         if (viewState.message != null && viewState.onboardingComplete) {
-            showRemoteMessage(viewState.message, viewState.newMessage)
+            // showRemoteMessage(viewState.message, viewState.newMessage) // Intentionally commented out to avoid showing remote message  (DDG survey, update etc.)
         } else {
             binding.messageCta.gone()
         }
