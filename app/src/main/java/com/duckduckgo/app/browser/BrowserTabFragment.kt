@@ -2439,15 +2439,17 @@ class BrowserTabFragment :
     }
 
     private fun configureFocusedView() {
-        focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
-            binding.focusedViewContainerLayout.addView(
-                focusedView.getView(requireContext()),
-                LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.MATCH_PARENT,
-                ),
-            )
-        }.launchIn(lifecycleScope)
+        viewLifecycleOwnerLiveData.observe(viewLifecycleOwner) { lifecycleOwner ->
+            focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
+                binding.focusedViewContainerLayout.addView(
+                    focusedView.getView(requireContext()),
+                    LayoutParams(
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT,
+                    ),
+                )
+            }.launchIn(lifecycleOwner.lifecycleScope)
+        }
     }
 
     private fun configureNewTab() {
@@ -2595,6 +2597,7 @@ class BrowserTabFragment :
             omnibar.omnibarTextInput.setText("")
         }
     }
+
 
     private fun userEnteredQuery(query: String) {
         viewModel.onUserSubmittedQuery(query)
