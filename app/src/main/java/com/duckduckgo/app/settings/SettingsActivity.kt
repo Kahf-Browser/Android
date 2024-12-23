@@ -140,14 +140,14 @@ class SettingsActivity : DuckDuckGoActivity() {
             webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
             cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
-            vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
+            // vpnSetting.setClickListener { viewModel.onAppTPSettingClicked() }
         }
 
         with(viewsSettings) {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
-            fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
+            // fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
             accessibilitySetting.setClickListener { viewModel.onAccessibilitySettingClicked() }
@@ -190,10 +190,10 @@ class SettingsActivity : DuckDuckGoActivity() {
             .onEach { viewState ->
                 viewState.let {
                     updateDefaultBrowserViewVisibility(it)
-                    updateDeviceShieldSettings(
+                    /*updateDeviceShieldSettings(
                         it.appTrackingProtectionEnabled,
                         it.appTrackingProtectionOnboardingShown,
-                    )
+                    )*/
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
                     updateSyncSetting(visible = it.showSyncSetting)
@@ -293,7 +293,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun updateDeviceShieldSettings(
+    /*private fun updateDeviceShieldSettings(
         appTPEnabled: Boolean,
         appTrackingProtectionOnboardingShown: Boolean,
     ) {
@@ -311,7 +311,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                 }
             }
         }
-    }
+    }*/
 
     private fun launchDefaultAppScreen() {
         launchDefaultAppActivity()
