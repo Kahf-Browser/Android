@@ -2615,7 +2615,7 @@ class BrowserTabFragment :
 
         webView?.let {
             safeGazeInterface = SafeGazeJsInterface(
-                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatchers,
+                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onUpdateBlur = { blur ->
                     val trimmedBlur = blur / 100
                     val jsFunction = "window.blurIntensity = $trimmedBlur; updateBluredImageOpacity();"

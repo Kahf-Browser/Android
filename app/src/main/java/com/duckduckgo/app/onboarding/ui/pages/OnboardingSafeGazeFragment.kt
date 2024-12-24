@@ -116,7 +116,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
         CoroutineScope(dispatcher.io() + exceptionHandler).launch {
             val jsInterface = SafeGazeJsInterface(
-                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatcher,
+                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatcher, analytics,
                 { _ -> // No op - onUpdateBlur
                 },
                 { _, _, _ -> // No op - onImageClassified

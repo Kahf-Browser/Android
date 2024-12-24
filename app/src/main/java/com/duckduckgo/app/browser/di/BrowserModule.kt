@@ -373,8 +373,12 @@ class BrowserModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesDnsResolver(dispatcherProvider: DispatcherProvider, sharedPreferences: SharedPreferences): CustomDnsResolver {
-        return CustomDnsResolver(dispatcherProvider, sharedPreferences)
+    fun providesDnsResolver(
+        dispatcherProvider: DispatcherProvider,
+        sharedPreferences: SharedPreferences,
+        analyticsService: AnalyticsService
+    ): CustomDnsResolver {
+        return CustomDnsResolver(dispatcherProvider, analyticsService, sharedPreferences)
     }
 
     @Provides

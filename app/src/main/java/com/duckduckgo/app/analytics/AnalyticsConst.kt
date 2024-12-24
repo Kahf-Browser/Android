@@ -24,12 +24,20 @@ sealed class AnalyticsEvent(val name: String) {
     data object DecentInternetToggled : AnalyticsEvent("decent_internet_toggled")
     data object PrayerTimeOpened : AnalyticsEvent("prayer_time_opened")
     data object SetAsDefaultBrowser : AnalyticsEvent("set_as_default_browser")
+    data object P90ImageProcessing : AnalyticsEvent("p90_image_processing")
+    data object P90DnsResolution : AnalyticsEvent("p90_dns_resolution")
+    data object AvgQueueTime : AnalyticsEvent("avg_queue_time")
+    data object ImageProcessingTimeout : AnalyticsEvent("image_processing_timeout")
     data object GoogleSearchPerformed : AnalyticsEvent("google_search_performed")
 }
 
 sealed class AnalyticsParam(val name: String) {
     data object Url : AnalyticsParam("url")
+    data object TimedOutImageUrl : AnalyticsParam("timed_out_image_url")
     data object IsEnabled : AnalyticsParam("enabled")
     data object Mode : AnalyticsParam("safe_internet_mode")
     data object SearchQuery : AnalyticsParam("search_query")
+    data object DnsResolutionTime : AnalyticsParam("dns_resolution_time_ms")
+    data object ImageProcessingTime : AnalyticsParam("image_processing_time_ms")
+    data object DnsResolver : AnalyticsParam("dns_resolver")
 }
