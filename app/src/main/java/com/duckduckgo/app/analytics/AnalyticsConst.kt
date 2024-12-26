@@ -27,6 +27,7 @@ sealed class AnalyticsEvent(val name: String) {
     data object P90DnsResolution : AnalyticsEvent("p90_dns_resolution")
     data object AvgQueueTime : AnalyticsEvent("avg_queue_time")
     data object ImageProcessingTimeout : AnalyticsEvent("image_processing_timeout")
+    data object ModelInitTime : AnalyticsEvent("model_initialization_time")
 
     // Onboarding
     data object OnboardSetAsDefaultBrowser : AnalyticsEvent("onboard_set_as_default_browser")
@@ -52,6 +53,7 @@ sealed class AnalyticsParam(val name: String) {
     data object DnsResolutionTime : AnalyticsParam("dns_resolution_time_ms")
     data object ImageProcessingTime : AnalyticsParam("image_processing_time_ms")
     data object DnsResolver : AnalyticsParam("dns_resolver")
+    data object ModelInitTimeMS : AnalyticsParam("model_initialization_time_ms")
 
     // Search
     data object SuggestionSearchEngine : AnalyticsParam("autosuggestion_search_engine")

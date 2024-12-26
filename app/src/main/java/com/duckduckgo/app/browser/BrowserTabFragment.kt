@@ -210,6 +210,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.global.GlobalData
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
@@ -594,6 +596,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var analyticsService: AnalyticsService
+
+    @Inject
+    lateinit var globalData: GlobalData
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2630,6 +2635,17 @@ class BrowserTabFragment :
                     val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson', `$base64Image`);"
                     webView?.post {
                         webView?.evaluateJavascript(jsFunctionCall, null)
+                    }
+
+                    if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0 && genderDetector.modelInitializationTime > 0 && poseDetector.modelInitializationTime() > 0) {
+                        val initializationTime = nsfwDetector.modelInitializationTime + genderDetector.modelInitializationTime + poseDetector.modelInitializationTime()
+                        analyticsService.logEvent(
+                            AnalyticsEvent.ModelInitTime,
+                            mapOf(AnalyticsParam.ModelInitTimeMS to initializationTime.toString())
+                        )
+                        globalData.modelInitializationTimeLogged = true
+
+                        Timber.d("Model initialization time: $initializationTime ms")
                     }
                 },
             )

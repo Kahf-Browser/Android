@@ -63,15 +63,18 @@ class MoveNetMultiPose(
         private const val KEYPOINT_COUNT = 17
         private const val OUTPUTS_COUNT_PER_KEYPOINT = 3
         private const val CPU_NUM_THREADS = 4
+        private var modelInitializationTime = 0L
 
         // allow specifying model type.
         fun create(
             context: Context,
             type: Type,
         ): MoveNetMultiPose {
+            val t1 = System.currentTimeMillis()
+
             val options = Interpreter.Options()
             options.setNumThreads(CPU_NUM_THREADS)
-            return MoveNetMultiPose(
+            val model = MoveNetMultiPose(
                 Interpreter(
                     FileUtil.loadMappedFile(
                         context,
@@ -80,8 +83,13 @@ class MoveNetMultiPose(
                     ), options
                 ), type
             )
+
+            modelInitializationTime = System.currentTimeMillis() - t1
+            return model
         }
     }
+
+    fun modelInitializationTime() = modelInitializationTime
 
     /**
      * Convert x and y coordinates ([0-1]) returns from the TFlite model

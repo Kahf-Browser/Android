@@ -20,11 +20,11 @@ class FirebaseAnalyticsService(private val firebaseAnalytics: FirebaseAnalytics)
                 value == "true" || value == "false" -> {
                     bundle.putBoolean(key.name, value.toBoolean())
                 }
-                value.toDoubleOrNull() != null -> {
-                    bundle.putDouble(key.name, value.toDouble())
-                }
                 value.toLongOrNull() != null -> {
                     bundle.putLong(key.name, value.toLong())
+                }
+                value.toDoubleOrNull() != null -> {
+                    bundle.putDouble(key.name, value.toDouble())
                 }
                 value.toIntOrNull() != null -> {
                     bundle.putInt(key.name, value.toInt())
@@ -34,8 +34,8 @@ class FirebaseAnalyticsService(private val firebaseAnalytics: FirebaseAnalytics)
                 }
             }
         }
-        firebaseAnalytics.logEvent(event.name, bundle)
 
+        firebaseAnalytics.logEvent(event.name, if (bundle.isEmpty) null else bundle)
         Timber.d("AnalyticsService -- successfully logged event: ${event.name} with params: $params")
     }
 
