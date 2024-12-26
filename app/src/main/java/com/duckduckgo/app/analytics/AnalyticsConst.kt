@@ -23,11 +23,16 @@ sealed class AnalyticsEvent(val name: String) {
     data object SafeInternetToggled : AnalyticsEvent("safe_internet_toggled")
     data object DecentInternetToggled : AnalyticsEvent("decent_internet_toggled")
     data object PrayerTimeOpened : AnalyticsEvent("prayer_time_opened")
-    data object SetAsDefaultBrowser : AnalyticsEvent("set_as_default_browser")
     data object P90ImageProcessing : AnalyticsEvent("p90_image_processing")
     data object P90DnsResolution : AnalyticsEvent("p90_dns_resolution")
     data object AvgQueueTime : AnalyticsEvent("avg_queue_time")
     data object ImageProcessingTimeout : AnalyticsEvent("image_processing_timeout")
+    data object OnboardSetAsDefaultBrowser : AnalyticsEvent("onboard_set_as_default_browser")
+    data object OnboardSkipDefaultBrowser : AnalyticsEvent("onboard_skip_default_browser")
+    data object OnboardSetBookmarks : AnalyticsEvent("onboard_set_bookmarks")
+    data object OnboardSkipBookmarks : AnalyticsEvent("onboard_skip_bookmarks")
+    data object OnboardEnabledDecentInternet : AnalyticsEvent("onboard_enabled_decent_internet")
+    data object OnboardSkipDecentInternet : AnalyticsEvent("onboard_skip_decent_internet")
     data object GoogleSearchPerformed : AnalyticsEvent("google_search_performed")
 }
 

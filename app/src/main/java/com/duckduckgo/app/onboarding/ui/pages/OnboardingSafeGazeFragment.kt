@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboardingSafegazeBinding
@@ -17,7 +18,6 @@ import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
-import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
@@ -65,6 +65,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
         binding = FragmentOnboardingSafegazeBinding.inflate(inflater, container, false)
 
         binding.btnSkip.setOnClickListener {
+            analytics.logEvent(AnalyticsEvent.OnboardSkipDecentInternet)
             if (hardwareCompatibilityChecked) {
                 (requireActivity() as KahfOnboardingActivity).onContinueClicked()
             }
@@ -72,6 +73,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
         binding.btnDefaultBrowser.setOnClickListener {
             if (hardwareCompatibilityChecked) {
+                analytics.logEvent(AnalyticsEvent.OnboardEnabledDecentInternet)
                 onEnableSafeGazeClicked()
             }
         }

@@ -22,6 +22,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboardingBookmarkBinding
 import com.duckduckgo.app.onboarding.model.PredefinedBookmark
@@ -48,6 +50,9 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
 
     @Inject
     lateinit var dispatcherProvide: DispatcherProvider
+
+    @Inject
+    lateinit var analytics: AnalyticsService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -99,6 +104,7 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
     private fun setupButtonClicks() {
         binding.btnSkip.setOnClickListener {
             CoroutineScope(dispatcherProvide.io()).launch {
+                analytics.logEvent(AnalyticsEvent.OnboardSkipBookmarks)
                 addBookmarks(false)
 
                 withContext(dispatcherProvide.main()) {
@@ -109,6 +115,7 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
 
         binding.btnSetBookmark.setOnClickListener {
             CoroutineScope(dispatcherProvide.io()).launch {
+                analytics.logEvent(AnalyticsEvent.OnboardSetBookmarks)
                 addBookmarks(true)
 
                 withContext(dispatcherProvide.main()) {
