@@ -27,13 +27,20 @@ sealed class AnalyticsEvent(val name: String) {
     data object P90DnsResolution : AnalyticsEvent("p90_dns_resolution")
     data object AvgQueueTime : AnalyticsEvent("avg_queue_time")
     data object ImageProcessingTimeout : AnalyticsEvent("image_processing_timeout")
+
+    // Onboarding
     data object OnboardSetAsDefaultBrowser : AnalyticsEvent("onboard_set_as_default_browser")
     data object OnboardSkipDefaultBrowser : AnalyticsEvent("onboard_skip_default_browser")
     data object OnboardSetBookmarks : AnalyticsEvent("onboard_set_bookmarks")
     data object OnboardSkipBookmarks : AnalyticsEvent("onboard_skip_bookmarks")
-    data object OnboardEnabledDecentInternet : AnalyticsEvent("onboard_enabled_decent_internet")
+    data object OnboardEnabledDecentInternet : AnalyticsEvent("onboard_enable_decent_internet")
     data object OnboardSkipDecentInternet : AnalyticsEvent("onboard_skip_decent_internet")
-    data object GoogleSearchPerformed : AnalyticsEvent("google_search_performed")
+
+    // Search
+    data object AddressBarSuggestionSelection : AnalyticsEvent("address_bar_suggestion_selection")
+    data object SearchQueryEnter : AnalyticsEvent("search_query_enter")
+    data object SearchResultLinkClick : AnalyticsEvent("search_result_link_click")
+    data object ExtSearchRedirect : AnalyticsEvent("external_search_redirect")
 }
 
 sealed class AnalyticsParam(val name: String) {
@@ -45,4 +52,10 @@ sealed class AnalyticsParam(val name: String) {
     data object DnsResolutionTime : AnalyticsParam("dns_resolution_time_ms")
     data object ImageProcessingTime : AnalyticsParam("image_processing_time_ms")
     data object DnsResolver : AnalyticsParam("dns_resolver")
+
+    // Search
+    data object SuggestionSearchEngine : AnalyticsParam("autosuggestion_search_engine")
+    data object QuerySearchEngine : AnalyticsParam("query_enter_search_engine")
+    data object ExtSearchEngine : AnalyticsParam("external_search_engine")
+    data object ResultClickSearchEngine : AnalyticsParam("search_result_link_click_search_engine")
 }

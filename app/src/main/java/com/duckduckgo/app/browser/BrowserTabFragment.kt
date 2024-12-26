@@ -2422,6 +2422,9 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
+                analyticsService.logEvent(
+                    AnalyticsEvent.AddressBarSuggestionSelection, mapOf(AnalyticsParam.SuggestionSearchEngine to "duckduckgo")
+                )
                 viewModel.userSelectedAutocomplete(it)
             },
             editableSearchClickListener = {
