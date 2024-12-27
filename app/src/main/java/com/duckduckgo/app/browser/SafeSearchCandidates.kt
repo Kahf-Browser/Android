@@ -16,9 +16,14 @@
 
 package com.duckduckgo.app.browser
 
+private val ssCandidateGoogle = SafeSearchCandidate("google.com", pathContains = listOf("search"), queryParam = "q", exclude = listOf("captcha", "accounts.google.com/"))
+
 val safeSearchCandidates = listOf(
-    SafeSearchCandidate("google.com", pathContains = listOf("search"), queryParam = "q", exclude = listOf("captcha", "accounts.google.com/")),
-    SafeSearchCandidate("google.de", pathContains = listOf("search"), queryParam = "q", exclude = listOf("captcha", "accounts.google.com/")),
+    ssCandidateGoogle,
+    ssCandidateGoogle.copy(domain = "google.de"),
+    ssCandidateGoogle.copy(domain = "google.ca"),
+    ssCandidateGoogle.copy(domain = "google.pl"),
+    ssCandidateGoogle.copy(domain = "google.co.uk"),
 
     SafeSearchCandidate("bing.com", pathContains = listOf("search", "account/general"), queryParam = "q"),
     SafeSearchCandidate("ecosia.org", queryParam = "q"),
