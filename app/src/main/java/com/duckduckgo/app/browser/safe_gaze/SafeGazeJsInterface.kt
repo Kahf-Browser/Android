@@ -294,7 +294,7 @@ class SafeGazeJsInterface(
                             val avg = waitingTimes.average().toLong()
                             analytics.logEvent(
                                 AnalyticsEvent.AvgQueueTime,
-                                mapOf(AnalyticsParam.ImageProcessingTime to avg.toString()),
+                                mapOf(AnalyticsParam.AvgQueueTimeMs to avg.toString()),
                             )
                             waitingTimes.clear()
                         }
@@ -305,19 +305,28 @@ class SafeGazeJsInterface(
                             Timber.d("kLog cache hit for ${it.url}")
                             return@let
                         }
+                        var inferenceTime = 0L
 
-                        val t1 = System.currentTimeMillis()
                         val result = try {
-                            withTimeout(MAX_INFERENCE_TIME_MS) {
+                            val t1 = System.currentTimeMillis()
+                            val shouldBlurResult = withTimeout(MAX_INFERENCE_TIME_MS) {
                                 shouldBlurImage(it.url, it.imageData)
                             }
+                            inferenceTime = System.currentTimeMillis() - t1
+                            inferenceTimes.add(inferenceTime)
+
+                            shouldBlurResult
                         } catch (e: TimeoutCancellationException) {
                             Timber.e("kLog Timeout occurred while processing image: ${it.url}")
                             analytics.logEvent(AnalyticsEvent.ImageProcessingTimeout, mapOf(AnalyticsParam.TimedOutImageUrl to it.url))
                             null
                         }
-                        val inferenceTime = System.currentTimeMillis() - t1
-                        inferenceTimes.add(inferenceTime)
+
+                        // If result is null, then timeout occurred. No need to process further or cache the result
+                        if (result == null) {
+                            callSafegazeOnDeviceModelHandler(it.uid, "null", "null")
+                            return@let
+                        }
 
                         // Log P90 inference time for every 30 images to GA
                         if (inferenceTimes.size >= 30) {
@@ -327,12 +336,6 @@ class SafeGazeJsInterface(
                                 mapOf(AnalyticsParam.ImageProcessingTime to p90.toString()),
                             )
                             inferenceTimes.clear()
-                        }
-
-                        // If result is null, then timeout occurred. No need to process further or cache the result
-                        if (result == null) {
-                            callSafegazeOnDeviceModelHandler(it.uid, "null", "null")
-                            return@let
                         }
 
                         val resultJson: String

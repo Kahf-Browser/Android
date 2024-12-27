@@ -49,9 +49,9 @@ sealed class AnalyticsParam(val name: String) {
     data object TimedOutImageUrl : AnalyticsParam("timed_out_image_url")
     data object IsEnabled : AnalyticsParam("enabled")
     data object Mode : AnalyticsParam("safe_internet_mode")
-    data object SearchQuery : AnalyticsParam("search_query")
     data object DnsResolutionTime : AnalyticsParam("dns_resolution_time_ms")
     data object ImageProcessingTime : AnalyticsParam("image_processing_time_ms")
+    data object AvgQueueTimeMs : AnalyticsParam("avg_queue_time_ms")
     data object DnsResolver : AnalyticsParam("dns_resolver")
     data object ModelInitTimeMS : AnalyticsParam("model_initialization_time_ms")
 
