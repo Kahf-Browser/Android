@@ -420,7 +420,14 @@ class SafeGazeJsInterface(
         Timber.d("kLog checking hardware compatibility")
         
         val bitmap = context.assets.open("test_image.webp").use {
-            BitmapFactory.decodeStream(it)
+            // convert input stream to byte array
+            val buffer = ByteArray(it.available())
+            it.read(buffer)
+            it.close()
+
+            BitmapFactory.decodeByteArray(buffer, 0, buffer.size, BitmapFactory.Options().also { op ->
+                op.inSampleSize = 3
+            })
         }
 
         val t1 = System.currentTimeMillis()
