@@ -67,6 +67,12 @@ fun String.isDataUri(): Boolean {
     return startsWith("data:")
 }
 
+fun String.md5(): String {
+    val md = java.security.MessageDigest.getInstance("MD5")
+    val digest = md.digest(toByteArray())
+    return digest.joinToString("") { "%02x".format(it) }
+}
+
 /**
  * Compares the current semantic version string with the target semantic version string.
  *

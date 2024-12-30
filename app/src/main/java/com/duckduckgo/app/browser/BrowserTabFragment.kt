@@ -49,6 +49,7 @@ import android.print.PrintAttributes
 import android.print.PrintManager
 import android.provider.MediaStore
 import android.text.Editable
+import android.text.Html
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -210,7 +211,6 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
-import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.GlobalData
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
@@ -960,7 +960,6 @@ class BrowserTabFragment :
         configureNewTab()
         initPrivacyProtectionsPopup()
         configureBottomNav()
-        loadWallpaper()
 
         if (tabDisplayedInCustomTabScreen) {
             configureCustomTab()
@@ -1368,16 +1367,6 @@ class BrowserTabFragment :
         addTabsObserver()
     }
 
-    private fun loadWallpaper() {
-        val bmp = viewModel.wallPaperBitmap(File("${requireContext().filesDir}/wp"))
-
-        Glide.with(requireContext())
-            .load(bmp ?: R.drawable.background_mosque)
-            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-            .skipMemoryCache(false)
-            .into(binding.newTabWallpaper)
-    }
-
     private fun processFileDownloadedCommand(command: DownloadCommand) {
         when (command) {
             is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
@@ -1453,7 +1442,6 @@ class BrowserTabFragment :
         errorSnackbar.dismiss()
         newBrowserTab.newTabLayout.show()
         newBrowserTab.newTabContainerLayout.show()
-        binding.newTabWallpaper.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
         omnibar.appBarLayout.setExpanded(true)
@@ -1469,7 +1457,6 @@ class BrowserTabFragment :
         Timber.d("New Tab: showBrowser")
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
-        binding.newTabWallpaper.gone()
         binding.browserLayout.show()
         webViewContainer.show()
         webView?.show()
@@ -1487,7 +1474,6 @@ class BrowserTabFragment :
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
-        binding.newTabWallpaper.gone()
         sslErrorView.gone()
         omnibar.appBarLayout.setExpanded(true)
         bottomNav.botNav.showIt()
@@ -1514,7 +1500,6 @@ class BrowserTabFragment :
         webViewContainer.gone()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
-        binding.newTabWallpaper.gone()
         webView?.onPause()
         webView?.hide()
         bottomNav.botNav.showIt()
@@ -4399,6 +4384,26 @@ class BrowserTabFragment :
             viewModel.newTabShown = true
             Timber.d("New Tab: showNewTab")
 
+            // Wallpaper and text
+            newBrowserTab.apply {
+                val wallpaper = viewModel.getWallpaper("${requireContext().filesDir}")
+
+                Glide.with(requireContext())
+                    .load(wallpaper?.bitmap ?: R.drawable.background_mosque)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .skipMemoryCache(false)
+                    .into(newTabWallpaper)
+
+                wallpaper?.let { data ->
+                    title.text = data.title
+                    subtitle.text = data.subtitle
+                    photoCredit.text = Html.fromHtml(data.credit, Html.FROM_HTML_MODE_COMPACT)
+                    photoCredit.setOnClickListener {
+                        viewModel.onUserSubmittedQuery(data.url)
+                    }
+                }
+            }
+
             newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
                 newBrowserTab.newTabContainerLayout.addView(
                     newTabPage.getView(requireContext()),
@@ -4430,13 +4435,11 @@ class BrowserTabFragment :
 
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
-            binding.newTabWallpaper.show()
         }
 
         private fun hideNewTab() {
             Timber.d("New Tab: hideNewTab")
             newBrowserTab.newTabContainerLayout.gone()
-            binding.newTabWallpaper.gone()
         }
 
         private fun hideDaxCta() {

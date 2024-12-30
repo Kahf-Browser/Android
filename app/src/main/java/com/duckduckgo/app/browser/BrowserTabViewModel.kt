@@ -177,6 +177,7 @@ import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.remotemessage.CommandActionMapper
+import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.WallpaperData
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
@@ -257,6 +258,7 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.extensions.asLocationPermissionOrigin
 import com.duckduckgo.common.utils.extensions.isDataUri
+import com.duckduckgo.common.utils.extensions.md5
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.toDesktopUri
 import com.duckduckgo.di.scopes.FragmentScope
@@ -293,6 +295,8 @@ import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.FEATURE_READ
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
 import com.duckduckgo.voice.api.VoiceSearchAvailability
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import com.jakewharton.rxrelay2.PublishRelay
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
@@ -326,7 +330,6 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.collections.set
-import kotlin.random.Random
 
 @ContributesViewModel(FragmentScope::class)
 class BrowserTabViewModel @Inject constructor(
@@ -3535,23 +3538,32 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun wallPaperBitmap(directory: File): Bitmap? {
-        var filesList: List<File> = emptyList()
+    fun getWallpaper(path: String): WallpaperData? {
+        val imageDirectory = File("$path/wp")
+        val filesList = imageDirectory.listFiles()?.toList().orEmpty()
 
-        if (directory.exists()) {
-            filesList = directory.listFiles()?.toList() ?: emptyList()
-        } else {
-            Timber.d("fLog Directory not exists")
+        if (filesList.isEmpty()) {
+            Timber.d("fLog Directory not exists or is empty")
+            return null
         }
 
-        if (filesList.isNotEmpty()) {
-            val randomIndex = Random.nextInt(0, filesList.size)
-            val randomFile = filesList[randomIndex]
-            return BitmapFactory.decodeFile(randomFile.absolutePath)
-        }
-        Timber.d("fLog No downloaded wallpapers found")
+        val randomFile = filesList.random()
+        val jsonFile = File("$path/labels.json")
 
-        return null
+        if (!jsonFile.exists()) {
+            return null
+        }
+
+        val jsonArrayStr = jsonFile.readText()
+        val gson = Gson()
+        val listType = object : TypeToken<List<WallpaperData>>() {}.type
+        val wallpaperDataList = gson.fromJson<List<WallpaperData>>(jsonArrayStr, listType)
+        val wallpaperData = wallpaperDataList.firstOrNull { it.downloadUrl.md5() == randomFile.name }
+        val bitmap = BitmapFactory.decodeFile(randomFile.absolutePath)
+
+        return bitmap?.let {
+            wallpaperData?.copy(bitmap = it) ?: WallpaperData(bitmap = it)
+        }
     }
 
     fun appendClipboardUrlToSuggestions(

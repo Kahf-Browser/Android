@@ -23,11 +23,11 @@ import java.io.FileOutputStream
 import java.io.IOException
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.duckduckgo.common.utils.extensions.md5
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import java.io.InputStream
 import java.net.HttpURLConnection
-import java.security.MessageDigest
 import java.net.URL
 
 object WallpaperDownloadManager {
@@ -41,7 +41,7 @@ object WallpaperDownloadManager {
         var downloadedCount = 0
 
         for (url in shuffledUrls) {
-            val fileName = getFileNameFromUrl(url)
+            val fileName = url.md5()
             val file =  File("${context.filesDir}/wp/$fileName")
 
             if (file.parentFile?.exists() == false) {
@@ -81,19 +81,21 @@ object WallpaperDownloadManager {
         }
     }
 
-    private fun getFileNameFromUrl(url: String): String {
-        val md = MessageDigest.getInstance("MD5")
-        val hash = md.digest(url.toByteArray())
-        return hash.joinToString("") { "%02x".format(it) }
-    }
-
-
     fun fetchWallpapers(context: Context){
-        val jsonUrl = URL("https://api.github.com/repos/Kahf-Browser/public/contents/wallpapers?ref=main")
+        val jsonUrl = URL("https://raw.githubusercontent.com/Kahf-Browser/public/main/wallpapers/labels.json")
 
         try {
             val gson = Gson()
             val jsonString = jsonUrl.readBytes().decodeToString()
+
+            // Save the JSON file to the disk
+            val file = File("${context.filesDir}/labels.json")
+            if (file.parentFile?.exists() == false) {
+                file.parentFile?.mkdirs()
+            }
+            file.writeText(jsonString)
+
+            // Parse the Image download Urls
             val jsonArray: JsonArray = gson.fromJson(jsonString, JsonArray::class.java)
 
             Timber.d("fLog Wallpaper's list downloaded successfully.")
