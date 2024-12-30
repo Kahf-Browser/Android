@@ -16,27 +16,27 @@ class FirebaseAnalyticsService(private val firebaseAnalytics: FirebaseAnalytics)
 
         val bundle = Bundle()
         params?.forEach { (key, value) ->
-            if (value == "true" || value == "false") {
-                bundle.putBoolean(key.name, value.toBoolean())
-                return@forEach
+            when {
+                value == "true" || value == "false" -> {
+                    bundle.putBoolean(key.name, value.toBoolean())
+                }
+                value.toLongOrNull() != null -> {
+                    bundle.putLong(key.name, value.toLong())
+                }
+                value.toDoubleOrNull() != null -> {
+                    bundle.putDouble(key.name, value.toDouble())
+                }
+                value.toIntOrNull() != null -> {
+                    bundle.putInt(key.name, value.toInt())
+                }
+                else -> {
+                    bundle.putString(key.name, value)
+                }
             }
-            if (value.toDoubleOrNull() != null) {
-                bundle.putDouble(key.name, value.toDouble())
-                return@forEach
-            }
-            if (value.toLongOrNull() != null) {
-                bundle.putLong(key.name, value.toLong())
-                return@forEach
-            }
-            if (value.toIntOrNull() != null) {
-                bundle.putInt(key.name, value.toInt())
-                return@forEach
-            }
-            bundle.putString(key.name, value)
         }
-        firebaseAnalytics.logEvent(event.name, bundle)
 
-        Timber.d("AnalyticsService -- successfully logged event: ${event.name}")
+        firebaseAnalytics.logEvent(event.name, if (bundle.isEmpty) null else bundle)
+        Timber.d("AnalyticsService -- successfully logged event: ${event.name} with params: $params")
     }
 
     override fun setUserProperty(

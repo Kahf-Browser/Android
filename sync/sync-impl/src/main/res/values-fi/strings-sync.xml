@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
-    <string name="sync_flows_disabled_new_version"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä DuckDuckGo uusimpaan versioon jatkaaksesi.</string>
+    <string name="sync_flows_disabled_new_version"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä Kahf uusimpaan versioon jatkaaksesi.</string>
     <string name="sync_create_account_disabled"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä DuckDuckGo uusimpaan versioon jatkaaksesi.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Synkronointi ja varmuuskopiointi ei käytettävissä</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä Kahf uusimpaan versioon jatkaaksesi.</string>
     <string name="sync_disabled_authenticated_user"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä DuckDuckGo uusimpaan versioon jatkaaksesi.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole enää käytettävissä tässä sovellusversiossa. Päivitä Kahf uusimpaan versioon jatkaaksesi.</string>
     <string name="sync_paused_notification"><b>Synkronointi ja varmuuskopiointi keskeytetty</b>\nSynkronointi ja varmuuskopiointi ei valitettavasti ole tällä hetkellä käytettävissä. Yritä myöhemmin uudelleen.</string>
     <string name="sync_error_notification"><b>Synkronointivirhe</b>\nSync &amp; Backup on tilapäisesti poissa käytöstä.</string>
     <string name="sync_error_warning"><b>Synkronointivirhe</b>\nSync &amp; Backup on tilapäisesti poissa käytöstä.</string>
@@ -34,12 +34,12 @@
     <string name="sync_setup_begin_syncing">Aloita synkronointi</string>
     <string name="sync_setup_with_another_device_cta_title">Synkronoi toisen laitteen kanssa</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Synkronoi kirjanmerkit ja salasanat turvallisesti laitteittesi välillä.</string>
-    <string name="sync_off_hint">Tietosi on salattu päästä päähän, eikä DuckDuckGolla ole hallussaan salausavainta.</string>
+    <string name="sync_off_hint">Tietosi on salattu päästä päähän, eikä Kahflla ole hallussaan salausavainta.</string>
     <string name="sync_setup_single_device_title">Yhden laitteen asennus</string>
     <string name="sync_setup_single_recover_data_cta_title">Palauta synkronoidut tiedot</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synkronoi ja varmuuskopioi tämä laite</string>
 
-    <string name="sync_off_encrypted_hint">Tietosi on salattu päästä päähän, eikä DuckDuckGolla ole hallussaan salauksen purkuavainta.</string>
+    <string name="sync_off_encrypted_hint">Tietosi on salattu päästä päähän, eikä Kahflla ole hallussaan salauksen purkuavainta.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Määritetään synkronointi ja varmuuskopiointi!</string>
@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Lataa synkronoitujen kirjanmerkkien kuvakkeet automaattisesti.</string>
     <string name="sync_enable_connecting">Yhdistetään…</string>
     <string name="sync_intro_enable_title">Synkronoi ja varmuuskopioi tämä laite</string>
-    <string name="sync_intro_enable_content">Tämä luo salatun varmuuskopion kirjanmerkeistäsi ja salasanoistasi DuckDuckGon suojatulle palvelimelle. Voit synkronoida varmuuskopion muiden laitteittesi kanssa.\n\n Salausavain tallennetaan vain laitteellesi. DuckDuckGo ei pääse siihen käsiksi.…</string>
+    <string name="sync_intro_enable_content">Tämä luo salatun varmuuskopion kirjanmerkeistäsi ja salasanoistasi Kahfn suojatulle palvelimelle. Voit synkronoida varmuuskopion muiden laitteittesi kanssa.\n\n Salausavain tallennetaan vain laitteellesi. Kahf ei pääse siihen käsiksi.…</string>
     <string name="sync_intro_enable_footer">Voit synkronoiden muiden laitteittesi kanssa myöhemmin.</string>
     <string name="sync_intro_enable_cta">Ota käyttöön synkronointi ja varmuuskopiointi</string>
     <string name="sync_intro_recover_title">Palauta synkronoidut tiedot</string>
@@ -64,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Skannaa QR-koodi</string>
-    <string name="connect_screen_scan_qr_hint">Siirry kohtaan <b>Asetukset &gt; Synkronointi ja varmuuskopiointi</b> DuckDuckGo-selaimessa muulla laitteella ja valitse ”Synkronoi toisen laitteen kanssa.”</string>
+    <string name="connect_screen_scan_qr_hint">Siirry kohtaan <b>Asetukset &gt; Synkronointi ja varmuuskopiointi</b> Kahf-selaimessa muulla laitteella ja valitse ”Synkronoi toisen laitteen kanssa.”</string>
     <string name="connect_screen_enter_code_cta">Tai syötä koodi manuaalisesti</string>
     <string name="connect_screen_connect_qr_hint_title">Mobile-to-Mobile?</string>
     <string name="connect_screen_connect_qr_hint_content">Skannaa tämä koodi toisella laitteella synkronoidaksesi.</string>
@@ -72,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Syötä koodi manuaalisesti</string>
-    <string name="sync_enter_code_hint">Siirry kohtaan <b>Asetukset &gt; Synkronoi ja varmuuskopioi &gt; Synkronoi toisen laitteen kanssa</b> ja valitse <b>Näytä tekstikoodi</b> DuckDuckGo-sovelluksessa toisella synkronoidulla laitteella. Liitä koodi tähän synkronoidaksesi tämän laitteen.</string>
+    <string name="sync_enter_code_hint">Siirry kohtaan <b>Asetukset &gt; Synkronoi ja varmuuskopioi &gt; Synkronoi toisen laitteen kanssa</b> ja valitse <b>Näytä tekstikoodi</b> Kahf-sovelluksessa toisella synkronoidulla laitteella. Liitä koodi tähän synkronoidaksesi tämän laitteen.</string>
     <string name="sync_enter_code_verifying">Koodin tarkistaminen</string>
     <string name="sync_enter_code_invalid">⚠️ Virheellinen koodi</string>
     <string name="sync_enter_code_paste">Liitä koodi</string>
@@ -97,7 +97,7 @@
 
     <string name="synced_devices_section_title">Synkronoidut laitteet</string>
     <string name="sync_new_device_section_title">Synkronoi uusi laite</string>
-    <string name="sync_new_device_hint">Siirry kohtaan Asetukset › Synkronointi ja varmuuskopiointi DuckDuckGo-sovelluksessa muulla laitteella, ja skannaa muodostaaksesi yhteyden välittömästi.</string>
+    <string name="sync_new_device_hint">Siirry kohtaan Asetukset › Synkronointi ja varmuuskopiointi Kahf-sovelluksessa muulla laitteella, ja skannaa muodostaaksesi yhteyden välittömästi.</string>
     <string name="sync_show_text_code_item">Näytä tekstikoodi</string>
     <string name="sync_show_qr_code_item">Skannaa QR-koodi</string>
     <string name="sync_save_recovery_code_item">Tallenna palautuksen PDF-tiedosto</string>
@@ -117,8 +117,8 @@
     <string name="sync_pdf_description">Palautuskoodin avulla voit synkronoida kirjanmerkkisi useiden laitteiden välillä ja palauttaa synkronoidut tiedot, jos menetät pääsyn laitteeseen.</string>
     <string name="sync_code_box_title">Säilytä nämä tiedot turvallisessa paikassa.</string>
     <string name="sync_instructions_title">Miten tämä toimii?</string>
-    <string name="sync_instructions_step1">Avaa DuckDuckGo toisella laitteella ja siirry kohtaan Synkronointi asetuksissa.</string>
-    <string name="sync_instructions_step2">Skannaa QR-koodi tai kopioi ja liitä tekstikoodi toiseen DuckDuckGo-sovellukseen.</string>
+    <string name="sync_instructions_step1">Avaa Kahf toisella laitteella ja siirry kohtaan Synkronointi asetuksissa.</string>
+    <string name="sync_instructions_step2">Skannaa QR-koodi tai kopioi ja liitä tekstikoodi toiseen Kahf-sovellukseen.</string>
     <string name="sync_instructions_step3">Synkronointi käynnistetään ja saat taas kaikki tietosi haltuusi.</string>
     <string name="remove_device_dialog_title">Poistetaanko laite?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" ei enää pääse käsiksi synkronoituihin tietoihisi.</string>

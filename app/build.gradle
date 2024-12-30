@@ -18,14 +18,14 @@ ext {
 
 android {
     defaultConfig {
-        applicationId "org"
+        applicationId "io.kahf.browser"
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
-        versionCode 202412111
-        versionName "1.0.0"
+        versionCode 202412271
+        versionName "1.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        archivesBaseName = "kahf_browser-$versionName"
+        archivesBaseName = "kahf_browser_${versionName}_${versionCode}"
         vectorDrawables.useSupportLibrary = true
         javaCompileOptions {
             annotationProcessorOptions {
@@ -93,7 +93,7 @@ android {
     }
     buildTypes {
         debug {
-            applicationIdSuffix ".kahf.browser.debug"
+            applicationIdSuffix ".debug"
             pseudoLocalesEnabled false
             manifestPlaceholders = [
                     appName     : "Kahf Debug",
@@ -102,7 +102,6 @@ android {
             ]
         }
         release {
-            applicationIdSuffix ".kahf.browser"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release

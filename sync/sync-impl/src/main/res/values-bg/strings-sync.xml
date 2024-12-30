@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране в момента не е достъпна. Моля, опитайте отново по-късно.</string>
-    <string name="sync_flows_disabled_new_version"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте DuckDuckGo до най-новата версия, за да продължите.</string>
+    <string name="sync_flows_disabled_new_version"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте Kahf до най-новата версия, за да продължите.</string>
     <string name="sync_create_account_disabled"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране в момента не е достъпна. Моля, опитайте отново по-късно.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте DuckDuckGo до най-новата версия, за да продължите.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Синхронизирането и архивирането не е достъпно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте Kahf до най-новата версия, за да продължите.</string>
     <string name="sync_disabled_authenticated_user"><b>Синхронизирането и архивирането е спряно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране в момента не е достъпна. Моля, опитайте отново по-късно.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Синхронизирането и архивирането е спряно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте DuckDuckGo до най-новата версия, за да продължите.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Синхронизирането и архивирането е спряно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране вече не се предлага в тази версия на приложението. Моля, актуализирайте Kahf до най-новата версия, за да продължите.</string>
     <string name="sync_paused_notification"><b>Синхронизирането и архивирането е спряно</b>\nСъжаляваме, но функцията за синхронизиране и архивиране в момента не е достъпна. Моля, опитайте отново по-късно.</string>
     <string name="sync_error_notification"><b>Грешка при синхронизирането</b>\nSync &amp; Backup временно не е налична.</string>
     <string name="sync_error_warning"><b>Грешка при синхронизирането</b>\nSync &amp; Backup временно не е налична.</string>
@@ -34,12 +34,12 @@
     <string name="sync_setup_begin_syncing">Стартиране на синхронизиране</string>
     <string name="sync_setup_with_another_device_cta_title">Синхронизиране с друго устройство</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Сигурно синхронизиране на отметките и паролите между отделни устройства.</string>
-    <string name="sync_off_hint">Данните Ви са изцяло криптирани и DuckDuckGo няма достъп до ключа за криптиране.</string>
+    <string name="sync_off_hint">Данните Ви са изцяло криптирани и Kahf няма достъп до ключа за криптиране.</string>
     <string name="sync_setup_single_device_title">Настройка на едно устройство</string>
     <string name="sync_setup_single_recover_data_cta_title">Възстановяване на синхронизирани данни</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Синхронизиране и архивиране на това устройство</string>
 
-    <string name="sync_off_encrypted_hint">Данните Ви са изцяло криптирани и DuckDuckGo няма достъп до ключа за декриптиране.</string>
+    <string name="sync_off_encrypted_hint">Данните Ви са изцяло криптирани и Kahf няма достъп до ключа за декриптиране.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Настройка на Синхронизиране и архивиране!</string>
@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Автоматично изтегляне на икони за синхронизираните отметки.</string>
     <string name="sync_enable_connecting">Свързване…</string>
     <string name="sync_intro_enable_title">Синхронизиране и архивиране на това устройство</string>
-    <string name="sync_intro_enable_content">Създава криптирано резервно копие на Вашите отметки и пароли на защитения сървър на DuckDuckGo, което може да бъде синхронизирано с други Ваши устройства. Ключът за криптиране се съхранява само на Вашето устройство и DuckDuckGo няма достъп до него.…</string>
+    <string name="sync_intro_enable_content">Създава криптирано резервно копие на Вашите отметки и пароли на защитения сървър на Kahf, което може да бъде синхронизирано с други Ваши устройства. Ключът за криптиране се съхранява само на Вашето устройство и Kahf няма достъп до него.…</string>
     <string name="sync_intro_enable_footer">Можете да синхронизирате с други устройства по-късно.</string>
     <string name="sync_intro_enable_cta">Включване на Синхронизиране и архивиране</string>
     <string name="sync_intro_recover_title">Възстановяване на синхронизирани данни</string>
@@ -64,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Сканиране на QR код</string>
-    <string name="connect_screen_scan_qr_hint">Влезте в <b>Настройки &gt; Синхронизиране и архивиране</b> в браузъра DuckDuckGo на друго устройство и изберете „Синхронизиране с друго устройство“.</string>
+    <string name="connect_screen_scan_qr_hint">Влезте в <b>Настройки &gt; Синхронизиране и архивиране</b> в браузъра Kahf на друго устройство и изберете „Синхронизиране с друго устройство“.</string>
     <string name="connect_screen_enter_code_cta">Или въведете кода ръчно</string>
     <string name="connect_screen_connect_qr_hint_title">От мобилно към мобилно устройство?</string>
     <string name="connect_screen_connect_qr_hint_content">Сканирайте този код с друго устройство, за да синхронизирате.</string>
@@ -72,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Ръчно въвеждане на код</string>
-    <string name="sync_enter_code_hint">Влезте в <b>Настройки &gt; Синхронизиране и архивиране &gt; Синхронизиране с друго устройство</b> и изберете <b>Преглед на текстов код</b> в приложението DuckDuckGo на друго синхронизирано устройство, след това поставете кода тук, за да синхронизирате това устройство.</string>
+    <string name="sync_enter_code_hint">Влезте в <b>Настройки &gt; Синхронизиране и архивиране &gt; Синхронизиране с друго устройство</b> и изберете <b>Преглед на текстов код</b> в приложението Kahf на друго синхронизирано устройство, след това поставете кода тук, за да синхронизирате това устройство.</string>
     <string name="sync_enter_code_verifying">Проверка на кода</string>
     <string name="sync_enter_code_invalid">⚠️ Невалиден код</string>
     <string name="sync_enter_code_paste">Поставяне на код</string>
@@ -97,7 +97,7 @@
 
     <string name="synced_devices_section_title">Синхронизирани устройства</string>
     <string name="sync_new_device_section_title">Синхронизиране на ново устройство</string>
-    <string name="sync_new_device_hint">Влезте в Настройки &gt; Синхронизиране и архивиране в приложението DuckDuckGo на друго устройство и сканирайте, за да се свържете веднага.</string>
+    <string name="sync_new_device_hint">Влезте в Настройки &gt; Синхронизиране и архивиране в приложението Kahf на друго устройство и сканирайте, за да се свържете веднага.</string>
     <string name="sync_show_text_code_item">Показване на текстов код</string>
     <string name="sync_show_qr_code_item">Сканиране на QR код</string>
     <string name="sync_save_recovery_code_item">Запазване на PDF за възстановяване</string>
@@ -117,8 +117,8 @@
     <string name="sync_pdf_description">Кодът за възстановяване Ви позволява да синхронизирате отметките на няколко устройства и да възстановявате синхронизираните данни, ако загубите достъп до устройство.</string>
     <string name="sync_code_box_title">Съхранявайте тази информация на сигурно място.</string>
     <string name="sync_instructions_title">Как става това?</string>
-    <string name="sync_instructions_step1">Отворете DuckDuckGo на друго устройство и влезте в Настройки &gt; Синхронизация.</string>
-    <string name="sync_instructions_step2">Сканирайте QR кода или копирайте и поставете текстовия код в друго приложение на DuckDuckGo.</string>
+    <string name="sync_instructions_step1">Отворете Kahf на друго устройство и влезте в Настройки &gt; Синхронизация.</string>
+    <string name="sync_instructions_step2">Сканирайте QR кода или копирайте и поставете текстовия код в друго приложение на Kahf.</string>
     <string name="sync_instructions_step3">Синхронизацията ще бъде активирана и отново ще имате достъп до всички свои данни.</string>
     <string name="remove_device_dialog_title">Премахване на устройство?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">„%1$s“ вече няма да има достъп до синхронизираните Ви данни.</string>

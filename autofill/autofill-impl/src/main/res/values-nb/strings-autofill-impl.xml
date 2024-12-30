@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Lagre passordet</string>
     <string name="saveLoginDialogNotNow">Ikke lagre</string>
-    <string name="saveLoginDialogTitle">Vil du at DuckDuckGo skal lagre passordet ditt?</string>
+    <string name="saveLoginDialogTitle">Vil du at Kahf skal lagre passordet ditt?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Flere alternativer</string>
 
     <string name="useSavedLoginDialogTitle">Vil du bruke et lagret passord?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Oppdater brukernavn</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Vil du oppdatere passordet for \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo oppdaterer dette lagrede passordet på enheten din.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf oppdaterer dette lagrede passordet på enheten din.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Lukk Autofyll-dialogboksen</string>
 
@@ -66,13 +66,13 @@
 
     <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
     <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
-    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
     <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Brukernavnet er kopiert</string>
     <string name="autofillManagementPasswordCopied">Passordet er kopiert</string>
 
-    <string name="autofill_password_generation_offer_title">Vil du bruke et sterkt passord fra DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_title">Vil du bruke et sterkt passord fra Kahf?</string>
     <string name="autofill_password_generation_offer_accept">Bruk sterkt passord</string>
     <string name="autofill_password_generation_offer_decline">Opprett eget passord</string>
 

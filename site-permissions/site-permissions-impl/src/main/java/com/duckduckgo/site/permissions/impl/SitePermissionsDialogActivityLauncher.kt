@@ -403,7 +403,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     companion object {
         private const val DRM_LEARN_MORE_ANNOTATION = "drm_learn_more_link"
-        val DRM_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/drm-permission/".toUri()
+        val DRM_LEARN_MORE_URL = "https://kahfbrowser.com/kahfbrowser-help-pages/privacy/drm-permission/".toUri()
     }
 }
 

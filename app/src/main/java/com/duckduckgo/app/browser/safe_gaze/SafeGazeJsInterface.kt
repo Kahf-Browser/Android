@@ -12,6 +12,9 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsParam
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.safegaze.genderdetection.FaceDetector
 import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
@@ -35,7 +38,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
-import java.util.Timer
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
@@ -44,7 +46,8 @@ import kotlin.coroutines.suspendCoroutine
 internal data class UrlInfo(
     val url: String,
     val uid: String,
-    val imageData: String? = null
+    val imageData: String? = null,
+    val insertedAt: Long = System.currentTimeMillis(),
 )
 
 class SafeGazeJsInterface(
@@ -54,10 +57,13 @@ class SafeGazeJsInterface(
     private val movenet: MoveNetMultiPose,
     private val kahfImageBlockedDao: KahfImageBlockedDao,
     private val dispatcher: DispatcherProvider,
+    private val analytics: AnalyticsService,
     private val onUpdateBlur: (blur: Float) -> Unit,
     private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?) -> Unit
 ) {
     private val onDeviceModelCachedResults = mutableMapOf<String, String>()
+    private val inferenceTimes = mutableListOf<Long>()
+    private val waitingTimes = mutableListOf<Long>()
 
     private val urlQueue: ConcurrentLinkedQueue<UrlInfo> = ConcurrentLinkedQueue()
     private var processingJob: Job? = null
@@ -84,9 +90,7 @@ class SafeGazeJsInterface(
         return suspendCoroutine { continuation ->
             scope.launch {
             var bitmap = if (imageData != null) {
-                val byteArrayImage = Base64.decode(imageData, Base64.DEFAULT)
-                val bitmapf = BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
-                bitmapf
+                base64ToBitmap(imageData)
             } else {
                 getBitmapFromUrl(url)
             }
@@ -155,14 +159,8 @@ class SafeGazeJsInterface(
 
     private suspend fun getBitmapFromUrl(url: String): Bitmap? {
         return if (url.startsWith("data:image")) {
-            try {
-                val base64Image = url.substringAfter(",")  // Remove the 'data:image/jpeg;base64,' prefix
-                val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
-                BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
-            } catch (e: Exception) {
-                Timber.e(e, "kLog Error decoding base64 image: $url")
-                null
-            }
+            val base64Image = url.substringAfter(",")  // Remove the 'data:image/jpeg;base64,' prefix
+            base64ToBitmap(base64Image)
         } else {
             try {
                 downloadBitmap(url, context)
@@ -170,6 +168,17 @@ class SafeGazeJsInterface(
                 Timber.e(e, "kLog Error downloading image: $url")
                 null
             }
+        }
+    }
+
+    // method to convert base64 to bitmap (handle possible exception when decoding base64)
+    private fun base64ToBitmap(base64Image: String): Bitmap? {
+        return try {
+            val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
+        } catch (e: Exception) {
+            Timber.e(e, "kLog Error decoding base64 image")
+            null
         }
     }
 
@@ -278,28 +287,55 @@ class SafeGazeJsInterface(
                     val task = urlQueue.poll()
 
                     task?.let {
+                        // Log average waiting time for every 30 images to GA
+                        val waitingTime = System.currentTimeMillis() - task.insertedAt
+                        waitingTimes.add(waitingTime)
+                        if (waitingTimes.size >= 30) {
+                            val avg = waitingTimes.average().toLong()
+                            analytics.logEvent(
+                                AnalyticsEvent.AvgQueueTime,
+                                mapOf(AnalyticsParam.AvgQueueTimeMs to avg.toString()),
+                            )
+                            waitingTimes.clear()
+                        }
+
                         // Again check on cache
                         if (onDeviceModelCachedResults.containsKey(it.url)) {
                             returnResultFromCache(it.url, it.uid)
                             Timber.d("kLog cache hit for ${it.url}")
                             return@let
                         }
+                        var inferenceTime = 0L
 
-                        val t1 = System.currentTimeMillis()
                         val result = try {
-                            withTimeout(MAX_INFERENCE_TIME_MS) {
+                            val t1 = System.currentTimeMillis()
+                            val shouldBlurResult = withTimeout(MAX_INFERENCE_TIME_MS) {
                                 shouldBlurImage(it.url, it.imageData)
                             }
+                            inferenceTime = System.currentTimeMillis() - t1
+                            inferenceTimes.add(inferenceTime)
+
+                            shouldBlurResult
                         } catch (e: TimeoutCancellationException) {
                             Timber.e("kLog Timeout occurred while processing image: ${it.url}")
+                            analytics.logEvent(AnalyticsEvent.ImageProcessingTimeout, mapOf(AnalyticsParam.TimedOutImageUrl to it.url))
                             null
                         }
-                        val inferenceTime = System.currentTimeMillis() - t1
 
                         // If result is null, then timeout occurred. No need to process further or cache the result
                         if (result == null) {
                             callSafegazeOnDeviceModelHandler(it.uid, "null", "null")
                             return@let
+                        }
+
+                        // Log P90 inference time for every 30 images to GA
+                        if (inferenceTimes.size >= 30) {
+                            val p90 = inferenceTimes.sorted()[inferenceTimes.size * 90 / 100]
+                            analytics.logEvent(
+                                AnalyticsEvent.P90ImageProcessing,
+                                mapOf(AnalyticsParam.ImageProcessingTime to p90.toString()),
+                            )
+                            inferenceTimes.clear()
                         }
 
                         val resultJson: String
@@ -372,6 +408,57 @@ class SafeGazeJsInterface(
                 processQueue()
                 Timber.d("kLog processing job resumed for $tabId")
             }
+        }
+    }
+
+    /**
+     * Check if the hardware is compatible with running the on-device models
+     * We run the models on a test image and check if the inference time is within limits
+     * @return true if the hardware is compatible, false otherwise
+     */
+    suspend fun isHardwareCompatible(): Boolean {
+        Timber.d("kLog checking hardware compatibility")
+        
+        val bitmap = context.assets.open("test_image.webp").use {
+            // convert input stream to byte array
+            val buffer = ByteArray(it.available())
+            it.read(buffer)
+            it.close()
+
+            BitmapFactory.decodeByteArray(buffer, 0, buffer.size, BitmapFactory.Options().also { op ->
+                op.inSampleSize = 3
+            })
+        }
+
+        val t1 = System.currentTimeMillis()
+
+        val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
+        Timber.d("kLog nsfw classified. IsSafe: ${nsfwPrediction.isSafe()}")
+
+        val (faceRectList, poseList) = runFaceAndPoseDetectionInParallel(bitmap)
+        Timber.d("kLog ${faceRectList.size} faces and ${poseList.size} poses detected")
+
+        val personList = VisualizationUtils.matchFacesToPoses(poseList, faceRectList)
+        personList.forEach { person ->
+            person.faceBox?.let { faceRect ->
+                VisualizationUtils.cropToBBox(bitmap, faceRect.toRect())?.let { faceBmp ->
+                    val genderPrediction = genderDetector.predictGender(faceBmp)
+                    person.isFemale = !genderPrediction.isMale
+                    person.genderScore = genderPrediction.genderScore
+                }
+            }
+        }
+
+        Timber.d("kLog ${personList.count { it.isFemale }} females detected")
+
+        val inferenceTime = System.currentTimeMillis() - t1
+
+        return if (inferenceTime > 1000) {
+            Timber.e("kLog Will make it slower: $inferenceTime ms")
+            false
+        } else {
+            Timber.d("kLog Will run fine: $inferenceTime ms")
+            true
         }
     }
 

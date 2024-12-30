@@ -16,7 +16,6 @@ import com.duckduckgo.app.browser.databinding.FragmentOnboarding2Binding
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
-import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.delay
@@ -55,6 +54,7 @@ class OnboardingFragment2 : DuckDuckGoFragment(R.layout.fragment_onboarding2) {
         binding = FragmentOnboarding2Binding.inflate(inflater, container, false)
 
         binding.btnSkip.setOnClickListener {
+            analytics.logEvent(AnalyticsEvent.OnboardSkipDefaultBrowser)
             (requireActivity() as KahfOnboardingActivity).onContinueClicked()
         }
 
@@ -62,19 +62,12 @@ class OnboardingFragment2 : DuckDuckGoFragment(R.layout.fragment_onboarding2) {
             onLaunchDefaultBrowserSettingsClicked()
         }
 
-        // To avoid the 'Skip' button being hidden behind the navigation bar
-        (requireActivity() as DuckDuckGoActivity).getNavigationBarHeight {
-            binding.guidelineBottom.setGuidelinePercent(
-                if (it > 100) 0.8f else 0.9f
-            )
-        }
-
         return binding.root
     }
 
     override fun onResume() {
         if (userTriedToSetDDGAsDefault && defaultWebBrowserCapability.isDefaultBrowser()) {
-            analytics.logEvent(AnalyticsEvent.SetAsDefaultBrowser)
+            analytics.logEvent(AnalyticsEvent.OnboardSetAsDefaultBrowser)
         }
         super.onResume()
     }

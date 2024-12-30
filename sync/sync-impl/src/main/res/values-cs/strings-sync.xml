@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
-    <string name="sync_flows_disabled_new_version"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj DuckDuckGo na nejnovější verzi.</string>
+    <string name="sync_flows_disabled_new_version"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj Kahf na nejnovější verzi.</string>
     <string name="sync_create_account_disabled"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj DuckDuckGo na nejnovější verzi.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Synchronizace a zálohování není k dispozici</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj Kahf na nejnovější verzi.</string>
     <string name="sync_disabled_authenticated_user"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj DuckDuckGo na nejnovější verzi.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování není v téhle verzi aplikace dostupná. Pro pokračování aktualizuj Kahf na nejnovější verzi.</string>
     <string name="sync_paused_notification"><b>Funkce synchronizace a zálohování je pozastavená</b>\nOmlouváme se, ale funkce synchronizace a zálohování teď není dostupná. Zkus to znovu později.</string>
     <string name="sync_error_notification"><b>Chyba synchronizace</b>\nFunkce Sync &amp; Backup je dočasně nedostupná.</string>
     <string name="sync_error_warning"><b>Chyba synchronizace</b>\nFunkce Sync &amp; Backup je dočasně nedostupná.</string>
@@ -34,12 +34,12 @@
     <string name="sync_setup_begin_syncing">Zahájení synchronizace</string>
     <string name="sync_setup_with_another_device_cta_title">Synchronizovat s jiným zařízením</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Bezpečně synchronizuj záložky a hesla mezi svými zařízeními.</string>
-    <string name="sync_off_hint">U tvých dat se uplatňuje end-to-end šifrování a DuckDuckGo nemá přístup k šifrovacímu klíči.</string>
+    <string name="sync_off_hint">U tvých dat se uplatňuje end-to-end šifrování a Kahf nemá přístup k šifrovacímu klíči.</string>
     <string name="sync_setup_single_device_title">Nastavení jednoho zařízení</string>
     <string name="sync_setup_single_recover_data_cta_title">Obnovit synchronizovaná data</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Synchronizace a záloha tohoto zařízení</string>
 
-    <string name="sync_off_encrypted_hint">U tvých dat se uplatňuje end-to-end šifrování a DuckDuckGo nemá přístup k dešifrovacímu klíči.</string>
+    <string name="sync_off_encrypted_hint">U tvých dat se uplatňuje end-to-end šifrování a Kahf nemá přístup k dešifrovacímu klíči.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Nastavuje se synchronizace a zálohování</string>
@@ -49,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automatické stahování ikon synchronizovaných záložek.</string>
     <string name="sync_enable_connecting">Připojování...</string>
     <string name="sync_intro_enable_title">Synchronizace a záloha tohoto zařízení</string>
-    <string name="sync_intro_enable_content">Na zabezpečeném serveru DuckDuckGo se vytvoří šifrovaná záloha záložek a hesel, kterou můžeš synchronizovat s ostatními zařízeními. \n\n Šifrovací klíč se ukládá jenom na tvé zařízení, DuckDuckGo k němu nemá přístup.</string>
+    <string name="sync_intro_enable_content">Na zabezpečeném serveru Kahf se vytvoří šifrovaná záloha záložek a hesel, kterou můžeš synchronizovat s ostatními zařízeními. \n\n Šifrovací klíč se ukládá jenom na tvé zařízení, Kahf k němu nemá přístup.</string>
     <string name="sync_intro_enable_footer">Synchronizaci s dalšími zařízeními můžeš provést později.</string>
     <string name="sync_intro_enable_cta">Zapnout synchronizaci a zálohování</string>
     <string name="sync_intro_recover_title">Obnovit synchronizovaná data</string>
@@ -64,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Skenování QR kódu</string>
-    <string name="connect_screen_scan_qr_hint">Přejdi v prohlížeči DuckDuckGo na jiném zařízení do <b>Nastavení &gt; Synchronizace a zálohování</b> a vyber možnost Synchronizovat s jiným zařízením.</string>
+    <string name="connect_screen_scan_qr_hint">Přejdi v prohlížeči Kahf na jiném zařízení do <b>Nastavení &gt; Synchronizace a zálohování</b> a vyber možnost Synchronizovat s jiným zařízením.</string>
     <string name="connect_screen_enter_code_cta">Nebo zadej kód ručně</string>
     <string name="connect_screen_connect_qr_hint_title">Z mobilu na mobil?</string>
     <string name="connect_screen_connect_qr_hint_content">Pro synchronizaci naskenuj tenhle kód pomocí jiného zařízení.</string>
@@ -72,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Ruční zadání kódu</string>
-    <string name="sync_enter_code_hint">V aplikaci DuckDuckGo na synchronizovaném zařízení přejdi do <b>Nastavení &gt; Synchronizace a zálohování &gt; Synchronizovat s jiným zařízením</b> a vyber <b>Zobrazit textový kód</b>. Pro synchronizaci tohoto zařízení stačí už jen vložit kód.</string>
+    <string name="sync_enter_code_hint">V aplikaci Kahf na synchronizovaném zařízení přejdi do <b>Nastavení &gt; Synchronizace a zálohování &gt; Synchronizovat s jiným zařízením</b> a vyber <b>Zobrazit textový kód</b>. Pro synchronizaci tohoto zařízení stačí už jen vložit kód.</string>
     <string name="sync_enter_code_verifying">Ověřování kódu</string>
     <string name="sync_enter_code_invalid">⚠️ Neplatný kód</string>
     <string name="sync_enter_code_paste">Vložit kód</string>
@@ -97,7 +97,7 @@
 
     <string name="synced_devices_section_title">Synchronizovaná zařízení</string>
     <string name="sync_new_device_section_title">Synchronizace nového zařízení</string>
-    <string name="sync_new_device_hint">Přejdi v aplikaci DuckDuckGo na jiném zařízení do Nastavení &gt; Synchronizace a zálohování. Po naskenování se okamžitě připojíš.</string>
+    <string name="sync_new_device_hint">Přejdi v aplikaci Kahf na jiném zařízení do Nastavení &gt; Synchronizace a zálohování. Po naskenování se okamžitě připojíš.</string>
     <string name="sync_show_text_code_item">Zobrazit textový kód</string>
     <string name="sync_show_qr_code_item">Skenování QR kódu</string>
     <string name="sync_save_recovery_code_item">Uložit PDF pro obnovení</string>
@@ -117,8 +117,8 @@
     <string name="sync_pdf_description">Kód pro obnovení umožňuje synchronizovat záložky v různých zařízeních a obnovit synchronizovaná data v případě ztráty přístupu k zařízení.</string>
     <string name="sync_code_box_title">Uchovávej tyhle informace v bezpečí.</string>
     <string name="sync_instructions_title">Jak to funguje?</string>
-    <string name="sync_instructions_step1">Otevři DuckDuckGo na jiném zařízení a v Nastavení vyber možnost Synchronizace.</string>
-    <string name="sync_instructions_step2">V jiné aplikaci DuckDuckGo naskenuj QR kód nebo do ní zkopíruj a vlož textový kód.</string>
+    <string name="sync_instructions_step1">Otevři Kahf na jiném zařízení a v Nastavení vyber možnost Synchronizace.</string>
+    <string name="sync_instructions_step2">V jiné aplikaci Kahf naskenuj QR kód nebo do ní zkopíruj a vlož textový kód.</string>
     <string name="sync_instructions_step3">Dojde k synchronizaci a ty budeš mít zase přístup ke všem svým datům.</string>
     <string name="remove_device_dialog_title">Smazat zařízení?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s už nebude mít přístup k synchronizovaným datům.</string>

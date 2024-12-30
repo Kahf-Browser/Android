@@ -187,7 +187,7 @@ class FavouritesNewTabSectionsAdapter(
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = binding.iconImageView, fetchFromRemote = true)
+                faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = binding.iconImageView)
             }
         }
 

@@ -78,6 +78,7 @@ import com.duckduckgo.app.fire.DatabaseCleanerHelper
 import com.duckduckgo.app.fire.DatabaseLocator
 import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.GlobalData
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
@@ -373,8 +374,12 @@ class BrowserModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesDnsResolver(dispatcherProvider: DispatcherProvider, sharedPreferences: SharedPreferences): CustomDnsResolver {
-        return CustomDnsResolver(dispatcherProvider, sharedPreferences)
+    fun providesDnsResolver(
+        dispatcherProvider: DispatcherProvider,
+        sharedPreferences: SharedPreferences,
+        analyticsService: AnalyticsService
+    ): CustomDnsResolver {
+        return CustomDnsResolver(dispatcherProvider, analyticsService, sharedPreferences)
     }
 
     @Provides
@@ -408,5 +413,11 @@ class BrowserModule {
     fun provideAnalyticsService(context: Context): AnalyticsService {
         val f = FirebaseAnalytics.getInstance(context.applicationContext)
         return FirebaseAnalyticsService(f)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideGlobalData(): GlobalData {
+        return GlobalData(false)
     }
 }

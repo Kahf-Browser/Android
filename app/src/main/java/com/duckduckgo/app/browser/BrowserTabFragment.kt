@@ -210,6 +210,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.global.DuckDuckGoApplication
+import com.duckduckgo.app.global.GlobalData
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
 import com.duckduckgo.app.global.view.NonDismissibleBehavior
@@ -594,6 +596,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var analyticsService: AnalyticsService
+
+    @Inject
+    lateinit var globalData: GlobalData
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2422,6 +2427,9 @@ class BrowserTabFragment :
         binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
+                analyticsService.logEvent(
+                    AnalyticsEvent.AddressBarSuggestionSelection, mapOf(AnalyticsParam.SuggestionSearchEngine to "duckduckgo")
+                )
                 viewModel.userSelectedAutocomplete(it)
             },
             editableSearchClickListener = {
@@ -2439,15 +2447,17 @@ class BrowserTabFragment :
     }
 
     private fun configureFocusedView() {
-        focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
-            binding.focusedViewContainerLayout.addView(
-                focusedView.getView(requireContext()),
-                LayoutParams(
-                    LayoutParams.MATCH_PARENT,
-                    LayoutParams.MATCH_PARENT,
-                ),
-            )
-        }.launchIn(lifecycleScope)
+        viewLifecycleOwnerLiveData.observe(viewLifecycleOwner) { lifecycleOwner ->
+            focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
+                binding.focusedViewContainerLayout.addView(
+                    focusedView.getView(requireContext()),
+                    LayoutParams(
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT,
+                    ),
+                )
+            }.launchIn(lifecycleOwner.lifecycleScope)
+        }
     }
 
     private fun configureNewTab() {
@@ -2596,6 +2606,7 @@ class BrowserTabFragment :
         }
     }
 
+
     private fun userEnteredQuery(query: String) {
         viewModel.onUserSubmittedQuery(query)
     }
@@ -2612,7 +2623,7 @@ class BrowserTabFragment :
 
         webView?.let {
             safeGazeInterface = SafeGazeJsInterface(
-                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatchers,
+                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onUpdateBlur = { blur ->
                     val trimmedBlur = blur / 100
                     val jsFunction = "window.blurIntensity = $trimmedBlur; updateBluredImageOpacity();"
@@ -2624,6 +2635,17 @@ class BrowserTabFragment :
                     val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson', `$base64Image`);"
                     webView?.post {
                         webView?.evaluateJavascript(jsFunctionCall, null)
+                    }
+
+                    if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0 && genderDetector.modelInitializationTime > 0 && poseDetector.modelInitializationTime() > 0) {
+                        val initializationTime = nsfwDetector.modelInitializationTime + genderDetector.modelInitializationTime + poseDetector.modelInitializationTime()
+                        analyticsService.logEvent(
+                            AnalyticsEvent.ModelInitTime,
+                            mapOf(AnalyticsParam.ModelInitTimeMS to initializationTime.toString())
+                        )
+                        globalData.modelInitializationTimeLogged = true
+
+                        Timber.d("Model initialization time: $initializationTime ms")
                     }
                 },
             )
@@ -3835,9 +3857,9 @@ class BrowserTabFragment :
                     browserActivity?.launchBookmarks()
                     pixel.fire(AppPixelName.MENU_ACTION_BOOKMARKS_PRESSED.pixelName)
                 }
-                onMenuItemClicked(menuBinding.fireproofWebsiteMenuItem) {
+                /*onMenuItemClicked(menuBinding.fireproofWebsiteMenuItem) {
                     viewModel.onFireproofWebsiteMenuClicked()
-                }
+                }*/
                 onMenuItemClicked(menuBinding.addBookmarksMenuItem) {
                     viewModel.onBookmarkMenuClicked()
                 }
@@ -3869,7 +3891,7 @@ class BrowserTabFragment :
                     pixel.fire(AppPixelName.MENU_ACTION_ADD_TO_HOME_PRESSED)
                     viewModel.onPinPageToHomeSelected()
                 }
-                onMenuItemClicked(menuBinding.createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
+                // onMenuItemClicked(menuBinding.createAliasMenuItem) { viewModel.consumeAliasAndCopyToClipboard() }
                 onMenuItemClicked(menuBinding.openInAppMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_APP_LINKS_OPEN_PRESSED)
                     viewModel.openAppLink()

@@ -900,12 +900,16 @@
     <string name="kahf_onboarding_subtitle">Start exploring the halal web\nand browse the internet without\nworrying about haram content,\nharam ad and adult sites.</string>
     <string name="kahf_onboarding_title">Search \nquickly and \nprivately</string>
     <string name="kahf_onboarding_sg_title">Blur\nIndecent\nPhotos</string>
-    <string name="kahf_onboarding_sg_subtitle">Enhance your browsing experience\nby blurring inappropriate images.\nAvoid major sins</string>
+    <string name="kahf_onboarding_sg_subtitle">Blurring inappropriate images.\nAvoid major sins</string>
     <string name="kahf_onboarding_sg_enable">Enable Image Blurring</string>
     <string name="kahf_onboarding_next">Next</string>
     <string name="kahf_onboarding_skip_now">Skip for now</string>
     <string name="kahf_onboarding_choose">Choose\nthe app you \nuse most</string>
     <string name="kahf_onboarding_choose_details">Select your favorite apps to keep them handy in your home screen</string>
+    <string name="kahf_onboarding_checking_compatibility">Checking compatibility</string>
+    <string name="kahf_onboarding_compatible">Device is compatible to blur images</string>
+    <string name="kahf_onboarding_incompatible">Device is incompatible</string>
+    <string name="kahf_onboarding_slow">Device is compatible.\nBut blurring images will make the browser slower</string>
     <string name="kahf_running_prayer">Running Prayer</string>
     <string name="kahf_running">Running…</string>
     <string name="kahf_fajr">Fajr</string>

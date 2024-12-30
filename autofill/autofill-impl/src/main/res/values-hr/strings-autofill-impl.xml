@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginDialogNotNow">Nemoj spremiti</string>
-    <string name="saveLoginDialogTitle">Želiš li da DuckDuckGo spremi tvoju lozinku?</string>
+    <string name="saveLoginDialogTitle">Želiš li da Kahf spremi tvoju lozinku?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Dodatne mogućnosti</string>
 
     <string name="useSavedLoginDialogTitle">Koristiti spremljenu lozinku?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Ažuriraj korisničko ime</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Želiš li ažurirati lozinku za korisnika \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo će ažurirati ovu pohranjenu lozinku na tvom uređaju.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf će ažurirati ovu pohranjenu lozinku na tvom uređaju.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zatvori dijaloški okvir za automatsko popunjavanje</string>
 
@@ -66,13 +66,13 @@
 
     <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
     <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
-    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
     <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Korisničko ime je kopirano</string>
     <string name="autofillManagementPasswordCopied">Lozinka je kopirana</string>
 
-    <string name="autofill_password_generation_offer_title">Koristiti jaku lozinku od DuckDuckGoa?</string>
+    <string name="autofill_password_generation_offer_title">Koristiti jaku lozinku od Kahf?</string>
     <string name="autofill_password_generation_offer_accept">Koristi jaku lozinku</string>
     <string name="autofill_password_generation_offer_decline">Izradi vlastitu</string>
 

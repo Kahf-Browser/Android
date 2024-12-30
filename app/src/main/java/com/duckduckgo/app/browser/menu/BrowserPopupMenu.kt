@@ -67,7 +67,7 @@ class BrowserPopupMenu(
             }
             binding.addBookmarksMenuItem.setIcon(if (isBookmark) drawable.ic_bookmark_solid_16 else drawable.ic_bookmark_16)
 
-            binding.fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite && !displayedInCustomTabScreen
+            /*binding.fireproofWebsiteMenuItem.isVisible = viewState.canFireproofSite && !displayedInCustomTabScreen
             binding.fireproofWebsiteMenuItem.label {
                 context.getString(
                     if (viewState.isFireproofWebsite) {
@@ -79,7 +79,7 @@ class BrowserPopupMenu(
             }
             binding.fireproofWebsiteMenuItem.setIcon(if (viewState.isFireproofWebsite) drawable.ic_fire_16 else drawable.ic_fireproofed_16)
 
-            binding.createAliasMenuItem.isVisible = viewState.isEmailSignedIn && !displayedInCustomTabScreen
+            binding.createAliasMenuItem.isVisible = viewState.isEmailSignedIn && !displayedInCustomTabScreen*/
 
             binding.changeBrowserModeMenuItem.isVisible = viewState.canChangeBrowsingMode
             binding.changeBrowserModeMenuItem.label {

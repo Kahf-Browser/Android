@@ -2,6 +2,9 @@ package com.duckduckgo.app.dns
 
 import android.content.SharedPreferences
 import androidx.core.net.toUri
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsParam
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.dns.socket_pool.SocketHelper
 import com.duckduckgo.app.kahftube.PrivateDnsLevel
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -33,10 +36,12 @@ data class CachedDnsResponse(
 
 class CustomDnsResolver(
     private val dispatcher: DispatcherProvider,
+    private val analytics: AnalyticsService,
     sharedPreferences: SharedPreferences
 ) : Dns {
     private var privateDns: PrivateDnsLevel
     private var socketHelper: SocketHelper
+    private val resolutionTimes = mutableListOf<Long>()
 
     companion object {
         private const val MAX_RETRY = 2
@@ -76,16 +81,20 @@ class CustomDnsResolver(
                 cache.remove(host)
 
                 try {
+                    val t1 = System.currentTimeMillis()
                     val queryMessage = Message.newQuery(Record.newRecord(Name.fromString(host), Type.A, DClass.IN))
                     val responseMessage = sendDoTQuery(queryMessage)
+                    calculateResolutionTimeAndLogP90(t1)
                     responseMessage
                 } catch (e: Exception) {
                     null
                 }
             }
         } ?: try {
+            val t1 = System.currentTimeMillis()
             val queryMessage = Message.newQuery(Record.newRecord(Name.fromString(host), Type.A, DClass.IN))
             val responseMessage = sendDoTQuery(queryMessage)
+            calculateResolutionTimeAndLogP90(t1)
             responseMessage
         } catch (e: Exception) {
             null
@@ -182,6 +191,25 @@ class CustomDnsResolver(
         runBlocking {
             socketHelper = SocketHelper.getInstance(privateDns.dnsServerIps.random(), 853, privateDns.url)
             Timber.d("tpLog DoH URL set to: ${privateDnsLevel.url}")
+        }
+    }
+
+    fun calculateResolutionTimeAndLogP90(t1: Long) {
+        val t2 = System.currentTimeMillis()
+        val inferenceTime = t2 - t1
+        resolutionTimes.add(inferenceTime)
+
+        // Log P90 DNS resolution time for every 30 images to GA
+        if (resolutionTimes.size >= 30) {
+            val p90 = resolutionTimes.sorted()[resolutionTimes.size * 90 / 100]
+            analytics.logEvent(
+                AnalyticsEvent.P90DnsResolution,
+                mapOf(
+                    AnalyticsParam.DnsResolutionTime to p90.toString(),
+                    AnalyticsParam.DnsResolver to privateDns.url,
+                ),
+            )
+            resolutionTimes.clear()
         }
     }
 }

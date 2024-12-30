@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:994768194050:android:1112b04c583c54691db51b",
+        "mobilesdk_app_id": "1:994768194050:android:346229bc3e24c7731db51b",
         "android_client_info": {
-          "package_name": "org.kahf.browser"
+          "package_name": "io.kahf.browser"
         }
       },
       "oauth_client": [],
@@ -26,9 +26,28 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:994768194050:android:c4d07952d6c04ce41db51b",
+        "mobilesdk_app_id": "1:994768194050:android:581e35edb42056bf1db51b",
         "android_client_info": {
-          "package_name": "org.kahf.browser.debug"
+          "package_name": "io.kahf.browser.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWx99bEMU7n3jOc068gHw182LMjSJGVfw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:994768194050:android:0d270d1f354d81c91db51b",
+        "android_client_info": {
+          "package_name": "org.halalz.kahfbrowser"
         }
       },
       "oauth_client": [],

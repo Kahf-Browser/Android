@@ -320,7 +320,7 @@ class TrackingProtectionExclusionListActivity :
         const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         const val LEARN_WHY_ANNOTATION = "learn_why_link"
         private const val KEY_FILTER_LIST = "KEY_FILTER_LIST"
-        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
+        private const val FAQ_WEBSITE = "https://help.kahfbrowser.com/kahfbrowser-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
 
         enum class AppsFilter {
             ALL,

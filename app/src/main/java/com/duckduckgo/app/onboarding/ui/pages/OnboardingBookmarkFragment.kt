@@ -22,6 +22,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboardingBookmarkBinding
 import com.duckduckgo.app.onboarding.model.PredefinedBookmark
@@ -49,6 +51,9 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
     @Inject
     lateinit var dispatcherProvide: DispatcherProvider
 
+    @Inject
+    lateinit var analytics: AnalyticsService
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,22 +62,6 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
 
         setupButtonClicks()
         setupRecyclerView()
-
-        // To avoid the 'Skip' button being hidden behind the navigation bar
-        (requireActivity() as DuckDuckGoActivity).getNavigationBarHeight {
-            binding.guidelineBottom.setGuidelinePercent(
-                if (it > 100) 0.8f else 0.9f
-            )
-        }
-
-        // Alternative solution (need checking on both orientation and on multiple devices)
-        /*(requireActivity() as DuckDuckGoActivity).getNavigationBarHeight { barHeight ->
-            val pcOfNavbarHeight = ((barHeight.toDouble() / getDisplayHeightInPixel().toDouble()) * 100)
-
-            binding.guidelineBottom.setGuidelinePercent(
-                (1 - (pcOfNavbarHeight + 1) / 100).toFloat(),
-            )
-        }*/
 
         return binding.root
     }
@@ -115,6 +104,7 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
     private fun setupButtonClicks() {
         binding.btnSkip.setOnClickListener {
             CoroutineScope(dispatcherProvide.io()).launch {
+                analytics.logEvent(AnalyticsEvent.OnboardSkipBookmarks)
                 addBookmarks(false)
 
                 withContext(dispatcherProvide.main()) {
@@ -125,6 +115,7 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
 
         binding.btnSetBookmark.setOnClickListener {
             CoroutineScope(dispatcherProvide.io()).launch {
+                analytics.logEvent(AnalyticsEvent.OnboardSetBookmarks)
                 addBookmarks(true)
 
                 withContext(dispatcherProvide.main()) {

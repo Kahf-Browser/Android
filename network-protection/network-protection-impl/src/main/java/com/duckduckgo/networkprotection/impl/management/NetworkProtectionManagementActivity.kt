@@ -495,6 +495,6 @@ class NetworkProtectionManagementActivity : DuckDuckGoActivity() {
         private const val REPORT_ISSUES_ANNOTATION = "report_issues_link"
         private const val OPEN_SETTINGS_ANNOTATION = "open_settings_link"
         private const val TAG_ALWAYS_ON_DIALOG = "NETP_ALWAYS_ON_DIALOG"
-        private const val VPN_HELP_CENTER_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/vpn/"
+        private const val VPN_HELP_CENTER_URL = "https://kahfbrowser.com/kahfbrowser-help-pages/privacy-pro/vpn/"
     }
 }

@@ -22,9 +22,12 @@ class GenderDetector (val context: Context) {
         .add(ResizeOp(inputImageSize, inputImageSize, BILINEAR))
         .add(NormalizeOp(0f, 255f))
         .build()
+    var modelInitializationTime = 0L
+        private set
 
     private fun initializeModel() {
         try {
+            val t1 = System.currentTimeMillis()
             val model = context.assets.open("mobilenet_v2_gender.tflite").use { it.readBytes() }
             val modelBuffer = ByteBuffer.allocateDirect(model.size)
             modelBuffer.order(ByteOrder.nativeOrder())
@@ -34,7 +37,7 @@ class GenderDetector (val context: Context) {
                 this.setNumThreads(4)
             }
             interpreter = Interpreter(modelBuffer, options)
-
+            modelInitializationTime = System.currentTimeMillis() - t1
             // warmUpModel()
         } catch (e: Exception) {
             e.printStackTrace()

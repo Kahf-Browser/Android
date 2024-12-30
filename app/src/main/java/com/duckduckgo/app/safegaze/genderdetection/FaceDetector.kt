@@ -40,11 +40,15 @@ class FaceDetector(val context: Context) {
 
     suspend fun detectFaces(bitmap: Bitmap): List<Rect> {
         return suspendCoroutine { continuation ->
-            val image = InputImage.fromBitmap(bitmap, 0)
+            try {
+                val image = InputImage.fromBitmap(bitmap, 0)
 
-            faceDetector.process(image).addOnSuccessListener { faces ->
-                continuation.resume(faces.map { it.boundingBox }.toList())
-            }.addOnFailureListener {
+                faceDetector.process(image).addOnSuccessListener { faces ->
+                    continuation.resume(faces.map { it.boundingBox }.toList())
+                }.addOnFailureListener {
+                    continuation.resume(listOf())
+                }
+            } catch (e: Exception) {
                 continuation.resume(listOf())
             }
         }

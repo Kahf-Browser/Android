@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spara lösenord</string>
     <string name="saveLoginDialogNotNow">Spara inte</string>
-    <string name="saveLoginDialogTitle">Vill du att DuckDuckGo ska spara ditt lösenord?</string>
+    <string name="saveLoginDialogTitle">Vill du att Kahf ska spara ditt lösenord?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Fler alternativ</string>
 
     <string name="useSavedLoginDialogTitle">Vill du använda ett sparat lösenord?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Uppdatera användarnamn</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Uppdatera lösenordet för \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo kommer att uppdatera det lagrade lösenordet på din enhet.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf kommer att uppdatera det lagrade lösenordet på din enhet.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Stäng dialogrutan för automatisk ifyllning</string>
 
@@ -66,13 +66,13 @@
 
     <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
     <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
-    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
     <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Användarnamn kopierat</string>
     <string name="autofillManagementPasswordCopied">Lösenord kopierat</string>
 
-    <string name="autofill_password_generation_offer_title">Använd ett starkt lösenord från DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_title">Använd ett starkt lösenord från Kahf?</string>
     <string name="autofill_password_generation_offer_accept">Använd starkt lösenord</string>
     <string name="autofill_password_generation_offer_decline">Skapa mitt eget</string>
 

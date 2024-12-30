@@ -63,15 +63,18 @@ class MoveNetMultiPose(
         private const val KEYPOINT_COUNT = 17
         private const val OUTPUTS_COUNT_PER_KEYPOINT = 3
         private const val CPU_NUM_THREADS = 4
+        private var modelInitializationTime = 0L
 
         // allow specifying model type.
         fun create(
             context: Context,
             type: Type,
         ): MoveNetMultiPose {
+            val t1 = System.currentTimeMillis()
+
             val options = Interpreter.Options()
             options.setNumThreads(CPU_NUM_THREADS)
-            return MoveNetMultiPose(
+            val model = MoveNetMultiPose(
                 Interpreter(
                     FileUtil.loadMappedFile(
                         context,
@@ -80,8 +83,13 @@ class MoveNetMultiPose(
                     ), options
                 ), type
             )
+
+            modelInitializationTime = System.currentTimeMillis() - t1
+            return model
         }
     }
+
+    fun modelInitializationTime() = modelInitializationTime
 
     /**
      * Convert x and y coordinates ([0-1]) returns from the TFlite model
@@ -250,22 +258,26 @@ class MoveNetMultiPose(
      * Run TFlite model and Returns a list of "Person" corresponding to the input image.
      */
     override fun estimatePoses(bitmap: Bitmap): List<Person> {
-        val inferenceStartTimeNanos = SystemClock.elapsedRealtimeNanos()
-        val inputTensor = processInputTensor(bitmap)
-        val outputTensor = TensorBuffer.createFixedSize(outputShape, DataType.FLOAT32)
+        try {
+            val inferenceStartTimeNanos = SystemClock.elapsedRealtimeNanos()
+            val inputTensor = processInputTensor(bitmap)
+            val outputTensor = TensorBuffer.createFixedSize(outputShape, DataType.FLOAT32)
 
-        // if model is dynamic, resize input before run interpreter
-        if (type == Type.Dynamic) {
-            val inputShape = intArrayOf(1).plus(inputTensor.tensorBuffer.shape)
-            interpreter.resizeInput(0, inputShape, true)
-            interpreter.allocateTensors()
+            // if model is dynamic, resize input before run interpreter
+            if (type == Type.Dynamic) {
+                val inputShape = intArrayOf(1).plus(inputTensor.tensorBuffer.shape)
+                interpreter.resizeInput(0, inputShape, true)
+                interpreter.allocateTensors()
+            }
+            interpreter.run(inputTensor.buffer, outputTensor.buffer.rewind())
+
+            val processedPerson = postProcess(outputTensor.floatArray)
+            lastInferenceTimeNanos =
+                SystemClock.elapsedRealtimeNanos() - inferenceStartTimeNanos
+            return processedPerson
+        } catch (e: Exception) {
+            return emptyList()
         }
-        interpreter.run(inputTensor.buffer, outputTensor.buffer.rewind())
-
-        val processedPerson = postProcess(outputTensor.floatArray)
-        lastInferenceTimeNanos =
-            SystemClock.elapsedRealtimeNanos() - inferenceStartTimeNanos
-        return processedPerson
     }
 
     override fun lastInferenceTimeNanos(): Long = lastInferenceTimeNanos

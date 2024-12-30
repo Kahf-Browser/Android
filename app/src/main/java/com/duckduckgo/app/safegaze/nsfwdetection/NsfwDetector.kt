@@ -14,6 +14,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
 class NsfwDetector(val context: Context) {
     private val inputImageSize = 224
+    var modelInitializationTime = 0L
+        private set
 
     lateinit var model: Nsfw
     private val imageProcessor = ImageProcessor.Builder()
@@ -24,7 +26,9 @@ class NsfwDetector(val context: Context) {
     fun isNsfw(bitmap: Bitmap): NsfwPrediction {
         // initializing mode in IO thread
         if (!::model.isInitialized) {
+            val t1 = System.currentTimeMillis()
             model = Nsfw.newInstance(context)
+            modelInitializationTime = System.currentTimeMillis() - t1
         }
 
         val inputFeature = TensorBuffer.createFixedSize(intArrayOf(1, inputImageSize, inputImageSize, 3), DataType.FLOAT32)

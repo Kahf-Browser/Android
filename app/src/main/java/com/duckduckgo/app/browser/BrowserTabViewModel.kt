@@ -915,6 +915,12 @@ class BrowserTabViewModel @Inject constructor(
 
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
+
+        // verticalParameter is only null when the user types a query in the address bar
+        if (verticalParameter == null && urlToNavigate.isNotEmpty()) {
+            analyticsService.logEvent(AnalyticsEvent.SearchQueryEnter, mapOf(AnalyticsParam.QuerySearchEngine to "duckduckgo"))
+        }
+
         when (val type = specialUrlDetector.determineType(trimmedInput)) {
             is ShouldLaunchPrivacyProLink -> {
                 if (webNavigationState == null || webNavigationState?.hasNavigationHistory == false) {

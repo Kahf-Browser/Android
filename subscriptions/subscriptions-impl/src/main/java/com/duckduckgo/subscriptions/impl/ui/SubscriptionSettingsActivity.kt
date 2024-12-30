@@ -267,9 +267,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
 
     companion object {
         const val URL = "https://play.google.com/store/account/subscriptions?sku=%s&package=%s"
-        const val ADD_EMAIL_URL = "https://duckduckgo.com/subscriptions/add-email"
-        const val MANAGE_URL = "https://duckduckgo.com/subscriptions/manage"
-        const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy-pro/adding-email"
+        const val ADD_EMAIL_URL = "https://kahfbrowser.com/subscriptions/add-email"
+        const val MANAGE_URL = "https://kahfbrowser.com/subscriptions/manage"
+        const val LEARN_MORE_URL = "https://kahfbrowser.com/kahfbrowser-help-pages/privacy-pro/adding-email"
         data object SubscriptionsSettingsScreenWithEmptyParams : GlobalActivityStarter.ActivityParams
     }
 }

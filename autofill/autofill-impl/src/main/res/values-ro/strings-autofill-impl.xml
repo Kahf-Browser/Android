@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Salvează parola</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvează parola</string>
     <string name="saveLoginDialogNotNow">Nu salva</string>
-    <string name="saveLoginDialogTitle">Dorești ca DuckDuckGo să-ți salveze parola?</string>
+    <string name="saveLoginDialogTitle">Dorești ca Kahf să-ți salveze parola?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Mai multe opțiuni</string>
 
     <string name="useSavedLoginDialogTitle">Folosești o parolă salvată?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Actualizează numele de utilizator</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Actualizezi parola pentru \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo va actualiza această parolă stocată pe dispozitivul tău.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf va actualiza această parolă stocată pe dispozitivul tău.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Închide dialogul de completare automată</string>
 
@@ -66,13 +66,13 @@
 
     <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
     <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
-    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in DuckDuckGo better.</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
     <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Numele de utilizator a fost copiat</string>
     <string name="autofillManagementPasswordCopied">Parolă copiată</string>
 
-    <string name="autofill_password_generation_offer_title">Folosiți o parolă puternică de la DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_title">Folosiți o parolă puternică de la Kahf?</string>
     <string name="autofill_password_generation_offer_accept">Utilizați o parolă puternică</string>
     <string name="autofill_password_generation_offer_decline">Îmi creez propria parolă</string>
 
