@@ -23,15 +23,6 @@
 
     <include layout="@layout/include_omnibar_toolbar" />
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/newTabWallpaper"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/background_mosque"
-        tools:visibility="gone"
-        android:visibility="visible"
-        android:scaleType="centerCrop"/>
-
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
         android:layout_width="match_parent"
