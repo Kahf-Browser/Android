@@ -35,13 +35,11 @@ import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.app.bookmarks.ui.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarMockupBinding
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
-import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
@@ -56,8 +54,6 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
-import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_PROMOTED_CANCEL
-import com.duckduckgo.app.playstore.PlayStoreUtils
 import com.duckduckgo.app.settings.SettingsActivity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
@@ -71,9 +67,11 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
+import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -101,9 +99,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var dataClearerForegroundAppRestartPixel: DataClearerForegroundAppRestartPixel
-
-    @Inject
-    lateinit var ctaViewModel: CtaViewModel
 
     @Inject
     lateinit var userEventsStore: UserEventsStore
@@ -229,18 +224,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
         return fragment
     }
 
-    private fun openFavoritesOnboardingNewTab(tabId: String): BrowserTabFragment {
-        pixel.fire(AppPixelName.APP_EMPTY_VIEW_WIDGET_LAUNCH)
-        val fragment = BrowserTabFragment.newInstanceFavoritesOnboarding(tabId)
-        addOrReplaceNewTab(fragment, tabId)
-        currentTab = fragment
-        return fragment
-    }
-
     private fun addOrReplaceNewTab(
         fragment: BrowserTabFragment,
         tabId: String,
     ) {
+        if (supportFragmentManager.isStateSaved) {
+            return
+        }
         val transaction = supportFragmentManager.beginTransaction()
         val tab = currentTab
         if (tab == null) {
@@ -322,16 +312,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             Toast.makeText(applicationContext, R.string.fireDataCleared, Toast.LENGTH_LONG).show()
         }
 
-        if (intent.getBooleanExtra(FAVORITES_ONBOARDING_EXTRA, false)) {
-            lifecycleScope.launch {
-                val tabId = viewModel.onNewTabRequested()
-                openFavoritesOnboardingNewTab(tabId)
-            }
-            return
-        }
-
-        if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.dataString, currentTab?.inContextEmailProtectionShowing)) {
-            currentTab?.showEmailProtectionInContextWebFlow(intent.dataString)
+        if (emailProtectionLinkVerifier.shouldDelegateToInContextView(intent.intentText, currentTab?.inContextEmailProtectionShowing)) {
+            currentTab?.showEmailProtectionInContextWebFlow(intent.intentText)
             Timber.v("Verification link was consumed, so don't allow it to open in a new tab")
             return
         }
@@ -353,6 +335,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
             } else if (intent.getBooleanExtra(LAUNCH_FROM_FAVORITES_WIDGET, false)) {
                 Timber.d("Favorite clicked from widget $sharedText")
                 lifecycleScope.launch { viewModel.onOpenFavoriteFromWidget(query = sharedText) }
+                return
+            } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
+                Timber.w("New Tab: open in current tab requested")
+                if (currentTab != null) {
+                    currentTab?.submitQuery(sharedText)
+                } else {
+                    Timber.w("New Tab: can't use current tab, opening in new tab instead")
+                    lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
+                }
                 return
             } else {
                 Timber.w("opening in new tab requested for $sharedText")
@@ -441,7 +432,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val dialog = FireDialog(
             context = this,
             clearPersonalDataAction = clearPersonalDataAction,
-            ctaViewModel = ctaViewModel,
             pixel = pixel,
             settingsDataStore = settingsDataStore,
             userEventsStore = userEventsStore,
@@ -453,7 +443,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
         dialog.setOnShowListener { currentTab?.onFireDialogVisibilityChanged(isVisible = true) }
         dialog.setOnCancelListener {
-            pixel.fire(if (dialog.ctaVisible) FIRE_DIALOG_PROMOTED_CANCEL else FIRE_DIALOG_CANCEL)
+            pixel.fire(FIRE_DIALOG_CANCEL)
             currentTab?.onFireDialogVisibilityChanged(isVisible = false)
         }
         dialog.show()
@@ -480,6 +470,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
             val fragment = openNewTab(tabId, null, false)
             fragment.messageFromPreviousTab = message
+        }
+    }
+
+    fun relaunchCurrentTab(url: String) {
+        lifecycleScope.launch {
+            viewModel.relaunchCurrentTab(url)
         }
     }
 
@@ -540,21 +536,23 @@ open class BrowserActivity : DuckDuckGoActivity() {
             queryExtra: String? = null,
             newSearch: Boolean = false,
             notifyDataCleared: Boolean = false,
+            openInCurrentTab: Boolean = false,
         ): Intent {
             val intent = Intent(context, BrowserActivity::class.java)
             intent.putExtra(EXTRA_TEXT, queryExtra)
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
             intent.putExtra(NOTIFY_DATA_CLEARED_EXTRA, notifyDataCleared)
+            intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
             return intent
         }
 
-        const val FAVORITES_ONBOARDING_EXTRA = "FAVORITES_ONBOARDING_EXTRA"
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
+        const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 

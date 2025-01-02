@@ -23,6 +23,7 @@ import android.os.Message
 import android.view.View
 import android.webkit.GeolocationPermissions
 import android.webkit.PermissionRequest
+import android.webkit.SslErrorHandler
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
@@ -33,6 +34,8 @@ import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermission
 
 interface WebViewClientListener {
 
+    fun onUrlBlocked(url: String)
+    fun onPageContentStart(url: String)
     fun navigationStateChanged(newWebNavigationState: WebNavigationState)
     fun pageRefreshed(refreshedUrl: String)
     fun progressChanged(newProgress: Int)
@@ -49,7 +52,7 @@ interface WebViewClientListener {
         callback: GeolocationPermissions.Callback,
     )
 
-    fun titleReceived(newTitle: String)
+    fun titleReceived(newTitle: String, url: String?)
     fun trackerDetected(event: TrackingEvent)
     fun pageHasHttpResources(page: String)
     fun pageHasHttpResources(page: Uri)
@@ -104,4 +107,9 @@ interface WebViewClientListener {
     fun getCurrentTabId(): String
 
     fun getSite(): Site?
+    fun onReceivedSslError(
+        handler: SslErrorHandler,
+        errorResponse: SslErrorResponse,
+    )
+    fun onShouldOverride()
 }

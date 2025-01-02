@@ -36,7 +36,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.notifyme.NotifyMeView.Orientation.Center
@@ -47,11 +47,11 @@ import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.OpenSettingsO
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.ShowPermissionRationale
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsState
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Command.UpdateNotificationsStateOnAndroid13Plus
-import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.Factory
 import com.duckduckgo.common.ui.notifyme.NotifyMeViewModel.ViewState
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.R.styleable
@@ -74,7 +74,7 @@ class NotifyMeView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     private lateinit var sharedPrefsKeyForDismiss: String
 
@@ -115,7 +115,7 @@ class NotifyMeView @JvmOverloads constructor(
 
         addViewTreeObserverOnGlobalLayoutListener()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -138,7 +138,7 @@ class NotifyMeView @JvmOverloads constructor(
 
         removeViewTreeObserverOnGlobalLayoutListener()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
 
         coroutineScope?.cancel()
         coroutineScope = null

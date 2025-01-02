@@ -21,6 +21,9 @@
     <string name="autofillDevSettingsSubtitle">Autofill and Email Protection dev options</string>
     <string name="autofillDevSettingsClearNeverAskAgainSettingButton">Clear \'never ask again\' setting</string>
     <string name="autofillDevSettingsEmailProtectionSignOutButton">Sign out</string>
+    <string name="autofillDevSettingsEngagementTitle">Engagement KPIs</string>
+    <string name="autofillDevSettingsEngagementClearHistory">Clear Engagement History</string>
+    <string name="autofillDevSettingsEngagementHistoryCleared">Cleared All Engagement History</string>
     <string name="autofillDevSettingsEmailProtectionTitle">Email Protection Settings</string>
     <string name="autofillDevSettingsEmailProtectionNeverAskAgainChoiceCleared">Never ask again choice cleared</string>
     <string name="autofillDevSettingsEmailProtectionSignedOut">Signed out</string>
@@ -69,4 +72,9 @@
     <string name="autofillDevSettingsAddSampleLoginsSameSubdomainSubtitle">Adds multiple logins for https://fill.dev with same username and password</string>
     <string name="autofillDevSettingsAddSampleLoginsMultipleSubdomains">Add duplicate logins (across different subdomains)</string>
     <string name="autofillDevSettingsAddSampleLoginsMultipleSubdomainsSubtitle">Adds multiple logins for https://fill.dev with same username and password but across different subdomains</string>
+
+    <string name="autofillDevSettingsSurveySectionTitle">Autofill Survey</string>
+    <string name="autofillDevSettingsSurveySectionResetPreviousSurveysTitle">Previously Seen Surveys</string>
+    <string name="autofillDevSettingsSurveySectionInstruction">Tap to reset available surveys</string>
+    <string name="autofillDevSettingsSurveySectionResetted">Previously seen surveys available again</string>
 </resources>

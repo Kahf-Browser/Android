@@ -14,11 +14,8 @@
 # update_fastlane
 
  # CONSTANTS
-    releaseNotesBodyHeader = "What's new in this release?"
-    releaseNotesSuffixHeader = "Have feedback?"
+    releaseNotesBodyHeader = "What's new:"
     releaseNotesFileBody = "../app/version/release-notes"
-    releaseNotesFileHiring = "../app/version/release-notes-hiring"
-    releaseNotesFileSuffix = "../app/version/release-notes-suffix"
     releaseNotesLocales= ["en-US", "en-GB", "en-CA"]
     releaseNotesMaxLength = 500
     errorMessageCancelled = "Release cancelled 😢"
@@ -33,10 +30,8 @@ platform :android do
   private_lane :release_notes_playstore do
 
     releaseNotesBody = File.read(releaseNotesFileBody)
-    releaseNotesSuffix = File.read(releaseNotesFileSuffix)
-    releaseNotesHiring = File.read(releaseNotesFileHiring)
 
-    formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n#{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+    formatted = "#{releaseNotesBodyHeader}\n#{releaseNotesBody}"
 
     validateReleaseNotes(releaseNotes: formatted)
     UI.message("\n#{formatted}")
@@ -49,17 +44,15 @@ platform :android do
     private_lane :release_notes_github do
 
       releaseNotesBody = File.read(releaseNotesFileBody)
-      releaseNotesSuffix = File.read(releaseNotesFileSuffix)
-      releaseNotesHiring = File.read(releaseNotesFileHiring)
 
-      formatted = "\#\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}#{releaseNotesHiring}\n\n\#\# #{releaseNotesSuffixHeader}\n#{releaseNotesSuffix}"
+      formatted = "\#\# #{releaseNotesBodyHeader}\n#{releaseNotesBody}"
       UI.message("\n#{formatted}")
       formatted
 
     end
 
 
-  desc "Upload APK to Play Store, in pre-production staging track"
+  desc "Upload APK to Play Store, in production track with a very small rollout percentage"
   lane :deploy_playstore do
 
     update_fastlane_release_notes()
@@ -70,14 +63,32 @@ platform :android do
 
     upload_to_play_store(
       apk: apkPath,
-      track: 'Staging',
+      track: 'production',
+      rollout: '0.001', # ie. 0.1%
       skip_upload_screenshots: true,
       skip_upload_images: true,
       validate_only: false
     )
 
     cleanup_fastlane_release_notes()
+    annotate_release()
 
+  end
+
+  desc "Annotate release"
+  private_lane :annotate_release do
+    props = property_file_read(file: "app/version/version.properties")
+    version = props["VERSION"]
+
+    http_status = sh("curl -s -o /dev/null -w '%{http_code}' https://improving.duckduckgo.com/t/m_new_release_android?appVersion=#{version}", log: false).to_i
+
+      if http_status >= 200 && http_status < 300
+        # Successful response
+        puts "Release annotation successful with status code #{http_status}"
+      else
+        # Unsuccessful response
+        puts "Release annotation failed with status code #{http_status}"
+      end
   end
 
   desc "Upload APK to ad-hoc internal app sharing"

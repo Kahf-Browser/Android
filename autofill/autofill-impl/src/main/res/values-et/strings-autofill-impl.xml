@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Salvesta parool</string>
     <string name="saveLoginDialogNotNow">Ära salvesta</string>
-    <string name="saveLoginDialogTitle">Kas soovid, et DuckDuckGo salvestaks sinu parooli?</string>
+    <string name="saveLoginDialogTitle">Kas soovid, et Kahf salvestaks sinu parooli?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Veel valikuid</string>
 
     <string name="useSavedLoginDialogTitle">Kas kasutada salvestatud parooli?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Värskenda kasutajanime</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Kas värskendada kasutajanime \n%1$s parooli?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo värskendab selle salvestatud parooli sinu seadmes.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf värskendab selle salvestatud parooli sinu seadmes.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Sulge automaatse täitmise dialoog</string>
 
@@ -56,17 +56,23 @@
 
     <string name="credentialManagementSuggestionsLabel">Soovitatud</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automaatne täitmine paroolide jaoks pole saadaval, sest sinu Android WebView\'i versioon on liiga vana.</string>
+
     <string name="autofillManagementSearchClearDescription">Tühjenda otsingusisend</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Päringule „%1$s” ei leitud tulemusi</string>
 
     <string name="autofillDeleteLoginDialogCancel">Loobu</string>
     <string name="autofillDeleteLoginDialogDelete">Kustuta</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Kasutajanimi on kopeeritud</string>
     <string name="autofillManagementPasswordCopied">Parool on kopeeritud</string>
 
-    <string name="autofill_password_generation_offer_title">Kas kasutada DuckDuckGo tugevat parooli?</string>
+    <string name="autofill_password_generation_offer_title">Kas kasutada Kahf tugevat parooli?</string>
     <string name="autofill_password_generation_offer_accept">Kasuta tugevat parooli</string>
     <string name="autofill_password_generation_offer_decline">Loon selle ise</string>
 
@@ -120,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Paroolid salvestatakse turvaliselt sinu seadmesse.</string>
     <string name="autofillManagementAddLogin">Parooli lisamine</string>
     <string name="credentialManagementEditLoginTitleHint">Pealkiri</string>
-    <string name="autofillDeleteLoginDialogTitle">Kas oled kindel, et soovid selle parooli kustutada?</string>
     <string name="autofillManagementDeletedConfirmation">Parool on kustutatud</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Viimati uuendatud %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Kas soovid jätkata paroolide salvestamist?</string>
@@ -133,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Paroolide kaitsmiseks on vaja seadme lukustusmustrit, PIN-koodi või biomeetriat.</string>
     <string name="credentialManagementEditTitle">Parooli muutmine</string>
 
-    <string name="credentials_limit_warning"><b>Sünkroonimine peatatud</b>\nSisselogimisandmete limiit on täis. Kustuta mõni, et jätkata sünkroonimist.\n\n<annotation type="manage_logins">Halda sisselogimisandmeid</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nOled paroolide sünkroonimise limiidi ületanud. Proovi mõned paroolid kustutada. Kuni see pole lahendatud, ei varundata sinu paroole.</string>
+    <string name="credentials_limit_warning"><b>Sünkroonimine peatatud</b>\nOled saavutanud maksimaalse paroolide arvu. Kustuta mõni, et jätkata sünkroonimisega.\n\n<annotation type="manage_logins">Halda paroole</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nOled saavutanud maksimaalse paroolide arvu. Sünkroonimise jätkamiseks kustuta mõned paroolid.</string>
+    <string name="credentials_invalid_request_warning"><b>Sünkroonimine peatatud</b>\nMõned paroolid on valesti vormindatud või liiga pikad ja neid ei sünkroonitud.\n\n<annotation type="manage_logins">Halda paroole</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Paroolide sünkroonimine on peatatud</b>\nMõned paroolid on valesti vormindatud või liiga pikad ja neid ei sünkroonitud.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Ära selle saidi kohta rohkem küsi</string>
     <string name="credentialManagementInstructionNeverForThisSite">Kui lähtestad välistatud saidid, pakutakse sulle järgmisel korral, kui logid neile saitidele sisse, võimalust parool salvestada.</string>
@@ -144,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Loobu</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Kustuta kõik paroolid</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Kas soovid kindlasti %1$d parooli kustutada?</item>
-        <item quantity="other">Kas soovid kindlasti %1$d parooli kustutada?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Sinu parool kustutatakse kõigist sünkroonitud seadmetest. Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Sinu paroolid kustutatakse kõikidest sünkroonitud seadmetest. Veendu, et sulle jääks endiselt mõni viis oma kontodele pääsemiseks.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d parool kustutatud</item>
@@ -159,5 +159,36 @@
 
     <string name="autofill_auth_text_for_delete_all">Autendi end, et kinnitada kõigi paroolide kustutamine</string>
     <string name="autofill_title_text_for_delete_all">Kustuta kõik paroolid</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Sinu parooli %1$s jaoks ei saa sünkroonida, sest üks selle väljadest ületab tähemärgipiirangu.</item>
+        <item quantity="other">Sinu paroolid %1$s ja %2$d muu saidi jaoks ei saa sünkroonida, kuna mõned nende väljad ületavad tähemärgipiirangu.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Halda paroole</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Teie parool kustutatakse sellest seadmest.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Sinu parool kustutatakse sellest seadmest.</item>
+        <item quantity="other">Sinu paroolid kustutatakse sellest seadmest.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Sinu parool kustutatakse kõigist sünkroonitud seadmetest.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Sinu parool kustutatakse kõikidest sünkroonitud seadmetest.</item>
+        <item quantity="other">Sinu paroolid kustutatakse kõikidest sünkroonitud seadmetest.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Kas oled kindel, et soovid selle parooli kustutada?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Kas soovid kindlasti %1$d parooli kustutada?</item>
+        <item quantity="other">Kas soovid kindlasti %1$d parooli kustutada?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Veendu, et sulle jääks endiselt mõni viis oma kontole pääsemiseks.</item>
+        <item quantity="other">Veendu, et sulle jääks endiselt mõni viis oma kontodele pääsemiseks.</item>
+    </plurals>
 
 </resources>

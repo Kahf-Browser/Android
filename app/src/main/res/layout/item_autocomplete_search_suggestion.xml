@@ -20,13 +20,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="6dp"
-    android:background="?attr/selectableItemBackground"
-    android:paddingTop="@dimen/keyline_2"
+    android:layout_marginBottom="1dp"
+    android:layout_marginTop="0dp"
+    android:background="@drawable/suggestion_bg_rounded"
+    android:paddingTop="@dimen/kahf_suggestion_padding"
     android:paddingEnd="@dimen/keyline_4"
     android:paddingStart="20dp"
-    android:paddingBottom="@dimen/keyline_2">
+    android:paddingBottom="@dimen/kahf_suggestion_padding">
 
     <ImageView
         android:id="@+id/phraseOrUrlIndicator"
@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         android:importantForAccessibility="no"
         android:src="@drawable/ic_find_search_20"
+        app:tint="@color/kahf_suggestion_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -41,13 +42,13 @@
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/phrase"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:ellipsize="end"
         android:gravity="center_vertical|start"
         android:includeFontPadding="false"
         android:maxLines="1"
-        android:textAlignment="textStart"
+        android:textColor="@color/kahf_suggestion_text"
         app:layout_constraintBottom_toBottomOf="@id/phraseOrUrlIndicator"
         app:layout_constraintEnd_toStartOf="@id/editQueryImage"
         app:layout_constraintStart_toEndOf="@id/phraseOrUrlIndicator"
@@ -62,7 +63,8 @@
         android:background="?selectableItemBackgroundBorderless"
         android:contentDescription="@string/editQueryBeforeSubmitting"
         android:padding="3dp"
-        android:src="@drawable/ic_autocomplete_24dp"
+        android:src="@drawable/ic_arrow_right_24"
+        app:tint="@color/kahf_suggestion_text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>

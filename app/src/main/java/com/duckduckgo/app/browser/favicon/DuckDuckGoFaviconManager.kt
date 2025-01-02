@@ -161,9 +161,10 @@ class DuckDuckGoFaviconManager(
         url: String,
         view: ImageView,
         placeholder: String?,
+        fetchFromRemote: Boolean?,
     ) {
         val bitmap = loadFromDisk(tabId = null, url = url)
-        if (bitmap == null && faviconsFetchingStore.isFaviconsFetchingEnabled) {
+        if (bitmap == null && fetchFromRemote ?: faviconsFetchingStore.isFaviconsFetchingEnabled) {
             tryFetchFaviconForUrl(url)
             view.loadFavicon(loadFromDisk(tabId = null, url = url), url, placeholder)
         } else {

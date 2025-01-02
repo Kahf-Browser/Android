@@ -34,12 +34,16 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.FragmentAutofillManagementListModeBinding
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult.Success
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_CTA_BUTTON
+import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.AUTOFILL_IMPORT_PASSWORDS_OVERFLOW_MENU
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementActivity
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.CopyPassword
@@ -48,13 +52,17 @@ import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementR
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillManagementRecyclerAdapter.ContextMenuAction.Edit
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchDeleteAllPasswordsConfirmation
+import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchImportPasswords
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.LaunchResetNeverSaveListConfirmation
 import com.duckduckgo.autofill.impl.ui.credential.management.AutofillSettingsViewModel.ListModeCommand.PromptUserToAuthenticateMassDeletion
+import com.duckduckgo.autofill.impl.ui.credential.management.importpassword.ImportPasswordActivityParams
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.CredentialGrouper
 import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtractor
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyDetails
 import com.duckduckgo.common.ui.DuckDuckGoFragment
+import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
@@ -64,14 +72,19 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.mobile.android.R as CommonR
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import javax.inject.Inject
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @InjectWith(FragmentScope::class)
 class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill_management_list_mode) {
 
     @Inject
     lateinit var faviconManager: FaviconManager
+
+    @Inject
+    lateinit var browserNav: BrowserNav
 
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
@@ -94,6 +107,15 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     @Inject
     lateinit var deviceAuthenticator: DeviceAuthenticator
 
+    @Inject
+    lateinit var stringBuilder: AutofillManagementStringBuilder
+
+    @Inject
+    lateinit var globalActivityStarter: GlobalActivityStarter
+
+    @Inject
+    lateinit var pixel: Pixel
+
     val viewModel by lazy {
         ViewModelProvider(requireActivity(), viewModelFactory)[AutofillSettingsViewModel::class.java]
     }
@@ -104,6 +126,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     private var searchMenuItem: MenuItem? = null
     private var resetNeverSavedSitesMenuItem: MenuItem? = null
     private var deleteAllPasswordsMenuItem: MenuItem? = null
+    private var importPasswordsMenuItem: MenuItem? = null
 
     private val globalAutofillToggleListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
         if (!lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) return@OnCheckedChangeListener
@@ -121,6 +144,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
         super.onViewCreated(view, savedInstanceState)
         configureToggle()
         configureRecyclerView()
+        configureImportPasswordsButton()
         observeViewModel()
         configureToolbar()
     }
@@ -128,6 +152,13 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
     override fun onStop() {
         super.onStop()
         hideSearchBar()
+    }
+
+    private fun configureImportPasswordsButton() {
+        binding.emptyStateLayout.importPasswordsButton.setOnClickListener {
+            viewModel.onImportPasswords()
+            pixel.fire(AUTOFILL_IMPORT_PASSWORDS_CTA_BUTTON)
+        }
     }
 
     private fun configureToolbar() {
@@ -141,6 +172,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     searchMenuItem = menu.findItem(R.id.searchLogins)
                     resetNeverSavedSitesMenuItem = menu.findItem(R.id.resetNeverSavedSites)
                     deleteAllPasswordsMenuItem = menu.findItem(R.id.deleteAllPasswords)
+                    importPasswordsMenuItem = menu.findItem(R.id.importPasswords)
 
                     initializeSearchBar()
                 }
@@ -150,6 +182,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                     searchMenuItem?.isVisible = loginsSaved
                     deleteAllPasswordsMenuItem?.isVisible = loginsSaved
                     resetNeverSavedSitesMenuItem?.isVisible = viewModel.neverSavedSitesViewState.value.showOptionToReset
+                    importPasswordsMenuItem?.isVisible = loginsSaved
                 }
 
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -166,6 +199,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
                         R.id.deleteAllPasswords -> {
                             viewModel.onDeleteAllPasswordsInitialSelection()
+                            true
+                        }
+
+                        R.id.importPasswords -> {
+                            viewModel.onImportPasswords()
+                            pixel.fire(AUTOFILL_IMPORT_PASSWORDS_OVERFLOW_MENU)
                             true
                         }
 
@@ -220,6 +259,12 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
                         binding.credentialToggleGroup.gone()
                         binding.logins.updateTopMargin(resources.getDimensionPixelSize(CommonR.dimen.keyline_4))
                     }
+
+                    if (state.survey == null) {
+                        hideSurvey()
+                    } else {
+                        showSurvey(state.survey)
+                    }
                 }
             }
         }
@@ -252,8 +297,40 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
             LaunchResetNeverSaveListConfirmation -> launchResetNeverSavedSitesConfirmation()
             is LaunchDeleteAllPasswordsConfirmation -> launchDeleteAllLoginsConfirmationDialog(command.numberToDelete)
             is PromptUserToAuthenticateMassDeletion -> promptUserToAuthenticateMassDeletion(command.authConfiguration)
+            LaunchImportPasswords -> launchImportPasswordsScreen()
         }
         viewModel.commandProcessed(command)
+    }
+
+    private fun hideSurvey() {
+        binding.autofillSurveyMessage.gone()
+    }
+
+    private fun showSurvey(survey: SurveyDetails) {
+        with(binding.autofillSurveyMessage) {
+            setMessage(
+                Message(
+                    topIllustration = R.drawable.ic_passwords_ddg_96,
+                    title = getString(R.string.autofillManagementSurveyPromptTitle),
+                    subtitle = getString(R.string.autofillManagementSurveyPromptMessage),
+                    action = getString(R.string.autofillManagementSurveyPromptAcceptButtonText),
+                ),
+            )
+            onPrimaryActionClicked {
+                startActivity(browserNav.openInNewTab(binding.root.context, survey.url))
+                viewModel.onSurveyShown(survey.id)
+            }
+            onCloseButtonClicked {
+                viewModel.onSurveyPromptDismissed(survey.id)
+            }
+            show()
+        }
+    }
+
+    private fun launchImportPasswordsScreen() {
+        context?.let {
+            globalActivityStarter.start(it, ImportPasswordActivityParams)
+        }
     }
 
     private suspend fun credentialsListUpdated(
@@ -277,6 +354,7 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private fun showEmptyCredentialsPlaceholders() {
         binding.emptyStateLayout.emptyStateContainer.show()
+
         binding.logins.gone()
     }
 
@@ -313,61 +391,54 @@ class AutofillManagementListMode : DuckDuckGoFragment(R.layout.fragment_autofill
 
     private fun launchDeleteLoginConfirmationDialog(loginCredentials: LoginCredentials) {
         this.context?.let {
-            TextAlertDialogBuilder(it)
-                .setTitle(R.string.autofillDeleteLoginDialogTitle)
-                .setMessage(R.string.credentialManagementDeletePasswordConfirmationMessage)
-                .setDestructiveButtons(true)
-                .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
-                .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.onDeleteCredentials(loginCredentials)
-                        }
-                    },
-                )
-                .show()
+            lifecycleScope.launch(dispatchers.io()) {
+                val dialogTitle = stringBuilder.stringForDeletePasswordDialogConfirmationTitle(numberToDelete = 1)
+                val dialogMessage = stringBuilder.stringForDeletePasswordDialogConfirmationMessage(numberToDelete = 1)
+
+                withContext(dispatchers.main()) {
+                    TextAlertDialogBuilder(it)
+                        .setTitle(dialogTitle)
+                        .setMessage(dialogMessage)
+                        .setDestructiveButtons(true)
+                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
+                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                        .addEventListener(
+                            object : TextAlertDialogBuilder.EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    viewModel.onDeleteCredentials(loginCredentials)
+                                }
+                            },
+                        )
+                        .show()
+                }
+            }
         }
     }
 
     private fun launchDeleteAllLoginsConfirmationDialog(numberToDelete: Int) {
-        val displayStrings = getDisplayStringsForDeletingAllLogins(numberToDelete)
-
         this.context?.let {
-            TextAlertDialogBuilder(it)
-                .setTitle(displayStrings.first)
-                .setMessage(displayStrings.second)
-                .setDestructiveButtons(true)
-                .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
-                .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
-                .setCancellable(true)
-                .addEventListener(
-                    object : TextAlertDialogBuilder.EventListener() {
-                        override fun onPositiveButtonClicked() {
-                            viewModel.onDeleteAllPasswordsConfirmed()
-                        }
-                    },
-                )
-                .show()
-        }
-    }
+            lifecycleScope.launch(dispatchers.io()) {
+                val dialogTitle = stringBuilder.stringForDeletePasswordDialogConfirmationTitle(numberToDelete)
+                val dialogMessage = stringBuilder.stringForDeletePasswordDialogConfirmationMessage(numberToDelete)
 
-    /**
-     * Returns a pair of strings for the title and message of the delete all logins confirmation dialog.
-     *
-     * The strings will change depending on if there is only one login to delete or multiple.
-     */
-    private fun getDisplayStringsForDeletingAllLogins(numberToDelete: Int): Pair<String, String> {
-        return if (numberToDelete == 1) {
-            Pair(
-                getString(R.string.autofillDeleteLoginDialogTitle),
-                getString(R.string.credentialManagementDeletePasswordConfirmationMessage),
-            )
-        } else {
-            Pair(
-                resources.getQuantityString(R.plurals.credentialManagementDeleteAllPasswordsConfirmationTitle, numberToDelete, numberToDelete),
-                getString(R.string.credentialManagementDeleteAllPasswordsConfirmationMessage),
-            )
+                withContext(dispatchers.main()) {
+                    TextAlertDialogBuilder(it)
+                        .setTitle(dialogTitle)
+                        .setMessage(dialogMessage)
+                        .setDestructiveButtons(true)
+                        .setPositiveButton(R.string.autofillDeleteLoginDialogDelete)
+                        .setNegativeButton(R.string.autofillDeleteLoginDialogCancel)
+                        .setCancellable(true)
+                        .addEventListener(
+                            object : TextAlertDialogBuilder.EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    viewModel.onDeleteAllPasswordsConfirmed()
+                                }
+                            },
+                        )
+                        .show()
+                }
+            }
         }
     }
 

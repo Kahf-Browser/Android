@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.applinks
 
-import com.duckduckgo.common.utils.UriString
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -57,10 +57,12 @@ class DuckDuckGoAppLinksHandler @Inject constructor() : AppLinksHandler {
 
         previousUrl?.let {
             if (isSameOrSubdomain(it, urlString)) {
-                if (isAUserQuery || !hasTriggeredForDomain || alwaysTriggerList.contains(urlString.extractDomain())) {
+                val shouldTrigger = alwaysTriggerList.contains(urlString.extractDomain())
+                if (isAUserQuery || !hasTriggeredForDomain || shouldTrigger) {
                     previousUrl = urlString
                     launchAppLink()
                     hasTriggeredForDomain = true
+                    if (shouldTrigger) return true
                 }
                 return false
             }

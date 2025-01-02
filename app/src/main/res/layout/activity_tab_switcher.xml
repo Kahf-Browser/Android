@@ -14,15 +14,89 @@
   ~ limitations under the License.
   -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/daxColorBackground"
+    android:background="@drawable/gradient_kahf"
+    android:fitsSystemWindows="true"
     tools:context="com.duckduckgo.app.tabs.ui.TabSwitcherActivity">
 
-    <include layout="@layout/include_default_toolbar" />
 
-    <include layout="@layout/content_tab_switcher" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
+            android:background="@null"
+            app:elevation="0dp"
+            android:layout_height="wrap_content">
+
+            <RelativeLayout
+                android:id="@+id/toolbar"
+                android:background="@null"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:orientation="horizontal"
+                app:popupTheme="@style/Widget.DuckDuckGo.PopUpOverflowMenu">
+
+                <com.duckduckgo.common.ui.view.button.IconButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:padding="@dimen/keyline_4"
+                    android:layout_alignParentStart="true"
+                    app:srcCompat="@drawable/ic_arrow_left_24"
+                    android:tint="?attr/daxColorWhite"
+                    android:layout_centerVertical="true"/>
+
+                <com.duckduckgo.common.ui.view.button.IconButton
+                    android:id="@+id/btnNewTab"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:padding="@dimen/keyline_4"
+                    android:layout_toStartOf="@id/btnMenu"
+                    app:srcCompat="@drawable/ic_newtab"
+                    android:tint="?attr/daxColorWhite"
+                    android:layout_centerVertical="true"
+                    tools:ignore="RelativeOverlap" />
+
+                <com.duckduckgo.common.ui.view.button.IconButton
+                    android:id="@+id/btnMenu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:padding="@dimen/keyline_4"
+                    android:layout_alignParentEnd="true"
+                    app:srcCompat="@drawable/ic_menu_vertical_24"
+                    android:tint="?attr/daxColorWhite"
+                    android:layout_centerVertical="true"
+                    tools:ignore="RelativeOverlap" />
+
+            </RelativeLayout>
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <include layout="@layout/content_tab_switcher" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:layout_marginEnd="@dimen/_08dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="?attr/daxColorSurface"
+        app:tint="@color/kahf_blue"
+        app:srcCompat="@drawable/ic_add_24" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -156,10 +156,16 @@
     <string name="privateSearchTitle">Omogućen je Private Search</string>
     <string name="privateSearchDescription">Kahf Private Search tvoja je zadana tražilica, tako da možeš pretraživati web bez praćenja.</string>
     <string name="privateSearchHeadingSearchSettings">Postavke pretraživanja</string>
-    <string name="privateSearchAutocompleteToggle">Prijedlozi za automatsko ispunjavanje</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Dodatne postavke pretraživanja</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Prilagodi jezik pretraživanja, regiju i još mnogo toga</string>
     <string name="privateSearchMoreSearchSettingsTitle">Dodatne postavke pretraživanja</string>
+    <string name="privateSearchAutocompleteToggle">Prijedlozi za automatsko ispunjavanje</string>
+    <string name="privateSearchAutocompleteHint">Prikaži prijedloge pretraživanja dok tipkaš, uključujući knjižne oznake. Sve pretrage su privatne.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedavno posjećena web-mjesta</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Prikaži nedavno posjećena mrežna mjesta u prijedlozima pretraživanja. Nedavno posjećena mrežna mjesta su privatna, pohranjena samo na tvom uređaju i mogu se izbrisati pomoću Fire Buttona.</string>
+    <string name="improvedAutoCompleteIAMContent">Prijedlozi za automatsko popunjavanje sada uključuju i nedavno posjećena mrežna mjesta. Isključi u Postavkama ili izbriši u bilo kojem trenutku pomoću Fire Buttona 🔥.</string>
+    <string name="improvedAutoCompleteIAMTitle">Ista privatnost.\nBolji prijedlozi za pretraživanje!</string>
+    <string name="openAutoCompleteSettings">Otvori postavke</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Zaštita od praćenja na webu</string>
@@ -231,29 +237,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">ISKLJUČIVANJE zaštite može pomoći.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Privremeno smo onemogućili zaštitu privatnosti jer se čini da ona ruši ovu web lokaciju.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Knjižne oznake</string>
-    <string name="bookmarksActivityTitle">Knjižne oznake</string>
-    <string name="noBookmarks">Još nema dodanih knjižnih oznaka</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Više opcija za knjižnu oznaku %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Izbrisano &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Izvoz</string>
-    <string name="exportBookmarksEmpty">Nemate knjižne oznake, ništa se neće izvesti</string>
-    <string name="exportBookmarksError">Nije moguće izvesti nijednu oznaku, došlo je do pogreške</string>
-    <string name="exportBookmarksSuccess">Sve knjižne oznake uspješno su izvezene</string>
-    <string name="importBookmarksMenu">Uvoz</string>
-    <string name="importBookmarksFileTitle">Odaberite datoteku knjižne oznake za uvoz</string>
-    <string name="importBookmarksError">Nije moguće uvesti nijednu knjižnu oznaku, došlo je do pogreške</string>
-    <string name="importBookmarksEmpty">Datoteka nema knjižnih oznaka za uvoz</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Uspješno uvezene knjižne oznake (njih %1$d)</string>
-    <string name="savedSiteDialogTitleHint">Naslov</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Uredi</string>
-    <string name="bookmarksSectionTitle">Knjižne oznake</string>
-    <string name="favoritesSectionTitle">Omiljeno</string>
-    <string name="bookmarksEmptyHint">Još nema dodanih knjižnih oznaka</string>
-    <string name="favoritesEmptyHint">Još uvijek nema omiljenih stavki</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdi</string>
     <string name="dialogSave">Spremi</string>
@@ -274,8 +257,6 @@
     <string name="widgetConfigurationAddWidgetOption">Dodaj widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Još uvijek nema omiljenih stavki</string>
     <string name="searchWidgetEmtpyFavoritesCta">Dodaj omiljenu stavku</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Brzo posjeti svoja omiljena web-mjesta!\n\nPosjeti web-mjesto koje voliš. Zatim dodirni ikonu \"⋯\" i odaberi *Dodaj u omiljene*.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Brzo posjeti svoja omiljena mrežna mjesta! Posjeti mrežno mjesto koje voliš. Zatim dodirni ikonu izbornika preglednika i odaberi Dodaj favorita.</string>
     <string name="widgetConfigurationActivityTitle">Konfiguracija widgeta</string>
     <string name="favoritesWidgetLabel">Omiljeno</string>
     <string name="searchWidgetLabel">Pretraga</string>
@@ -445,14 +426,8 @@
     <string name="systemSearchOnboardingButtonOk">Shvatio/la sam</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Sakrij</string>
-    <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogNext">Dalje</string>
     <string name="daxDialogHighFive">Daj pet!</string>
     <string name="daxDialogGotIt">Shvatio/la sam</string>
-    <string name="hideTipsTitle">Sakriti preostale savjete?</string>
-    <string name="hideTipsText">Ima ih samo nekoliko, a pokušali smo ih učiniti što informativnijima.</string>
-    <string name="hideTipsButton">Sakrij savjete zauvijek</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Sad blokiraš alate za praćenje na čitavoj mreži🎉<br/><br/>Također mogu blokirati alate za praćenje koji se skrivaju u tvojim drugim aplikacijama, čak i kad ne koristiš telefon.]]></string>
@@ -463,41 +438,9 @@
     <string name="onboardingWelcomeTitle">"Dobro došao/la u Kahf!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet može biti pomalo neugodan.<br/><br/> Ne brini! Privatno pretraživanje i pregledavanje lakše je nego što misliš.]]></string>
     <string name="onboardingLetsDoItButton">Učinimo to!</string>
-    <string name="daxIntroCtaText"><![CDATA[Zatim pokušaj posjetiti jedno od svojih omiljenih web-mjesta! <br/><br/>Blokirat ću tragače kako te ne bi mogli špijunirati. Nadogradit ću i sigurnost tvoje veze ako je moguće. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Shvatio/la si!<br/><br/> Zapamti: svaki put kada pregledavaš sa mnom, neugodna reklama gubi krila. 👍]]></string>
-    <string name="daxSerpCtaText">Tvoje su Kahf pretrage anonimne. Uvijek. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ i <b>%1$d drugi</b> te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati adresnu traku da vidiš tko te pokušava pratiti kada posjetiš novo web-mjesto.]]></item>
-        <item quantity="few"><![CDATA[ i <b>%1$d druga</b> te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="many"><![CDATA[ i <b>%1$d drugih</b> te pokušalo te ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="other"><![CDATA[ i <b>%1$d drugih</b> pokušalo te ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="few"><![CDATA[ te pokušalo ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="many"><![CDATA[ te pokušalo pratiti ovdje. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-        <item quantity="other"><![CDATA[ te pokušalo pratiti ovdje pratiti. <br/><br/>Ja sam ih blokirao!<br/><br/> ☝️Možeš pogledati na adresnu traku da vidiš tko te pokušava pratiti kad posjetiš novo web-mjesto.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Dok dodiruješ i pomičeš se na zaslonu, blokirat ću neugodne tragače.\n\nSamo naprijed - nastavi pretraživati!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Pažnja! Ne mogu spriječiti %1$s da vidi tvoju aktivnost na %2$s &lt;br /&gt;&lt;br /&gt;Ali pretražuj sa mnom i mogu umanjiti ono što %3$s zna o tebi tako što ću blokirati njihove tragače na mnogim drugim web-mjestima.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Pažnja! Budući da je %1$s vlasnik %2$s, ne mogu ga spriječiti da ovdje vidi tvoju aktivnost.&lt;br/&gt;Ali pretražuj sa mnom i mogu umanjiti ono što %3$s može saznati o tebi tako što ću blokirati alate za praćenje na mnogim drugim web-mjestima.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Zbog čega ste se odlučili za Kahf?</string>
-    <string name="onboardingFeatureOptionsContinue">Nastavi</string>
-    <string name="onboardingFeatureOptionsSkip">Preskoči ovaj korak</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privatno pretraživanje</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blokiranje alata za praćenje</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Manji digitalni trag</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Brže učitavanje stranica</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Manje oglasa</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Brisanje podataka 1 klikom</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Spremi %1$s</string>
@@ -645,31 +588,6 @@
     <string name="emailNotSupported">Uređaj nije podržan</string>
     <string name="emailNotSupportedExplanation">Zaštita e-pošte omogućuje ti stvaranje privatnih adresa e-pošte koje uklanjaju praćenje e-pošte. Adrese koje kreiraš moramo šifrirati i pohraniti lokalno na tvom uređaju. Budući da tvoj uređaj ne podržava šifriranu pohranu, zaštita e-pošte nije dostupna.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Uredi knjižnu oznaku</string>
-    <string name="favoriteDialogTitleEdit">Uredi Favorite</string>
-    <string name="locationLabel">Lokacija</string>
-    <string name="folderLocationTitle">Odaberi lokaciju</string>
-    <string name="addFolder">Dodaj mapu</string>
-    <string name="editFolder">Uredi mapu</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Želiš li izbrisati mapu i njezin sadržaj?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Jesi li siguran da ovo želiš izbrisati "</string>
-    <string name="bookmarkFolderEmpty">Prazno</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s i %3$d stavka?</item>
-        <item quantity="few">%1$s%2$s i %3$d stavke?</item>
-        <item quantity="many">%1$s%2$s i %3$d stavki?</item>
-        <item quantity="other">%1$s%2$s i %3$d stavki?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d stavka</item>
-        <item quantity="few">%1$d stavke</item>
-        <item quantity="many">%1$d stavki</item>
-        <item quantity="other">%1$d stavki</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Pristupačnost</string>
     <string name="accessibilityActivityTitle">Pristupačnost</string>
@@ -689,7 +607,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Pretražujte privatno s našom aplikacijom za Mac</string>
-    <string name="macos_settings_title">Aplikacija Kahf za Mac</string>
+    <string name="macos_settings_title">Kahf preglednik za Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Preuzimanja</string>
@@ -751,7 +669,7 @@
     <string name="downloadsNotifyMeSubtitle">Primi obavijest kad se preuzimanja završe.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplikacija Kahf za Windows</string>
+    <string name="windows_settings_title">Kahf preglednik za Windows</string>
     <string name="windows_settings_description">Privatno pregledavanje s našom aplikacijom za Windows</string>
     <string name="windows_settings_description_ready">Preuzimanje je dostupno</string>
     <string name="windows_settings_description_list">Na popisu si!</string>
@@ -764,16 +682,6 @@
     <string name="closeAppTabsConfirmationDialogDescription">Jesi li siguran da želiš zatvoriti sve kartice?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Odustani</string>
     <string name="closeAppTabsConfirmationDialogClose">Zatvori</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Izbrisati ovu knjižnu oznaku?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Ovo će izbrisati tvoju oznaku za &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Želiš li izbrisati ovaj favorit?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ovo će izbrisati tvoj favorit: &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Želiš li izbrisati ovu mapu knjižnih oznaka?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Ovo će izbrisati tvoju mapu knjižnih oznaka: &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Odustani</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Izbriši</string>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Dodaj opciju privatnog glasovnog pretraživanja na adresnu traku. Zvuk se ne pohranjuje i ne dijeli ni s kim, uključujući Kahf.</string>
@@ -794,6 +702,60 @@
     <string name="autofillLoginSavedSnackbarMessage">Lozinka je spremljena</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Lozinka je ažurirana</string>
 
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Otvori u Kahfu</string>
+    <string name="runningInDdgMenuItemTitle">Izvodi se u Kahfu</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Upozorenje: ova stranica može biti nesigurna</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Certifikat za ovu stranicu nije valjan. Možda se povezuješ s poslužiteljem koji se pretvara da je %1$s, što bi moglo ugroziti tvoje povjerljive podatke.</string>
+    <string name="sslErrorLeaveCTA">Napusti ovo web-mjesto</string>
+    <string name="sslErrorAdvancedCTA">Napredno</string>
+    <string name="sslErrorExpandedHeadline">Kahf te upozorava kada web-mjesto ima nevažeći certifikat.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Prihvati rizik i posjeti web-mjesto<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Sigurnosni certifikat za %1$s je istekao. Moguće je da je web-mjesto pogrešno konfigurirano, da je napadač ugrozio tvoju vezu ili da je sat tvog sustava netočan.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Sigurnosni certifikat za %1$s ne odgovara *.%2$s. Moguće je da je web-mjesto pogrešno konfigurirano, da je napadač ugrozio tvoju vezu ili da je sat tvog sustava netočan.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operativni sustav tvog uređaja ne vjeruje sigurnosnom certifikatu za %1$s. Moguće je da je web-mjesto pogrešno konfigurirano, da je napadač ugrozio tvoju vezu ili da je sat tvog sustava netočan.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Bok.<br/><br/>Jesi li spreman za bolji, privatniji internet?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Učinimo to!</string>
+    <string name="preOnboardingDaxDialog2Title">Zaštita privatnosti aktivirana!</string>
+    <string name="preOnboardingDaxDialog2Button">Odaberi preglednik</string>
+    <string name="preOnboardingComparisonChartItem1">Pretražuj privatno po zadanim postavkama</string>
+    <string name="preOnboardingComparisonChartItem2">Blokiraj alate za praćenje trećih strana</string>
+    <string name="preOnboardingComparisonChartItem3">Blokiraj skočne prozore kolačića</string>
+    <string name="preOnboardingComparisonChartItem4">Blokiraj neželjene oglase</string>
+    <string name="preOnboardingComparisonChartItem5">Brzo izbriši podatke pregledavanja</string>
+    <string name="preOnboardingDaxDialog3Title">Odlično! Dobrodošli na našu stranu!</string>
+    <string name="preOnboardingDaxDialog3Button">Započni pretraživanje</string>
+    <string name="onboardingSearchDaxDialogTitle">Isprobajte pretragu!</string>
+    <string name="onboardingSearchDaxDialogDescription">Tvoja su Kahf pretraživanja uvijek anonimna.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kako se kaže \"patka\" na engleskom</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kako se kaže \"patka\" na španjolskom</string>
+    <string name="onboardingSearchQueryOption1">kako se kaže patka na engleskom</string>
+    <string name="onboardingSearchQueryOption1English">kako se kaže \"patka\" na španjolskom</string>
+    <string name="onboardingSearchDaxDialogOption2">uloge u filmu Avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">moćne patke</string>
+    <string name="onboardingSearchDaxDialogOption3">lokalno vrijeme</string>
+    <string name="onboardingSearchDaxDialogOption4">Iznenadi me!</string>
+    <string name="onboardingSearchQueryOption4">recepti za večeru</string>
+    <string name="onboardingSearchQueryOption4US">recepti za kolačiće s komadićima čokolade</string>
+    <string name="onboardingSitesDaxDialogTitle">Pokušaj posjetiti web-mjesto!</string>
+    <string name="onboardingSitesDaxDialogDescription">Blokirat ću tragače kako te ne bi mogli špijunirati.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Iznenadi me!</string>
+    <string name="onboardingSerpDaxDialogDescription">To je Kahf Search. Privatno. Brzo. Manje oglasa.</string>
+    <string name="onboardingSerpDaxDialogButton">Shvaćam!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Nakon toga pokušaj posjetiti neko web-mjesto!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="few"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="many"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="other"><![CDATA[ I <b>još %1$d drugih</b> pokušavalo te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+    </plurals>
     <string name="safegaze_popup_report_title">Molimo prijavite bilo kakve pogreške ili prijedloge putem ovog obrasca</string>
     <string name="safegaze_popup_support_title">Podržite ovaj projekt</string>
     <string name="safegaze_popup_woman_title">Ja sam žena</string>
@@ -818,7 +780,7 @@
     <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Knjižna oznaka dodana u %1$s</string>
     <string name="addToFavorites">Dodaj u Omiljeno</string>
     <string name="editBookmark">Uredi knjižnu oznaku</string>
-    <string name="importBookmarksDescription">Ako su tvoje oznake spremljene u drugom pregledniku, možeš ih \n uvesti u DuckDuckGo.</string>
+    <string name="importBookmarksDescription">Ako su tvoje oznake spremljene u drugom pregledniku, možeš ih \n uvesti u Kahf.</string>
     <string name="importBookmarks">Uvoz knjižnih oznaka</string>
     <string name="noResultsFor" instruction="%1$s is the search term">Nema rezultata za \"%1$s\"</string>
     <string name="removeFromFavorites">Ukloni iz omiljenih</string>
@@ -829,5 +791,16 @@
         <item quantity="many">Jeste li sigurni da želite izbrisati ovu mapu i %1$d stavki?</item>
         <item quantity="other">Jeste li sigurni da želite izbrisati ovu mapu i %1$d stavki?</item>
     </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Sigurno želiš izbrisati svoju oznaku za &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="few"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="many"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+        <item quantity="other"><![CDATA[ pokušavali su te ovdje pratiti. Blokirani su!<br/><br/>☝️ Dodirni štit za više informacija.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Shvaćam!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Odmah izbriši svoju aktivnost pregledavanja pomoću <b>Fire Buttona</b>.<br/><br/>Probaj! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Možeš ti to!"</string>
+    <string name="onboardingEndDaxDialogDescription">Zapamti: svaki put kada me koristiš za pregledavanje, grozne reklame odlaze u zaborav. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Gotovo!</string>
+
 </resources>

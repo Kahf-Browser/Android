@@ -28,10 +28,6 @@ class PageLoadedHandlerTest {
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val pageLoadedPixelDao: PageLoadedPixelDao = mock()
     private val autoconsent: Autoconsent = mock()
-    private val optimizeTrackerEvaluationRCWrapper = object : OptimizeTrackerEvaluationRCWrapper {
-        override val enabled: Boolean
-            get() = true
-    }
 
     private val testee = RealPageLoadedHandler(
         deviceInfo,
@@ -39,8 +35,11 @@ class PageLoadedHandlerTest {
         pageLoadedPixelDao,
         TestScope(),
         coroutinesTestRule.testDispatcherProvider,
-        optimizeTrackerEvaluationRCWrapper,
         autoconsent,
+        object : OptimizeTrackerEvaluationRCWrapper {
+            override val enabled: Boolean
+                get() = true
+        },
     )
 
     @Before
@@ -52,16 +51,15 @@ class PageLoadedHandlerTest {
 
     @Test
     fun whenInvokingWithValidUrlThenPixelIsAdded() {
-        testee.invoke(VALID_URL, 0L, 10L)
+        testee.onPageLoaded(VALID_URL, "title", 0L, 10L)
         val argumentCaptor = argumentCaptor<PageLoadedPixelEntity>()
         verify(pageLoadedPixelDao).add(argumentCaptor.capture())
         Assert.assertEquals(10L, argumentCaptor.firstValue.elapsedTime)
-        Assert.assertEquals(true, argumentCaptor.firstValue.trackerOptimizationEnabled)
     }
 
     @Test
     fun whenInvokingWithInvalidUrlThenPixelIsAdded() {
-        testee.invoke(INVALID_URL, 0L, 10L)
+        testee.onPageLoaded(INVALID_URL, "title", 0L, 10L)
         verify(pageLoadedPixelDao, never()).add(any())
     }
 }

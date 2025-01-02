@@ -61,6 +61,11 @@ interface TabRepository {
         tabId: String,
     )
 
+    suspend fun addNewTabAfterExistingTabAndGetId(
+        url: String? = null,
+        tabId: String,
+    ): String
+
     suspend fun update(
         tabId: String,
         site: Site?,

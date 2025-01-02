@@ -15,6 +15,7 @@
   -->
 
 <resources>
+    <dimen name="sslWarningTextWidth">0dp</dimen>
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
     <dimen name="text_size_large">22sp</dimen>
@@ -23,4 +24,5 @@
     <dimen name="default_padding">16dp</dimen>
     <dimen name="_200dp">200dp</dimen>
     <dimen name="_08dp">08dp</dimen>
+    <dimen name="kahf_onboard_button_width">180dp</dimen>
 </resources>

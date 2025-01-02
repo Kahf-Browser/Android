@@ -64,6 +64,8 @@ dependencies {
     implementation project(':statistics')
     implementation project(':library-loader-api')
     implementation project(':network-protection-api')
+    implementation project(':data-store-api')
+    implementation project(':new-tab-page-api')
 
     implementation AndroidX.core.ktx
 
@@ -80,9 +82,6 @@ dependencies {
 
     // multi-process shared preferences
     implementation "com.frybits.harmony:harmony:_"
-
-    // Security crypto
-    implementation AndroidX.security.crypto
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"

@@ -24,7 +24,9 @@
     <ImageView
         android:id="@+id/logo"
         style="@style/Widget.DuckDuckGo.SearchWidgetDDGLogo"
-        android:src="@drawable/logo_mini" />
+        android:layout_width="14dp"
+        android:layout_height="19dp"
+        android:src="@drawable/ic_dax_icon" />
 
     <TextView
         android:id="@+id/searchInputBox"

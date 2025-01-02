@@ -25,8 +25,10 @@ import com.duckduckgo.app.pixels.remoteconfig.AndroidBrowserConfigFeature
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacyprotectionspopup.api.PrivacyProtectionsPopupExperimentExternalPixels
+import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -42,7 +44,9 @@ class EnqueuedPixelWorkerTest {
     private val lifecycleOwner: LifecycleOwner = mock()
     private val webViewVersionProvider: WebViewVersionProvider = mock()
     private val defaultBrowserDetector: DefaultBrowserDetector = mock()
+    private val customTabDetector: CustomTabDetector = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = mock()
+    private val isVerifiedPlayStoreInstall: IsVerifiedPlayStoreInstall = mock()
     private val privacyProtectionsPopupExperimentExternalPixels = FakePrivacyProtectionsPopupExperimentExternalPixels()
 
     private lateinit var enqueuedPixelWorker: EnqueuedPixelWorker
@@ -55,8 +59,10 @@ class EnqueuedPixelWorkerTest {
             unsentForgetAllPixelStore,
             webViewVersionProvider,
             defaultBrowserDetector,
+            customTabDetector,
             androidBrowserConfigFeature,
             privacyProtectionsPopupExperimentExternalPixels,
+            isVerifiedPlayStoreInstall,
             coroutineRule.testScope,
         )
         setupRemoteConfig(browserEnabled = false, collectFullWebViewVersionEnabled = false)
@@ -107,6 +113,25 @@ class EnqueuedPixelWorkerTest {
             mapOf(
                 Pixel.PixelParameter.WEBVIEW_VERSION to "91",
                 Pixel.PixelParameter.DEFAULT_BROWSER to "false",
+            ),
+        )
+    }
+
+    @Test
+    fun whenOnStartAndInCustomTabAndAppLaunchThenDoNotSendAppLaunchPixel() {
+        whenever(customTabDetector.isCustomTab()).thenReturn(true)
+        whenever(unsentForgetAllPixelStore.pendingPixelCountClearData).thenReturn(1)
+        whenever(webViewVersionProvider.getMajorVersion()).thenReturn("91")
+        whenever(defaultBrowserDetector.isDefaultBrowser()).thenReturn(true)
+
+        enqueuedPixelWorker.onCreate(lifecycleOwner)
+        enqueuedPixelWorker.onStart(lifecycleOwner)
+
+        verify(pixel).fire(
+            AppPixelName.APP_LAUNCH,
+            mapOf(
+                Pixel.PixelParameter.WEBVIEW_VERSION to "91",
+                Pixel.PixelParameter.DEFAULT_BROWSER to "true",
             ),
         )
     }

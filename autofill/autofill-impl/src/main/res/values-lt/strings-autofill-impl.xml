@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Nustatyti nustatymuose</b></string>
 
     <string name="saveLoginDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Išsaugoti slaptažodį</string>
     <string name="saveLoginDialogNotNow">Neišsaugokite</string>
-    <string name="saveLoginDialogTitle">Ar norite, kad „DuckDuckGo“ išsaugotų jūsų slaptažodį?</string>
+    <string name="saveLoginDialogTitle">Ar norite, kad „Kahf“ išsaugotų jūsų slaptažodį?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Daugiau parinkčių</string>
 
     <string name="useSavedLoginDialogTitle">Naudoti išsaugotą slaptažodį?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Atnaujinti naudotojo vardą</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atnaujinti \n%1$s slaptažodį?</string>
-    <string name="updateLoginUpdatePasswordExplanation">„DuckDuckGo“ atnaujins šį jūsų įrenginyje išsaugotą slaptažodį.</string>
+    <string name="updateLoginUpdatePasswordExplanation">„Kahf“ atnaujins šį jūsų įrenginyje išsaugotą slaptažodį.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Uždaryti automatinio pildymo dialogo langą</string>
 
@@ -56,17 +56,23 @@
 
     <string name="credentialManagementSuggestionsLabel">Siūloma</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatinis slaptažodžių įrašymas nepasiekiamas, nes jūsų „Android WebView“ versija yra per sena.</string>
+
     <string name="autofillManagementSearchClearDescription">Išvalyti paieškos įvestį</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Rezultatų pagal paiešką „%1$s“ nerasta</string>
 
     <string name="autofillDeleteLoginDialogCancel">Atšaukti</string>
     <string name="autofillDeleteLoginDialogDelete">Trinti</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Naudotojo vardas nukopijuotas</string>
     <string name="autofillManagementPasswordCopied">Slaptažodis nukopijuotas</string>
 
-    <string name="autofill_password_generation_offer_title">Naudoti stiprų „DuckDuckGo“ slaptažodį?</string>
+    <string name="autofill_password_generation_offer_title">Naudoti stiprų „Kahf“ slaptažodį?</string>
     <string name="autofill_password_generation_offer_accept">Naudoti stiprų slaptažodį</string>
     <string name="autofill_password_generation_offer_decline">Sukurti savo</string>
 
@@ -120,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Slaptažodžiai saugiai saugomi jūsų įrenginyje.</string>
     <string name="autofillManagementAddLogin">Pridėti slaptažodį</string>
     <string name="credentialManagementEditLoginTitleHint">Pavadinimas</string>
-    <string name="autofillDeleteLoginDialogTitle">Ar tikrai norite ištrinti šį slaptažodį?</string>
     <string name="autofillManagementDeletedConfirmation">Slaptažodis ištrintas</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Paskutinį kartą atnaujinta %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Ar norite toliau saugoti slaptažodžius?</string>
@@ -133,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Slaptažodžiams apsaugoti reikia naudoti įrenginio užrakinimo šabloną, PIN kodą arba biometrinius duomenis.</string>
     <string name="credentialManagementEditTitle">Redaguoti slaptažodį</string>
 
-    <string name="credentials_limit_warning"><b>Sinchronizavimas pristabdytas</b>\nViršyta prisijungimų riba. Ištrinkite kai kuriuos, kad tęstumėte sinchronizavimą.\n\n<annotation type="manage_logins">Valdyti prisijungimus</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Slaptažodžių sinchronizavimas pristabdytas</b>\nJūs viršijote slaptažodžių sinchronizavimo ribą. Pabandykite ištrinti kai kuriuos slaptažodžius. Kol ši problema nebus išspręsta, nebus kuriamos atsarginės jūsų slaptažodžių kopijos.</string>
+    <string name="credentials_limit_warning"><b>Sinchronizavimas pristabdytas</b>\nPasiekėte maksimalų slaptažodžių skaičių. Ištrinkite kai kuriuos slaptažodžius, kad tęstumėte sinchronizavimą.\n\n<annotation type="manage_logins">Tvarkyti slaptažodžius</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Slaptažodžių sinchronizavimas pristabdytas</b>\nPasiekėte maksimalų slaptažodžių skaičių. Ištrinkite kai kuriuos slaptažodžius, kad tęstumėte sinchronizavimą.</string>
+    <string name="credentials_invalid_request_warning"><b>Sinchronizavimas pristabdytas</b>\nKai kurie slaptažodžiai suformatuoti neteisingai arba yra per ilgi ir nebuvo sinchronizuoti.\n\n<annotation type="manage_logins">Tvarkyti slaptažodžius</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Slaptažodžių sinchronizavimas pristabdytas</b>\nKai kurie slaptažodžiai suformatuoti neteisingai arba yra per ilgi ir nebuvo sinchronizuoti.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Niekada neklauskite šioje svetainėje</string>
     <string name="credentialManagementInstructionNeverForThisSite">Jei iš naujo nustatysite neįtrauktas svetaines, kitą kartą, kai prisijungsite prie bet kurios iš šių svetainių, būsite paraginti išsaugoti savo slaptažodį.</string>
@@ -144,15 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Atšaukti</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Ištrinti visus slaptažodžius</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Ar tikrai norite ištrinti %1$d slaptažodį?</item>
-        <item quantity="few">Ar tikrai norite ištrinti %1$d slaptažodžius?</item>
-        <item quantity="many">Ar tikrai norite ištrinti %1$d slaptažodžio?</item>
-        <item quantity="other">Ar tikrai norite ištrinti %1$d slaptažodžių?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Jūsų slaptažodis bus ištrintas iš visų sinchronizuojamų įrenginių. Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyrą.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių. Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d slaptažodis ištrintas</item>
@@ -163,5 +161,46 @@
 
     <string name="autofill_auth_text_for_delete_all">Patvirtinkite tapatybę, kad patvirtintumėte, jog norite ištrinti visus slaptažodžius</string>
     <string name="autofill_title_text_for_delete_all">Ištrinti visus slaptažodžius</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Jūsų %1$s slaptažodžio negalima sinchronizuoti, nes tekstas, viename iš laukų, viršija simbolių limitą.</item>
+        <item quantity="few">Jūsų %1$s ir %2$d kitų svetainių slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+        <item quantity="many">Jūsų %1$s ir %2$d kitų svetainės slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+        <item quantity="other">Jūsų %1$s ir %2$d kitų svetainių slaptažodžių negalima sinchronizuoti, nes tekstas kai kuriuose laukuose viršija simbolių limitą.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Slaptažodžių valdymas</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Jūsų slaptažodis bus ištrintas iš šio įrenginio.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Jūsų slaptažodis bus ištrintas iš šio įrenginio.</item>
+        <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
+        <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
+        <item quantity="other">Jūsų slaptažodžiai bus ištrinti iš šio įrenginio.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Jūsų slaptažodis bus ištrintas iš visų sinchronizuojamų įrenginių.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+        <item quantity="few">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+        <item quantity="many">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+        <item quantity="other">Jūsų slaptažodžiai bus ištrinti iš visų sinchronizuojamų įrenginių.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Ar tikrai norite ištrinti šį slaptažodį?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Ar tikrai norite ištrinti %1$d slaptažodį?</item>
+        <item quantity="few">Ar tikrai norite ištrinti %1$d slaptažodžius?</item>
+        <item quantity="many">Ar tikrai norite ištrinti %1$d slaptažodžio?</item>
+        <item quantity="other">Ar tikrai norite ištrinti %1$d slaptažodžių?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyrą.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Įsitikinkite, kad turite būdą pasiekti paskyrą.</item>
+        <item quantity="few">Įsitikinkite, kad turite būdą, kaip pasiekti paskyras.</item>
+        <item quantity="many">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
+        <item quantity="other">Įsitikinkite, kad vis dar turite būdą, kaip pasiekti paskyras.</item>
+    </plurals>
 
 </resources>

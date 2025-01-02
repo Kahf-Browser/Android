@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources tools:ignore="InvalidColorAttribute" xmlns:tools="http://schemas.android.com/tools">
 
     <style name="Widget"/>
     <style name="ThemeOverlay"/>
@@ -286,7 +286,6 @@
 
     <style name="Widget.DuckDuckGo.DialogFullScreen">
         <item name="android:windowIsFloating">false</item>
-        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
     <!-- Dax Dialog -->
@@ -375,13 +374,10 @@
     </style>
 
     <!-- Switches -->
-    <style name="Widget.DuckDuckGo.Switch" parent="Widget.MaterialComponents.CompoundButton.Switch">
-        <item name="materialThemeOverlay">@style/ThemeOverlay.DuckDuckGo.Switch</item>
-    </style>
-
-    <style name="ThemeOverlay.DuckDuckGo.Switch" >
+    <style name="Widget.DuckDuckGo.v3.Switch" parent="Widget.Material3.CompoundButton.MaterialSwitch">
         <item name="trackTint">@color/switch_track_tint</item>
         <item name="thumbTint">@color/switch_thumb_tint</item>
+        <item name="android:thumb">@drawable/switch_thumb</item>
     </style>
 
     <!-- Slider -->
@@ -414,6 +410,17 @@
     <style name="Widget.DuckDuckGo.CardView" parent="Widget.MaterialComponents.CardView">
         <item name="cardBackgroundColor">?attr/daxColorSurface</item>
         <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.MediumComponent</item>
+    </style>
+
+    <style name="Widget.DuckDuckGo.Card">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/background_message_cta</item>
+        <item name="android:elevation">4dp</item>
+        <item name="android:layout_marginTop">@dimen/keyline_2</item>
+        <item name="android:layout_marginBottom">@dimen/keyline_2</item>
+        <item name="android:layout_marginHorizontal">@dimen/keyline_4</item>
+        <item name="android:paddingBottom">@dimen/keyline_4</item>
     </style>
 
     <!-- Expandable Menu Item Items -->

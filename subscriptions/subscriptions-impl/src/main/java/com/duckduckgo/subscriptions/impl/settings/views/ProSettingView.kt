@@ -18,36 +18,39 @@ package com.duckduckgo.subscriptions.impl.settings.views
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.View
-import android.view.ViewTreeObserver.OnGlobalLayoutListener
-import android.view.ViewTreeObserver.OnScrollChangedListener
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import androidx.core.view.doOnAttach
-import androidx.core.view.doOnDetach
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.ALERT
+import com.duckduckgo.common.ui.view.listitem.CheckListItem.CheckItemStatus.DISABLED
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.GRACE_PERIOD
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.WAITING
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants
 import com.duckduckgo.subscriptions.impl.databinding.ViewSettingsBinding
-import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenBuyScreen
+import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenRestoreScreen
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Command.OpenSettings
-import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.Factory
 import com.duckduckgo.subscriptions.impl.settings.views.ProSettingViewModel.ViewState
+import com.duckduckgo.subscriptions.impl.ui.RestoreSubscriptionActivity.Companion.RestoreSubscriptionScreenWithParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsActivity.Companion.SubscriptionsSettingsScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
 import dagger.android.support.AndroidSupportInjection
@@ -67,13 +70,10 @@ class ProSettingView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
-
-    @Inject
-    lateinit var pixelSender: SubscriptionPixelSender
 
     private var coroutineScope: CoroutineScope? = null
 
@@ -89,7 +89,7 @@ class ProSettingView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         @SuppressLint("NoHardcodedCoroutineDispatcher")
         coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
@@ -102,14 +102,31 @@ class ProSettingView @JvmOverloads constructor(
             .onEach { renderView(it) }
             .launchIn(coroutineScope!!)
 
-        binding.subscribeSecondary.doOnFullyVisible {
-            pixelSender.reportSubscriptionSettingsSectionShown()
+        binding.subscriptionSetting.setOnClickListener(null)
+        binding.subscriptionSetting.setOnTouchListener(null)
+        binding.subscriptionBuy.setOnClickListener(null)
+        binding.subscriptionBuy.setOnTouchListener(null)
+        binding.subscriptionGet.setOnClickListener(null)
+        binding.subscriptionGet.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnTouchListener(null)
+        binding.subscriptionRestore.setOnClickListener(null)
+
+        binding.subscriptionSettingContainer.setOnClickListener {
+            viewModel.onSettings()
+        }
+
+        binding.subscriptionRestoreContainer.setOnClickListener {
+            viewModel.onRestore()
+        }
+
+        binding.subscriptionBuyContainer.setOnClickListener {
+            viewModel.onBuy()
         }
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         coroutineScope?.cancel()
         job.cancel()
         coroutineScope = null
@@ -117,26 +134,42 @@ class ProSettingView @JvmOverloads constructor(
 
     @SuppressLint("ClickableViewAccessibility")
     private fun renderView(viewState: ViewState) {
-        binding.subscriptionSetting.setOnClickListener(null)
-        binding.subscriptionSetting.setOnTouchListener(null)
-        binding.subscriptionBuy.setOnClickListener(null)
-        binding.subscriptionBuy.setOnTouchListener(null)
-
-        if (viewState.hasSubscription) {
-            binding.subscriptionBuy.gone()
-            binding.subscribeSecondary.gone()
-            binding.subscriptionSetting.show()
-            binding.settingContainer.setOnClickListener {
-                viewModel.onSettings()
+        when (viewState.status) {
+            AUTO_RENEWABLE, NOT_AUTO_RENEWABLE, GRACE_PERIOD -> {
+                binding.subscriptionBuyContainer.gone()
+                binding.subscriptionRestoreContainer.gone()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionSettingContainer.show()
             }
-        } else {
-            val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
-            binding.subscribeSecondary.show()
-            binding.subscribeSecondary.text = htmlText
-            binding.subscriptionBuy.show()
-            binding.subscriptionSetting.gone()
-            binding.settingContainer.setOnClickListener {
-                viewModel.onBuy()
+            WAITING -> {
+                binding.subscriptionBuyContainer.gone()
+                binding.subscriptionWaitingContainer.show()
+                binding.subscriptionSettingContainer.gone()
+                binding.subscriptionRestoreContainer.show()
+            }
+            EXPIRED, INACTIVE -> {
+                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingExpired))
+                binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingExpiredSubtitle))
+                binding.subscriptionBuy.setItemStatus(ALERT)
+                binding.subscriptionGet.setText(R.string.subscriptionSettingExpiredViewPlans)
+                binding.subscribeSecondary.gone()
+                binding.subscriptionBuyContainer.show()
+                binding.subscriptionSettingContainer.show()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionRestoreContainer.gone()
+            }
+            else -> {
+                binding.subscriptionBuy.setPrimaryText(context.getString(R.string.subscriptionSettingSubscribe))
+                binding.subscriptionBuy.setSecondaryText(context.getString(R.string.subscriptionSettingSubscribeSubtitle))
+                binding.subscriptionBuy.setItemStatus(DISABLED)
+                binding.subscriptionGet.setText(R.string.subscriptionSettingGet)
+                val htmlText = context.getString(R.string.subscriptionSettingFeaturesList).html(context)
+                binding.subscribeSecondary.text = htmlText.noTrailingWhiteLines()
+                binding.subscribeSecondary.show()
+                binding.subscriptionBuyContainer.show()
+                binding.subscriptionSettingContainer.gone()
+                binding.subscriptionWaitingContainer.gone()
+                binding.subscriptionRestoreContainer.show()
             }
         }
     }
@@ -151,10 +184,11 @@ class ProSettingView @JvmOverloads constructor(
                     context,
                     SubscriptionsWebViewActivityWithParams(
                         url = SubscriptionsConstants.BUY_URL,
-                        screenTitle = "",
-                        defaultToolbar = true,
                     ),
                 )
+            }
+            is OpenRestoreScreen -> {
+                globalActivityStarter.start(context, RestoreSubscriptionScreenWithParams(isOriginWeb = false))
             }
         }
     }
@@ -170,50 +204,10 @@ class SubscriptionSettingLayout @JvmOverloads constructor(
     }
 }
 
-private fun View.doOnFullyVisible(action: () -> Unit) {
-    val listener = object : OnGlobalLayoutListener, OnScrollChangedListener {
-        var actionInvoked = false
-
-        override fun onGlobalLayout() {
-            onPotentialVisibilityChange()
-        }
-
-        override fun onScrollChanged() {
-            onPotentialVisibilityChange()
-        }
-
-        fun onPotentialVisibilityChange() {
-            if (!actionInvoked && isViewFullyVisible()) {
-                actionInvoked = true
-                action()
-            }
-
-            if (actionInvoked) {
-                unregister()
-            }
-        }
-
-        fun isViewFullyVisible(): Boolean {
-            val visibleRect = Rect()
-            val isGlobalVisible = getGlobalVisibleRect(visibleRect)
-            return isGlobalVisible && width == visibleRect.width() && height == visibleRect.height()
-        }
-
-        fun register() {
-            viewTreeObserver.addOnGlobalLayoutListener(this)
-            viewTreeObserver.addOnScrollChangedListener(this)
-        }
-
-        fun unregister() {
-            viewTreeObserver.removeOnGlobalLayoutListener(this)
-            viewTreeObserver.removeOnScrollChangedListener(this)
-        }
+private fun CharSequence.noTrailingWhiteLines(): CharSequence {
+    var text = this
+    while (text[text.length - 1] == '\n') {
+        text = text.subSequence(0, text.length - 1)
     }
-
-    doOnAttach {
-        listener.register()
-        doOnDetach {
-            listener.unregister()
-        }
-    }
+    return text
 }

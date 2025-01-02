@@ -16,12 +16,13 @@
 
 package com.duckduckgo.app.browser.pageloadpixel
 
+import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.browser.pageloadpixel.PageLoadedSites.Companion.sites
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.UriString
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesBinding
@@ -29,19 +30,8 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-private val sites = listOf(
-    "bbc.com",
-    "ebay.com",
-    "espn.com",
-    "reddit.com",
-    "twitch.tv",
-    "twitter.com",
-    "wikipedia.org",
-    "weather.com",
-)
-
 interface PageLoadedHandler {
-    operator fun invoke(url: String, start: Long, end: Long)
+    fun onPageLoaded(url: String, title: String?, start: Long, end: Long)
 }
 
 @ContributesBinding(AppScope::class)
@@ -51,11 +41,11 @@ class RealPageLoadedHandler @Inject constructor(
     private val pageLoadedPixelDao: PageLoadedPixelDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
-    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
     private val autoconsent: Autoconsent,
+    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
 ) : PageLoadedHandler {
 
-    override operator fun invoke(url: String, start: Long, end: Long) {
+    override fun onPageLoaded(url: String, title: String?, start: Long, end: Long) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             if (sites.any { UriString.sameOrSubdomain(url, it) }) {
                 pageLoadedPixelDao.add(
@@ -63,8 +53,8 @@ class RealPageLoadedHandler @Inject constructor(
                         elapsedTime = end - start,
                         webviewVersion = webViewVersionProvider.getMajorVersion(),
                         appVersion = deviceInfo.appVersion,
-                        trackerOptimizationEnabled = optimizeTrackerEvaluationRCWrapper.enabled,
                         cpmEnabled = autoconsent.isAutoconsentEnabled(),
+                        trackerOptimizationEnabled = optimizeTrackerEvaluationRCWrapper.enabled,
                     ),
                 )
             }

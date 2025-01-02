@@ -49,11 +49,11 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAddHomeScreenWidget" />
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+    <!--<com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/fireButtonSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsFireButton" />
+        app:primaryText="@string/settingsFireButton" />-->
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/permissionsSetting"

@@ -156,10 +156,16 @@
     <string name="privateSearchTitle">Private Search este activată</string>
     <string name="privateSearchDescription">Kahf Private Search este motorul tău de căutare implicit, astfel încât poți căuta pe web fără a fi urmărit(ă).</string>
     <string name="privateSearchHeadingSearchSettings">Setări de căutare</string>
-    <string name="privateSearchAutocompleteToggle">Afișează sugestiile de completare automată</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Mai multe setări de căutare</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personalizează-ți limba de căutare, regiunea și multe altele</string>
     <string name="privateSearchMoreSearchSettingsTitle">Mai multe setări de căutare</string>
+    <string name="privateSearchAutocompleteToggle">Afișează sugestiile de completare automată</string>
+    <string name="privateSearchAutocompleteHint">Afișează sugestii de căutare, inclusiv marcajele tale, pe măsură ce tastezi. Toate căutările sunt private.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Site-uri vizitate recent</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Afișează site-urile accesate recent în sugestiile de căutare. Site-urile accesate recent sunt private, stocate doar pe dispozitiv și pot fi șterse cu Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Sugestiile de completare automată includ acum site-urile accesate recent. Dezactivează-le din Setări sau șterge-le în orice moment cu ajutorul Fire Button 🔥.</string>
+    <string name="improvedAutoCompleteIAMTitle">Aceeași confidențialitate.\nSugestii de căutare mai bune!</string>
+    <string name="openAutoCompleteSettings">Deschide Setări</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protecție împotriva urmăririi pe web</string>
@@ -231,29 +237,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Dezactivarea protecțiilor ar putea fi de ajutor.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Am dezactivat temporar Elementele de protecție a confidențialității, deoarece par să creeze disfuncții pe acest site.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Marcaje</string>
-    <string name="bookmarksActivityTitle">Marcaje</string>
-    <string name="noBookmarks">Nu s-a adăugat niciun marcaj</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Mai multe opțiuni pentru marcajul %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; șters</string>
-    <string name="exportBookmarksMenu">Export</string>
-    <string name="exportBookmarksEmpty">Nu ai marcaje, nimic nu va fi exportat</string>
-    <string name="exportBookmarksError">Nu s-au putut exporta marcajele, a apărut o eroare</string>
-    <string name="exportBookmarksSuccess">Toate marcajele au fost exportate cu succes</string>
-    <string name="importBookmarksMenu">Import</string>
-    <string name="importBookmarksFileTitle">Selectați un fișier cu marcaje de importat</string>
-    <string name="importBookmarksError">Nu s-au putut importa marcajele, a apărut o eroare</string>
-    <string name="importBookmarksEmpty">Fișierul nu are marcaje de importat</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d marcaje importate cu succes</string>
-    <string name="savedSiteDialogTitleHint">Titlu</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Editare</string>
-    <string name="bookmarksSectionTitle">Marcaje</string>
-    <string name="favoritesSectionTitle">Favorite</string>
-    <string name="bookmarksEmptyHint">Nu s-a adăugat niciun marcaj</string>
-    <string name="favoritesEmptyHint">Nu s-a adăugat niciun favorit</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmare</string>
     <string name="dialogSave">Salvare</string>
@@ -274,8 +257,6 @@
     <string name="widgetConfigurationAddWidgetOption">Adăugare widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Nu s-a adăugat niciun favorit</string>
     <string name="searchWidgetEmtpyFavoritesCta">Adaugă favorit</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Vizitează site-urile preferate într-o clipă!\n\nAccesează un site care îți place. Apoi atinge pictograma „ ⠇” și selectează Adaugă la favorite.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Vizitează site-urile preferate într-o clipă! Accesează un site care îți place. Apoi atinge pictograma de meniu a browserului și selectează Adaugă la favorite.</string>
     <string name="widgetConfigurationActivityTitle">Configurare widget</string>
     <string name="favoritesWidgetLabel">Preferințe</string>
     <string name="searchWidgetLabel">Căutare</string>
@@ -445,14 +426,8 @@
     <string name="systemSearchOnboardingButtonOk">Am înțeles</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Ascunde</string>
-    <string name="daxDialogPhew">Pfiu!</string>
-    <string name="daxDialogNext">Următorul</string>
     <string name="daxDialogHighFive">Bate palma!</string>
     <string name="daxDialogGotIt">Am înțeles</string>
-    <string name="hideTipsTitle">Ascunzi sfaturile rămase?</string>
-    <string name="hideTipsText">Sunt doar câteva, iar noi am încercat să le facem informative.</string>
-    <string name="hideTipsButton">Ascunde sfaturile definitiv</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Acum blochezi tehnologii de urmărire de pe internet 🎉<br/><br/>De asemenea, pot să blochez și tehnologiile de urmărire care se ascund în alte aplicații ale tale, chiar și atunci când nu îți folosești telefonul.]]></string>
@@ -463,39 +438,9 @@
     <string name="onboardingWelcomeTitle">"Bine ai venit la Kahf!"</string>
     <string name="onboardingDaxText"><![CDATA[Internetul poate fi cam terifiant.<br/><br/>Nu te îngrijora! Căutarea și navigarea în mod confidențial sunt mai ușoare decât crezi.]]></string>
     <string name="onboardingLetsDoItButton">Să Începem!</string>
-    <string name="daxIntroCtaText"><![CDATA[Apoi, încearcă să vizitezi unul din site-urile tale preferate! <br/><br/>Voi bloca urmăritorii ca să nu te mai spioneze. Voi îmbunătăți, de asemenea, securitatea conexiunii tale, dacă este posibil. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Ai ghicit!<br/><br/>Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👍]]></string>
-    <string name="daxSerpCtaText">Căutările Kahf sunt anonime. Întotdeauna. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ și <b>%1$d altul</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
-        <item quantity="few"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
-        <item quantity="other"><![CDATA[ și <b>%1$d alții</b> încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara de adrese pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ încerca să te urmărească aici. <br/><br/>Am blocat-o!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
-        <item quantity="few"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
-        <item quantity="other"><![CDATA[ încercau să te urmărească aici. <br/><br/>I-am blocat!<br/><br/> ☝️ Poți verifica bara URL pentru a vedea cine încearcă să te urmărească atunci când vizitezi un nou site.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[În timp ce atingi și derulezi, voi bloca urmăritorii pisălogi. <br/><br/>Dă-i bătaie - continuă să navighezi!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Atenție! Nu pot împiedica utilizatorul %1$s să îți vadă activitatea pe %2$s.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot limita ceea ce știe %3$s despre tine în general, blocându-i instrumentul de urmărire pe o mulțime de alte site-uri.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Atenție! Deoarece %1$s deține %2$s, nu îi pot împiedica să îți vadă activitatea aici.&lt;br/&gt;&lt;br/&gt;Dar navighează cu mine și pot reduce ceea ce %3$s cunoaște despre tine în general, blocând instrumentele lor de urmărire pe o mulțime de alte site-uri.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Ce te aduce la Kahf?</string>
-    <string name="onboardingFeatureOptionsContinue">Continuă</string>
-    <string name="onboardingFeatureOptionsSkip">Omite acest pas</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Căutare Confidențială</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blocarea urmăririi</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Urme digitale mai mici</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Încărcări mai rapide ale paginilor</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Mai puține reclame</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Ștergerea datelor cu un clic</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Salvează %1$s</string>
@@ -643,29 +588,6 @@
     <string name="emailNotSupported">Dispozitivul nu este acceptat</string>
     <string name="emailNotSupportedExplanation">Protecția pentru e-mail îți permite să creezi adrese de e-mail private care elimină tehnologiile de urmărire prin e-mail. Trebuie să criptăm și să stocăm aceste adrese pe care le-ai creat local, pe dispozitivul tău. Din cauza faptului că dispozitivul tău nu acceptă stocarea criptată, protecția pentru e-mail este indisponibilă.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Editare marcaj</string>
-    <string name="favoriteDialogTitleEdit">Editare favorit</string>
-    <string name="locationLabel">Locație</string>
-    <string name="folderLocationTitle">Selectează locația</string>
-    <string name="addFolder">Adaugă dosar</string>
-    <string name="editFolder">Editează dosarul</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ștergi folderul și conținutul acestuia?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Sigur dorești să ștergi "</string>
-    <string name="bookmarkFolderEmpty">Gol</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s și %3$d element?</item>
-        <item quantity="few">%1$s%2$s și %3$d elemente?</item>
-        <item quantity="other">%1$s%2$s și %3$d elemente?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d element</item>
-        <item quantity="few">%1$d elemente</item>
-        <item quantity="other">%1$d elemente</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Accesibilitate</string>
     <string name="accessibilityActivityTitle">Accesibilitate</string>
@@ -685,7 +607,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Răsfoiește în mod privat, cu aplicația noastră pentru Mac</string>
-    <string name="macos_settings_title">Aplicația Kahf pentru Mac</string>
+    <string name="macos_settings_title">Browserul Kahf pentru Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Descărcări</string>
@@ -747,7 +669,7 @@
     <string name="downloadsNotifyMeSubtitle">Primește o notificare când s-au finalizat descărcările.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Aplicația Kahf pentru Windows</string>
+    <string name="windows_settings_title">Browserul Kahf pentru Windows</string>
     <string name="windows_settings_description">Navighează în mod privat cu aplicația noastră pentru Windows</string>
     <string name="windows_settings_description_ready">Descărcare disponibilă</string>
     <string name="windows_settings_description_list">Ești pe listă!</string>
@@ -760,16 +682,6 @@
     <string name="closeAppTabsConfirmationDialogDescription">Sigur dorești să închizi toate filele?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Anulare</string>
     <string name="closeAppTabsConfirmationDialogClose">Închidere</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Ștergi acest marcaj?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Aceasta va șterge marcajul tău pentru &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Dorești să ștergi acest favorit?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Aceasta îți va șterge favoritul pentru &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Ștergi acest folder de marcaje?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Aceasta va șterge folderul tău de marcaje &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Anulare</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Ștergere</string>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adaugă opțiunea de Căutare vocală privată în bara de adrese.Sunetul nu este stocat sau partajat cu nimeni, inclusiv cu Kahf.</string>
@@ -790,6 +702,59 @@
     <string name="autofillLoginSavedSnackbarMessage">Parolă salvată</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Parolă actualizată</string>
 
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Deschide în Kahf</string>
+    <string name="runningInDdgMenuItemTitle">Redare în Kahf</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Avertisment: acest site poate fi nesigur</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Certificatul pentru acest site este nevalid. S-ar putea să te conectezi la un server care pretinde a fi %1$s, ceea ce ar putea pune în pericol informațiile tale confidențiale.</string>
+    <string name="sslErrorLeaveCTA">Părăsește acest site</string>
+    <string name="sslErrorAdvancedCTA">Avansat</string>
+    <string name="sslErrorExpandedHeadline">Kahf te avertizează când un site web are un certificat nevalid.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Acceptă riscul și accesează site-ul<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s a expirat. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Certificatul de securitate pentru %1$s nu se potrivește cu *.%2$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sistemul de operare al dispozitivului tău nu are încredere în certificatul de securitate pentru %1$s. Este posibil ca site-ul web să fie configurat greșit, ca un atacator să-ți fi compromis conexiunea sau ca ceasul sistemului tău să fie incorect.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Salut!<br/><br/>Ești gata pentru un internet mai bun și mai privat?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Hai să o facem!</string>
+    <string name="preOnboardingDaxDialog2Title">Măsurile de protecție a confidențialității au fost activate!</string>
+    <string name="preOnboardingDaxDialog2Button">Alege browserul</string>
+    <string name="preOnboardingComparisonChartItem1">Caută implicit în mod privat</string>
+    <string name="preOnboardingComparisonChartItem2">Blochează tehnologiile de urmărire terțe</string>
+    <string name="preOnboardingComparisonChartItem3">Blochează ferestrele pop-up privind modulele cookie</string>
+    <string name="preOnboardingComparisonChartItem4">Blochează reclamele înfiorătoare</string>
+    <string name="preOnboardingComparisonChartItem5">Șterge rapid datele de navigare</string>
+    <string name="preOnboardingDaxDialog3Title">Super! Bine ai venit de cealaltă parte!</string>
+    <string name="preOnboardingDaxDialog3Button">Începe navigarea</string>
+    <string name="onboardingSearchDaxDialogTitle">Încearcă o căutare!</string>
+    <string name="onboardingSearchDaxDialogDescription">Căutările tale Kahf sunt întotdeauna anonime.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">cum se spune „rață” în engleză</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">cum se spune „rață” în spaniolă</string>
+    <string name="onboardingSearchQueryOption1">cum se spune rață în engleză</string>
+    <string name="onboardingSearchQueryOption1English">cum se spune rață în spaniolă</string>
+    <string name="onboardingSearchDaxDialogOption2">distribuția din avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">distribuție mighty ducks</string>
+    <string name="onboardingSearchDaxDialogOption3">vremea locală</string>
+    <string name="onboardingSearchDaxDialogOption4">Surprinde-mă!</string>
+    <string name="onboardingSearchQueryOption4">rețete pentru cină</string>
+    <string name="onboardingSearchQueryOption4US">rețete de fursecuri cu fulgi de ciocolată</string>
+    <string name="onboardingSitesDaxDialogTitle">Încearcă să vizitezi un site!</string>
+    <string name="onboardingSitesDaxDialogDescription">Voi bloca instrumentele de urmărire ca să nu te mai spioneze.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Surprinde-mă!</string>
+    <string name="onboardingSerpDaxDialogDescription">Acesta este Kahf Search. Privat. Rapid. Mai puține reclame.</string>
+    <string name="onboardingSerpDaxDialogButton">Am înțeles!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Apoi, încearcă să vizitezi un site!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ și <b>încă %1$d</b> încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="few"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other"><![CDATA[ și <b>încă %1$d</b> încercau să te urmărească aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+    </plurals>
     <string name="safegaze_popup_report_title">Vă rugăm să raportați orice erori sau sugestii prin acest formular</string>
     <string name="safegaze_popup_support_title">Sprijiniți acest proiect</string>
     <string name="safegaze_popup_woman_title">Sunt femeie</string>
@@ -814,7 +779,7 @@
     <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Marcaj adăugat în %1$s</string>
     <string name="addToFavorites">Adaugă la preferințe</string>
     <string name="editBookmark">Editează marcaj</string>
-    <string name="importBookmarksDescription">Dacă marcajele tale sunt salvate într-un alt browser, \nle poți importa în DuckDuckGo.</string>
+    <string name="importBookmarksDescription">Dacă marcajele tale sunt salvate într-un alt browser, \nle poți importa în Kahf.</string>
     <string name="importBookmarks">Importă marcaje</string>
     <string name="noResultsFor" instruction="%1$s is the search term">Nu există rezultate pentru „%1$s”</string>
     <string name="removeFromFavorites">Elimină din favorite</string>
@@ -824,5 +789,15 @@
         <item quantity="few">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
         <item quantity="other">Sigur vrei să ștergi acest folder și %1$d elemente?</item>
     </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Sigur dorești să ștergi marcajul pentru &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ încerca să te urmărească aici. L-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="few"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+        <item quantity="other"><![CDATA[ încercau să te urmărească până aici. Le-am blocat!<br/><br/>☝️ Atinge scutul pentru mai multe informații.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Am înțeles!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Șterge instantaneu activitatea de navigare cu <b>Fire Button</b>.<br/><br/>Încearcă! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Ai ghicit!"</string>
+    <string name="onboardingEndDaxDialogDescription">Reține: de fiecare dată când navighezi cu mine, o reclamă terifiantă își pierde aripile. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Gata!</string>
+
 </resources>

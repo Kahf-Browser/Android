@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Odredi u Postavkama</b></string>
 
     <string name="saveLoginDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Spremi lozinku</string>
     <string name="saveLoginDialogNotNow">Nemoj spremiti</string>
-    <string name="saveLoginDialogTitle">Želiš li da DuckDuckGo spremi tvoju lozinku?</string>
+    <string name="saveLoginDialogTitle">Želiš li da Kahf spremi tvoju lozinku?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Dodatne mogućnosti</string>
 
     <string name="useSavedLoginDialogTitle">Koristiti spremljenu lozinku?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Ažuriraj korisničko ime</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Želiš li ažurirati lozinku za korisnika \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo će ažurirati ovu pohranjenu lozinku na tvom uređaju.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf će ažurirati ovu pohranjenu lozinku na tvom uređaju.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zatvori dijaloški okvir za automatsko popunjavanje</string>
 
@@ -56,17 +56,23 @@
 
     <string name="credentialManagementSuggestionsLabel">Predloženo</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatsko popunjavanje lozinki nije dostupno jer je vaša verzija Android WebViewa prestara.</string>
+
     <string name="autofillManagementSearchClearDescription">Obriši unos pretraživanja</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Nema rezultata za \"%1$s\"</string>
 
     <string name="autofillDeleteLoginDialogCancel">Odustani</string>
     <string name="autofillDeleteLoginDialogDelete">Izbriši</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Korisničko ime je kopirano</string>
     <string name="autofillManagementPasswordCopied">Lozinka je kopirana</string>
 
-    <string name="autofill_password_generation_offer_title">Koristiti jaku lozinku od DuckDuckGoa?</string>
+    <string name="autofill_password_generation_offer_title">Koristiti jaku lozinku od Kahf?</string>
     <string name="autofill_password_generation_offer_accept">Koristi jaku lozinku</string>
     <string name="autofill_password_generation_offer_decline">Izradi vlastitu</string>
 
@@ -120,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Lozinke su sigurno pohranjene na tvom uređaju.</string>
     <string name="autofillManagementAddLogin">Dodaj lozinku</string>
     <string name="credentialManagementEditLoginTitleHint">Naslov</string>
-    <string name="autofillDeleteLoginDialogTitle">Sigurno želiš izbrisati ovu lozinku?</string>
     <string name="autofillManagementDeletedConfirmation">Lozinka je izbrisana</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Posljednje ažuriranje: %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Želiš li nastaviti spremati lozinke?</string>
@@ -133,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Uzorak za zaključavanje uređaja, PIN ili biometrija potrebni su za zaštitu tvojih lozinki.</string>
     <string name="credentialManagementEditTitle">Uredi lozinku</string>
 
-    <string name="credentials_limit_warning"><b>Sinkronizacija pauzirana</b>\nOgraničenje prijava premašeno. Izbriši neke za nastavak sinkronizacije.\n\n<annotation type="manage_logins">upravljanje prijavama</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Sinkronizacija lozinki je pauzirana</b>\nPremašeno je ograničenje sinkronizacije lozinki. Pokušaj izbrisati neke lozinke. Dok se to ne riješi, tvoje se lozinke neće sigurnosno kopirati.</string>
+    <string name="credentials_limit_warning"><b>Sinkronizacija je pauzirana</b>\nDosegnut je maksimalni broj lozinki. Izbriši neke za nastavak sinkronizacije.\n\n<annotation type="manage_logins">Upravljanje lozinkama</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Sinkronizacija lozinki je pauzirana</b>\nDosegnut je maksimalni broj lozinki. Izbriši neke lozinke za nastavak sinkronizacije.</string>
+    <string name="credentials_invalid_request_warning"><b>Sinkronizacija je pauzirana</b>\nNeke su lozinke formatirane pogrešno, ili su preduge i nisu sinkronizirane.\n\n<annotation type="manage_logins">Upravljanje lozinkama</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Sinkronizacija lozinki je pauzirana</b>\nNeke su lozinke formatirane pogrešno, ili su preduge i nisu sinkronizirane.\n\n</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nikada ne traži za ovu web lokaciju</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ako resetiraš isključene web lokacije, od tebe će se zatražiti da spremiš svoju lozinku sljedeći put kad se prijaviš na bilo koju od ovih lokacija.</string>
@@ -144,15 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Odustani</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Izbriši sve lozinke</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Sigurno želiš izbrisati %1$d lozinku?</item>
-        <item quantity="few">Sigurno želiš izbrisati %1$d lozinke?</item>
-        <item quantity="many">Sigurno želiš izbrisati %1$d lozinki?</item>
-        <item quantity="other">Sigurno želiš izbrisati %1$d lozinki?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Tvoja lozinka bit će izbrisana sa svih sinkroniziranih uređaja. Uvjeri se da i dalje imaš način pristupa svom računu.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja. Uvjeri se da i dalje imaš način pristupa svojim računima.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">Izbrisana je %1$d lozinka</item>
@@ -163,5 +161,46 @@
 
     <string name="autofill_auth_text_for_delete_all">Izvrši autentifikaciju i time potvrdi da želiš izbrisati sve lozinke</string>
     <string name="autofill_title_text_for_delete_all">Izbriši sve lozinke</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Tvoje lozinke za %1$s ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+        <item quantity="few">Tvoje lozinke za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+        <item quantity="many">Tvoje lozinke za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+        <item quantity="other">Tvoje lozinke za %1$s i %2$d drugih web-mjesta ne mogu se sinkronizirati jer neka njihova polja premašuju ograničenje broja znakova.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Upravljanje lozinkama</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Tvoja lozinka bit će izbrisana s ovog uređaja.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tvoja lozinka (ili više njih) bit će izbrisana s ovog uređaja.</item>
+        <item quantity="few">Tvoje lozinke bit će izbrisane s ovog uređaja.</item>
+        <item quantity="many">Tvoje lozinke bit će izbrisane s ovog uređaja.</item>
+        <item quantity="other">Tvoje lozinke bit će izbrisane s ovog uređaja.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Tvoja lozinka bit će izbrisana sa svih sinkroniziranih uređaja.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Tvoja lozinka (ili više njih) bit će izbrisana sa svih sinkroniziranih uređaja.</item>
+        <item quantity="few">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja.</item>
+        <item quantity="many">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja.</item>
+        <item quantity="other">Tvoje lozinke bit će izbrisane sa svih sinkroniziranih uređaja.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Sigurno želiš izbrisati ovu lozinku?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Sigurno želiš izbrisati %1$d lozinku?</item>
+        <item quantity="few">Sigurno želiš izbrisati %1$d lozinke?</item>
+        <item quantity="many">Sigurno želiš izbrisati %1$d lozinki?</item>
+        <item quantity="other">Sigurno želiš izbrisati %1$d lozinki?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Uvjeri se da i dalje imaš način pristupa svom računu.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Uvjeri se da i dalje imaš način pristupa svom računu/računima.</item>
+        <item quantity="few">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
+        <item quantity="many">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
+        <item quantity="other">Uvjeri se da i dalje imaš način pristupa svojim računima.</item>
+    </plurals>
 
 </resources>

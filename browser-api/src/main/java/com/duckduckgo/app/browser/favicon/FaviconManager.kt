@@ -45,6 +45,7 @@ interface FaviconManager {
         url: String,
         view: ImageView,
         placeholder: String? = null,
+        fetchFromRemote: Boolean? = null,
     )
 
     suspend fun loadToViewFromLocalWithPlaceholder(

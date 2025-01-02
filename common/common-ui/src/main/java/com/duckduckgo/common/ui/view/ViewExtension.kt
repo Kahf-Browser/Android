@@ -16,14 +16,17 @@
 
 package com.duckduckgo.common.ui.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
+import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.core.view.children
+import com.duckduckgo.mobile.android.R
 import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.BaseTransientBottomBar.Duration
 import com.google.android.material.snackbar.Snackbar
@@ -118,18 +121,38 @@ fun CompoundButton.quietlySetIsChecked(
 fun View.makeSnackbarWithNoBottomInset(
     text: CharSequence,
     @Duration duration: Int,
+    showOverBottomNav: Boolean = false,
 ): Snackbar {
     val snackbar = Snackbar.make(this, text, duration)
     snackbar.isGestureInsetBottomIgnored = true
+
+    if (showOverBottomNav) {
+        val snackbarView = snackbar.view
+        val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
+        val marginBottom = resources.getDimensionPixelSize(R.dimen.bottomNavHeight) + snackbarView.dp2Px(10).toInt()
+        params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, marginBottom)
+        snackbarView.layoutParams = params
+    }
+
     return snackbar
 }
 
 fun View.makeSnackbarWithNoBottomInset(
     @StringRes resId: Int,
     @Duration duration: Int,
+    showOverBottomNav: Boolean = false,
 ): Snackbar {
     val snackbar = Snackbar.make(this, resId, duration)
     snackbar.isGestureInsetBottomIgnored = true
+
+    if (showOverBottomNav) {
+        val snackbarView = snackbar.view
+        val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
+        val marginBottom = resources.getDimensionPixelSize(R.dimen.bottomNavHeight) + snackbarView.dp2Px(10).toInt()
+        params.setMargins(params.leftMargin, params.topMargin, params.rightMargin, marginBottom)
+        snackbarView.layoutParams = params
+    }
+
     return snackbar
 }
 
@@ -194,4 +217,21 @@ private inline fun <reified T : ViewGroup.LayoutParams> updateLayoutParam(
     val params = view.layoutParams as T
     block(params)
     view.layoutParams = params
+}
+
+@SuppressLint("DefaultLocale")
+fun TextView.setFormattedCount(number: Int) {
+    this.text = when {
+        number == 0 -> "0"
+        number < 10 -> String.format("%02d", number)
+        number < 1000 -> number.toString()
+        number < 1000000 -> String.format("%.1fk", number / 1000.0)
+        else -> String.format("%.1fM", number /1000000.0)
+    }
+}
+
+/** Overlook system font scale **/
+fun TextView.scaleIndependentTextSize(sp: Float) {
+    val density = context.resources.configuration.fontScale
+    setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, sp / density)
 }

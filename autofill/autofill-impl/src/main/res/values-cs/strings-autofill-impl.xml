@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Uložit heslo</string>
     <string name="saveLoginDialogNotNow">Neukládat</string>
-    <string name="saveLoginDialogTitle">Má DuckDuckGo uložit heslo?</string>
+    <string name="saveLoginDialogTitle">Má Kahf uložit heslo?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Další možnosti</string>
 
     <string name="useSavedLoginDialogTitle">Použít uložené heslo?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Aktualizovat uživatelské jméno</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Aktualizovat heslo pro \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo aktualizuje tohle uložené heslo ve tvém zařízení.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf aktualizuje tohle uložené heslo ve tvém zařízení.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Zavřít dialogové okno Automatické vyplňování</string>
 
@@ -56,17 +56,23 @@
 
     <string name="credentialManagementSuggestionsLabel">Navrhované</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Automatické vyplňování hesel není dostupné, protože tvoje verze Android WebView je moc stará.</string>
+
     <string name="autofillManagementSearchClearDescription">Vymazat vyhledávací vstup</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Žádné výsledky pro dotaz „%1$s“</string>
 
     <string name="autofillDeleteLoginDialogCancel">Zrušit</string>
     <string name="autofillDeleteLoginDialogDelete">Smazat</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Uživatelské jméno zkopírováno</string>
     <string name="autofillManagementPasswordCopied">Heslo zkopírováno</string>
 
-    <string name="autofill_password_generation_offer_title">Použít silné heslo od DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_title">Použít silné heslo od Kahf?</string>
     <string name="autofill_password_generation_offer_accept">Použít silné heslo</string>
     <string name="autofill_password_generation_offer_decline">Vytvořit vlastní</string>
 
@@ -120,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Hesla se bezpečně ukládají do tvého zařízení.</string>
     <string name="autofillManagementAddLogin">Přidat heslo</string>
     <string name="credentialManagementEditLoginTitleHint">Název</string>
-    <string name="autofillDeleteLoginDialogTitle">Opravdu chceš smazat tohle heslo?</string>
     <string name="autofillManagementDeletedConfirmation">Heslo smazáno</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Poslední aktualizace %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Chceš dál ukládat hesla?</string>
@@ -133,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Na ochranu hesel se vyžaduje gesto zámku obrazovky, PIN nebo biometrické ověření.</string>
     <string name="credentialManagementEditTitle">Upravit heslo</string>
 
-    <string name="credentials_limit_warning"><b>Synchronizace je pozastavená</b>\nJe překročený limit počtu přihlášení. Jestli chceš synchronizaci obnovit, některá odstraň.\n\n<annotation type="manage_logins">Spravovat přihlašovací údaje</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Synchronizace hesel je pozastavená</b>\nDošlo k překročení limitu pro synchronizaci hesel. Zkus pár hesel smazat. Dokud tenhle problém nevyřešíš, hesla se nebudou zálohovat.</string>
+    <string name="credentials_limit_warning"><b>Synchronizace je pozastavená</b>\nUž máš maximální počet hesel. Jestli chceš synchronizaci obnovit, některá smaž.\n\n<annotation type="manage_logins">Spravovat hesla</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Synchronizace hesel je pozastavená</b>\nUž máš maximální počet hesel. Jestli chceš synchronizaci obnovit, některá hesla smaž.</string>
+    <string name="credentials_invalid_request_warning"><b>Synchronizace je pozastavená</b>\nNěkterá hesla jsou nesprávně naformátovaná nebo moc dlouhá, takže jsme je nemohli synchronizovat.\n\n<annotation type="manage_logins">Spravovat hesla</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Synchronizace hesel je pozastavená</b>\nNěkterá hesla jsou nesprávně naformátovaná nebo moc dlouhá, takže jsme je nemohli synchronizovat.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Na téhle stránce už se neptat</string>
     <string name="credentialManagementInstructionNeverForThisSite">Pokud vyloučené weby resetuješ, při příštím přihlašování na některý z nich se ti zobrazí výzva k uložení hesla.</string>
@@ -144,15 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Zrušit</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Smazat všechna hesla</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Opravdu chceš smazat %1$d heslo?</item>
-        <item quantity="few">Opravdu chceš smazat %1$d hesla?</item>
-        <item quantity="many">Opravdu chceš smazat %1$d hesla?</item>
-        <item quantity="other">Opravdu chceš smazat %1$d hesel?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Tvoje heslo se smaže ze všech synchronizovaných zařízení. Zkontroluj si předtím, že se i tak dostaneš ke svému účtu.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Tvoje hesla se smažou ze všech synchronizovaných zařízení. Zkontroluj si předtím, že se k účtům i tak dostaneš.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d smazané heslo</item>
@@ -163,5 +161,46 @@
 
     <string name="autofill_auth_text_for_delete_all">Ověřením potvrď, že chceš smazat všechna hesla</string>
     <string name="autofill_title_text_for_delete_all">Smazat všechna hesla</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Tvoje heslo pro %1$s se nedá synchronizovat, protože některé z jeho polí překračuje maximální počet znaků.</item>
+        <item quantity="few">Tvoje hesla pro %1$s a %2$d další weby se nedají synchronizovat, protože některá z jejich polí překračují maximální počet znaků.</item>
+        <item quantity="many">Tvoje hesla pro %1$s a %2$d dalšího webu se nedají synchronizovat, protože některá z jejich polí překračují maximální počet znaků.</item>
+        <item quantity="other">Tvoje hesla pro %1$s a %2$d dalších webů se nedají synchronizovat, protože některá z jejich polí překračují maximální počet znaků.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Spravovat hesla</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Tvoje heslo se z tohohle zařízení smaže.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Tvoje heslo se z tohohle zařízení smaže.</item>
+        <item quantity="few">Tvoje hesla se z tohohle zařízení smažou.</item>
+        <item quantity="many">Tvoje hesla se z tohohle zařízení smažou.</item>
+        <item quantity="other">Tvoje hesla se z tohohle zařízení smažou.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Tvoje heslo se smaže ze všech synchronizovaných zařízení.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Tvoje heslo se smaže ze všech synchronizovaných zařízení.</item>
+        <item quantity="few">Tvoje hesla se smažou ze všech synchronizovaných zařízení.</item>
+        <item quantity="many">Tvoje hesla se smažou ze všech synchronizovaných zařízení.</item>
+        <item quantity="other">Tvoje hesla se smažou ze všech synchronizovaných zařízení.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Opravdu chceš smazat tohle heslo?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Opravdu chceš smazat %1$d heslo?</item>
+        <item quantity="few">Opravdu chceš smazat %1$d hesla?</item>
+        <item quantity="many">Opravdu chceš smazat %1$d hesla?</item>
+        <item quantity="other">Opravdu chceš smazat %1$d hesel?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Zkontroluj si předtím, že se i tak dostaneš ke svému účtu.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Zkontroluj si předtím, že se k účtu i tak dostaneš.</item>
+        <item quantity="few">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>
+        <item quantity="many">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>
+        <item quantity="other">Zkontroluj si předtím, že se k účtům i tak dostaneš.</item>
+    </plurals>
 
 </resources>

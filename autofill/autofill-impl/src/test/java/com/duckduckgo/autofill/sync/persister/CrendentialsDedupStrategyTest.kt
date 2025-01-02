@@ -18,6 +18,7 @@ package com.duckduckgo.autofill.sync.persister
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.FakePasswordStoreEventPlugin
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures.amazonCredentials
 import com.duckduckgo.autofill.sync.CredentialsFixtures.spotifyCredentials
@@ -27,6 +28,7 @@ import com.duckduckgo.autofill.sync.CredentialsFixtures.twitterCredentials
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMapper
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
+import com.duckduckgo.autofill.sync.FakeCredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
@@ -55,7 +57,14 @@ internal class CredentialsDedupStrategyTest {
     private val secureStorage = FakeSecureStorage()
     private val credentialsSyncStore = FakeCredentialsSyncStore()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
-    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(
+        secureStorage,
+        credentialsSyncStore,
+        credentialsSyncMetadata,
+        FakeCrypto(),
+        FakeCredentialsSyncLocalValidationFeature(),
+        FakePasswordStoreEventPlugin(),
+    )
 
     @After fun after() = runBlocking {
         db.close()

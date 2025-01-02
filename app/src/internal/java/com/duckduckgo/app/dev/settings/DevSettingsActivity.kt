@@ -34,6 +34,7 @@ import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ActivityDevSettingsBinding
 import com.duckduckgo.app.browser.webview.WebContentDebuggingFeature
 import com.duckduckgo.app.dev.settings.DevSettingsViewModel.Command
+import com.duckduckgo.app.dev.settings.customtabs.CustomTabsInternalSettingsActivity
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.dev.settings.privacy.TrackerDataDevReceiver.Companion.DOWNLOAD_TDS_INTENT_ACTION
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -100,6 +101,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         }
         binding.overrideUserAgentSelector.setOnClickListener { viewModel.onUserAgentSelectorClicked() }
         binding.overridePrivacyRemoteConfigUrl.setOnClickListener { viewModel.onRemotePrivacyUrlClicked() }
+        binding.customTabs.setOnClickListener { viewModel.customTabsClicked() }
     }
 
     private fun observeViewModel() {
@@ -128,6 +130,7 @@ class DevSettingsActivity : DuckDuckGoActivity() {
             is Command.OpenUASelector -> showUASelector()
             is Command.ShowSavedSitesClearedConfirmation -> showSavedSitesClearedConfirmation()
             is Command.ChangePrivacyConfigUrl -> showChangePrivacyUrl()
+            is Command.CustomTabs -> showCustomTabs()
             else -> TODO()
         }
     }
@@ -148,11 +151,8 @@ class DevSettingsActivity : DuckDuckGoActivity() {
         val popup = PopupMenu(layoutInflater, layout.popup_window_user_agent_override)
         val view = popup.contentView
         popup.apply {
-            onMenuItemClicked(view.findViewById(R.id.noAppId)) { viewModel.onUserAgentSelected(UAOverride.NO_APP_ID) }
-            onMenuItemClicked(view.findViewById(R.id.noVersion)) { viewModel.onUserAgentSelected(UAOverride.NO_VERSION) }
-            onMenuItemClicked(view.findViewById(R.id.chrome)) { viewModel.onUserAgentSelected(UAOverride.CHROME) }
             onMenuItemClicked(view.findViewById(R.id.firefox)) { viewModel.onUserAgentSelected(UAOverride.FIREFOX) }
-            onMenuItemClicked(view.findViewById(R.id.duckDuckGo)) { viewModel.onUserAgentSelected(UAOverride.DDG) }
+            onMenuItemClicked(view.findViewById(R.id.defaultUA)) { viewModel.onUserAgentSelected(UAOverride.DEFAULT) }
             onMenuItemClicked(view.findViewById(R.id.webView)) { viewModel.onUserAgentSelected(UAOverride.WEBVIEW) }
         }
         popup.show(binding.root, binding.overrideUserAgentSelector)
@@ -165,6 +165,11 @@ class DevSettingsActivity : DuckDuckGoActivity() {
     private fun showChangePrivacyUrl() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         startActivity(PrivacyConfigInternalSettingsActivity.intent(this), options)
+    }
+
+    private fun showCustomTabs() {
+        val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
+        startActivity(CustomTabsInternalSettingsActivity.intent(this), options)
     }
 
     companion object {

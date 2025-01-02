@@ -17,6 +17,8 @@
 package com.duckduckgo.common.ui
 
 import android.content.Context
+import android.os.Build
+import android.util.DisplayMetrics
 import androidx.annotation.LayoutRes
 import dagger.android.DaggerFragment
 import dagger.android.support.AndroidSupportInjection
@@ -26,5 +28,16 @@ abstract class DuckDuckGoFragment(@LayoutRes contentLayoutId: Int = 0) : DaggerF
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)
         super.onAttach(context)
+    }
+
+    fun getDisplayHeightInPixel(): Int {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val windowMetrics = requireActivity().windowManager.currentWindowMetrics
+            windowMetrics.bounds.height()
+        } else {
+            val displayMetrics = DisplayMetrics()
+            requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
+            displayMetrics.heightPixels
+        }
     }
 }

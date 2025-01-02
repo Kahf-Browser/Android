@@ -20,13 +20,22 @@ import android.annotation.SuppressLint
 import android.app.UiModeManager
 import android.content.BroadcastReceiver
 import android.content.Context
+import android.graphics.Color
+import android.os.Build.VERSION
+import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewTreeObserver
+import android.view.WindowManager.LayoutParams
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
+import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.R
 import dagger.android.AndroidInjection
@@ -61,7 +70,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     }
 
     protected fun daggerInject() {
-        AndroidInjection.inject(this)
+        AndroidInjection.inject(this, bindingKey = DaggerActivity::class.java)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -87,6 +96,48 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_left_24)
     }
 
+    fun setTranslucentStatusBarAndNavBar() {
+        if (VERSION.SDK_INT >= VERSION_CODES.LOLLIPOP) {
+            window.clearFlags(LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            window.addFlags(LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION)
+
+            window.statusBarColor = Color.TRANSPARENT
+            window.navigationBarColor = Color.TRANSPARENT
+
+            @Suppress("DEPRECATION")
+            if (VERSION.SDK_INT >= VERSION_CODES.O) {
+                window.decorView.systemUiVisibility = (
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        or View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
+            }
+        }
+    }
+
+    fun getNavigationBarHeight(callback: (Int) -> Unit) {
+        val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                val windowInsetsCompat = ViewCompat.getRootWindowInsets(window.decorView)
+                val navigationBarInsets = windowInsetsCompat?.getInsets(WindowInsetsCompat.Type.navigationBars())
+                val height = navigationBarInsets?.bottom ?: 0
+
+                // Remove the listener to avoid multiple triggers
+                window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                callback(height)
+            }
+        }
+
+        window.decorView.viewTreeObserver.addOnGlobalLayoutListener(listener)
+    }
+
     fun isDarkThemeEnabled(): Boolean {
         return when (themingDataStore.theme) {
             DuckDuckGoTheme.SYSTEM_DEFAULT -> {
@@ -99,6 +150,19 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
             DARK -> true
             else -> false
         }
+    }
+
+    fun toggleTheme() {
+        val currentTheme = themingDataStore.theme
+        val newTheme = when (currentTheme) {
+            LIGHT -> DARK
+            DARK -> LIGHT
+            DuckDuckGoTheme.SYSTEM_DEFAULT -> {
+                if (isDarkThemeEnabled()) LIGHT else DARK
+            }
+        }
+        themingDataStore.theme = newTheme
+        sendThemeChangedBroadcast()
     }
 
     protected inline fun <reified V : ViewModel> bindViewModel() = lazy {

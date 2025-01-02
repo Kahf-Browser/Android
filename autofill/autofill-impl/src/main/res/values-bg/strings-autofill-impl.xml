@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Запазване на паролата</string>
     <string name="saveLoginDialogNotNow">Не записвай</string>
-    <string name="saveLoginDialogTitle">Искате ли DuckDuckGo да запази Вашата парола?</string>
+    <string name="saveLoginDialogTitle">Искате ли Kahf да запази Вашата парола?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Повече опции</string>
 
     <string name="useSavedLoginDialogTitle">Използване на запазена парола?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Актуализиране на потребителското име</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Актуализиране на паролата за \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo ще актуализира запазената парола във Вашето устройство.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf ще актуализира запазената парола във Вашето устройство.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Затваряне на диалоговия прозорец за автоматично попълване</string>
 
@@ -56,17 +56,23 @@
 
     <string name="credentialManagementSuggestionsLabel">Предложения</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Автоматичното попълване за пароли не е достъпно, защото Вашата версия на Android WebView е твърде стара.</string>
+
     <string name="autofillManagementSearchClearDescription">Изчистване на въведеното търсене</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Няма резултати за \'%1$s\'</string>
 
     <string name="autofillDeleteLoginDialogCancel">Отмени</string>
     <string name="autofillDeleteLoginDialogDelete">Изтрий</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Потребителското име е копирано</string>
     <string name="autofillManagementPasswordCopied">Паролата е копирана</string>
 
-    <string name="autofill_password_generation_offer_title">Използване на силна парола от DuckDuckGo?</string>
+    <string name="autofill_password_generation_offer_title">Използване на силна парола от Kahf?</string>
     <string name="autofill_password_generation_offer_accept">Използване на силна парола</string>
     <string name="autofill_password_generation_offer_decline">Създаване на собствена</string>
 
@@ -120,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Паролите се съхраняват сигурно на Вашето устройство.</string>
     <string name="autofillManagementAddLogin">Добавяне на парола</string>
     <string name="credentialManagementEditLoginTitleHint">Заглавие</string>
-    <string name="autofillDeleteLoginDialogTitle">Сигурни ли сте, че искате да изтриете тази парола?</string>
     <string name="autofillManagementDeletedConfirmation">Паролата е изтрита</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Последна актуализация %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Искате ли да продължите да запазвате пароли?</string>
@@ -133,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">За защита на паролите е необходимо да зададете модел за заключване, ПИН код или биометрични данни.</string>
     <string name="credentialManagementEditTitle">Редактиране на парола</string>
 
-    <string name="credentials_limit_warning"><b>Синхронизирането е спряно</b>\nПревишихте лимита за данни за вход. Изтрийте някои от тях, за да възобновите синхронизирането.<annotation type="manage_logins">Управление на данните за вход</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Синхронизирането на пароли е спряно</b>\nПревишихте ограничението за синхронизиране на пароли. Опитайте да изтриете някои от паролите. Докато този проблем не бъде разрешен, паролите няма да бъдат архивирани.</string>
+    <string name="credentials_limit_warning"><b>Синхронизирането е на пауза</b>\nДостигнахте максималния брой пароли. Изтрийте някои от тях, за да възобновите синхронизирането.\n\n<annotation type="manage_logins">Управление на пароли</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Синхронизирането на пароли е на пауза</b>\nДостигнахте максималния брой пароли. Изтрийте някои пароли, за да възобновите синхронизирането.</string>
+    <string name="credentials_invalid_request_warning"><b>Синхронизирането е на пауза</b>\nНякои пароли са форматирани неправилно или са твърде дълги и не бяха синхронизирани.\n\n<annotation type="manage_logins">Управление на пароли</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b></b>\nСинхронизирането на пароли е на пауза\nНякои пароли са форматирани неправилно или са твърде дълги и не бяха синхронизирани.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Никога не питай за този сайт</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ако нулирате изключените сайтове, при следващото влизане в някой от тези сайтове ще бъдете подканени да запазите паролата за вход.</string>
@@ -144,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Отмени</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Изтриване на всички пароли</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Сигурни ли сте, че искате да изтриете %1$d парола?</item>
-        <item quantity="other">Сигурни ли сте, че искате да изтриете %1$d пароли?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Вашата парола ще бъде изтрита от всички синхронизирани устройства. Уверете се, че все още имате друг начин за достъп до акаунта си.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Вашите пароли ще бъдат изтрити от всички синхронизирани устройства. Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d изтрита парола</item>
@@ -159,5 +159,36 @@
 
     <string name="autofill_auth_text_for_delete_all">Удостоверете се, за да потвърдите, че искате да изтриете всички пароли</string>
     <string name="autofill_title_text_for_delete_all">Изтриване на всички пароли</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Вашата парола за %1$s не може да се синхронизира, защото някои от нейните полета надвишават ограничението за знаци.</item>
+        <item quantity="other">Вашите пароли за %1$s и %2$d други сайта не могат да се синхронизират, защото някои от техните полета надвишават ограничението за знаци.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Управление на пароли</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Вашата парола ще бъде изтрита от това устройство.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Вашата парола ще бъде изтрита от това устройство.</item>
+        <item quantity="other">Вашите пароли ще бъдат изтрити от това устройство.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Вашата парола ще бъде изтрита от всички синхронизирани устройства.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Вашата парола ще бъде изтрита от всички синхронизирани устройства.</item>
+        <item quantity="other">Вашите пароли ще бъдат изтрити от всички синхронизирани устройства.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Сигурни ли сте, че искате да изтриете тази парола?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Сигурни ли сте, че искате да изтриете %1$d парола?</item>
+        <item quantity="other">Сигурни ли сте, че искате да изтриете %1$d пароли?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Уверете се, че все още имате друг начин за достъп до акаунта си.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Уверете се, че все още имате друг начин за достъп до Вашия акаунт.</item>
+        <item quantity="other">Уверете се, че все още имате друг начин за достъп до Вашите акаунти.</item>
+    </plurals>
 
 </resources>

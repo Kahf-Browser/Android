@@ -22,11 +22,11 @@
     android:background="@drawable/popup_menu_bg"
     android:orientation="vertical">
 
-    <com.duckduckgo.common.ui.view.PopupMenuItemView
+    <!--<com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/edit" />
+        app:primaryText="@string/edit" />-->
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/removeFromFavorites"

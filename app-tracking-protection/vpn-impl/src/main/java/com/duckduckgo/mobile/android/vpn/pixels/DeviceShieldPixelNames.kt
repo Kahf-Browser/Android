@@ -103,6 +103,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
 
     ATP_ESTABLISH_TUN_INTERFACE_ERROR_DAILY("m_atp_ev_establish_tun_error_d"),
     ATP_ESTABLISH_TUN_INTERFACE_ERROR("m_atp_ev_establish_tun_error_c"),
+    ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR_DAILY("m_atp_ev_establish_null_tun_error_d"),
+    ATP_ESTABLISH_NULL_TUN_INTERFACE_ERROR("m_atp_ev_establish_null_tun_error_c"),
 
     ATP_PROCESS_EXPENDABLE_LOW_DAILY("m_atp_ev_expen_memory_low_d"),
     ATP_PROCESS_EXPENDABLE_MODERATE_DAILY("m_atp_ev_expen_memory_moderate_d"),
@@ -125,6 +127,7 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     ATP_DID_REPORT_ISSUES_FROM_TRACKER_ACTIVITY_DAILY("m_atp_imp_tracker_activity_report_issues_d"),
 
     ATP_APP_BREAKAGE_REPORT("m_atp_breakage_report"),
+    ATP_APP_BREAKAGE_REPORT_DAILY("m_atp_breakage_report_d"),
     ATP_APP_BREAKAGE_REPORT_UNIQUE("m_atp_breakage_report_u"),
     ATP_APP_CPU_MONITOR_REPORT("m_atp_ev_cpu_usage_above_%d"),
 
@@ -220,5 +223,8 @@ enum class DeviceShieldPixelNames(override val pixelName: String, val enqueue: B
     VPN_SNOOZE_ENDED_DAILY("m_vpn_ev_snooze_ended_d", enqueue = true),
 
     VPN_MOTO_G_FIX_DAILY("m_vpn_ev_moto_g_fix_d", enqueue = true),
+    VPN_START_ATTEMPT("m_vpn_ev_start_attempt_c", enqueue = true),
+    VPN_START_ATTEMPT_SUCCESS("m_vpn_ev_start_attempt_success_c", enqueue = true),
+    VPN_START_ATTEMPT_FAILURE("m_vpn_ev_start_attempt_failure_c", enqueue = true),
     ;
 }

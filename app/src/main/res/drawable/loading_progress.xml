@@ -25,9 +25,11 @@
     <item
         android:id="@android:id/progress">
         <clip>
-            <shape>
-                <solid
-                    android:color="?colorAccent" />
+            <shape android:shape="rectangle">
+                <gradient
+                    android:startColor="@color/kahf_gradient_80_start"
+                    android:endColor="@color/kahf_gradient_80_end"
+                    android:type="linear" />
             </shape>
         </clip>
     </item>

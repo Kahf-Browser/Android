@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,24 +19,27 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sünkroonimine ja varundamine pole saadaval</b>\nKahjuks pole sünkroonimine ja varundamine praegu saadaval. Proovi hiljem uuesti.</string>
-    <string name="sync_flows_disabled_new_version"><b>Sünkroonimine ja varundus pole saadaval</b>\nVabandust, sünkroonimine ja varundus pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda DuckDuckGo uusimale versioonile.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sünkroonimine ja varundus pole saadaval</b>\nVabandust, sünkroonimine ja varundus pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda Kahf uusimale versioonile.</string>
     <string name="sync_create_account_disabled"><b>Sünkroonimine ja varundus pole saadaval</b>\nVabandust, sünkroonimine ja varundus pole praegu saadaval. Proovi hiljem uuesti.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Sünkroonimine ja varundus pole saadaval</b>\nVabandust, sünkroonimine ja varundus pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda DuckDuckGo uusimale versioonile.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sünkroonimine ja varundus pole saadaval</b>\nVabandust, sünkroonimine ja varundus pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda Kahf uusimale versioonile.</string>
     <string name="sync_disabled_authenticated_user"><b>Sünkroonimine ja varundamine peatatud</b>\nKahjuks pole sünkroonimine ja varundamine praegu saadaval. Proovi hiljem uuesti.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Sünkroonimine ja varundamine peatatud</b>\nVabandust, kuid sünkroonimine ja varundamine pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda DuckDuckGo uusimale versioonile.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sünkroonimine ja varundamine peatatud</b>\nVabandust, kuid sünkroonimine ja varundamine pole selles rakenduse versioonis enam saadaval. Jätkamiseks värskenda Kahf uusimale versioonile.</string>
     <string name="sync_paused_notification"><b>Sünkroonimine ja varundus on peatatud</b>\nVabandust, sünkroonimine ja varundus pole praegu saadaval. Proovi hiljem uuesti.</string>
+    <string name="sync_error_notification"><b>Sünkroonimisviga</b>\nSync &amp; Backup pole ajutiselt saadaval.</string>
+    <string name="sync_error_warning"><b>Sünkroonimisviga</b>\nSync &amp; Backup pole ajutiselt saadaval.</string>
+    <string name="sync_signed_out_notification"><b>Sünkroonimine on peatatud</b>\nSünkroonimine on peatatud. Kui soovid selle seadme sünkroonimist jätkata, loo uuesti ühendus, kasutades mõnda teist seadet või taastamiskoodi.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sünkroonimine ja varundamine</string>
     <string name="sync_setup_begin_syncing">Alusta sünkroonimist</string>
     <string name="sync_setup_with_another_device_cta_title">Sünkrooni teise seadmega</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Sünkrooni järjehoidjaid ja paroole turvaliselt oma seadmete vahel.</string>
-    <string name="sync_off_hint">Sinu andmed on otsast lõpuni krüptitud ja DuckDuckGo ei pääse krüpteerimisvõtmele ligi.</string>
+    <string name="sync_off_hint">Sinu andmed on otsast lõpuni krüptitud ja Kahf ei pääse krüpteerimisvõtmele ligi.</string>
     <string name="sync_setup_single_device_title">Ühe seadme seadistamine</string>
     <string name="sync_setup_single_recover_data_cta_title">Taasta sünkroonitud andmed</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Selle seadme sünkroonimine ja varundamine</string>
 
-    <string name="sync_off_encrypted_hint">Sinu andmed on otsast lõpuni krüptitud ja DuckDuckGo ei pääse dekrüpteerimisvõtmele ligi.</string>
+    <string name="sync_off_encrypted_hint">Sinu andmed on otsast lõpuni krüptitud ja Kahf ei pääse dekrüpteerimisvõtmele ligi.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Sünkroonimise ja varundamise seadistamine!</string>
@@ -46,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Laadi automaatselt alla oma sünkroonitud järjehoidjate ikoonid.</string>
     <string name="sync_enable_connecting">Ühendamine ...</string>
     <string name="sync_intro_enable_title">Selle seadme sünkroonimine ja varundamine</string>
-    <string name="sync_intro_enable_content">See loob DuckDuckGo turvalises serveris krüptitud varukoopia sinu järjehoidjatest ja paroolidest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, DuckDuckGo ei pääse sellele juurde.</string>
+    <string name="sync_intro_enable_content">See loob Kahf turvalises serveris krüptitud varukoopia sinu järjehoidjatest ja paroolidest, mida saab sünkroonida sinu teiste seadmetega. \n\n Krüptimisvõti salvestatakse ainult sinu seadmesse, Kahf ei pääse sellele juurde.</string>
     <string name="sync_intro_enable_footer">Saad hiljem sünkroonida teiste seadmetega.</string>
     <string name="sync_intro_enable_cta">Lülita sünkroonimine ja varundamine sisse</string>
     <string name="sync_intro_recover_title">Taasta sünkroonitud andmed</string>
@@ -61,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">QR-koodi skannimine</string>
-    <string name="connect_screen_scan_qr_hint">Ava teises seadmes DuckDuckGo brauseris <b>Seaded &gt; Sünkroonimine ja varundus</b> ning vali käsk „Sünkrooni teise seadmega“.</string>
+    <string name="connect_screen_scan_qr_hint">Ava teises seadmes Kahf brauseris <b>Seaded &gt; Sünkroonimine ja varundus</b> ning vali käsk „Sünkrooni teise seadmega“.</string>
     <string name="connect_screen_enter_code_cta">Või sisesta kood käsitsi</string>
     <string name="connect_screen_connect_qr_hint_title">Mobiililt mobiilile?</string>
     <string name="connect_screen_connect_qr_hint_content">Sünkroonimiseks skanni see kood teise seadmega.</string>
@@ -69,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Sisesta kood käsitsi</string>
-    <string name="sync_enter_code_hint">Ava teises sünkroonitud seadmes DuckDuckGo rakenduses <b>Seaded &gt; Sünkroonimine ja varundus &gt; Sünkrooni teise seadmega</b>, vali <b>Kuva tekstikood</b> tee ja kleebi kood selle seadme sünkroonimiseks siia.</string>
+    <string name="sync_enter_code_hint">Ava teises sünkroonitud seadmes Kahf rakenduses <b>Seaded &gt; Sünkroonimine ja varundus &gt; Sünkrooni teise seadmega</b>, vali <b>Kuva tekstikood</b> tee ja kleebi kood selle seadme sünkroonimiseks siia.</string>
     <string name="sync_enter_code_verifying">Koodi kontrollimine</string>
     <string name="sync_enter_code_invalid">⚠️ Vale kood</string>
     <string name="sync_enter_code_paste">Kleebi kood</string>
@@ -94,7 +97,7 @@
 
     <string name="synced_devices_section_title">Sünkroonitud seadmed</string>
     <string name="sync_new_device_section_title">Uue seadme sünkroonimine</string>
-    <string name="sync_new_device_hint">Ava teises seadmes DuckDuckGo rakenduses Seaded &gt; Sünkroonimine ja varundus ning skanni, et kohe ühendus luua.</string>
+    <string name="sync_new_device_hint">Ava teises seadmes Kahf rakenduses Seaded &gt; Sünkroonimine ja varundus ning skanni, et kohe ühendus luua.</string>
     <string name="sync_show_text_code_item">Näita tekstikoodi</string>
     <string name="sync_show_qr_code_item">QR-koodi skannimine</string>
     <string name="sync_save_recovery_code_item">Salvesta taastamise PDF</string>
@@ -114,8 +117,8 @@
     <string name="sync_pdf_description">Taastamiskood võimaldab sünkroonida järjehoidjaid mitmes seadmes ja taastada sünkroonitud andmed, kui kaotad juurdepääsu seadmele.</string>
     <string name="sync_code_box_title">Hoia seda teavet kindlas kohas.</string>
     <string name="sync_instructions_title">Kuidas see toimib?</string>
-    <string name="sync_instructions_step1">Ava teises seadmes DuckDuckGo ning ava seadetes käsk Sünkrooni.</string>
-    <string name="sync_instructions_step2">Skanni QR-kood või kopeeri ja kleepi tekstikood teise DuckDuckGo rakendusse.</string>
+    <string name="sync_instructions_step1">Ava teises seadmes Kahf ning ava seadetes käsk Sünkrooni.</string>
+    <string name="sync_instructions_step2">Skanni QR-kood või kopeeri ja kleepi tekstikood teise Kahf rakendusse.</string>
     <string name="sync_instructions_step3">Sünkroonimine aktiveeritakse ja sul on uuesti juurdepääs kõikidele oma andmetele.</string>
     <string name="remove_device_dialog_title">Kas seade eemaldada?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">%1$s ei pääse enam sinu sünkroonitud andmetele juurde.</string>
@@ -139,4 +142,33 @@
     <string name="sync_notification_channel_name">Sünkrooni</string>
     <string name="sync_notify_me_title">Teavitused on välja lülitatud</string>
     <string name="sync_notify_me_description">Saad teavituse, kui sünkroonimisel ja varundamisel tekib mõni tõrge.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Sünkroonimist ja varundamist ei saa välja lülitada.</string>
+    <string name="sync_edit_device_error">Seadme nime ei saa uuendada.</string>
+    <string name="sync_remove_device_error">Seda seadet ei saa sünkroonimisest ja varundamisest eemaldada.</string>
+    <string name="sync_delete_data_error">Serveris olevaid andmeid ei saa kustutada.</string>
+    <string name="sync_login_authenticated_device_error">"Nende seadmete sidumiseks lülitage ühes seadmes välja Sync &amp; Backup ning puudutage siis teises seadmes suvandit „Sünkrooni teise seadmega“."</string>
+    <string name="sync_connect_generic_error">Serveriga ei saa ühendust luua.</string>
+    <string name="sync_connect_login_error">Teise seadmega ei saa sünkroonida.</string>
+    <string name="sync_create_account_generic_error">Serveriga ei saa ühendust luua.</string>
+    <string name="sync_invalid_code_error">Kahjuks on see kood kehtetu. Veenduge, et sisestatud või skaneeritud kood on õige.</string>
+    <string name="sync_recovery_pdf_error">Taaste-PDFi ei saa luua.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Sünkroonimine ja varundamine</string>
+    <string name="sync_encryption_not_supported_error_title">Seadet ei toetata</string>
+    <string name="sync_encryption_not_supported_error">Sync &amp; Backup on otsast lõpuni krüptitud ja peab olema võimeline krüptima ja salvestama andmeid teie seadmes. Kuna teie seade ei toeta krüptitud salvestusruumi, pole Sync &amp; Backup saadaval.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Sync &amp; Backup funktsiooni juurde pääsemiseks avage seade.</string>
+    <string name="sync_biometric_prompt_title">Sync &amp; Backup on lukustatud</string>
+    <string name="sync_require_device_passcode_dialog_title">Funktsiooni Sync &amp; Backup kasutamiseks kindlusta oma seade</string>
+    <string name="sync_require_device_passcode_dialog_body">Seadme lukustusmuster, PIN-kood või biomeetria on vajalik funktsiooni Sync &amp; Backup kasutamiseks.</string>
+    <string name="sync_require_device_passcode_dialog_action">Ava Sätted</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Kas kustutada serveri andmed?</string>
+    <string name="sync_delete_server_data_dialog_content">Kõigi seadmete ühendus katkestatakse ja sinu sünkroonitud andmed kustutatakse serverist.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Andmete kustutamine</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Loobu</string>
 </resources>

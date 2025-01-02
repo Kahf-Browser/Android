@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@
     <string name="sitePermissionsDialogContent">Διαχειριστείτε εκχωρημένα δικαιώματα στις ρυθμίσεις</string>
     <string name="sitePermissionsDialogDenyButton">Απόρριψη</string>
     <string name="sitePermissionsDialogAllowButton">Αποδοχή</string>
-    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στην κάμερα και στο μικρόφωνο</string>
-    <string name="sitePermissionsCameraDeniedSnackBarMessage">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στην κάμερα</string>
-    <string name="sitePermissionsMicDeniedSnackBarMessage">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στο μικρόφωνο</string>
+    <string name="sitePermissionsCameraAndMicDeniedSnackBarMessage">Επιτρέψτε στο Kahf να αιτηθεί πρόσβαση στην κάμερα και στο μικρόφωνο</string>
+    <string name="sitePermissionsCameraDeniedSnackBarMessage">Επιτρέψτε στο Kahf να αιτηθεί πρόσβαση στην κάμερα</string>
+    <string name="sitePermissionsMicDeniedSnackBarMessage">Επιτρέψτε στο Kahf να αιτηθεί πρόσβαση στο μικρόφωνο</string>
     <string name="sitePermissionsDeniedSnackBarAction">Αποδοχή</string>
-    <string name="systemPermissionDialogCameraDeniedTitle">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στην κάμερα της συσκευής αυτής</string>
-    <string name="systemPermissionDialogCameraDeniedContent">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερά σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
-    <string name="systemPermissionDialogAudioDeniedTitle">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στο μικρόφωνο της συσκευής αυτής</string>
-    <string name="systemPermissionDialogAudioDeniedContent">Οι ιστότοποι μπορούν να χρησιμοποιούν το μικρόφωνό σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
-    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Επιτρέψτε στο DuckDuckGo να αιτηθεί πρόσβαση στην κάμερα και στο μικρόφωνο της συσκευής αυτής</string>
-    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερα και το μικρόφωνό σας μόνο εάν επιτρέψετε στο DuckDuckGo να αιτηθεί πρόσβαση.</string>
+    <string name="systemPermissionDialogCameraDeniedTitle">Επιτρέψτε στο Kahf να αιτηθεί πρόσβαση στην κάμερα της συσκευής αυτής</string>
+    <string name="systemPermissionDialogCameraDeniedContent">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερά σας μόνο εάν επιτρέψετε στο Kahf να αιτηθεί πρόσβαση.</string>
+    <string name="systemPermissionDialogAudioDeniedTitle">Επιτρέψτε στο Kahf να αιτηθεί πρόσβαση στο μικρόφωνο της συσκευής αυτής</string>
+    <string name="systemPermissionDialogAudioDeniedContent">Οι ιστότοποι μπορούν να χρησιμοποιούν το μικρόφωνό σας μόνο εάν επιτρέψετε στο Kahf να αιτηθεί πρόσβαση.</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedTitle">Επιτρέψτε στο Kahf να αιτηθεί πρόσβαση στην κάμερα και στο μικρόφωνο της συσκευής αυτής</string>
+    <string name="systemPermissionDialogCameraAndAudioDeniedContent">Οι ιστότοποι μπορούν να χρησιμοποιούν την κάμερα και το μικρόφωνό σας μόνο εάν επιτρέψετε στο Kahf να αιτηθεί πρόσβαση.</string>
     <string name="systemPermissionsDeniedDialogPositiveButton">Άνοιγμα ρυθμίσεων</string>
     <string name="systemPermissionsDeniedDialogNegativeButton">Ακύρωση</string>
 </resources>

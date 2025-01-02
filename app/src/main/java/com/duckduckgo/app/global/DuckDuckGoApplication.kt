@@ -16,14 +16,15 @@
 
 package com.duckduckgo.app.global
 
+import android.os.StrictMode
+import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.safe_gaze.JsDownloadWorker
-import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndHostBlockerWorker
+import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
@@ -37,11 +38,11 @@ import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
-import java.io.File
-import javax.inject.Inject
 import kotlinx.coroutines.*
 import timber.log.Timber
+import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
 
@@ -80,6 +81,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         configureLogging()
         Timber.d("onMainProcessCreate $currentProcessName with pid=${android.os.Process.myPid()}")
 
+        configureStrictMode()
         configureDependencyInjection()
         setupActivityLifecycleCallbacks()
         configureUncaughtExceptionHandler()
@@ -101,6 +103,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
         runInSecondaryProcessNamed(VPN_PROCESS_NAME) {
             configureLogging()
+            configureStrictMode()
             Timber.d("Init for secondary process $shortProcessName with pid=${android.os.Process.myPid()}")
             configureDependencyInjection()
             configureUncaughtExceptionHandler()
@@ -133,23 +136,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     private fun scheduleTasks() {
         val periodicWorkRequest = PeriodicWorkRequest.Builder(
-            SafeGazeBlockListAndHostBlockerWorker::class.java, 7, TimeUnit.DAYS
+            SafeGazeBlockListAndWallpaperWorker::class.java, 1, TimeUnit.DAYS
         ).build()
 
-        val jsDownloadWorkReq = OneTimeWorkRequestBuilder<JsDownloadWorker>().addTag("jsDownloader").build()
+        // val jsDownloadWorkReq = OneTimeWorkRequestBuilder<JsDownloadWorker>().addTag("jsDownloader").build()
 
         val workManager = WorkManager.getInstance(this)
         workManager.apply {
-            enqueue(jsDownloadWorkReq)
+            // enqueue(jsDownloadWorkReq)
             enqueue(periodicWorkRequest)
-        }
-
-        val periodicWorkRequestStatus = workManager.getWorkInfoById(periodicWorkRequest.id).get()
-
-        if (periodicWorkRequestStatus.state == WorkInfo.State.SUCCEEDED) {
-            println("periodicWorkRequestStatus worked")
-        } else if (periodicWorkRequestStatus.state == WorkInfo.State.FAILED) {
-            println("periodicWorkRequestStatus failed")
         }
     }
 
@@ -163,6 +158,20 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             .applicationCoroutineScope(applicationCoroutineScope)
             .build()
         daggerAppComponent.inject(this)
+    }
+
+    private fun configureStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()
+                    .penaltyLog()
+                    .penaltyDropBox()
+                    .build(),
+            )
+        }
     }
 
     // vtodo - Work around for https://crbug.com/558377

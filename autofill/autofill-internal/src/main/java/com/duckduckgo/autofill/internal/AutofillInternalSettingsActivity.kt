@@ -26,13 +26,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillFeature
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource.InternalDevSettings
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.email.EmailManager
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
+import com.duckduckgo.autofill.impl.engagement.store.AutofillEngagementRepository
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.autofill.impl.store.NeverSavedSiteRepository
+import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurveyStore
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -41,6 +44,7 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -83,6 +87,12 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var autofillJavascriptEnvironmentConfiguration: AutofillJavascriptEnvironmentConfiguration
 
+    @Inject
+    lateinit var autofillSurveyStore: AutofillSurveyStore
+
+    @Inject
+    lateinit var engagementRepository: AutofillEngagementRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -96,21 +106,31 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
 
     private fun refreshRemoteConfigSettings() {
         lifecycleScope.launch(dispatchers.io()) {
-            val autofillEnabled = autofillFeature.self().isEnabled()
+            val autofillEnabled = autofillFeature.self()
             val onByDefault = autofillFeature.onByDefault()
+            val canIntegrateAutofill = autofillFeature.canIntegrateAutofillInWebView()
             val canSaveCredentials = autofillFeature.canSaveCredentials()
             val canInjectCredentials = autofillFeature.canInjectCredentials()
             val canGeneratePasswords = autofillFeature.canGeneratePasswords()
             val canAccessCredentialManagement = autofillFeature.canAccessCredentialManagement()
 
             withContext(dispatchers.main()) {
-                binding.autofillTopLevelFeature.setSecondaryText(autofillEnabled.toString())
-                binding.autofillOnByDefaultFeature.setSecondaryText("${onByDefault.isEnabled()} ${onByDefault.getRawStoredState()}")
-                binding.canSaveCredentialsFeature.setSecondaryText(canSaveCredentials.isEnabled().toString())
-                binding.canInjectCredentialsFeature.setSecondaryText(canInjectCredentials.isEnabled().toString())
-                binding.canGeneratePasswordsFeature.setSecondaryText(canGeneratePasswords.isEnabled().toString())
-                binding.canAccessCredentialManagementFeature.setSecondaryText(canAccessCredentialManagement.isEnabled().toString())
+                binding.autofillTopLevelFeature.setSecondaryText(autofillEnabled.description())
+                binding.autofillOnByDefaultFeature.setSecondaryText(onByDefault.description())
+                binding.canIntegrateAutofillWithWebView.setSecondaryText(canIntegrateAutofill.description())
+                binding.canSaveCredentialsFeature.setSecondaryText(canSaveCredentials.description())
+                binding.canInjectCredentialsFeature.setSecondaryText(canInjectCredentials.description())
+                binding.canGeneratePasswordsFeature.setSecondaryText(canGeneratePasswords.description())
+                binding.canAccessCredentialManagementFeature.setSecondaryText(canAccessCredentialManagement.description())
             }
+        }
+    }
+
+    private fun Toggle.description(includeRawState: Boolean = false): String {
+        return if (includeRawState) {
+            "${isEnabled()} ${getRawStoredState()}"
+        } else {
+            isEnabled().toString()
         }
     }
 
@@ -132,6 +152,29 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         configureLoginsUiEventHandlers()
         configureNeverSavedSitesEventHandlers()
         configureAutofillJsConfigEventHandlers()
+        configureSurveyEventHandlers()
+        configureEngagementEventHandlers()
+    }
+
+    private fun configureEngagementEventHandlers() {
+        binding.engagementClearEngagementHistoryButton.setOnClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                engagementRepository.clearData(preserveToday = false)
+                withContext(dispatchers.main()) {
+                    val message = getString(R.string.autofillDevSettingsEngagementHistoryCleared)
+                    Toast.makeText(this@AutofillInternalSettingsActivity, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun configureSurveyEventHandlers() {
+        binding.autofillSurveyResetButton.setOnClickListener {
+            lifecycleScope.launch(dispatchers.io()) {
+                autofillSurveyStore.resetPreviousSurveys()
+            }
+            Toast.makeText(this, getString(R.string.autofillDevSettingsSurveySectionResetted), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun configureNeverSavedSitesEventHandlers() = with(binding) {
@@ -241,7 +284,7 @@ class AutofillInternalSettingsActivity : DuckDuckGoActivity() {
         }
 
         binding.viewSavedLoginsButton.setClickListener {
-            globalActivityStarter.start(this, AutofillSettingsScreenNoParams)
+            globalActivityStarter.start(this, AutofillSettingsScreen(source = InternalDevSettings))
         }
     }
 

@@ -22,15 +22,21 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
+import com.duckduckgo.app.browser.databinding.PopupWindowTabSwitcherBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
-import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.global.events.db.UserEventsStore
@@ -43,16 +49,20 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.Close
 import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsRequest
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.view.button.IconButton
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
 
 @InjectWith(ActivityScope::class)
 class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, CoroutineScope {
@@ -79,9 +89,6 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     lateinit var pixel: Pixel
 
     @Inject
-    lateinit var ctaViewModel: CtaViewModel
-
-    @Inject
     lateinit var faviconManager: FaviconManager
 
     @Inject
@@ -105,16 +112,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private lateinit var tabsRecycler: RecyclerView
     private lateinit var tabGridItemDecorator: TabGridItemDecorator
-    private lateinit var toolbar: Toolbar
+    private lateinit var popupMenu: TabSwitcherPopupMenu
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tab_switcher)
         extractIntentExtras()
         configureViewReferences()
-        setupToolbar(toolbar)
+        setTranslucentStatusBarAndNavBar()
         configureRecycler()
         configureObservers()
+        configureOnBackPressedListener()
+        createPopupMenu()
     }
 
     private fun extractIntentExtras() {
@@ -123,7 +132,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun configureViewReferences() {
         tabsRecycler = findViewById(R.id.tabsRecycler)
-        toolbar = findViewById(R.id.toolbar)
+
+        findViewById<FloatingActionButton>(R.id.fab).setOnClickListener {
+            onNewTabRequested(fromOverflowMenu = false)
+        }
     }
 
     private fun configureRecycler() {
@@ -138,7 +150,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 numberColumns,
                 object : SwipeToCloseTabListener.OnTabSwipedListener {
                     override fun onSwiped(tab: TabEntity) {
-                        onTabDeleted(tab)
+                        onTabDeleted(tab, true)
                     }
                 },
             ),
@@ -150,8 +162,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun configureObservers() {
-        viewModel.tabs.observe(this) {
-            render(it)
+        viewModel.tabs.observe(this) { tabs ->
+            render(tabs)
+
+            val noTabSelected = tabs.none { it.tabId == tabGridItemDecorator.selectedTabId }
+            if (noTabSelected && tabs.isNotEmpty()) {
+                updateTabGridItemDecorator(tabs.last())
+            }
+        }
+        viewModel.activeTab.observe(this) { tab ->
+            if (tab != null && tab.tabId != tabGridItemDecorator.selectedTabId && !tab.deletable) {
+                updateTabGridItemDecorator(tab)
+            }
         }
         viewModel.deletableTabs.observe(this) {
             if (it.isNotEmpty()) {
@@ -160,6 +182,52 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
         viewModel.command.observe(this) {
             processCommand(it)
+        }
+    }
+
+    private fun createPopupMenu() {
+        popupMenu = TabSwitcherPopupMenu(
+            context = this,
+            layoutInflater = layoutInflater,
+        )
+        val menuBinding = PopupWindowTabSwitcherBinding.bind(popupMenu.contentView)
+
+        menuBinding.apply {
+            newTab.setOnClickListener {
+                popupMenu.dismiss()
+                onNewTabRequested(fromOverflowMenu = false)
+            }
+            closeAllTabs.setOnClickListener {
+                popupMenu.dismiss()
+                closeAllTabs()
+            }
+            settings.setOnClickListener {
+                popupMenu.dismiss()
+                showSettings()
+            }
+            downloads.setOnClickListener {
+                popupMenu.dismiss()
+                showDownloads()
+            }
+        }
+
+        findViewById<IconButton>(R.id.btnBack).setOnClickListener {
+            viewModel.onUpButtonPressed()
+            finish()
+        }
+
+        findViewById<IconButton>(R.id.btnNewTab).setOnClickListener {
+            onNewTabRequested(fromOverflowMenu = true)
+        }
+
+        findViewById<IconButton>(R.id.btnMenu).setOnClickListener {
+            menuBinding.closeAllTabs.isVisible = viewModel.tabs.value?.isNotEmpty() == true
+            menuBinding.closeAllTabsDivider.isVisible = viewModel.tabs.value?.isNotEmpty() == true
+
+            popupMenu.show(
+                findViewById(R.id.rootView),
+                findViewById(R.id.btnMenu),
+            )
         }
     }
 
@@ -185,30 +253,26 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_tab_switcher_activity, menu)
-        return true
-    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        Timber.d("ttLog onOptionsItemSelected")
         when (item.itemId) {
-            R.id.newTab, R.id.newTabOverflow -> onNewTabRequested()
+            R.id.newTab -> onNewTabRequested(fromOverflowMenu = false)
+            R.id.newTabOverflow -> onNewTabRequested(fromOverflowMenu = true)
             R.id.closeAllTabs -> closeAllTabs()
             R.id.downloads -> showDownloads()
             R.id.settings -> showSettings()
+            android.R.id.home -> {
+                viewModel.onUpButtonPressed()
+                finish()
+                return true
+            }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        val closeAllTabsMenuItem = menu?.findItem(R.id.closeAllTabs)
-        closeAllTabsMenuItem?.isVisible = viewModel.tabs.value?.isNotEmpty() == true
-        return super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onNewTabRequested() {
+    override fun onNewTabRequested(fromOverflowMenu: Boolean) {
         clearObserversEarlyToStopViewUpdates()
-        launch { viewModel.onNewTabRequested() }
+        launch { viewModel.onNewTabRequested(fromOverflowMenu) }
     }
 
     override fun onTabSelected(tab: TabEntity) {
@@ -222,12 +286,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         tabsRecycler.invalidateItemDecorations()
     }
 
-    override fun onTabDeleted(tab: TabEntity) {
-        launch { viewModel.onMarkTabAsDeletable(tab) }
+    override fun onTabDeleted(tab: TabEntity, deletedBySwipe: Boolean) {
+        launch { viewModel.onMarkTabAsDeletable(tab, deletedBySwipe) }
     }
 
     private fun onDeletableTab(tab: TabEntity) {
-        Snackbar.make(toolbar, getString(R.string.tabClosed), Snackbar.LENGTH_LONG)
+        Snackbar.make(findViewById(R.id.toolbar), getString(R.string.tabClosed), Snackbar.LENGTH_LONG)
             .setDuration(3500) // 3.5 seconds
             .setAction(R.string.tabClosedUndo) {
                 // noop, handled in onDismissed callback
@@ -262,10 +326,12 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     private fun showDownloads() {
         startActivity(DownloadsActivity.intent(this))
+        viewModel.onDownloadsMenuPressed()
     }
 
     private fun showSettings() {
         startActivity(SettingsActivity.intent(this))
+        viewModel.onSettingsMenuPressed()
     }
 
     override fun finish() {
@@ -303,6 +369,18 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
                 },
             )
             .show()
+    }
+
+    private fun configureOnBackPressedListener() {
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    viewModel.onBackButtonPressed()
+                    finish()
+                }
+            },
+        )
     }
 
     companion object {

@@ -5,5 +5,5 @@
     android:viewportHeight="15">
   <path
       android:pathData="M8.373,0.837C9.171,-0.279 10.829,-0.279 11.627,0.837L18.997,11.148C19.944,12.471 18.997,14.311 17.37,14.311H2.63C1.003,14.311 0.056,12.471 1.003,11.148L8.373,0.837Z"
-      android:fillColor="#FAFAFA"/>
+      android:fillColor="?attr/kahfCardBackground"/>
 </vector>

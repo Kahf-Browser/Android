@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,24 +19,27 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje trenutačno nisu dostupni. Pokušaj ponovno nešto kasnije.</string>
-    <string name="sync_flows_disabled_new_version"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje više nisu dostupni u ovoj verziji aplikacije. Za nastavak, ažuriraj DuckDuckGo na najnoviju verziju.</string>
+    <string name="sync_flows_disabled_new_version"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje više nisu dostupni u ovoj verziji aplikacije. Za nastavak, ažuriraj Kahf na najnoviju verziju.</string>
     <string name="sync_create_account_disabled"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje trenutačno nisu dostupni. Pokušaj ponovno nešto kasnije.</string>
-    <string name="sync_create_account_disabled_new_version"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje više nisu dostupni u ovoj verziji aplikacije. Za nastavak ažuriraj DuckDuckGo na najnoviju verziju.</string>
+    <string name="sync_create_account_disabled_new_version"><b>Sinkronizacija i sigurnosno kopiranje nisu dostupni</b>\nNažalost, sinkronizacija i sigurnosno kopiranje više nisu dostupni u ovoj verziji aplikacije. Za nastavak ažuriraj Kahf na najnoviju verziju.</string>
     <string name="sync_disabled_authenticated_user"><b>Sinkronizacija i sigurnosno kopiranje pauzirani</b>\nŽao nam je, ali sinkronizacija i sigurnosno kopiranje trenutačno nisu dostupni. Pokušaj ponovno nešto kasnije.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>Sinkronizacija i sigurnosno kopiranje pauzirani</b>\nŽao nam je, ali sinkronizacija i sigurnosno kopiranje više nisu dostupni u ovoj verziji aplikacije. Za nastavak ažuriraj DuckDuckGo na najnoviju verziju.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>Sinkronizacija i sigurnosno kopiranje pauzirani</b>\nŽao nam je, ali sinkronizacija i sigurnosno kopiranje više nisu dostupni u ovoj verziji aplikacije. Za nastavak ažuriraj Kahf na najnoviju verziju.</string>
     <string name="sync_paused_notification"><b>Sinkronizacija i sigurnosno kopiranje su pauzirani</b>\nNažalost, sinkronizacija i sigurnosno kopiranje trenutačno nisu dostupni. Pokušaj ponovno nešto kasnije.</string>
+    <string name="sync_error_notification"><b>Pogreška u sinkronizaciji</b>\nZnačajka Sync &amp; Backup privremeno je nedostupna.</string>
+    <string name="sync_error_warning"><b>Pogreška u sinkronizaciji</b>\nZnačajka Sync &amp; Backup privremeno je nedostupna.</string>
+    <string name="sync_signed_out_notification"><b>Sinkronizacija je pauzirana</b>\nSinkronizacija je pauzirana. Ako želiš nastaviti sinkronizirati ovaj uređaj, ponovno se poveži pomoću drugog uređaja ili šifre za oporavak.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Sinkronizacija i sigurnosno kopiranje</string>
     <string name="sync_setup_begin_syncing">Započni sinkronizaciju</string>
     <string name="sync_setup_with_another_device_cta_title">Sinkronizacija s drugim uređajem</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Sigurno sinkroniziraj oznake i lozinke između svojih uređaja.</string>
-    <string name="sync_off_hint">Tvoji su podaci šifrirani od početka do kraja, a DuckDuckGo nema pristup ključu za šifriranje.</string>
+    <string name="sync_off_hint">Tvoji su podaci šifrirani od početka do kraja, a Kahf nema pristup ključu za šifriranje.</string>
     <string name="sync_setup_single_device_title">Postavljanje jednog uređaja</string>
     <string name="sync_setup_single_recover_data_cta_title">Oporavak sinkroniziranih podataka</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Sinkroniziraj i izradi sigurnosnu kopiju ovog uređaja</string>
 
-    <string name="sync_off_encrypted_hint">Tvoji su podaci šifrirani od početka do kraja, a DuckDuckGo nema pristup ključu za šifriranje.</string>
+    <string name="sync_off_encrypted_hint">Tvoji su podaci šifrirani od početka do kraja, a Kahf nema pristup ključu za šifriranje.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Postavljanje sinkronizacije i sigurnosnog kopiranja!</string>
@@ -46,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">Automatski preuzmi ikone za sinkronizirane oznake.</string>
     <string name="sync_enable_connecting">Povezivanje u tijeku...</string>
     <string name="sync_intro_enable_title">Sinkroniziraj i izradi sigurnosnu kopiju ovog uređaja</string>
-    <string name="sync_intro_enable_content">Time se stvara šifrirana sigurnosna kopija tvojih oznaka i lozinki na sigurnom poslužitelju DuckDuckGo, koja se može sinkronizirati s tvojim drugim uređajima. \n\n Ključ za šifriranje pohranjen je samo na tvom uređaju, DuckDuckGo mu ne može pristupiti.…</string>
+    <string name="sync_intro_enable_content">Time se stvara šifrirana sigurnosna kopija tvojih oznaka i lozinki na sigurnom poslužitelju Kahf, koja se može sinkronizirati s tvojim drugim uređajima. \n\n Ključ za šifriranje pohranjen je samo na tvom uređaju, Kahf mu ne može pristupiti.…</string>
     <string name="sync_intro_enable_footer">Kasnije možeš sinkronizirati s drugim uređajima.</string>
     <string name="sync_intro_enable_cta">Uključi sinkronizaciju i sigurnosno kopiranje</string>
     <string name="sync_intro_recover_title">Oporavak sinkroniziranih podataka</string>
@@ -61,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">Skeniraj QR kôd</string>
-    <string name="connect_screen_scan_qr_hint">Idi na <b>Postavke &gt; Sinkronizacija i sigurnosno kopiranje</b> u pregledniku DuckDuckGo na drugom uređaju i odaberi \"Sinkroniziraj s drugim uređajem\".</string>
+    <string name="connect_screen_scan_qr_hint">Idi na <b>Postavke &gt; Sinkronizacija i sigurnosno kopiranje</b> u pregledniku Kahf na drugom uređaju i odaberi \"Sinkroniziraj s drugim uređajem\".</string>
     <string name="connect_screen_enter_code_cta">Ili ručno unesi šifru</string>
     <string name="connect_screen_connect_qr_hint_title">S mobilnog uređaja na mobilni uređaj?</string>
     <string name="connect_screen_connect_qr_hint_content">Skeniraj ovaj kôd drugim uređajem za sinkronizaciju.</string>
@@ -69,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Ručno unesi šifru</string>
-    <string name="sync_enter_code_hint">Idi na <b>Postavke &gt; Sinkronizacija i sigurnosno kopiranje &gt; Sinkronizacija s drugim uređajem</b> i odaberi <b>Prikaz tekstne šifre</b> u aplikaciji DuckDuckGo na drugom sinkroniziranom uređaju i tamo zalijepi šifru za sinkroniziranje ovog uređaja.</string>
+    <string name="sync_enter_code_hint">Idi na <b>Postavke &gt; Sinkronizacija i sigurnosno kopiranje &gt; Sinkronizacija s drugim uređajem</b> i odaberi <b>Prikaz tekstne šifre</b> u aplikaciji Kahf na drugom sinkroniziranom uređaju i tamo zalijepi šifru za sinkroniziranje ovog uređaja.</string>
     <string name="sync_enter_code_verifying">Potvrda šifre u tijeku</string>
     <string name="sync_enter_code_invalid">⚠️ Šifra nije valjana</string>
     <string name="sync_enter_code_paste">Zalijepi šifru</string>
@@ -94,7 +97,7 @@
 
     <string name="synced_devices_section_title">Sinkronizirani uređaji</string>
     <string name="sync_new_device_section_title">Sinkroniziraj novi uređaj</string>
-    <string name="sync_new_device_hint">Idi na Postavke › Sinkronizacija i sigurnosno kopiranje u aplikaciji DuckDuckGo na drugom uređaju i skeniraj za trenutno povezivanje.</string>
+    <string name="sync_new_device_hint">Idi na Postavke › Sinkronizacija i sigurnosno kopiranje u aplikaciji Kahf na drugom uređaju i skeniraj za trenutno povezivanje.</string>
     <string name="sync_show_text_code_item">Pokaži tekstnu šifru</string>
     <string name="sync_show_qr_code_item">Skeniraj QR kôd</string>
     <string name="sync_save_recovery_code_item">Spremi PDF za oporavak</string>
@@ -114,8 +117,8 @@
     <string name="sync_pdf_description">Šifra za oporavak omogućuje ti sinkronizaciju oznaka na više uređaja i oporavak sinkroniziranih podataka ako izgubiš pristup uređaju.</string>
     <string name="sync_code_box_title">Čuvaj ove podatke na sigurnom.</string>
     <string name="sync_instructions_title">Kako to funkcionira?</string>
-    <string name="sync_instructions_step1">Otvori DuckDuckGo na drugom uređaju i idi na Sinkronizaciju u Postavkama.</string>
-    <string name="sync_instructions_step2">Skeniraj QR kod ili kopiraj i zalijepi tekstualnu šifru u drugu aplikaciju DuckDuckGo.</string>
+    <string name="sync_instructions_step1">Otvori Kahf na drugom uređaju i idi na Sinkronizaciju u Postavkama.</string>
+    <string name="sync_instructions_step2">Skeniraj QR kod ili kopiraj i zalijepi tekstualnu šifru u drugu aplikaciju Kahf.</string>
     <string name="sync_instructions_step3">Sinkronizacija će se aktivirati i opet ćeš imati pristup svim svojim podacima.</string>
     <string name="remove_device_dialog_title">Želiš li ukloniti uređaj?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">\"%1$s\" više neće moći pristupiti tvojim sinkroniziranim podacima.</string>
@@ -139,4 +142,33 @@
     <string name="sync_notification_channel_name">Sinkronizacija</string>
     <string name="sync_notify_me_title">Obavijesti su onemogućene</string>
     <string name="sync_notify_me_description">Primi obavijest u slučaju da Sinkronizacija i sigurnosno kopiranje nailazi na pogrešku.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Nije moguće isključiti Sinkronizaciju i sigurnosno kopiranje.</string>
+    <string name="sync_edit_device_error">Nije moguće ažurirati naziv uređaja.</string>
+    <string name="sync_remove_device_error">Nije moguće ukloniti ovaj uređaj iz Sinkronizacije i sigurnosnog kopiranja.</string>
+    <string name="sync_delete_data_error">Nije moguće izbrisati podatke na poslužitelju.</string>
+    <string name="sync_login_authenticated_device_error">"Za uparivanje tih uređaja, isključi opciju Sync &amp; Backup na jednom uređaju, a zatim dodirni \"Sinkroniziraj s drugim uređajem\" (Sync with Another Device) na drugom uređaju."</string>
+    <string name="sync_connect_generic_error">Nije moguće spojiti se na poslužitelj.</string>
+    <string name="sync_connect_login_error">Nije moguće sinkronizirati s drugim uređajem.</string>
+    <string name="sync_create_account_generic_error">Nije moguće spojiti se na poslužitelj.</string>
+    <string name="sync_invalid_code_error">Nažalost, ovaj je kôd nevažeći. Provjeri je li unesen ili skeniran točan kôd.</string>
+    <string name="sync_recovery_pdf_error">Nije moguće izraditi PDF za oporavak.</string>
+    <string name="sync_dialog_error_ok">U redu</string>
+    <string name="sync_dialog_error_title">Sinkronizacija i sigurnosno kopiranje</string>
+    <string name="sync_encryption_not_supported_error_title">Uređaj nije podržan</string>
+    <string name="sync_encryption_not_supported_error">Opcija Sync &amp; Backup šifrirana je metodom \"od kraja do kraja\" (end-to-end) i mora biti u mogućnosti šifrirati i pohranjivati podatke na uređaju. Budući da tvoj uređaj ne podržava šifriranu pohranu, Sync &amp; Backup, tj. sinkronizacija i sigurnosno kopiranje nisu dostupni.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Otključaj uređaj za pristup opciji Sync &amp; Backup.</string>
+    <string name="sync_biometric_prompt_title">Opcija Sync &amp; Backup je zaključana</string>
+    <string name="sync_require_device_passcode_dialog_title">Zaštiti svoj uređaj za korištenje značajke Sync &amp; Backup</string>
+    <string name="sync_require_device_passcode_dialog_body">Za korištenje Sync &amp; Backupa potreban je uzorak za zaključavanje uređaja, PIN ili biometrija.</string>
+    <string name="sync_require_device_passcode_dialog_action">Idi na Postavke</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Izbrisati podatke poslužitelja?</string>
+    <string name="sync_delete_server_data_dialog_content">Svi uređaji bit će isključeni i tvoji sinkronizirani podaci bit će izbrisani s poslužitelja.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Izbriši podatke</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Odustani</string>
 </resources>

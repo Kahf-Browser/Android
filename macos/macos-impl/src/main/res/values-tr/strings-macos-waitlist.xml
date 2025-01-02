@@ -17,13 +17,13 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="macos_app">Mac için DuckDuckGo Uygulaması</string>
-    <string name="macos_title">Mac için DuckDuckGo\'yu edinin!</string>
+    <string name="macos_app">Mac için Kahf Uygulaması</string>
+    <string name="macos_title">Mac için Kahf\'yu edinin!</string>
 
     <string name="macos_share_title">Bağlantıyı paylaş</string>
-    <string name="macos_description_text">Mac için DuckDuckGo, ihtiyacınız olan hız ve beklediğiniz tarama özelliklerinin yanı sıra sınıfındaki en iyi gizlilik özelliklerini (Privacy Essentials) sunuyor.\n\nMac cihazınızda şu adrese gidin:</string>
-    <string name="macos_description_link">duckduckgo.com/mac</string>
-    <string name="macos_share_text">Mac\'te gizliliğinizi koruyarak gezinmeye hazır mısınız?\n\nİndirmek için Mac\'inizde bu URL\'yi ziyaret edin:\nhttps://duckduckgo.com/mac</string>
+    <string name="macos_description_text">Mac için Kahf, ihtiyacınız olan hız ve beklediğiniz tarama özelliklerinin yanı sıra sınıfındaki en iyi gizlilik özelliklerini (Privacy Essentials) sunuyor.\n\nMac cihazınızda şu adrese gidin:</string>
+    <string name="macos_description_link">kahfbrowser.com/mac</string>
+    <string name="macos_share_text">Mac\'te gizliliğinizi koruyarak gezinmeye hazır mısınız?\n\nİndirmek için Mac\'inizde bu URL\'yi ziyaret edin:\nhttps://kahfbrowser.com/mac</string>
 
     <string name="macos_waitlist_windows_link">Windows Sürümünü mü arıyorsunuz?</string>
     <string name="macos_waitlist_footer">Bekleme listesine katılmak için kişisel bilgilerinizi paylaşmanız gerekmez. Yerinizi yalnızca cihazınıza yerleştirilen bir zaman damgası ile güvence altına alacaksınız. Böylece sıranız geldiğinde sizi bilgilendirebiliriz.</string>

@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.webkit.WebResourceRequest
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.lifecycle.Lifecycle.State.STARTED
@@ -35,8 +34,6 @@ import com.duckduckgo.browser.api.brokensite.BrokenSiteNav
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.webview.enableDarkMode
-import com.duckduckgo.common.utils.webview.enableLightMode
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
@@ -85,7 +82,7 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
                 holder = webView,
                 onPrivacyProtectionSettingChanged = { userChangedValues -> if (userChangedValues) finish() },
                 onPrivacyProtectionsClicked = { newValue ->
-                    viewModel.onPrivacyProtectionsClicked(newValue)
+                    viewModel.onPrivacyProtectionsClicked(newValue, dashboardOpenedFromCustomTab())
                 },
                 onUrlClicked = { payload ->
                     viewModel.onUrlClicked(payload)
@@ -152,7 +149,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         with(webView.settings) {
             builtInZoomControls = false
             javaScriptEnabled = true
-            configureDarkThemeSupport(this)
         }
 
         webView.webViewClient = object : WebViewClient() {
@@ -181,13 +177,6 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun configureDarkThemeSupport(webSettings: WebSettings) {
-        when (appTheme.isLightModeEnabled()) {
-            true -> webSettings.enableLightMode()
-            false -> webSettings.enableDarkMode()
-        }
-    }
-
     private fun configViewStateObserver() {
         lifecycleScope.launch {
             viewModel.viewState()
@@ -206,5 +195,10 @@ class PrivacyDashboardHybridActivity : DuckDuckGoActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    private fun dashboardOpenedFromCustomTab(): Boolean {
+        val tabIdParam = intent.getActivityParams(PrivacyDashboardHybridWithTabIdParam::class.java)?.tabId
+        return tabIdParam?.startsWith("CustomTab-") ?: false
     }
 }
