@@ -17,8 +17,6 @@
 package com.duckduckgo.autofill.impl.ui.credential.management
 
 import android.os.Bundle
-import android.system.Os.remove
-import android.text.TextUtils.replace
 import android.view.WindowManager
 import androidx.core.view.isVisible
 import androidx.fragment.app.commit
@@ -29,9 +27,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenDirectlyViewCredentialsParams
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenNoParams
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreenShowSuggestionsForSiteParams
+import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.databinding.ActivityAutofillSettingsBinding
@@ -80,7 +79,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AutofillSettingsScreenNoParams::class)
+@ContributeToActivityStarter(AutofillSettingsScreen::class)
 @ContributeToActivityStarter(AutofillSettingsScreenShowSuggestionsForSiteParams::class)
 @ContributeToActivityStarter(AutofillSettingsScreenDirectlyViewCredentialsParams::class)
 class AutofillManagementActivity : DuckDuckGoActivity() {
@@ -109,11 +108,25 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun sendLaunchPixel(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
-            val mode = extractViewMode()
-            val launchedFromBrowser = (mode is ViewMode.ListModeWithSuggestions)
-            val directLinkToCredentials = mode is ViewMode.CredentialMode
-            viewModel.sendLaunchPixel(launchedFromBrowser, directLinkToCredentials)
+            viewModel.sendLaunchPixel(extractLaunchSource())
         }
+    }
+
+    private fun extractLaunchSource(): AutofillSettingsLaunchSource {
+        intent.getActivityParams(AutofillSettingsScreenShowSuggestionsForSiteParams::class.java)?.let {
+            return it.source
+        }
+
+        intent.getActivityParams(AutofillSettingsScreenDirectlyViewCredentialsParams::class.java)?.let {
+            return it.source
+        }
+
+        intent.getActivityParams(AutofillSettingsScreen::class.java)?.let {
+            return it.source
+        }
+
+        // default if nothing else matches
+        return AutofillSettingsLaunchSource.Unknown
     }
 
     override fun onStart() {
@@ -133,8 +146,8 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
 
     private fun setupInitialState() {
         when (val mode = extractViewMode()) {
-            is ViewMode.ListMode -> viewModel.onShowListMode()
-            is ViewMode.ListModeWithSuggestions -> viewModel.onShowListMode()
+            is ViewMode.ListMode -> viewModel.onInitialiseListMode()
+            is ViewMode.ListModeWithSuggestions -> viewModel.onInitialiseListMode()
             is ViewMode.CredentialMode -> viewModel.onViewCredentials(mode.loginCredentials)
         }
     }
@@ -252,7 +265,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
         if (credentialModeLaunchedDirectly()) {
             finish()
         } else {
-            viewModel.onShowListMode()
+            viewModel.onReturnToListModeFromCredentialMode()
         }
     }
 
@@ -339,7 +352,7 @@ class AutofillManagementActivity : DuckDuckGoActivity() {
                 if (credentialModeLaunchedDirectly()) {
                     finish()
                 } else {
-                    viewModel.onShowListMode()
+                    viewModel.onReturnToListModeFromCredentialMode()
                 }
             }
 

@@ -17,9 +17,9 @@
 package com.duckduckgo.autoconsent.impl.remoteconfig
 
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeatureModels.AutoconsentSettings
-import com.duckduckgo.autoconsent.store.AutoconsentDao
-import com.duckduckgo.autoconsent.store.AutoconsentDatabase
-import com.duckduckgo.autoconsent.store.DisabledCmpsEntity
+import com.duckduckgo.autoconsent.impl.store.AutoconsentDao
+import com.duckduckgo.autoconsent.impl.store.AutoconsentDatabase
+import com.duckduckgo.autoconsent.impl.store.DisabledCmpsEntity
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -52,14 +52,14 @@ class RealAutoconsentFeatureSettingsRepositoryTest {
     fun whenRepositoryIsCreatedThenExceptionsLoadedIntoMemory() {
         givenDaoContainsDisabledCmps()
 
-        repository = RealAutoconsentFeatureSettingsRepository(TestScope(), coroutineRule.testDispatcherProvider, mockDatabase)
+        repository = RealAutoconsentFeatureSettingsRepository(TestScope(), coroutineRule.testDispatcherProvider, mockDatabase, isMainProcess = true)
 
         assertEquals(disabledCmpName, repository.disabledCMPs.first())
     }
 
     @Test
     fun whenUpdateAllThenUpdateAllCalled() = runTest {
-        repository = RealAutoconsentFeatureSettingsRepository(TestScope(), coroutineRule.testDispatcherProvider, mockDatabase)
+        repository = RealAutoconsentFeatureSettingsRepository(TestScope(), coroutineRule.testDispatcherProvider, mockDatabase, isMainProcess = true)
 
         repository.updateAllSettings(AutoconsentSettings(listOf()))
 
@@ -69,7 +69,7 @@ class RealAutoconsentFeatureSettingsRepositoryTest {
     @Test
     fun whenUpdateAllThenPreviousExceptionsAreCleared() = runTest {
         givenDaoContainsDisabledCmps()
-        repository = RealAutoconsentFeatureSettingsRepository(TestScope(), coroutineRule.testDispatcherProvider, mockDatabase)
+        repository = RealAutoconsentFeatureSettingsRepository(TestScope(), coroutineRule.testDispatcherProvider, mockDatabase, isMainProcess = true)
 
         assertEquals(1, repository.disabledCMPs.size)
 

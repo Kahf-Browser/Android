@@ -47,6 +47,7 @@ class RealSavedSitesRepository(
     private val savedSitesEntitiesDao: SavedSitesEntitiesDao,
     private val savedSitesRelationsDao: SavedSitesRelationsDao,
     private val favoritesDelegate: FavoritesDelegate,
+    private val relationsReconciler: RelationsReconciler,
     private val dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
 ) : SavedSitesRepository {
 
@@ -274,8 +275,9 @@ class RealSavedSitesRepository(
     override fun getBookmarkById(id: String): Bookmark? {
         val bookmark = savedSitesEntitiesDao.entityById(id)
         return if (bookmark != null) {
+            val isFavourite = getFavoriteById(id)
             savedSitesRelationsDao.relationByEntityId(bookmark.entityId)?.let {
-                bookmark.mapToBookmark(it.folderId)
+                bookmark.mapToBookmark(it.folderId, isFavourite != null)
             }
         } else {
             null
@@ -507,7 +509,11 @@ class RealSavedSitesRepository(
         folderId: String,
         entities: List<String>,
     ) {
-        savedSitesRelationsDao.replaceBookmarkFolder(folderId, entities)
+        val reconciledList = relationsReconciler.reconcileRelations(
+            originalRelations = savedSitesRelationsDao.relationsByFolderId(folderId).map { it.entityId },
+            newFolderRelations = entities,
+        )
+        savedSitesRelationsDao.replaceBookmarkFolder(folderId, reconciledList)
     }
 
     override fun getFolder(folderId: String): BookmarkFolder? {
@@ -580,8 +586,8 @@ class RealSavedSitesRepository(
         favoritesDelegate.updateWithPosition(favorites)
     }
 
-    private fun Entity.mapToBookmark(relationId: String): Bookmark =
-        Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId, this.lastModified, deleted = this.deletedFlag())
+    private fun Entity.mapToBookmark(relationId: String, isFavourite: Boolean = false): Bookmark =
+        Bookmark(this.entityId, this.title, this.url.orEmpty(), relationId, this.lastModified, deleted = this.deletedFlag(), isFavorite = isFavourite)
 
     private fun Entity.mapToBookmarkFolder(relationId: String): BookmarkFolder =
         BookmarkFolder(

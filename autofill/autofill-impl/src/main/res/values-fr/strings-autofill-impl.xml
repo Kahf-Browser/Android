@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Configurer dans les paramètres</b></string>
 
     <string name="saveLoginDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Enregistrer le mot de passe</string>
     <string name="saveLoginDialogNotNow">Ne pas enregistrer</string>
-    <string name="saveLoginDialogTitle">Voulez-vous que DuckDuckGo enregistre votre mot de passe ?</string>
+    <string name="saveLoginDialogTitle">Voulez-vous que Kahf enregistre votre mot de passe ?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Plus d\'options</string>
 
     <string name="useSavedLoginDialogTitle">Utiliser un mot de passe enregistré ?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Modifier le nom d\'utilisateur</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Mettre à jour le mot de passe pour \n%1$s ?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo mettra à jour ce mot de passe enregistré sur votre appareil.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf mettra à jour ce mot de passe enregistré sur votre appareil.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Fermer la boîte de dialogue de saisie automatique</string>
 
@@ -56,17 +56,23 @@
 
     <string name="credentialManagementSuggestionsLabel">Suggéré</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">La saisie automatique des mots de passe n\'est pas disponible car votre version d\'Android WebView est trop ancienne.</string>
+
     <string name="autofillManagementSearchClearDescription">Effacer la recherche</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Aucun résultat pour « %1$s »</string>
 
     <string name="autofillDeleteLoginDialogCancel">Annuler</string>
     <string name="autofillDeleteLoginDialogDelete">Supprimer</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Nom d\'utilisateur copié</string>
     <string name="autofillManagementPasswordCopied">Mot de passe copié</string>
 
-    <string name="autofill_password_generation_offer_title">Utiliser un mot de passe fort généré par DuckDuckGo ?</string>
+    <string name="autofill_password_generation_offer_title">Utiliser un mot de passe fort généré par Kahf ?</string>
     <string name="autofill_password_generation_offer_accept">Utiliser un mot de passe fort</string>
     <string name="autofill_password_generation_offer_decline">Créer le mien</string>
 
@@ -120,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Les mots de passe sont stockés en toute sécurité sur votre appareil.</string>
     <string name="autofillManagementAddLogin">Ajouter un mot de passe</string>
     <string name="credentialManagementEditLoginTitleHint">Titre</string>
-    <string name="autofillDeleteLoginDialogTitle">Voulez-vous vraiment supprimer ce mot de passe ?</string>
     <string name="autofillManagementDeletedConfirmation">Le mot de passe a été supprimé</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Dernière modification : %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Voulez-vous continuer à enregistrer vos mots de passe ?</string>
@@ -133,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Un schéma de verrouillage de l\'appareil, un code PIN ou des données biométriques sont nécessaires pour protéger vos mots de passe.</string>
     <string name="credentialManagementEditTitle">Modifier le mot de passe</string>
 
-    <string name="credentials_limit_warning"><b>Synchronisation suspendue</b>\nLimite d\'identifiants dépassée. Supprimez-en quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_logins">Gérer les identifiants</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nVous avez dépassé la limite de synchronisation des mots de passe. Veuillez en supprimer quelques-uns pour pouvoir sauvegarder vos mots de passe.</string>
+    <string name="credentials_limit_warning"><b>Synchronisation suspendue</b>\nVous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation.\n\n<annotation type="manage_logins">Gérer les mots de passe</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nVous avez atteint le nombre maximal de mots de passe. Veuillez en supprimer quelques-uns pour reprendre la synchronisation.</string>
+    <string name="credentials_invalid_request_warning"><b>Synchronisation suspendue</b>\nCertains mots de passe sont mal formatés ou trop longs et n\'ont pas été synchronisés.\n\n<annotation type="manage_logins">Gérer les mots de passe</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>La synchronisation des mots de passe est suspendue</b>\nCertains mots de passe sont mal formatés ou trop longs et n\'ont pas été synchronisés.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Ne jamais demander pour ce site</string>
     <string name="credentialManagementInstructionNeverForThisSite">Si vous réinitialisez les sites exclus, vous serez invité(e) à enregistrer votre mot de passe lors de votre prochaine connexion à l\'un de ces sites.</string>
@@ -144,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Annuler</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Supprimer tous les mots de passe</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Voulez-vous vraiment supprimer %1$d mot de passe ?</item>
-        <item quantity="other">Voulez-vous vraiment supprimer %1$d mots de passe ?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Votre mot de passe sera supprimé de tous les appareils synchronisés. Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Vos mots de passe seront supprimés de tous les appareils synchronisés. Assurez-vous d\'avoir toujours un moyen d\'accéder à vos comptes.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d mot de passe supprimé</item>
@@ -159,5 +159,36 @@
 
     <string name="autofill_auth_text_for_delete_all">Authentifiez-vous pour confirmer que vous souhaitez supprimer tous les mots de passe</string>
     <string name="autofill_title_text_for_delete_all">Supprimer tous les mots de passe</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Votre mot de passe pour %1$s ne peut pas être synchronisé car l\'un de ses champs dépasse la limite de caractères.</item>
+        <item quantity="other">Vos mots de passe pour %1$s et %2$d autres sites ne peuvent pas être synchronisés car certains de leurs champs dépassent la limite de caractères.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Gérer les mots de passe</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Votre mot de passe sera supprimé de cet appareil.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural"  tools:ignore="ImpliedQuantity">
+        <item quantity="one">Votre mot de passe sera supprimé de cet appareil.</item>
+        <item quantity="other">Vos mots de passe seront supprimés de cet appareil.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Votre mot de passe sera supprimé de tous les appareils synchronisés.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="one">Votre mot de passe sera supprimé de tous les appareils synchronisés.</item>
+        <item quantity="other">Vos mots de passe seront supprimés de tous les appareils synchronisés.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Voulez-vous vraiment supprimer ce mot de passe ?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Voulez-vous vraiment supprimer %1$d mot de passe ?</item>
+        <item quantity="other">Voulez-vous vraiment supprimer %1$d mots de passe ?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="MissingQuantity,ImpliedQuantity">
+        <item quantity="one">Assurez-vous d\'avoir toujours un moyen d\'accéder à votre compte.</item>
+        <item quantity="other">Assurez-vous d\'avoir toujours un moyen d\'accéder à vos comptes.</item>
+    </plurals>
 
 </resources>

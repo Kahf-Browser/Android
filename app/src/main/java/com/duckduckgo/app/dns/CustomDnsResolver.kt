@@ -1,26 +1,31 @@
 package com.duckduckgo.app.dns
 
+import android.content.SharedPreferences
 import androidx.core.net.toUri
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsParam
+import com.duckduckgo.app.analytics.AnalyticsService
+import com.duckduckgo.app.dns.socket_pool.SocketHelper
+import com.duckduckgo.app.kahftube.PrivateDnsLevel
 import com.duckduckgo.common.utils.DispatcherProvider
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_IP
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_WITH_DOT
+import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
+import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import okhttp3.Dns
 import org.xbill.DNS.DClass
 import org.xbill.DNS.Message
+import org.xbill.DNS.Name
 import org.xbill.DNS.Record
 import org.xbill.DNS.Section
 import org.xbill.DNS.Type
 import timber.log.Timber
 import java.io.IOException
+import java.net.InetAddress
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 data class CachedDnsResponse(
     val message: Message,
@@ -29,120 +34,183 @@ data class CachedDnsResponse(
     fun isExpired() = System.currentTimeMillis() > expirationTimeMillis
 }
 
-class CustomDnsResolver(private val dispatcher: DispatcherProvider) {
-    private val dohServerUrl = "https://sp-dns-doh.kahfguard.com/dns-query"
+class CustomDnsResolver(
+    private val dispatcher: DispatcherProvider,
+    private val analytics: AnalyticsService,
+    sharedPreferences: SharedPreferences
+) : Dns {
+    private var privateDns: PrivateDnsLevel
+    private var socketHelper: SocketHelper
+    private val resolutionTimes = mutableListOf<Long>()
 
-    private val client = OkHttpClient()
-    private val cache = ConcurrentHashMap<String, CachedDnsResponse>()
-
-    suspend fun sendDnsQueries(domain: android.net.Uri): String? {
-        val host = domain.host?.plus(".") ?: return null // trailing dot to make absolute URL
-
-        return checkCacheAndSendRequest(host, Type.A, createDnsQuery(host, Type.A), mutableSetOf())
-            ?: checkCacheAndSendRequest(host, Type.AAAA, createDnsQuery(host, Type.AAAA), mutableSetOf())
-            ?: checkCacheAndSendRequest(host, Type.CNAME, createDnsQuery(host, Type.CNAME), mutableSetOf())
+    companion object {
+        private const val MAX_RETRY = 2
+        private val cache = ConcurrentHashMap<String, CachedDnsResponse>()
     }
 
-    private suspend fun checkCacheAndSendRequest(
-        domain: String,
-        recordType: Int,
-        queryData: ByteArray,
-        visitedDomains: MutableSet<String>
-    ): String? {
-        val cacheKey = "$domain-$recordType"
-        cache[cacheKey]?.takeUnless { it.isExpired() }?.let { cachedResponse ->
-            Timber.d("ipLog Cache hit!")
-            return getDnsResponse(cachedResponse.message, visitedDomains)
-        }
+    init {
+        val currentMode = sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: KAHF_GUARD_DEFAULT
+        privateDns = PrivateDnsLevel.get(currentMode)
 
-        return sendDoHRequest(queryData, recordType, domain, visitedDomains)
-    }
-
-    private fun createDnsQuery(domain: String, type: Int): ByteArray {
-        val name = org.xbill.DNS.Name.fromString(domain, org.xbill.DNS.Name.root)
-        val record = Record.newRecord(name, type, DClass.IN)
-        val query = Message.newQuery(record)
-
-        return query.toWire()
-    }
-
-    private suspend fun sendDoHRequest(
-        queryData: ByteArray,
-        recordType: Int,
-        domain: String,
-        visitedDomains: MutableSet<String>
-    ): String? {
-        val request = Request.Builder()
-            .url(dohServerUrl)
-            .addHeader("Content-Type", "application/dns-message")
-            .addHeader("Accept", "application/dns-message")
-            .post(queryData.toRequestBody("application/dns-message".toMediaTypeOrNull())) // Simplified request body
-            .build()
-
-        return suspendCoroutine { continuation ->
-            client.newCall(request).enqueue(object : Callback {
-                override fun onFailure(call: Call, e: IOException) {
-                    Timber.e(e)
-                    continuation.resume(null)
-                }
-
-                override fun onResponse(call: Call, response: Response) {
-                    if (response.isSuccessful) {
-                        response.body?.bytes()?.let { responseBytes ->
-                            val responseMessage = Message(responseBytes)
-                            cacheDnsResponse(domain, recordType, responseMessage)
-
-                            CoroutineScope(dispatcher.io()).launch {
-                                val dnsResponse = getDnsResponse(responseMessage, visitedDomains)
-                                continuation.resume(dnsResponse)
-                            }
-                        } ?: continuation.resume(null)
-                    } else {
-                        continuation.resume(null)
-                        Timber.e("DoH query failed with status code ${response.code}")
-                    }
-                }
-            })
+        runBlocking {
+            socketHelper = SocketHelper.getInstance(privateDns.dnsServerIps.random(), 853, privateDns.url)
         }
     }
 
-    private suspend fun getDnsResponse(responseMessage: Message, visitedDomains: MutableSet<String>): String? {
-        val answers = responseMessage.getSection(Section.ANSWER)
-        val results = mutableListOf<String?>()
+    override fun lookup(hostname: String): List<InetAddress> {
+        return try {
+            runBlocking {
+                val resolvedIp = resolveDomain(hostname.toUri())
+                resolvedIp?.let {
+                    listOf(InetAddress.getByName(it.first))
+                } ?: emptyList()
+            }
+        } catch (e: Exception) {
+            Timber.e("tpLog Lookup error: ${e.message}")
+            emptyList()
+        }
+    }
 
-        for (record in answers) {
-            when (record.type) {
-                Type.A -> {
-                    val ipAddress = record.rdataToString()
-                    results.add(0, ipAddress)
-                }
-                Type.AAAA -> {
-                    val ipAddress = record.rdataToString()
-                    results.add(ipAddress)
-                }
-                Type.CNAME -> {
-                    val cnameTarget = record.rdataToString()
+    private suspend fun checkCacheAndResolve(host: String): Message? {
+        return cache[host]?.let { cachedResponse ->
+            if (!cachedResponse.isExpired()) {
+                Timber.d("tpLog Cache hit for $host")
+                cachedResponse.message
+            } else {
+                Timber.d("tpLog Cache expired for $host")
+                cache.remove(host)
 
-                    if (!visitedDomains.contains(cnameTarget)) {
-                        visitedDomains.add(cnameTarget)
-                        sendDnsQueries(cnameTarget.toUri())
+                try {
+                    val t1 = System.currentTimeMillis()
+                    val queryMessage = Message.newQuery(Record.newRecord(Name.fromString(host), Type.A, DClass.IN))
+                    val responseMessage = sendDoTQuery(queryMessage)
+                    calculateResolutionTimeAndLogP90(t1)
+                    responseMessage
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        } ?: try {
+            val t1 = System.currentTimeMillis()
+            val queryMessage = Message.newQuery(Record.newRecord(Name.fromString(host), Type.A, DClass.IN))
+            val responseMessage = sendDoTQuery(queryMessage)
+            calculateResolutionTimeAndLogP90(t1)
+            responseMessage
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun resolveDomain(domain: android.net.Uri, attempt: Int = 0): Pair<String, String>? {
+        if (attempt > 2) return null
+
+        return withContext(dispatcher.io()) {
+            val host = (domain.host ?: domain.toString()).removeSuffix(".") + "."
+
+            try {
+                val responseMessage = checkCacheAndResolve(host)
+                val answers = responseMessage?.getSection(Section.ANSWER)
+
+                val aRecord = answers?.find { it.type == Type.A }
+                if (aRecord != null) {
+                    cache[host] = CachedDnsResponse(responseMessage, System.currentTimeMillis() + 5 * 60 * 1000)
+                    val resolvedIp = Pair(aRecord.rdataToString(), aRecord.name.toString(true))
+                    Timber.d("tpLog Resolved IP: ${resolvedIp.first} ${resolvedIp.second}")
+                    return@withContext resolvedIp
+                }
+
+                val cnameRecord = answers?.find { it.type == Type.CNAME }
+                if (cnameRecord != null) {
+                    if (cnameRecord.rdataToString() == KAHF_GUARD_BLOCKED_WITH_DOT) {
+                        Timber.d("tpLog CNAME: $KAHF_GUARD_BLOCKED_URL")
+                        return@withContext Pair(KAHF_GUARD_BLOCKED_URL, KAHF_GUARD_BLOCKED_IP)
+                    }
+
+                    val cnameResponseMessage = resolveDomain(cnameRecord.rdataToString().toUri(), attempt + 1)
+                    cnameResponseMessage?.let { pair ->
+                        cache[host] = CachedDnsResponse(responseMessage, System.currentTimeMillis() + 5 * 60 * 1000)
+                        Timber.d("tpLog Resolved CNAME: ${pair.first} ${pair.second}")
+                        return@withContext pair
                     }
                 }
-                else -> results.add(null)
+
+                return@withContext null
+            } catch (e: Exception) {
+                Timber.e("tpLog Error resolving domain: ${e.message}")
+                null
             }
         }
-
-        return results.first()
     }
 
-    private fun cacheDnsResponse(domain: String, recordType: Int, responseMessage: Message) {
-        val cacheKey = "$domain-$recordType"
-        val ttl = responseMessage.getMinTTL()
-        val cachedResponse = CachedDnsResponse(responseMessage, System.currentTimeMillis() + ttl * 1000)
-        cache[cacheKey] = cachedResponse
+    private suspend fun sendDoTQuery(query: Message, retry: Int = 0): Message? {
+        if (retry > MAX_RETRY) {
+            return null
+        }
+
+        val queryBytes = query.toWire()
+
+        return withContext(dispatcher.io()) {
+            val socketClient = socketHelper.socket
+
+            try {
+                val ans = socketClient.execute(queryBytes)
+                val message = Message(ans)
+                socketHelper.returnSocket(socketClient)
+                message
+            } catch (e: IOException) {
+                Timber.e("tpLog DoT query error 1: ${e.message ?: e.toString()}")
+                // socketHelper.returnSocket(socketClient) // intentionally not invalidating the socket here
+                sendDoTQuery(query, retry + 1)
+            } catch (e: Exception) {
+                Timber.e("tpLog DoT query error 2: ${e.message ?: e.toString()}")
+                socketHelper.invalidateSocket(socketClient)
+                sendDoTQuery(query, retry + 1)
+            }
+        }
     }
 
-    private fun Message.getMinTTL(): Long {
-        return getSection(Section.ANSWER).minOfOrNull { it.ttl } ?: 0L
+    private suspend fun closeConnection() {
+        try {
+            withContext(dispatcher.io()) {
+                socketHelper.shutDown()
+                Timber.d("tpLog Socket connection closed successfully.")
+            }
+        } catch (e: Exception) {
+            Timber.e("tpLog Error closing socket connection: ${e.message}")
+        }
+    }
+
+    fun updateDohServerUrl(privateDnsLevel: PrivateDnsLevel) {
+        runBlocking {
+            closeConnection()
+        }
+
+        cache.clear()
+        privateDns = privateDnsLevel
+
+        runBlocking {
+            socketHelper = SocketHelper.getInstance(privateDns.dnsServerIps.random(), 853, privateDns.url)
+            Timber.d("tpLog DoH URL set to: ${privateDnsLevel.url}")
+        }
+    }
+
+    fun calculateResolutionTimeAndLogP90(t1: Long) {
+        val t2 = System.currentTimeMillis()
+        val inferenceTime = t2 - t1
+        resolutionTimes.add(inferenceTime)
+
+        // Log P90 DNS resolution time for every 30 images to GA
+        if (resolutionTimes.size >= 30) {
+            val p90 = resolutionTimes.sorted()[resolutionTimes.size * 90 / 100]
+            analytics.logEvent(
+                AnalyticsEvent.P90DnsResolution,
+                mapOf(
+                    AnalyticsParam.DnsResolutionTime to p90.toString(),
+                    AnalyticsParam.DnsResolver to privateDns.url,
+                ),
+            )
+            resolutionTimes.clear()
+        }
     }
 }
+

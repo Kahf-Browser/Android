@@ -54,14 +54,14 @@ jobs:
       - name: Assemble internal release APK
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: assembleInternalRelease -Pforce-default-variant -x lint
+          arguments: assembleInternalRelease -Pforce-default-variant -Psync-disable-auth-requirement -x lint
 
       - name: Move APK to new folder
         if: always()
         run: find . -name "*.apk"  -exec mv '{}' apk/release.apk \;
 
       - name: Sync Flows
-        uses: mobile-dev-inc/action-maestro-cloud@v1.6.0
+        uses: mobile-dev-inc/action-maestro-cloud@v1.8.1
         with:
           api-key: ${{ secrets.MOBILE_DEV_API_KEY }}
           name: ${{ github.sha }}

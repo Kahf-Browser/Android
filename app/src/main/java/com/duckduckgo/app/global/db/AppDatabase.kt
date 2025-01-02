@@ -28,6 +28,8 @@ import com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsDao
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelEntity
 import com.duckduckgo.app.browser.rating.db.*
 import com.duckduckgo.app.cta.db.DismissedCtaDao
 import com.duckduckgo.app.cta.model.DismissedCta
@@ -68,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 52,
+    version = 57,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -96,10 +98,13 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         LocationPermissionEntity::class,
         PixelEntity::class,
         PageLoadedPixelEntity::class,
+        PagePaintedPixelEntity::class,
         WebTrackerBlocked::class,
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
         Relation::class,
+        KahfImageBlocked::class,
+        HarmfulSiteBlocked::class,
     ],
 )
 
@@ -144,8 +149,11 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun pixelDao(): PendingPixelDao
 
     abstract fun pageLoadedPixelDao(): PageLoadedPixelDao
+    abstract fun pagePaintedPixelDao(): PagePaintedPixelDao
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
+    abstract fun kahfImageBlockedDao(): KahfImageBlockedDao
+    abstract fun harmfulSiteBlockedDao(): HarmfulSiteBlockedDao
 
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
 
@@ -641,6 +649,92 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_52_TO_53: Migration = object : Migration(52, 53) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("DELETE FROM `page_loaded_pixel_entity`")
+        }
+    }
+
+    private val MIGRATION_53_TO_54: Migration = object : Migration(53, 54) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS `page_painted_pixel_entity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`appVersion` TEXT NOT NULL, `elapsedTimeFirstPaint` INTEGER NOT NULL, `webViewVersion` TEXT NOT NULL)",
+            )
+        }
+    }
+
+    private val MIGRATION_54_TO_55: Migration = object : Migration(54, 55) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `kahf_image_blocked` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`imageUrl` TEXT NOT NULL, `tag` TEXT NOT NULL, `score` REAL NOT NULL)",
+            )
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `harmful_site_blocked` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`url` TEXT NOT NULL)",
+            )
+        }
+    }
+
+    private val MIGRATION_55_TO_56 = object : Migration(55, 56) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Rename the old table to a temporary name
+            db.execSQL("ALTER TABLE kahf_image_blocked RENAME TO kahf_image_blocked_old")
+
+            // Create the new table with the modified schema
+            db.execSQL("""
+            CREATE TABLE kahf_image_blocked (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                imageUrl TEXT NOT NULL,
+                isIndecent INTEGER NOT NULL DEFAULT 0,
+                responseStr TEXT NOT NULL,
+                imageWidth REAL NOT NULL,
+                imageHeight REAL NOT NULL
+            )
+        """.trimIndent())
+
+            // Copy the relevant data from the old table to the new table
+            db.execSQL("""
+            INSERT INTO kahf_image_blocked (id, imageUrl, isIndecent, responseStr, imageWidth, imageHeight)
+            SELECT id, imageUrl, 1, '{}', 0, 0
+            FROM kahf_image_blocked_old
+        """.trimIndent())
+
+            // Drop the old table
+            db.execSQL("DROP TABLE kahf_image_blocked_old")
+        }
+    }
+
+    val MIGRATION_56_TO_57 = object : Migration(56, 57) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Add the new column 'modifiedAt' with a default value of 0 for existing entries
+            db.execSQL("ALTER TABLE kahf_image_blocked ADD COLUMN modifiedAt INTEGER NOT NULL DEFAULT 0")
+
+            // Remove duplicate rows, keeping only the first occurrence
+            db.execSQL(
+                """
+            DELETE FROM kahf_image_blocked
+            WHERE id NOT IN (
+                SELECT MIN(id)
+                FROM kahf_image_blocked
+                GROUP BY imageUrl
+            )
+            """,
+            )
+
+            // Add the unique constraint
+            db.execSQL("CREATE UNIQUE INDEX index_kahf_image_blocked_imageUrl ON kahf_image_blocked(imageUrl)")
+        }
+    }
+
+
+    /**
+     * WARNING ⚠️
+     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
+     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
+     * constraint.
+     */
     val BOOKMARKS_DB_ON_CREATE = object : RoomDatabase.Callback() {
         override fun onCreate(database: SupportSQLiteDatabase) {
             database.execSQL(
@@ -653,12 +747,6 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
-    /**
-     * WARNING ⚠️
-     * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
-     * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
-     * constraint.
-     */
     val CHANGE_JOURNAL_ON_OPEN = object : RoomDatabase.Callback() {
         override fun onOpen(db: SupportSQLiteDatabase) {
             db.query("PRAGMA journal_mode=DELETE;").use { cursor -> cursor.moveToFirst() }
@@ -718,6 +806,11 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_49_TO_50,
             MIGRATION_50_TO_51,
             MIGRATION_51_TO_52,
+            MIGRATION_52_TO_53,
+            MIGRATION_53_TO_54,
+            MIGRATION_54_TO_55,
+            MIGRATION_55_TO_56,
+            MIGRATION_56_TO_57
         )
 
     @Deprecated(

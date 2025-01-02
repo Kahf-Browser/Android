@@ -25,11 +25,8 @@ import java.util.EnumSet
 enum class SubscriptionPixel(
     private val baseName: String,
     private val types: Set<PixelType>,
+    private val withSuffix: Boolean = true,
 ) {
-    SETTINGS_SUBSCRIPTION_SECTION_SHOWN(
-        baseName = "m_privacy-pro_app-settings_privacy-pro-section_impression",
-        type = COUNT,
-    ),
     SUBSCRIPTION_ACTIVE(
         baseName = "m_privacy-pro_app_subscription_active",
         type = DAILY,
@@ -61,6 +58,11 @@ enum class SubscriptionPixel(
     PURCHASE_SUCCESS(
         baseName = "m_privacy-pro_app_subscription-purchase_success",
         types = EnumSet.of(COUNT, DAILY),
+    ),
+    PURCHASE_SUCCESS_ORIGIN(
+        baseName = "m_subscribe",
+        type = COUNT,
+        withSuffix = false,
     ),
     OFFER_RESTORE_PURCHASE_CLICK(
         baseName = "m_privacy-pro_offer_restore-purchase_click",
@@ -102,10 +104,6 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_welcome_add-device_click",
         type = UNIQUE,
     ),
-    SETTINGS_ADD_DEVICE_CLICK(
-        baseName = "m_privacy-pro_settings_add-device_click",
-        type = COUNT,
-    ),
     ADD_DEVICE_ENTER_EMAIL_CLICK(
         baseName = "m_privacy-pro_add-device_enter-email_click",
         type = COUNT,
@@ -134,6 +132,10 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_app-settings_identity-theft-restoration_click",
         type = COUNT,
     ),
+    APP_SETTINGS_RESTORE_PURCHASE_CLICK(
+        baseName = "m_privacy-pro_app-settings_restore-purchase_click",
+        type = COUNT,
+    ),
     SUBSCRIPTION_SETTINGS_CHANGE_PLAN_OR_BILLING_CLICK(
         baseName = "m_privacy-pro_settings_change-plan-or-billing_click",
         type = COUNT,
@@ -142,15 +144,36 @@ enum class SubscriptionPixel(
         baseName = "m_privacy-pro_settings_remove-from-device_click",
         type = COUNT,
     ),
+    SUBSCRIPTION_PRICE_MONTHLY_CLICK(
+        baseName = "m_privacy-pro_offer_monthly-price_click",
+        type = COUNT,
+    ),
+    SUBSCRIPTION_PRICE_YEARLY_CLICK(
+        baseName = "m_privacy-pro_offer_yearly-price_click",
+        type = COUNT,
+    ),
+    SUBSCRIPTION_ONBOARDING_FAQ_CLICK(
+        baseName = "m_privacy-pro_welcome_faq_click",
+        type = UNIQUE,
+    ),
+    SUBSCRIPTION_ADD_EMAIL_SUCCESS(
+        baseName = "m_privacy-pro_app_add-email_success",
+        type = UNIQUE,
+    ),
+    SUBSCRIPTION_PRIVACY_PRO_REDIRECT(
+        baseName = "m_privacy-pro_app_redirect",
+        type = COUNT,
+    ),
     ;
 
     constructor(
         baseName: String,
         type: PixelType,
-    ) : this(baseName, EnumSet.of(type))
+        withSuffix: Boolean = true,
+    ) : this(baseName, EnumSet.of(type), withSuffix)
 
     fun getPixelNames(): Map<PixelType, String> =
-        types.associateWith { type -> "${baseName}_${type.pixelNameSuffix}" }
+        types.associateWith { type -> if (withSuffix) "${baseName}_${type.pixelNameSuffix}" else baseName }
 }
 
 private val PixelType.pixelNameSuffix: String

@@ -17,10 +17,19 @@
 package com.duckduckgo.app.browser
 
 import android.graphics.Bitmap
+import android.graphics.Bitmap.Config.ARGB_8888
+import android.graphics.Color
 import android.net.Uri
 import android.os.Message
 import android.view.View
-import android.webkit.*
+import android.webkit.ConsoleMessage
+import android.webkit.GeolocationPermissions
+import android.webkit.JsPromptResult
+import android.webkit.JsResult
+import android.webkit.PermissionRequest
+import android.webkit.ValueCallback
+import android.webkit.WebChromeClient
+import android.webkit.WebView
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import javax.inject.Inject
@@ -100,7 +109,7 @@ class BrowserChromeClient @Inject constructor(
         view: WebView,
         title: String,
     ) {
-        webViewClientListener?.titleReceived(title)
+        webViewClientListener?.titleReceived(title, view.url)
     }
 
     override fun onShowFileChooser(
@@ -195,5 +204,9 @@ class BrowserChromeClient @Inject constructor(
         callback: GeolocationPermissions.Callback,
     ) {
         callback.invoke(origin, true, false)
+    }
+
+    override fun getDefaultVideoPoster(): Bitmap {
+        return Bitmap.createBitmap(intArrayOf(Color.TRANSPARENT), 1, 1, ARGB_8888)
     }
 }

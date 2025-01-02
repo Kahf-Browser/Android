@@ -25,6 +25,7 @@ import com.duckduckgo.app.browser.databinding.ActivityOnboardingBinding
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
+import timber.log.Timber
 
 @InjectWith(ActivityScope::class)
 class OnboardingActivity : DuckDuckGoActivity() {
@@ -53,7 +54,7 @@ class OnboardingActivity : DuckDuckGoActivity() {
         }
     }
 
-    fun onOnboardingDone() {
+    private fun onOnboardingDone() {
         viewModel.onOnboardingDone()
         startActivity(BrowserActivity.intent(this@OnboardingActivity))
         finish()

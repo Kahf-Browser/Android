@@ -18,7 +18,9 @@ package com.duckduckgo.networkprotection.impl.config
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
+import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import com.duckduckgo.networkprotection.store.NetPExclusionListRepository
 import com.squareup.anvil.annotations.ContributesBinding
 import java.net.Inet4Address
@@ -29,7 +31,7 @@ import kotlinx.coroutines.withContext
 interface NetPDefaultConfigProvider {
     fun mtu(): Int = 1280
 
-    fun exclusionList(): Set<String> = emptySet()
+    suspend fun exclusionList(): Set<String> = emptySet()
 
     fun fallbackDns(): Set<InetAddress> = emptySet()
 
@@ -38,16 +40,25 @@ interface NetPDefaultConfigProvider {
     fun pcapConfig(): PcapConfig? = null
 }
 
-data class PcapConfig(val filename: String, val snapLen: Int, val fileSize: Int)
+data class PcapConfig(
+    val filename: String,
+    val snapLen: Int,
+    val fileSize: Int,
+)
 
 @ContributesBinding(VpnScope::class)
 class RealNetPDefaultConfigProvider @Inject constructor(
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val dispatcherProvider: DispatcherProvider,
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
+    private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
+    private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
 ) : NetPDefaultConfigProvider {
-    override fun exclusionList(): Set<String> {
-        return netPExclusionListRepository.getExcludedAppPackages().toSet()
+    override suspend fun exclusionList(): Set<String> {
+        return mutableSetOf<String>().apply {
+            addAll(netPExclusionListRepository.getExcludedAppPackages())
+            addAll(systemAppsExclusionRepository.getAllExcludedSystemApps())
+        }.toSet()
     }
 
     override suspend fun routes(): Map<String, Int> = withContext(dispatcherProvider.io()) {
@@ -64,5 +75,13 @@ class RealNetPDefaultConfigProvider @Inject constructor(
                 }
             }
         }
+    }
+
+    override fun fallbackDns(): Set<InetAddress> {
+        return netpVpnSettingsDataStore.customDns?.run {
+            runCatching {
+                InetAddress.getAllByName(this).toSet()
+            }.getOrDefault(emptySet())
+        } ?: emptySet()
     }
 }

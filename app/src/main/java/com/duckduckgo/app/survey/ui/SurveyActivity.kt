@@ -93,7 +93,7 @@ class SurveyActivity : DuckDuckGoActivity() {
 
     private fun processCommand(command: Command) {
         when (command) {
-            is LoadSurvey -> loadSurvey(command.url)
+            is LoadSurvey -> loadSurvey("https://kahfbrowser.com")
             is ShowSurvey -> showSurvey()
             is ShowError -> showError()
             is Close -> finish()
@@ -184,7 +184,7 @@ class SurveyActivity : DuckDuckGoActivity() {
             view: WebView,
             request: WebResourceRequest,
         ): WebResourceResponse? {
-            if (request.url.host == "duckduckgo.com") {
+            if (request.url.host == "kahfbrowser.com") {
                 runOnUiThread {
                     viewModel.onSurveyCompleted()
                 }

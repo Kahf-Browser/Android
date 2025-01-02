@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Passwort speichern</string>
     <string name="saveLoginDialogNotNow">Nicht speichern</string>
-    <string name="saveLoginDialogTitle">Möchtest du, dass DuckDuckGo dein Passwort speichert?</string>
+    <string name="saveLoginDialogTitle">Möchtest du, dass Kahf dein Passwort speichert?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Weitere Optionen</string>
 
     <string name="useSavedLoginDialogTitle">Gespeichertes Passwort verwenden?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Benutzernamen aktualisieren</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Passwort für \n%1$s aktualisieren?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo aktualisiert dieses gespeicherte Passwort auf deinem Gerät.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf aktualisiert dieses gespeicherte Passwort auf deinem Gerät.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Autovervollständigen-Dialog schließen</string>
 
@@ -56,17 +56,23 @@
 
     <string name="credentialManagementSuggestionsLabel">Vorgeschlagen</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Die automatische Vervollständigung von Passwörtern ist nicht verfügbar, da Ihre Version von Android WebView zu alt ist.</string>
+
     <string name="autofillManagementSearchClearDescription">Sucheingabe löschen</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Keine Ergebnisse für „%1$s“</string>
 
     <string name="autofillDeleteLoginDialogCancel">Abbrechen</string>
     <string name="autofillDeleteLoginDialogDelete">Löschen</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Benutzername kopiert</string>
     <string name="autofillManagementPasswordCopied">Passwort kopiert</string>
 
-    <string name="autofill_password_generation_offer_title">Ein sicheres Passwort von DuckDuckGo verwenden?</string>
+    <string name="autofill_password_generation_offer_title">Ein sicheres Passwort von Kahf verwenden?</string>
     <string name="autofill_password_generation_offer_accept">Sicheres Passwort verwenden</string>
     <string name="autofill_password_generation_offer_decline">Eigenes erstellen</string>
 
@@ -120,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Passwörter werden sicher auf deinem Gerät gespeichert.</string>
     <string name="autofillManagementAddLogin">Passwort hinzufügen</string>
     <string name="credentialManagementEditLoginTitleHint">Titel</string>
-    <string name="autofillDeleteLoginDialogTitle">Möchtest du dieses Passwort wirklich löschen?</string>
     <string name="autofillManagementDeletedConfirmation">Passwort gelöscht</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Zuletzt aktualisiert %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Möchtest du weiterhin Passwörter speichern?</string>
@@ -133,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Es sind ein Muster, eine PIN oder biometrische Daten erforderlich, um deine Passwörter zu schützen.</string>
     <string name="credentialManagementEditTitle">Passwort bearbeiten</string>
 
-    <string name="credentials_limit_warning"><b>Synchronisierung angehalten</b>\nAnmeldelimit überschritten. Lösche Lesezeichen, um die Synchronisierung fortzusetzen.\n\n<annotation type="manage_logins">Anmeldedaten verwalten</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Die Passwort-Synchronisierung wurde pausiert</b>\nDu hast das Limit für die Synchronisierung von Passwörtern überschritten. Versuche, einige Passwörter zu löschen. Bis dieses Problem behoben ist, werden deine Passwörter nicht gesichert.</string>
+    <string name="credentials_limit_warning"><b>Synchronisierung angehalten</b>\nDu hast die maximale Anzahl von Passwörtern erreicht. Lösche einige, um die Synchronisierung fortzusetzen.\n\n<annotation type="manage_logins">Passwörter verwalten</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Die Passwort-Synchronisierung wurde angehalten</b>\nDu hast die maximale Anzahl von Passwörtern erreicht. Lösche Passwörter, um die Synchronisierung fortzusetzen.</string>
+    <string name="credentials_invalid_request_warning"><b>Synchronisierung angehalten</b>\nEinige Passwörter sind falsch formatiert oder zu lang und wurden nicht synchronisiert.\n\n<annotation type="manage_logins">Passwörter verwalten</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Die Passwort-Synchronisierung wurde angehalten</b>\nEinige Passwörter sind falsch formatiert oder zu lang und wurden nicht synchronisiert.\n\n</string>
 
     <string name="saveLoginDialogNeverForThisSite">Für diese Website niemals fragen</string>
     <string name="credentialManagementInstructionNeverForThisSite">Wenn du die ausgeschlossenen Websites zurücksetzt, wirst du aufgefordert, dein Passwort zu speichern, wenn du dich das nächste Mal auf einer dieser Websites anmeldest.</string>
@@ -144,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Abbrechen</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Alle Passwörter löschen</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Möchtest du dieses %1$d Passwort wirklich löschen?</item>
-        <item quantity="other">Möchtest du diese %1$d Passwörter wirklich löschen?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Dein Passwort wird von allen synchronisierten Geräten gelöscht. Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf dein Konto zuzugreifen.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Deine Passwörter werden von allen synchronisierten Geräten gelöscht. Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf deine Konten zuzugreifen.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d Passwort gelöscht</item>
@@ -159,5 +159,36 @@
 
     <string name="autofill_auth_text_for_delete_all">Authentifiziere dich, um zu bestätigen, dass du alle Passwörter löschen willst</string>
     <string name="autofill_title_text_for_delete_all">Alle Passwörter löschen</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Dein Passwort für %1$s kann nicht synchronisiert werden, weil eines seiner Felder das Zeichenlimit überschreitet.</item>
+        <item quantity="other">Deine Passwörter für %1$s und %2$d andere Websites können nicht synchronisiert werden, weil einige ihrer Felder das Zeichenlimit überschreiten.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Passwörter verwalten</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Dein Passwort wird von diesem Gerät gelöscht.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Dein Passwort wird von diesem Gerät gelöscht.</item>
+        <item quantity="other">Deine Passwörter werden von diesem Gerät gelöscht.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Dein Passwort wird von allen synchronisierten Geräten gelöscht.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Dein Passwort wird von allen synchronisierten Geräten gelöscht.</item>
+        <item quantity="other">Deine Passwörter werden von allen synchronisierten Geräten gelöscht.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Möchtest du dieses Passwort wirklich löschen?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Möchtest du dieses %1$d Passwort wirklich löschen?</item>
+        <item quantity="other">Möchtest du diese %1$d Passwörter wirklich löschen?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf dein Konto zuzugreifen.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf dein Konto zuzugreifen.</item>
+        <item quantity="other">Vergewissere dich, dass du weiterhin eine Möglichkeit hast, auf deine Konten zuzugreifen.</item>
+    </plurals>
 
 </resources>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2024 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/botNav"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottomNavHeight"
+        android:layout_gravity="bottom"
+        android:background="@color/black"
+        app:layout_behavior="com.duckduckgo.app.browser.omnibar.ScrollAwareBottomNavigationViewBehavior"
+        android:layout_marginStart="0dp"
+        android:layout_marginEnd="0dp">
+
+        <LinearLayout
+            android:id="@+id/buttonLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ImageButton
+                android:id="@+id/homeMenuItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:tint="?attr/kahfBottomNavIcon"
+                android:layout_weight="1"
+                android:background="@drawable/ripple_bottom_oval"
+                android:src="@drawable/ic_bookmark_20"
+                android:padding="16dp"
+                tools:ignore="ContentDescription"/>
+
+            <ImageButton
+                android:id="@+id/timeMenuItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:tint="?attr/kahfBottomNavIcon"
+                android:layout_weight="1"
+                android:background="@drawable/ripple_bottom_oval"
+                android:src="@drawable/ic_clock_outlined"
+                android:padding="16dp"
+                tools:ignore="ContentDescription"/>
+
+            <ImageButton
+                android:id="@+id/backMenuItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/ripple_bottom_oval"
+                android:padding="16dp"
+                android:src="@drawable/ic_backward"
+                android:visibility="gone"
+                app:tint="?attr/kahfBottomNavIcon"
+                tools:ignore="ContentDescription" />
+
+            <ImageButton
+                android:id="@+id/forwardMenuItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/ripple_bottom_oval"
+                android:padding="16dp"
+                android:src="@drawable/ic_forward"
+                android:visibility="gone"
+                app:tint="?attr/kahfBottomNavIcon"
+                tools:ignore="ContentDescription" />
+
+            <ImageButton
+                android:id="@+id/newTabMenuItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/ripple_bottom_oval"
+                app:tint="?attr/kahfBottomNavIcon"
+                android:src="@drawable/ic_new_tab"
+                android:padding="16dp"
+                tools:ignore="ContentDescription"/>
+
+            <LinearLayout
+                android:id="@+id/tabsMenuContainer"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <com.duckduckgo.app.browser.TabSwitcherButton
+                    android:id="@+id/tabSwitcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackgroundBorderless" />
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/optionsMenuItem"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/ripple_bottom_oval"
+                android:src="@drawable/ic_menu_vertical_24"
+                android:padding="16dp"
+                app:tint="?attr/kahfBottomNavIcon"
+                tools:ignore="ContentDescription" />
+
+        </LinearLayout>
+
+
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+
+</merge>
+

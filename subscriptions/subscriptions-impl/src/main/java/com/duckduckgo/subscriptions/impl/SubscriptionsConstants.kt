@@ -23,8 +23,8 @@ object SubscriptionsConstants {
     val LIST_OF_PRODUCTS = listOf(BASIC_SUBSCRIPTION)
 
     // List of plans
-    const val YEARLY_PLAN = "ddg-privacy-pro-sandbox-yearly-renews-us"
-    const val MONTHLY_PLAN = "ddg-privacy-pro-sandbox-monthly-renews-us"
+    const val YEARLY_PLAN = "ddg-privacy-pro-yearly-renews-us"
+    const val MONTHLY_PLAN = "ddg-privacy-pro-monthly-renews-us"
 
     // List of features
     const val NETP = "vpn"
@@ -39,7 +39,20 @@ object SubscriptionsConstants {
     const val YEARLY = "yearly"
 
     // URLs
-    const val BUY_URL = "https://abrown.duckduckgo.com/subscriptions"
-    const val ACTIVATE_URL = "https://abrown.duckduckgo.com/subscriptions/activate"
-    const val ITR_URL = "https://abrown.duckduckgo.com/identity-theft-restoration"
+    const val BUY_URL = "https://kahfbrowser.com/subscriptions"
+    const val ACTIVATE_URL = "https://kahfbrowser.com/subscriptions/activate"
+    const val ITR_URL = "https://kahfbrowser.com/identity-theft-restoration"
+    const val FAQS_URL = "https://kahfbrowser.com/kahfbrowser-help-pages/privacy-pro/"
+    const val PRIVACY_PRO_ETLD = "kahfbrowser.com"
+    const val PRIVACY_PRO_PATH = "pro"
+}
+
+internal fun String.productIdToBillingPeriod(): String? {
+    return if (this == SubscriptionsConstants.MONTHLY_PLAN) {
+        "monthly"
+    } else if (this == SubscriptionsConstants.YEARLY_PLAN) {
+        "annual"
+    } else {
+        null
+    }
 }

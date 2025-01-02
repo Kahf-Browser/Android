@@ -35,9 +35,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.DaxDialogListener
+import com.duckduckgo.common.ui.view.DaxSwitch
 import com.duckduckgo.common.ui.view.InfoPanel.Companion.APPTP_SETTINGS_ANNOTATION
 import com.duckduckgo.common.ui.view.InfoPanel.Companion.REPORT_ISSUES_ANNOTATION
-import com.duckduckgo.common.ui.view.SwitchView
 import com.duckduckgo.common.ui.view.TypewriterDaxDialog
 import com.duckduckgo.common.ui.view.dialog.StackedAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
@@ -86,7 +86,7 @@ import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class)
+@ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class, screenName = "apptp.main")
 class DeviceShieldTrackerActivity :
     DuckDuckGoActivity(),
     DeviceShieldActivityFeedFragment.DeviceShieldActivityFeedListener {
@@ -113,7 +113,7 @@ class DeviceShieldTrackerActivity :
 
     private val binding: ActivityDeviceShieldActivityBinding by viewBinding()
 
-    private lateinit var deviceShieldSwitch: SwitchView
+    private lateinit var deviceShieldSwitch: DaxSwitch
 
     // we might get an update before options menu has been populated; temporarily cache value to use when menu populated
     private var vpnCachedState: VpnState? = null
@@ -596,7 +596,7 @@ class DeviceShieldTrackerActivity :
         menuInflater.inflate(R.menu.menu_device_tracker_activity, menu)
 
         val switchMenuItem = menu.findItem(R.id.deviceShieldSwitch)
-        deviceShieldSwitch = switchMenuItem?.actionView as SwitchView
+        deviceShieldSwitch = switchMenuItem?.actionView as DaxSwitch
         deviceShieldSwitch.setOnCheckedChangeListener(enableAppTPSwitchListener)
         return true
     }
@@ -693,7 +693,7 @@ class DeviceShieldTrackerActivity :
         private const val MIN_ROWS_FOR_ALL_ACTIVITY = 5
         private const val TAG_APPTP_PROMOTE_ALWAYS_ON_DIALOG = "AppTPPromoteAlwaysOnDialog"
         private const val TAG_APPTP_ENABLED_CTA_DIALOG = "AppTpEnabledCta"
-        private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
+        private const val FAQ_WEBSITE = "https://kahfbrowser.com/kahfbrowser-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
 
         private const val REQUEST_ASK_VPN_PERMISSION = 101
 

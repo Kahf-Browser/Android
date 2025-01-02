@@ -123,6 +123,7 @@
     <string name="settingsHeadingAbout">About</string>
     <string name="settingsAboutAsil">About Kahf</string>
     <string name="settingsVersion">Version</string>
+    <string name="settingsVersionFull" translatable="false">Version: %1$s (%2$s) </string>
     <string name="leaveFeedback">Share Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
     <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
@@ -157,10 +158,16 @@
     <string name="privateSearchTitle">Private Search is Enabled</string>
     <string name="privateSearchDescription">Kahf Private Search is your default search engine, so you can search the web without being tracked.</string>
     <string name="privateSearchHeadingSearchSettings">Search Settings</string>
-    <string name="privateSearchAutocompleteToggle">Autocomplete Suggestions</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">More Search Settings</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Customize your search language, region, and more</string>
     <string name="privateSearchMoreSearchSettingsTitle">More Search Settings</string>
+    <string name="privateSearchAutocompleteToggle">Autocomplete Suggestions</string>
+    <string name="privateSearchAutocompleteHint">Show search suggestions as you type, including your bookmarks. All searches are private.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Recently Visited Sites</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Show recently visited sites in search suggestions. Recently visited sites are private, only stored on your device, and can be cleared with the Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Autocomplete Suggestions now include your recently visited sites. Turn off in Settings, or clear anytime with the 🔥 Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">Same privacy.\nBetter search suggestions!</string>
+    <string name="openAutoCompleteSettings">Open Settings</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web Tracking Protection</string>
@@ -232,29 +239,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Turning protections OFF might help.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">We temporarily turned Privacy Protections off as they appear to be breaking this site.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Bookmarks</string>
-    <string name="bookmarksActivityTitle">Bookmarks</string>
-    <string name="noBookmarks">No bookmarks added yet</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">More options for bookmark %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Deleted &lt;b>%1$s&lt;/b></string>
-    <string name="exportBookmarksMenu">Export</string>
-    <string name="exportBookmarksEmpty">You don\'t have bookmarks, nothing will be exported</string>
-    <string name="exportBookmarksError">Couldn\'t export any bookmarks, something went wrong</string>
-    <string name="exportBookmarksSuccess">All bookmarks were successfully exported</string>
-    <string name="importBookmarksMenu">Import</string>
-    <string name="importBookmarksFileTitle">Select a bookmark file to import</string>
-    <string name="importBookmarksError">Couldn\'t import any bookmarks, something went wrong</string>
-    <string name="importBookmarksEmpty">The file has no bookmarks to import</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Successfully imported %1$d bookmarks</string>
-    <string name="savedSiteDialogTitleHint">Title</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Edit</string>
-    <string name="bookmarksSectionTitle">Bookmarks</string>
-    <string name="favoritesSectionTitle">Favorites</string>
-    <string name="bookmarksEmptyHint">No bookmarks added yet</string>
-    <string name="favoritesEmptyHint">No favorites added yet</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirm</string>
     <string name="dialogSave">Save</string>
@@ -275,8 +259,6 @@
     <string name="widgetConfigurationAddWidgetOption">Add widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">No favorites added yet</string>
     <string name="searchWidgetEmtpyFavoritesCta">Add Favorite</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Visit your favorite sites in a flash!<br/><br/>Go to a site you love. Then tap the \" &#x2807;\" icon and select Add Favorite.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Visit your favorite sites in a flash! Go to a site you love. Then tap the browser menu icon and select Add Favorite.</string>
     <string name="widgetConfigurationActivityTitle">Widget Configuration</string>
     <string name="favoritesWidgetLabel">Favorites</string>
     <string name="searchWidgetLabel">Search</string>
@@ -446,14 +428,8 @@
     <string name="systemSearchOnboardingButtonOk">Got it</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Hide</string>
-    <string name="daxDialogPhew">Phew!</string>
-    <string name="daxDialogNext">Next</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Got It</string>
-    <string name="hideTipsTitle">Hide remaining tips?</string>
-    <string name="hideTipsText">There are only a few, and we tried to make them informative.</string>
-    <string name="hideTipsButton">Hide Tips Forever</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[You\'re now blocking trackers across the web 🎉<br/><br/>I can also block trackers hiding in your other apps, even when you aren\'t using your phone.]]></string>
@@ -464,37 +440,9 @@
     <string name="onboardingWelcomeTitle">"Welcome to Kahf!"</string>
     <string name="onboardingDaxText"><![CDATA[The Internet can be kinda creepy.<br/><br/>Not to worry! Searching and browsing privately is easier than you think.]]></string>
     <string name="onboardingLetsDoItButton">Let\'s Do It!</string>
-    <string name="daxIntroCtaText"><![CDATA[Next, try visiting one of your favorite sites!<br/><br/>I\'ll block trackers so they can\'t spy on you. I\'ll also upgrade the security of your connection if possible. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[You\'ve got this!<br/><br/>Remember: Every time you browse with me, a creepy ad loses its wings. 👍]]></string>
-    <string name="daxSerpCtaText">Your Kahf searches are anonymous. Always. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and <b>%1$d other</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
-        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and <b>%1$d others</b> were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the address bar to see who is trying to track you when you visit a new site.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
-        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. <br/><br/>I blocked them!<br/><br/> ☝️You can check the URL bar to see who is trying to track you when you visit a new site.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[As you tap and scroll, I\'ll block pesky trackers. <br/><br/>Go ahead — keep browsing!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Heads up! I can\'t stop %1$s from seeing your activity on %2$s &lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %3$s knows about you overall by blocking their trackers on lots of other sites.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Heads up! Since %1$s owns %2$s, I can\'t stop them from seeing your activity here.&lt;br/&gt;&lt;br/&gt;But browse with me, and I can reduce what %3$s knows about you overall by blocking their trackers on lots of other sites.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">What brings you to Kahf?</string>
-    <string name="onboardingFeatureOptionsContinue">Continue</string>
-    <string name="onboardingFeatureOptionsSkip">Skip This Step</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Private search</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Tracker blocking</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Smaller digital footprint</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Faster page loads</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Fewer ads</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">One-click data clearing</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">Save to downloads</string>
@@ -643,27 +591,6 @@
     <string name="emailNotSupported">Device not supported</string>
     <string name="emailNotSupportedExplanation">Email Protection allows you to create private email addresses that remove email trackers. We need to encrypt and store these addresses you create locally on your device. Because your device does not support encrypted storage, Email Protection is unavailable.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Edit Bookmark</string>
-    <string name="favoriteDialogTitleEdit">Edit Favorite</string>
-    <string name="locationLabel">Location</string>
-    <string name="folderLocationTitle">Select Location</string>
-    <string name="addFolder">Add Folder</string>
-    <string name="editFolder">Edit Folder</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Delete folder and its contents?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Are you sure you want to delete "</string>
-    <string name="bookmarkFolderEmpty">Empty</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d item?</item>
-        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s and %3$d items?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one" instruction="Placeholder is the number of items">%1$d item</item>
-        <item quantity="other" instruction="Placeholder is the number of items">%1$d items</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Accessibility</string>
     <string name="accessibilityActivityTitle">Accessibility</string>
@@ -683,7 +610,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privately with our app for Mac</string>
-    <string name="macos_settings_title">Kahf Mac App</string>
+    <string name="macos_settings_title">Kahf Mac Browser</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
@@ -745,7 +672,7 @@
     <string name="downloadsNotifyMeSubtitle">Get a notification when downloads complete.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Kahf Windows App</string>
+    <string name="windows_settings_title">Kahf Windows Browser</string>
     <string name="windows_settings_description">Browse privately with our app for Windows</string>
     <string name="windows_settings_description_ready">Download available</string>
     <string name="windows_settings_description_list">You\'re on the list!</string>
@@ -758,16 +685,6 @@
     <string name="closeAppTabsConfirmationDialogDescription">Are you sure you want to close all tabs?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Cancel</string>
     <string name="closeAppTabsConfirmationDialogClose">Close</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Delete this bookmark?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">This will delete your bookmark for &lt;b>%1$s&lt;/b>.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Delete this favorite?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your favorite for &lt;b>%1$s&lt;/b>.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Delete this bookmark folder?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">This will delete your &lt;b>%1$s&lt;/b> bookmark folder.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Cancel</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Delete</string>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Add Private Voice Search option to the address bar. Audio is not stored or shared with anyone, including Kahf.</string>
@@ -826,26 +743,209 @@
     <string name="safegaze_popup_turnon_title">Turn on SafeGaze</string>
 
 
-    <!-- Bookmarks -->
-    <string name="searchBookmarks">Search Bookmarks</string>
-    <string name="deleteFolder" instruction="%1$s is the folder name">"Delete %1$s?"</string>
-    <string name="deleteBookmark" instruction="%1$s is the bookmark name">"Delete %1$s bookmark?"</string>
-    <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bookmark added in %1$s</string>
-    <string name="addToFavorites">Add to Favorites</string>
-    <string name="editBookmark">Edit Bookmark</string>
-    <string name="importBookmarksDescription">If your bookmarks are saved in another browser, you\ncan import them into DuckDuckGo.</string>
-    <string name="importBookmarks">Import Bookmarks</string>
-    <string name="noResultsFor" instruction="%1$s is the search term">No results for \'%1$s\'</string>
-    <string name="removeFromFavorites">Remove From Favorites</string>
-    <string name="addToFavoritesMenu">Add to Favorites</string>
-    <plurals name="bookmarkFolderDeleteMessage">
-        <item quantity="one" instruction="%1$d is the number of items inside the folder">Are you sure you want to delete this folder and %1$d item?</item>
-        <item quantity="other" instruction="%1$d is the number of items inside the folder">Are you sure you want to delete this folder and %1$d items?</item>
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Open in Kahf</string>
+    <string name="runningInDdgMenuItemTitle">Running in Kahf</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Warning: This site may be insecure</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">The certificate for this site is invalid. You might be connecting to a server that is pretending to be %1$s which could put your confidential information at risk.</string>
+    <string name="sslErrorLeaveCTA">Leave This Site</string>
+    <string name="sslErrorAdvancedCTA">Advanced</string>
+    <string name="sslErrorExpandedHeadline">Kahf warns you when a website has an invalid certificate.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accept Risk and Visit Site<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s is expired. It’s possible that the website is misconfigured, that an attacker has compromised your connection, or that your system clock is incorrect.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s does not match *.%2$s. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">The security certificate for %1$s is not trusted by your device\'s operating system. It’s possible that the website is misconfigured or that an attacker has compromised your connection, or that your system clock is incorrect.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hi there.<br/><br/>Ready for a better, more private internet?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Let\'s do it!</string>
+    <string name="preOnboardingDaxDialog2Title">Privacy protections activated!</string>
+    <string name="preOnboardingDaxDialog2Button">Choose Your Browser</string>
+    <string name="preOnboardingComparisonChartItem1">Search privately by default</string>
+    <string name="preOnboardingComparisonChartItem2">Block 3rd-party trackers</string>
+    <string name="preOnboardingComparisonChartItem3">Block cookie pop-ups</string>
+    <string name="preOnboardingComparisonChartItem4">Block creepy ads</string>
+    <string name="preOnboardingComparisonChartItem5">Swiftly erase browsing data</string>
+    <string name="preOnboardingDaxDialog3Title">Awesome! Welcome to the duck side.</string>
+    <string name="preOnboardingDaxDialog3Button">Start Browsing</string>
+    <string name="onboardingSearchDaxDialogTitle">Try a search!</string>
+    <string name="onboardingSearchDaxDialogDescription">Your Kahf searches are always anonymous.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate 'duck' too.">how to say “duck” in english</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate 'duck' too. Don't add question mark">how to say “duck” in spanish</string>
+    <string name="onboardingSearchQueryOption1">how to say duck in english</string>
+    <string name="onboardingSearchQueryOption1English">how to say duck in spanish</string>
+    <string name="onboardingSearchDaxDialogOption2">cast of avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks cast</string>
+    <string name="onboardingSearchDaxDialogOption3">local weather</string>
+    <string name="onboardingSearchDaxDialogOption4">Surprise me!</string>
+    <string name="onboardingSearchQueryOption4">dinner recipes</string>
+    <string name="onboardingSearchQueryOption4US">chocolate chip cookie recipes</string>
+    <string name="onboardingSitesDaxDialogTitle">Try visiting a site!</string>
+    <string name="onboardingSitesDaxDialogDescription">I\'ll block trackers so they can\'t spy on you.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Surprise me!</string>
+    <string name="onboardingSerpDaxDialogDescription">That’s Kahf Search. Private. Fast. Fewer ads.</string>
+    <string name="onboardingSerpDaxDialogButton">Got it!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Next, try visiting a site!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;and <b>%1$d other</b> were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
+        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;and <b>%1$d others</b> were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
     </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;was trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
+        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;were trying to track you here. I blocked them!<br/><br/>☝️ Tap the shield for more info.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Got it!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Instantly clear your browsing activity with the <b>Fire Button</b>.<br/><br/>Give it a try! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">You\'ve got this!"</string>
+    <string name="onboardingEndDaxDialogDescription">Remember: every time you browse with me a creepy ad loses its wings. 👌</string>
+    <string name="onboardingEndDaxDialogButton">All done!</string>
+
     <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Are you sure you want to delete your bookmark for &lt;b>%1$s&lt;/b>?</string>
     <string name="kahf_dns_not_protected_text">You are not protected from 5,906,168 Haram site</string>
     <string name="kahf_dns_protected_text">You are protected from 5,906,168 Haram site</string>
     <string name="verify_protection">Verify Protection</string>
     <string name="by_halalz_e_ticaret_ltd_ti">by Halalz e-ticaret Ltd Şti</string>
     <string name="kahf_guard">KahfGuard</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage" tools:ignore="MissingQuantity">
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s و %3$d عنصر؟</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s و %3$d عناصر؟</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems" tools:ignore="MissingQuantity">
+        <item quantity="one" instruction="Placeholder is the number of items">%1$d عنصر</item>
+        <item quantity="other" instruction="Placeholder is the number of items">%1$d عناصر</item>
+    </plurals>
+    <string name="bookmarksMenuTitle">Bookmarks</string>
+    <string name="bookmarksActivityTitle">Bookmarks</string>
+    <string name="noBookmarks">No bookmarks have been added yet</string>
+    <string name="exportBookmarksMenu">Export</string>
+    <string name="exportBookmarksEmpty">You have no bookmarks, nothing will be exported</string>
+    <string name="exportBookmarksError">No bookmarks were exported, something went wrong</string>
+    <string name="exportBookmarksSuccess">All bookmarks have been successfully exported</string>
+    <string name="importBookmarksMenu">Import</string>
+    <string name="importBookmarksFileTitle">Choose the bookmarks file to import</string>
+    <string name="importBookmarksError">No bookmarks were imported, something went wrong</string>
+    <string name="importBookmarksEmpty">The file contains no bookmarks to import</string>
+    <string name="importBookmarksSuccess">%1$d bookmark was imported successfully</string>
+    <string name="savedSiteDialogTitleHint">Address</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Amendment</string>
+    <string name="bookmarksSectionTitle">Bookmarks</string>
+    <string name="favoritesSectionTitle">Favorite</string>
+    <string name="bookmarksEmptyHint">No bookmarks have been added yet</string>
+    <string name="favoritesEmptyHint">No favorites have been added yet</string>
+    <string name="bookmarkDialogTitleEdit">Edit bookmark</string>
+    <string name="favoriteDialogTitleEdit">Edit favorites</string>
+    <string name="locationLabel">the site</string>
+    <string name="folderLocationTitle">Choose location</string>
+    <string name="addFolder">Add folder</string>
+    <string name="editFolder">Edit folder</string>
+    <string name="bookmarkFolderDeleteDialogTitle">Delete the folder and its contents?</string>
+    <string name="bookmarkFolderEmpty">Empty</string>
+    <string name="bookmarkFolderDeleteDialogMessage">Are you sure you want to delete</string>
+    <string name="deleteBookmarkConfirmationDialogTitle">Delete this bookmark?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription">This will delete your bookmark for &lt;b>%1$s&lt;/b>.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle">Delete these favorites?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription">This will delete your favorites for &lt;b>%1$s&lt;/b>.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle">Delete this bookmarks folder?</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Cancel</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Delete</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription">This will delete your bookmarks folder &lt;b>%1$s&lt;/b>.</string>
+    <string name="bookmarkDeleteConfirmationMessage">&lt;b>%1$s&lt;/b> has been deleted</string>
+    <string name="bookmarkOverflowContentDescription">More options for bookmark %1$s</string>
+    <string name="searchBookmarks">Search bookmarks</string>
+    <string name="deleteFolder">Do you want to delete the folder \"%1$s\"?</string>
+    <string name="deleteBookmark">Delete bookmark \"%1$s\"?</string>
+    <string name="addToFavorites">Add to favorites</string>
+    <string name="bookmarkAddedInBookmarks">Bookmark added to folder \"%1$s\"</string>
+    <string name="editBookmark">Edit bookmark</string>
+    <string name="importBookmarksDescription">If your bookmarks are stored in another browser, you can import them into Kahf.</string>
+    <string name="importBookmarks">Import bookmarks</string>
+    <string name="noResultsFor">Search \"%1$s\" returned no results</string>
+    <string name="removeFromFavorites">Remove from favorites</string>
+    <string name="addToFavoritesMenu">Add to favorites</string>
+    <string name="not_implemented">Not implemented yet</string>
+    <string name="clipboardYouCopied">Paste from clipboard</string>
+    <string name="kahf_menu">Menu</string>
+    <string name="kahf_safer_internet">Safer Internet</string>
+    <string name="kahf_mode_desc_high">Safe search + kids friendly youtube. Block ads + trackers + harmful websites + adult contents</string>
+    <string name="kahf_mode_desc_medium">Harmful Website + Block Ads + Safe Search</string>
+    <string name="kahf_mode_desc_low">Harmful Websites + Block Ads only</string>
+    <string name="kahf_decent_internet">Decent Internet</string>
+    <string name="kahf_desc_blur_full_image">Blur indecent photos. Avoid major sins.</string>
+    <string name="kahf_human_only">Human only</string>
+    <string name="kahf_premium">(Premium)</string>
+    <string name="kahf_full_image">Full Image</string>
+    <string name="kahf_free">(Free)</string>
+    <string name="kahf_harm_avoided">Harm Avoided</string>
+    <string name="kahf_harmful_sites">Harmful Sites</string>
+    <string name="kahf_indecent_pictures">Indecent Pictures</string>
+    <string name="kahf_ads_trackers">Ads + Trackers</string>
+    <string name="kahf_share">Share</string>
+    <string name="kahf_support">Support</string>
+    <string name="kahf_dark_mode">Dark Mode</string>
+    <string name="kahf_high">HIGH</string>
+    <string name="kahf_medium">MEDIUM</string>
+    <string name="kahf_low">LOW</string>
+    <string name="kahf_off">Off</string>
+    <string name="kahf_onboarding_get_what_you_want">Get what you\nwant twice\nas fast</string>
+    <string name="kahf_onboarding_lets_go">Let\'s Go</string>
+    <string name="kahf_onboarding_skip">Skip</string>
+    <string name="kahf_onboarding_subtitle">Start exploring the halal web\nand browse the internet without\nworrying about haram content,\nharam ad and adult sites.</string>
+    <string name="kahf_onboarding_title">Search \nquickly and \nprivately</string>
+    <string name="kahf_onboarding_sg_title">Blur\nIndecent\nPhotos</string>
+    <string name="kahf_onboarding_sg_subtitle">Blurring inappropriate images.\nAvoid major sins</string>
+    <string name="kahf_onboarding_sg_enable">Enable Image Blurring</string>
+    <string name="kahf_onboarding_next">Next</string>
+    <string name="kahf_onboarding_skip_now">Skip for now</string>
+    <string name="kahf_onboarding_choose">Choose\nthe app you \nuse most</string>
+    <string name="kahf_onboarding_choose_details">Select your favorite apps to keep them handy in your home screen</string>
+    <string name="kahf_onboarding_checking_compatibility">Checking compatibility</string>
+    <string name="kahf_onboarding_compatible">Device is compatible to blur images</string>
+    <string name="kahf_onboarding_incompatible">Device is incompatible</string>
+    <string name="kahf_onboarding_slow">Device is compatible.\nBut blurring images will make the browser slower</string>
+    <string name="kahf_running_prayer">Running Prayer</string>
+    <string name="kahf_running">Running…</string>
+    <string name="kahf_fajr">Fajr</string>
+    <string name="kahf_sunrise">Sunrise</string>
+    <string name="kahf_dhuhr">Dhuhr</string>
+    <string name="kahf_asr">Asr</string>
+    <string name="kahf_tomorrow">Tomorrow</string>
+    <string name="kahf_yesterday">Yesterday</string>
+    <string name="kahf_next_prayer_time">Next Prayer Time</string>
+    <string name="kahf_magrib">Maghrib</string>
+    <string name="kahf_hours">Hours</string>
+    <string name="kahf_hours_left">Hours Left</string>
+    <string name="kahf_secs_left">Secs Left</string>
+    <string name="kahf_hours_until">hours until</string>
+    <string name="kahf_minutes_until">minutes until</string>
+    <string name="kahf_secs_until">secs until</string>
+    <string name="kahf_isha">Isha</string>
+    <string name="kahf_today">Today</string>
+    <string name="kahf_alert">Alert</string>
+    <string name="kahf_location_could_not_get">We couldn\'t retrieve your location information. Please make sure that your phone\'s location features are turned on.</string>
+    <string name="kahf_location_could_not_get_app_level">You must grant location permission in your device\'s settings to view this page. Please go to location permission on redirected page and grant permission.</string>
+    <string name="kahf_ok">OK</string>
+    <string name="kahf_madhab_asr_time">Madhab / Asr Time</string>
+    <string name="kahf_calculation_method">Calculation Method</string>
+    <string name="kahf_adhan">Adhan</string>
+    <string name="kahf_notification">Notification</string>
+    <string name="kahf_notification_message">Notification Message (Sound Only)</string>
+    <string name="kahf_full_adhan_notification">Full Adhan and Notification</string>
+    <string name="kahf_silent">Silent</string>
+    <string name="kahf_no_notification_adhan">No Notification and Adhan</string>
+    <string name="kahf_adhan_and_notification">Adhan &amp; Notification</string>
+    <string name="kahf_update_location">Update location</string>
+    <string name="kahf_location_updated">Location updated</string>
+    <string name="kahf_on_off">On / Off</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Are you sure you want to delete this folder and %1$d item?</item>
+        <item quantity="other">Are you sure you want to delete this folder and %1$d items?</item>
+    </plurals>
 </resources>

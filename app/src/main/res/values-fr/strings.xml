@@ -156,10 +156,16 @@
     <string name="privateSearchTitle">Private Search est activé</string>
     <string name="privateSearchDescription">Kahf Private Search est votre moteur de recherche par défaut, qui vous permet d\'effectuer des recherches sur le Web sans être suivi(e).</string>
     <string name="privateSearchHeadingSearchSettings">Paramètres de recherche</string>
-    <string name="privateSearchAutocompleteToggle">Afficher les suggestions de saisie semi-automatique</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Autres paramètres de recherche</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Personnalisez votre langue de recherche, votre région et plus encore</string>
     <string name="privateSearchMoreSearchSettingsTitle">Autres paramètres de recherche</string>
+    <string name="privateSearchAutocompleteToggle">Afficher les suggestions de saisie semi-automatique</string>
+    <string name="privateSearchAutocompleteHint">Affichez les suggestions de recherche au fur et à mesure que vous tapez, y compris vos signets. Toutes les recherches sont privées.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Sites récemment visités</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Affichez les sites récemment visités dans les suggestions de recherche. Les sites récemment visités sont confidentiels, ne sont stockés que sur votre appareil et peuvent être effacés avec le Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Les suggestions de saisie semi-automatique incluent désormais les sites que vous avez récemment visités. Désactivez cette option dans Paramètres ou effacez à tout moment grâce au Fire Button 🔥.</string>
+    <string name="improvedAutoCompleteIAMTitle">La confidentialité reste la même.\nLes suggestions de recherche s\'améliorent !</string>
+    <string name="openAutoCompleteSettings">Ouvrir les paramètres</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Protection contre le pistage sur le Web</string>
@@ -231,29 +237,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">La désactivation des protections pourrait aider.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Nous avons temporairement désactivé les protections de confidentialité car elles semblent perturber ce site.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Signets</string>
-    <string name="bookmarksActivityTitle">Signets</string>
-    <string name="noBookmarks">Aucun signet ajouté pour le moment</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Plus d\'options pour le signet %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; supprimé</string>
-    <string name="exportBookmarksMenu">Exporter</string>
-    <string name="exportBookmarksEmpty">Rien ne sera exporté car vous n\'avez pas de signet.</string>
-    <string name="exportBookmarksError">Impossible d\'exporter les signets. Un problème est survenu.</string>
-    <string name="exportBookmarksSuccess">Tous les signets ont bien été exportés.</string>
-    <string name="importBookmarksMenu">Importer</string>
-    <string name="importBookmarksFileTitle">Sélectionnez un fichier de signets à importer.</string>
-    <string name="importBookmarksError">Impossible d\'importer les signets. Un problème est survenu.</string>
-    <string name="importBookmarksEmpty">Le fichier ne contient aucun signet à importer.</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Importation réussie de %1$d signets.</string>
-    <string name="savedSiteDialogTitleHint">Titre</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Modifier</string>
-    <string name="bookmarksSectionTitle">Signets</string>
-    <string name="favoritesSectionTitle">Favoris</string>
-    <string name="bookmarksEmptyHint">Aucun signet ajouté pour le moment</string>
-    <string name="favoritesEmptyHint">Aucun favori ajouté pour le moment</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Confirmer</string>
     <string name="dialogSave">Enregistrer</string>
@@ -274,8 +257,6 @@
     <string name="widgetConfigurationAddWidgetOption">Ajouter un widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Aucun favori ajouté pour le moment</string>
     <string name="searchWidgetEmtpyFavoritesCta">Ajouter un favori</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Consultez vos sites préférés en un clin d\'œil !Rendez-vous sur un site que vous aimez particulièrement. Puis appuyez sur l\'icône « ⠇» et sélectionnez Ajouter un favori.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Consultez vos sites préférés en un clin d\'œil ! Rendez-vous sur un site que vous aimez particulièrement. Appuyez ensuite sur l\'icône du menu du navigateur et sélectionnez Ajouter un favori.</string>
     <string name="widgetConfigurationActivityTitle">Configuration des widgets</string>
     <string name="favoritesWidgetLabel">Favoris</string>
     <string name="searchWidgetLabel">Rechercher</string>
@@ -445,14 +426,8 @@
     <string name="systemSearchOnboardingButtonOk">J\'ai compris</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Masquer</string>
-    <string name="daxDialogPhew">Ouf !</string>
-    <string name="daxDialogNext">Suivant</string>
     <string name="daxDialogHighFive">Bien joué !</string>
     <string name="daxDialogGotIt">J\'ai compris</string>
-    <string name="hideTipsTitle">Masquer les conseils restants ?</string>
-    <string name="hideTipsText">Il n\'y en a que quelques-uns et nous avons essayé de les rendre aussi utiles que possible.</string>
-    <string name="hideTipsButton">Masquer les conseils définitivement</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Vous bloquez désormais les traqueurs sur le Web 🎉<br/><br/>Je peux également bloquer les traqueurs qui se cachent dans vos autres applications, même lorsque vous n\'utilisez pas votre téléphone.]]></string>
@@ -463,37 +438,9 @@
     <string name="onboardingWelcomeTitle">"Bienvenue sur Kahf !"</string>
     <string name="onboardingDaxText"><![CDATA[Internet peut être intrusif.\n\nMais ne vous inquiétez pas ! Rechercher et naviguer de manière confidentielle est plus facile que vous ne le pensez.]]></string>
     <string name="onboardingLetsDoItButton">Allons-y !</string>
-    <string name="daxIntroCtaText"><![CDATA[Maintenant, essayez de visiter un de vos sites préférés !<br/><br/>Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner. J\'améliorerai également la sécurité de votre connexion dans la mesure du possible. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Bien joué !<br/><br/>Souvenez-vous : chaque fois que vous naviguez avec moi, des publicités intrusives disparaissent. 👍]]></string>
-    <string name="daxSerpCtaText">Vos recherches sur Kahf sont anonymes. Toujours. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ et <b>%1$d autre</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
-        <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ essayait de vous traquer ici. <br/><br/>Je l\'ai bloqué !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
-        <item quantity="other"><![CDATA[ essayaient de vous traquer ici. <br/><br/>Je les ai bloqués !<br/><br/> ☝️Vous pouvez voir dans la barre d\'adresse URL qui essaie de vous traquer lorsque vous visitez un nouveau site.️️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Lors de votre navigation, je bloque les traqueurs indésirables.<br/><br/>Continuez à naviguer en toute tranquillité !]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Attention ! Je ne peux pas empêcher %1$s de voir votre activité sur %2$s.&lt;br/&gt;&lt;br/&gt;Si vous naviguez avec moi, je peux réduire les données récoltées par %3$s en bloquant ses traqueurs sur de nombreux autres sites.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Attention ! Comme %1$s est propriétaire de %2$s, je ne peux pas l\'empêcher d\'y suivre votre activité.&lt;br/&gt;&lt;br/&gt;Si vous naviguez avec moi, je peux réduire les données récoltées par %3$s en bloquant ses traqueurs sur de nombreux autres sites.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Qu\'est-ce qui vous amène chez Kahf ?</string>
-    <string name="onboardingFeatureOptionsContinue">Continuer</string>
-    <string name="onboardingFeatureOptionsSkip">Ignorer cette étape</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Recherche privée</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">blocage des traqueurs</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Empreinte numérique réduite</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Chargement rapide des pages</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Moins de publicités</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Données supprimées en 1 clic</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Enregistrer %1$s</string>
@@ -641,27 +588,6 @@
     <string name="emailNotSupported">Appareil non pris en charge</string>
     <string name="emailNotSupportedExplanation">La protection des e-mails vous permet de créer des adresses e-mail privées qui suppriment les traqueurs d\'e-mails. Nous devons chiffrer et stocker ces adresses que vous créez localement sur votre appareil. Ce dernier ne prenant pas en charge le stockage chiffré, la protection des e-mails n\'est pas disponible.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Modifier le signet</string>
-    <string name="favoriteDialogTitleEdit">Modifier le favori</string>
-    <string name="locationLabel">Localisation</string>
-    <string name="folderLocationTitle">Sélectionner un emplacement</string>
-    <string name="addFolder">Ajouter le dossier</string>
-    <string name="editFolder">Modifier le dossier</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Supprimer le dossier et son contenu ?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Voulez-vous vraiment supprimer "</string>
-    <string name="bookmarkFolderEmpty">Vide</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s et %3$d élément ?</item>
-        <item quantity="other">%1$s%2$s et %3$d éléments ?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d élément</item>
-        <item quantity="other">%1$d éléments</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Accessibilité</string>
     <string name="accessibilityActivityTitle">Accessibilité</string>
@@ -681,7 +607,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Naviguez incognito avec notre application pour Mac</string>
-    <string name="macos_settings_title">Application Kahf pour Mac</string>
+    <string name="macos_settings_title">Navigateur Kahf pour Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Téléchargements</string>
@@ -743,7 +669,7 @@
     <string name="downloadsNotifyMeSubtitle">Recevez une notification lorsque les téléchargements sont terminés.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Application Kahf pour Windows</string>
+    <string name="windows_settings_title">Navigateur Kahf pour Windows</string>
     <string name="windows_settings_description">Naviguez incognito avec notre application pour Windows</string>
     <string name="windows_settings_description_ready">Téléchargement disponible</string>
     <string name="windows_settings_description_list">Vous êtes sur la liste !</string>
@@ -756,16 +682,6 @@
     <string name="closeAppTabsConfirmationDialogDescription">Voulez-vous vraiment fermer tous les onglets ?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Annuler</string>
     <string name="closeAppTabsConfirmationDialogClose">Fermer</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Supprimer ce signet ?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Cela supprimera votre signet pour &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Supprimer ce favori ?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Cela supprimera votre favori pour &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Supprimer ce dossier de signets ?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Cela supprimera votre dossier de signets &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Annuler</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Supprimer</string>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Ajoutez l\'option Recherche vocale privée à la barre d\'adresse. L\'audio n\'est ni stocké ni partagé avec qui que ce soit, y compris Kahf.</string>
@@ -786,6 +702,58 @@
     <string name="autofillLoginSavedSnackbarMessage">Le mot de passe a été enregistré</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Le mot de passe a été modifié</string>
 
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Ouvrir dans Kahf</string>
+    <string name="runningInDdgMenuItemTitle">S\'exécute dans Kahf</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Avertissement : ce site n\'est peut-être pas sécurisé</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Le certificat de ce site n\'est pas valide. Vous vous connectez peut-être à un serveur qui se fait passer pour %1$s, ce qui pourrait mettre vos informations confidentielles en danger.</string>
+    <string name="sslErrorLeaveCTA">Quitter ce site</string>
+    <string name="sslErrorAdvancedCTA">Options avancées</string>
+    <string name="sslErrorExpandedHeadline">Kahf vous avertit lorsque le certificat d\'un site Web n\'est pas valide.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Accepter le risque et visiter le site<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s a expiré. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s ne correspond pas à *.%2$s. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Le certificat de sécurité de %1$s n\'est pas approuvé par le système d\'exploitation de votre appareil. Il est possible que le site soit mal configuré, qu\'un pirate ait compromis votre connexion ou que l\'horloge de votre système soit incorrecte.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Bonjour.<br/><br/>Envie de profiter d\'Internet d\'une meilleure façon plus confidentielle ?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Allons-y !</string>
+    <string name="preOnboardingDaxDialog2Title">Protections de la confidentialité activées !</string>
+    <string name="preOnboardingDaxDialog2Button">Choisissez votre navigateur</string>
+    <string name="preOnboardingComparisonChartItem1">Faire une recherche privée par défaut</string>
+    <string name="preOnboardingComparisonChartItem2">Bloquer les traqueurs tiers</string>
+    <string name="preOnboardingComparisonChartItem3">Bloquez les fenêtres contextuelles de cookies</string>
+    <string name="preOnboardingComparisonChartItem4">Bloquez les publicités douteuses</string>
+    <string name="preOnboardingComparisonChartItem5">Effacer rapidement les données de navigation</string>
+    <string name="preOnboardingDaxDialog3Title">Génial ! Bienvenue chez Kahf.</string>
+    <string name="preOnboardingDaxDialog3Button">Commencer la navigation</string>
+    <string name="onboardingSearchDaxDialogTitle">Essayez une recherche !</string>
+    <string name="onboardingSearchDaxDialogDescription">Vos recherches sur Kahf sont toujours anonymes.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">comment dire « canard » en anglais</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">comment dire « duck » en espagnol</string>
+    <string name="onboardingSearchQueryOption1">comment dire canard en anglais</string>
+    <string name="onboardingSearchQueryOption1English">comment dire « canard » en espagnol</string>
+    <string name="onboardingSearchDaxDialogOption2">casting d\'avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">casting de mighty ducks</string>
+    <string name="onboardingSearchDaxDialogOption3">météo locale</string>
+    <string name="onboardingSearchDaxDialogOption4">Surprenez-moi !</string>
+    <string name="onboardingSearchQueryOption4">recettes pour le dîner</string>
+    <string name="onboardingSearchQueryOption4US">recettes de cookies aux pépites de chocolat</string>
+    <string name="onboardingSitesDaxDialogTitle">Essayez de visiter un site !</string>
+    <string name="onboardingSitesDaxDialogDescription">Je bloquerai les traqueurs afin qu\'ils ne puissent pas vous espionner.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Surprenez-moi !</string>
+    <string name="onboardingSerpDaxDialogDescription">C\'est Kahf Search. Privé. Rapide. Moins de publicités.</string>
+    <string name="onboardingSerpDaxDialogButton">J\'ai compris !</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Ensuite, essayez de visiter un site !</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ et <b>%1$d autre</b> essayaient de vous suivre ici. Je les ai bloqués !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
+        <item quantity="other"><![CDATA[ et <b>%1$d autres</b> essayaient de vous suivre ici. Je les ai bloqués !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
+    </plurals>
     <string name="safegaze_popup_report_title">Veuillez signaler tout bogue ou suggestion via ce formulaire</string>
     <string name="safegaze_popup_support_title">Soutenez ce projet</string>
     <string name="safegaze_popup_woman_title">Je suis une femme</string>
@@ -810,7 +778,7 @@
     <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Favori ajouté dans %1$s</string>
     <string name="addToFavorites">Ajouter aux favoris</string>
     <string name="editBookmark">Modifier le signet</string>
-    <string name="importBookmarksDescription">Si vos favoris sont enregistrés dans un autre navigateur, vous\npouvez les importer dans DuckDuckGo.</string>
+    <string name="importBookmarksDescription">Si vos favoris sont enregistrés dans un autre navigateur, vous\npouvez les importer dans Kahf.</string>
     <string name="importBookmarks">Importer des favoris</string>
     <string name="noResultsFor" instruction="%1$s is the search term">Aucun résultat pour « %1$s »</string>
     <string name="removeFromFavorites">Supprimer des favoris</string>
@@ -819,5 +787,14 @@
         <item quantity="one">Voulez-vous vraiment supprimer ce dossier et %1$d élément ?</item>
         <item quantity="other">Voulez-vous vraiment supprimer ce dossier et %1$d éléments ?</item>
     </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Voulez-vous vraiment supprimer votre favori pour &lt;b&gt;%1$s&lt;/b&gt; ?</string>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ essayait de vous suivre ici. Je l\'ai bloqué !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
+        <item quantity="other"><![CDATA[ essayaient de vous suivre ici. Je les ai bloqués !<br/><br/>☝️ Appuyez sur le bouclier pour en savoir plus.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">J\'ai compris !</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Effacez instantanément votre activité de navigation avec le <b>Fire Button</b>.<br/><br/>Essayez par vous-même ! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Bien joué !"</string>
+    <string name="onboardingEndDaxDialogDescription">Pensez-y : chaque fois que vous naviguez avec moi, une publicité douteuse disparaît. 👌</string>
+    <string name="onboardingEndDaxDialogButton">C\'est fait !</string>
+
 </resources>

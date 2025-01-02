@@ -3,17 +3,19 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.9.20'
+        kotlin_version = '1.9.22'
         spotless = '6.1.2'
-        anvil_version = '2.4.9'
-        ksp_version = '1.9.20-1.0.14'
-        gradle_plugin = '8.1.2'
+        anvil_version = '2.5.0-beta07'
+        ksp_version = '1.9.22-1.0.17'
+        gradle_plugin = '8.2.0'
         min_sdk = 26
         target_sdk = 34
         compile_sdk = 34
         fladle_version = '0.17.4'
         kotlinter_version = '3.12.0'
         dokka_version = '1.8.20'
+        google_services_version = '4.4.2'
+        firebase_crashlytics_version = '3.0.2'
 
         // Calculate lint_version (must always be gradle_plugin + 23)
         def components = gradle_plugin.split('\\.')
@@ -30,6 +32,8 @@ buildscript {
         classpath "com.diffplug.spotless:spotless-plugin-gradle:$spotless"
         classpath "com.squareup.anvil:gradle-plugin:$anvil_version"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.google.gms:google-services:$google_services_version"
+        classpath "com.google.firebase:firebase-crashlytics-gradle:$firebase_crashlytics_version"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -123,7 +127,8 @@ subprojects {
                         if (dependencyPath == projectPath) continue
                         // internal modules have to use internalImplementation
                         // when a non internal configuration is built (i.e. PlayDebug) no internal dependencies should be found
-                        if (dependencyPath.endsWith('internal') && !name.toLowerCase().contains("internal")) {
+                        def internalExceptions = []
+                        if (dependencyPath.endsWith('internal') && !internalExceptions.contains(dependencyPath) && !name.toLowerCase().contains("internal")) {
                             throw new GradleException("Invalid dependency $projectPath -> $dependencyPath. " +
                                     "'internal' modules must use internalImplementation")
                         }

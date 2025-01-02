@@ -193,6 +193,31 @@ class TabDataRepository @Inject constructor(
         }
     }
 
+    override suspend fun addNewTabAfterExistingTabAndGetId(
+        url: String?,
+        tabId: String,
+    ): String {
+        val id = generateTabId()
+
+        databaseExecutor().scheduleDirect {
+            val position = tabsDao.tab(tabId)?.position ?: -1
+            val uri = Uri.parse(url)
+            val title = uri.host?.removePrefix("www.") ?: url
+            val tab = TabEntity(
+                tabId = id,
+                url = url,
+                title = title,
+                skipHome = false,
+                viewed = false,
+                position = position + 1,
+                sourceTabId = tabId,
+            )
+            tabsDao.insertTabAtPosition(tab)
+        }
+
+        return id
+    }
+
     override suspend fun update(
         tabId: String,
         site: Site?,

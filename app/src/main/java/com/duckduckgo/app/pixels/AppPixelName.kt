@@ -23,6 +23,8 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     PROCESS_CREATED_MAIN("m_process_created_main"),
     PROCESS_CREATED_VPN("m_process_created_vpn"),
 
+    APP_LAUNCH_VERIFIED_INSTALL("m_app_launched_on_verified_play_store_install"),
+
     FORGET_ALL_PRESSED_BROWSING("mf_bp"),
     FORGET_ALL_PRESSED_TABSWITCHING("mf_tp"),
     FORGET_ALL_EXECUTED("mf"),
@@ -34,6 +36,12 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     BROKEN_SITE_ALLOWLIST_ADD("m_broken_site_allowlist_add"),
     BROKEN_SITE_ALLOWLIST_REMOVE("m_broken_site_allowlist_remove"),
 
+    PREONBOARDING_INTRO_SHOWN_UNIQUE("m_preonboarding_intro_shown_unique"),
+    PREONBOARDING_COMPARISON_CHART_SHOWN_UNIQUE("m_preonboarding_comparison_chart_shown_unique"),
+    PREONBOARDING_CHOOSE_BROWSER_PRESSED("m_preonboarding_choose_browser_pressed"),
+    PREONBOARDING_AFFIRMATION_SHOWN_UNIQUE("m_preonboarding_affirmation_shown_unique"),
+    ONBOARDING_SEARCH_CUSTOM("m_onboarding_search_custom"),
+    ONBOARDING_VISIT_SITE_CUSTOM("m_onboarding_visit_site_custom"),
     ONBOARDING_DAX_CTA_SHOWN("m_odc_s"),
     ONBOARDING_DAX_ALL_CTA_HIDDEN("m_odc_h"),
     ONBOARDING_DAX_CTA_OK_BUTTON("m_odc_ok"),
@@ -61,7 +69,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FAVORITES_WIDGETS_DARK(pixelName = "m_sfw_dk"),
     FAVORITES_WIDGETS_SYSTEM(pixelName = "m_sfw_sd"),
 
-    FAVORITES_ONBOARDING_CTA_SHOWN("m_fo_s"),
     FAVORITE_OMNIBAR_ITEM_PRESSED("m_fav_o"),
     FAVORITE_HOMETAB_ITEM_PRESSED("m_fav_ht"),
     FAVORITE_BOOKMARKS_ITEM_PRESSED("m_fav_b"),
@@ -71,7 +78,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     APP_WIDGET_LAUNCH(pixelName = "m_w_l"),
     APP_FAVORITES_SEARCHBAR_WIDGET_LAUNCH(pixelName = "m_sfbw_l"),
     APP_FAVORITES_ITEM_WIDGET_LAUNCH(pixelName = "m_sfiw_l"),
-    APP_EMPTY_VIEW_WIDGET_LAUNCH(pixelName = "m_sfew_l"),
     APP_ASSIST_LAUNCH(pixelName = "m_a_l"),
     APP_SYSTEM_SEARCH_BOX_LAUNCH(pixelName = "m_ssb_l"),
     APP_THIRD_PARTY_LAUNCH(pixelName = "m_third_party_launch"),
@@ -119,7 +125,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_WINDOWS_APP_PRESSED("ms_windows_app_setting_pressed"),
     SETTINGS_EMAIL_PROTECTION_PRESSED("ms_email_protection_setting_pressed"),
     SETTINGS_APPTP_PRESSED("ms_apptp_setting_pressed"),
-    SETTINGS_NETP_PRESSED("ms_netp_setting_pressed"),
     SETTINGS_GPC_PRESSED("ms_gpc_pressed"),
     SETTINGS_FIREPROOF_WEBSITES_PRESSED("ms_fireproof_websites_pressed"),
     SETTINGS_AUTOMATICALLY_CLEAR_WHAT_PRESSED("ms_automatically_clear_what_pressed"),
@@ -129,7 +134,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     SETTINGS_ABOUT_DDG_PRIVACY_POLICY_PRESSED("ms_about_ddg_privacy_policy_pressed"),
     SETTINGS_ABOUT_DDG_VERSION_EASTER_EGG_PRESSED("ms_about_ddg_version_easter_egg_pressed"),
     SETTINGS_ABOUT_DDG_SHARE_FEEDBACK_PRESSED("ms_about_ddg_share_feedback_pressed"),
-    SETTINGS_ABOUT_DDG_NETP_UNLOCK_PRESSED("ms_about_ddg_netp_unlock_pressed"),
     SETTINGS_PRIVATE_SEARCH_MORE_SEARCH_SETTINGS_PRESSED("ms_private_search_more_search_settings_pressed"),
     SETTINGS_COOKIE_POPUP_PROTECTION_PRESSED("ms_cookie_popup_protection_setting_pressed"),
     SETTINGS_FIRE_BUTTON_PRESSED("ms_fire_button_setting_pressed"),
@@ -144,6 +148,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     NOTIFICATION_CANCELLED("mnot_c"),
     NOTIFICATIONS_ENABLED("mnot_e"),
     NOTIFICATIONS_DISABLED("mnot_d"),
+    NOTIFICATION_RUNTIME_PERMISSION_SHOWN("m_notification_runtime_permission_shown"),
 
     AUTOMATIC_CLEAR_DATA_WHAT_SHOWN("macwhat_s"),
     AUTOMATIC_CLEAR_DATA_WHAT_OPTION_NONE("macwhat_n"),
@@ -178,8 +183,28 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     FEEDBACK_POSITIVE_SUBMISSION("mfbs_%s_submit"),
     FEEDBACK_NEGATIVE_SUBMISSION("mfbs_%s_%s_%s"),
 
-    AUTOCOMPLETE_BOOKMARK_SELECTION("m_aut_s_b"),
-    AUTOCOMPLETE_SEARCH_SELECTION("m_aut_s_s"),
+    AUTOCOMPLETE_BOOKMARK_SELECTION("m_autocomplete_click_bookmark"),
+    AUTOCOMPLETE_FAVORITE_SELECTION("m_autocomplete_click_favorite"),
+    AUTOCOMPLETE_SEARCH_PHRASE_SELECTION("m_autocomplete_click_phrase"),
+    AUTOCOMPLETE_SEARCH_WEBSITE_SELECTION("m_autocomplete_click_website"),
+
+    AUTOCOMPLETE_HISTORY_SEARCH_SELECTION("m_autocomplete_click_history_search"),
+    AUTOCOMPLETE_HISTORY_SITE_SELECTION("m_autocomplete_click_history_site"),
+
+    AUTOCOMPLETE_TOGGLED_OFF("m_autocomplete_recent_sites_toggled_off"),
+    AUTOCOMPLETE_TOGGLED_ON("m_autocomplete_recent_sites_toggled_on"),
+
+    AUTOCOMPLETE_HISTORY_TOGGLED_OFF("m_autocomplete_history_toggled_off"),
+    AUTOCOMPLETE_HISTORY_TOGGLED_ON("m_autocomplete_history_toggled_on"),
+
+    AUTOCOMPLETE_BANNER_SHOWN("m_autocomplete_recent_sites_intro_message_displayed"),
+    AUTOCOMPLETE_BANNER_DISMISSED("m_autocomplete_recent_sites_intro_message_dismissed"),
+
+    AUTOCOMPLETE_DISPLAYED_LOCAL_BOOKMARK("m_autocomplete_displayed_bookmark"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_FAVORITE("m_autocomplete_displayed_favorite"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_WEBSITE("m_autocomplete_displayed_website"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY("m_autocomplete_displayed_history_site"),
+    AUTOCOMPLETE_DISPLAYED_LOCAL_HISTORY_SEARCH("m_autocomplete_displayed_history_search"),
 
     SERP_REQUERY("rq_%s"),
 
@@ -206,6 +231,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     MENU_ACTION_SETTINGS_PRESSED("m_nav_s_p"),
     MENU_ACTION_APP_LINKS_OPEN_PRESSED("m_nav_app_links_open_menu_item_pressed"),
     MENU_ACTION_DOWNLOADS_PRESSED("m_nav_downloads_menu_item_pressed"),
+    MENU_ACTION_AUTOFILL_PRESSED("m_nav_autofill_menu_item_pressed"),
 
     FIREPROOF_WEBSITE_ADDED("m_fw_a"),
     FIREPROOF_WEBSITE_REMOVE("m_fw_r"),
@@ -241,7 +267,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
 
     FIRE_DIALOG_PROMOTED_CLEAR_PRESSED("m_fdp_p"),
     FIRE_DIALOG_CLEAR_PRESSED("m_fd_p"),
-    FIRE_DIALOG_PROMOTED_CANCEL("m_fdp_c"),
     FIRE_DIALOG_CANCEL("m_fd_c"),
     FIRE_DIALOG_ANIMATION("m_fd_a"),
 
@@ -253,9 +278,6 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_EMAIL_OVERRIDE_PIXEL("m_sync_duck_address_override"),
 
     EMAIL_COPIED_TO_CLIPBOARD("email_generated_button"),
-    EMAIL_DID_SHOW_WAITLIST_DIALOG("email_did_show_waitlist_dialog"),
-    EMAIL_DID_PRESS_WAITLIST_DIALOG_NOTIFY_ME("email_did_press_waitlist_dialog_notify_me"),
-    EMAIL_DID_PRESS_WAITLIST_DIALOG_NO_THANKS("email_did_press_waitlist_dialog_dismiss"),
 
     ENCRYPTION_UNABLE_TO_DECRYPT_SECURE_EMAIL_DATA("m_unable_to_decrypt_secure_email_data"),
     ENCRYPTED_IO_EXCEPTION("m_e_io_e"),
@@ -268,4 +290,48 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     REMOTE_MESSAGE_SECONDARY_ACTION_CLICKED("m_remote_message_secondary_action_clicked"),
     REMOTE_MESSAGE_ACTION_CLICKED("m_remote_message_action_clicked"),
     REMOTE_MESSAGE_SHARED("m_remote_message_share"),
+
+    PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE("m_privacy-pro_is-enabled"),
+
+    SSL_CERTIFICATE_WARNING_CLOSE_PRESSED("m_certificate_warning_leave_clicked"),
+    SSL_CERTIFICATE_WARNING_ADVANCED_PRESSED("m_certificate_warning_advanced_clicked"),
+    SSL_CERTIFICATE_WARNING_PROCEED_PRESSED("m_certificate_warning_proceed_clicked"),
+    SSL_CERTIFICATE_WARNING_WRONG_HOST_SHOWN("m_certificate_warning_displayed_wrong_host"),
+    SSL_CERTIFICATE_WARNING_EXPIRED_SHOWN("m_certificate_warning_displayed_expired"),
+    SSL_CERTIFICATE_WARNING_UNTRUSTED_SHOWN("m_certificate_warning_displayed_untrusted"),
+    SSL_CERTIFICATE_WARNING_GENERIC_SHOWN("m_certificate_warning_displayed_generic"),
+
+    FORCE_DARK_MODE_ENABLED("ms_forced_dark_toggled_on"),
+    FORCE_DARK_MODE_DISABLED("ms_forced_dark_toggled_off"),
+
+    ADDRESS_BAR_NEW_TAB_PAGE_CLICKED("m_addressbar_click_ntp"),
+    ADDRESS_BAR_WEBSITE_CLICKED("m_addressbar_click_website"),
+    ADDRESS_BAR_SERP_CLICKED("m_addressbar_click_serp"),
+    ADDRESS_BAR_NEW_TAB_PAGE_ENTRY_CLEARED("m_addressbar_focus_clear_entry_ntp"),
+    ADDRESS_BAR_WEBSITE_ENTRY_CLEARED("m_addressbar_focus_clear_entry_website"),
+    ADDRESS_BAR_SERP_ENTRY_CLEARED("m_addressbar_focus_clear_entry_serp"),
+    ADDRESS_BAR_NEW_TAB_PAGE_CANCELLED("m_addressbar_focus_cancel_ntp"),
+    ADDRESS_BAR_WEBSITE_CANCELLED("m_addressbar_focus_cancel_website"),
+    ADDRESS_BAR_SERP_CANCELLED("m_addressbar_focus_cancel_serp"),
+
+    KEYBOARD_GO_NEW_TAB_CLICKED("m_keyboard_go_click_ntp"),
+    KEYBOARD_GO_WEBSITE_CLICKED("m_keyboard_go_click_website"),
+    KEYBOARD_GO_SERP_CLICKED("m_keyboard_go_click_serp"),
+
+    TAB_MANAGER_CLICKED("m_tab_manager_clicked"),
+    TAB_MANAGER_NEW_TAB_CLICKED("m_tab_manager_new_tab_click"),
+    TAB_MANAGER_SWITCH_TABS("m_tab_manager_switch_tabs"),
+    TAB_MANAGER_CLOSE_TAB_CLICKED("m_tab_manager_close_tab_click"),
+    TAB_MANAGER_CLOSE_TAB_SWIPED("m_tab_manager_close_tab_swipe"),
+    TAB_MANAGER_NEW_TAB_LONG_PRESSED("m_tab_manager_long_press_new_tab"),
+    TAB_MANAGER_UP_BUTTON_PRESSED("m_tab_manager_exit_back_arrow"),
+    TAB_MANAGER_BACK_BUTTON_PRESSED("m_tab_manager_exit_other"),
+    TAB_MANAGER_MENU_PRESSED("m_tab_manager_menu"),
+    TAB_MANAGER_MENU_NEW_TAB_PRESSED("m_tab_manager_menu_new_tab"),
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_PRESSED("m_tab_manager_menu_close_all_tabs"),
+    TAB_MANAGER_MENU_CLOSE_ALL_TABS_CONFIRMED("m_tab_manager_menu_close_all_tabs_confirm"),
+    TAB_MANAGER_MENU_DOWNLOADS_PRESSED("m_tab_manager_menu_downloads"),
+    TAB_MANAGER_MENU_SETTINGS_PRESSED("m_tab_manager_menu_settings"),
+
+    ADD_BOOKMARK_CONFIRM_EDITED("m_add_bookmark_confirm_edit"),
 }

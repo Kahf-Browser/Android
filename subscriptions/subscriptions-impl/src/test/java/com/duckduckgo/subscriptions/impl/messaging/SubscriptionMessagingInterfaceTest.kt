@@ -6,10 +6,14 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHelper
 import com.duckduckgo.js.messaging.api.JsRequestResponse
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
+import com.duckduckgo.subscriptions.impl.AccessToken
 import com.duckduckgo.subscriptions.impl.AuthToken
+import com.duckduckgo.subscriptions.impl.SubscriptionsChecker
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
-import kotlinx.coroutines.test.TestScope
+import com.duckduckgo.subscriptions.impl.repository.Entitlement
+import com.duckduckgo.subscriptions.impl.repository.Subscription
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.*
@@ -23,6 +27,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
@@ -33,12 +38,14 @@ class SubscriptionMessagingInterfaceTest {
     private val jsMessageHelper: JsMessageHelper = mock()
     private val subscriptionsManager: SubscriptionsManager = mock()
     private val pixelSender: SubscriptionPixelSender = mock()
+    private val subscriptionsChecker: SubscriptionsChecker = mock()
     private val messagingInterface = SubscriptionMessagingInterface(
         subscriptionsManager,
         jsMessageHelper,
         coroutineRule.testDispatcherProvider,
-        TestScope(),
+        coroutineRule.testScope,
         pixelSender,
+        subscriptionsChecker,
     )
 
     private val callback = object : JsMessageCallback() {
@@ -91,7 +98,7 @@ class SubscriptionMessagingInterfaceTest {
 
     @Test
     fun whenProcessInterfaceNotRegisteredDoNothing() = runTest {
-        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com")
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"getSubscription","id":"myId","params":{}}
@@ -118,7 +125,35 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
-    fun whenProcessAndGetSubscriptionsMessageThenReturnResponse() = runTest {
+    fun whenProcessAndGetSubscriptionsMessageIfActiveThenReturnResponse() = runTest {
+        givenInterfaceIsRegistered()
+        givenAuthTokenIsSuccess()
+        givenSubscriptionIsActive()
+
+        val expected = JsRequestResponse.Success(
+            context = "subscriptionPages",
+            featureName = "useSubscription",
+            method = "getSubscription",
+            id = "myId",
+            result = JSONObject("""{ "token":"authToken"}"""),
+        )
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getSubscription","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        val captor = argumentCaptor<JsRequestResponse>()
+        verify(jsMessageHelper).sendJsResponse(captor.capture(), eq(CALLBACK_NAME), eq(SECRET), eq(webView))
+        val jsMessage = captor.firstValue
+
+        assertTrue(jsMessage is JsRequestResponse.Success)
+        checkEquals(expected, jsMessage)
+    }
+
+    @Test
+    fun whenProcessAndGetSubscriptionsMessageIfNotActiveThenReturnResponse() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
 
@@ -172,6 +207,33 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun whenProcessAndGetSubscriptionsMessageIfTokenExpiredThenReturnResponse() = runTest {
+        givenInterfaceIsRegistered()
+        givenAuthTokenIsExpired()
+
+        val expected = JsRequestResponse.Success(
+            context = "subscriptionPages",
+            featureName = "useSubscription",
+            method = "getSubscription",
+            id = "myId",
+            result = JSONObject("""{ "token":"authToken"}"""),
+        )
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getSubscription","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        val captor = argumentCaptor<JsRequestResponse>()
+        verify(jsMessageHelper).sendJsResponse(captor.capture(), eq(CALLBACK_NAME), eq(SECRET), eq(webView))
+        val jsMessage = captor.firstValue
+
+        assertTrue(jsMessage is JsRequestResponse.Success)
+        checkEquals(expected, jsMessage)
+    }
+
+    @Test
     fun whenProcessAndGetSubscriptionsIfFeatureNameDoesNotMatchDoNothing() = runTest {
         givenInterfaceIsRegistered()
         givenAuthTokenIsSuccess()
@@ -192,6 +254,74 @@ class SubscriptionMessagingInterfaceTest {
 
         val message = """
             {"context":"subscriptionPages","featureName":"useSubscription","method":"getSubscription", "params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verifyNoInteractions(jsMessageHelper)
+    }
+
+    @Test
+    fun whenProcessAndGetAccessTokenThenReturnResponse() = runTest {
+        givenInterfaceIsRegistered()
+        givenAccessTokenIsSuccess()
+
+        val expected = JsRequestResponse.Success(
+            context = "subscriptionPages",
+            featureName = "useSubscription",
+            method = "getAccessToken",
+            id = "myId",
+            result = JSONObject("""{ token:"accessToken" }"""),
+        )
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getAccessToken","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        val captor = argumentCaptor<JsRequestResponse>()
+        verify(jsMessageHelper).sendJsResponse(captor.capture(), eq(CALLBACK_NAME), eq(SECRET), eq(webView))
+        val jsMessage = captor.firstValue
+
+        assertTrue(jsMessage is JsRequestResponse.Success)
+        checkEquals(expected, jsMessage)
+    }
+
+    @Test
+    fun whenProcessAndGetAccessTokenMessageErrorThenReturnResponse() = runTest {
+        givenInterfaceIsRegistered()
+        givenAccessTokenIsFailure()
+
+        val expected = JsRequestResponse.Success(
+            context = "subscriptionPages",
+            featureName = "useSubscription",
+            method = "getAccessToken",
+            id = "myId",
+            result = JSONObject("""{ }"""),
+        )
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getAccessToken","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        val captor = argumentCaptor<JsRequestResponse>()
+        verify(jsMessageHelper).sendJsResponse(captor.capture(), eq(CALLBACK_NAME), eq(SECRET), eq(webView))
+        val jsMessage = captor.firstValue
+
+        assertTrue(jsMessage is JsRequestResponse.Success)
+        checkEquals(expected, jsMessage)
+    }
+
+    @Test
+    fun whenProcessAndGetAccessTokenIfNoIdDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+        givenAuthTokenIsSuccess()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"getAccessToken","params":{}}
         """.trimIndent()
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
@@ -249,9 +379,10 @@ class SubscriptionMessagingInterfaceTest {
 
         messagingInterface.process(message, "duckduckgo-android-messaging-secret")
 
-        verify(subscriptionsManager).authenticate("authToken")
+        verify(subscriptionsManager).exchangeAuthToken("authToken")
         verify(pixelSender).reportRestoreUsingEmailSuccess()
         verify(pixelSender).reportSubscriptionActivated()
+        assertEquals(0, callback.counter)
     }
 
     @Test
@@ -400,9 +531,120 @@ class SubscriptionMessagingInterfaceTest {
         assertEquals(0, callback.counter)
     }
 
+    @Test
+    fun whenProcessAndBackToSettingsActivateSuccessIfFeatureNameDoesNotMatchDoNothing() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"test","id":"myId","method":"backToSettingsActivateSuccess","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(0, callback.counter)
+    }
+
+    @Test
+    fun whenProcessAndBackToSettingsActiveSuccessThenCallbackExecuted() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","id":"myId","method":"backToSettingsActivateSuccess","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun whenProcessAndMonthlyPriceClickedThenPixelSent() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsMonthlyPriceClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(pixelSender).reportMonthlyPriceClick()
+        verifyNoMoreInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenProcessAndYearlyPriceClickedThenPixelSent() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsYearlyPriceClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(pixelSender).reportYearlyPriceClick()
+        verifyNoMoreInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenProcessAndAddEmailSuccessThenPixelSent() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsAddEmailSuccess","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(pixelSender).reportAddEmailSuccess()
+        verifyNoMoreInteractions(pixelSender)
+    }
+
+    @Test
+    fun whenProcessAndFaqClickedThenCallbackExecuted() = runTest {
+        val jsMessageCallback: JsMessageCallback = mock()
+        messagingInterface.register(webView, jsMessageCallback)
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsWelcomeFaqClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(jsMessageCallback).process(eq("useSubscription"), eq("subscriptionsWelcomeFaqClicked"), any(), any())
+    }
+
+    @Test
+    fun whenProcessAndAddEmailClickedThenCallbackExecuted() = runTest {
+        val jsMessageCallback: JsMessageCallback = mock()
+        messagingInterface.register(webView, jsMessageCallback)
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"subscriptionsWelcomeAddEmailClicked","id":"myId","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        verify(jsMessageCallback).process(eq("useSubscription"), eq("subscriptionsWelcomeAddEmailClicked"), any(), any())
+    }
+
     private fun givenInterfaceIsRegistered() {
         messagingInterface.register(webView, callback)
-        whenever(webView.url).thenReturn("https://abrown.duckduckgo.com/test")
+        whenever(webView.url).thenReturn("https://duckduckgo.com/test")
+    }
+
+    private suspend fun givenSubscriptionIsActive() {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = "productId",
+                startedAt = 10000L,
+                expiresOrRenewsAt = 10000L,
+                status = AUTO_RENEWABLE,
+                platform = "google",
+                entitlements = listOf(Entitlement("name", "product")),
+            ),
+        )
     }
 
     private suspend fun givenAuthTokenIsSuccess() {
@@ -410,7 +652,19 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     private suspend fun givenAuthTokenIsFailure() {
-        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Failure(message = "something happened"))
+        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Failure.UnknownError)
+    }
+
+    private suspend fun givenAuthTokenIsExpired() {
+        whenever(subscriptionsManager.getAuthToken()).thenReturn(AuthToken.Failure.TokenExpired(authToken = "authToken"))
+    }
+
+    private suspend fun givenAccessTokenIsSuccess() {
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessToken.Success(accessToken = "accessToken"))
+    }
+
+    private suspend fun givenAccessTokenIsFailure() {
+        whenever(subscriptionsManager.getAccessToken()).thenReturn(AccessToken.Failure(message = "something happened"))
     }
 
     private fun checkEquals(expected: JsRequestResponse, actual: JsRequestResponse) {

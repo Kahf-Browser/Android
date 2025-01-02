@@ -21,20 +21,20 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.impl.databinding.ViewPirSettingsBinding
 import com.duckduckgo.subscriptions.impl.pir.PirActivity.Companion.PirScreenWithEmptyParams
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Command.OpenPir
-import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.Factory
 import com.duckduckgo.subscriptions.impl.settings.views.PirSettingViewModel.ViewState
 import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
@@ -53,7 +53,7 @@ class PirSettingView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyle) {
 
     @Inject
-    lateinit var viewModelFactory: Factory
+    lateinit var viewModelFactory: ViewViewModelFactory
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -72,7 +72,7 @@ class PirSettingView @JvmOverloads constructor(
         AndroidSupportInjection.inject(this)
         super.onAttachedToWindow()
 
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.addObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.addObserver(viewModel)
 
         binding.pirSettings.setClickListener {
             viewModel.onPir()
@@ -92,7 +92,7 @@ class PirSettingView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
-        ViewTreeLifecycleOwner.get(this)?.lifecycle?.removeObserver(viewModel)
+        findViewTreeLifecycleOwner()?.lifecycle?.removeObserver(viewModel)
         coroutineScope?.cancel()
         job.cancel()
         coroutineScope = null

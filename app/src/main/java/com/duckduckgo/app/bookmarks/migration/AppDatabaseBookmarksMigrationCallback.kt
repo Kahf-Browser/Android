@@ -56,7 +56,7 @@ class AppDatabaseBookmarksMigrationCallback(
             cleanUpTables()
         }
 
-        val needsOldFavouritesMigration = needsOldFavouritesMigration()
+        val needsOldFavouritesMigration = runCatching { needsOldFavouritesMigration() }.getOrDefault(emptyList())
         if (needsOldFavouritesMigration.isNotEmpty()) {
             runOldFavouritesMigration(needsOldFavouritesMigration)
         }
@@ -194,6 +194,7 @@ class AppDatabaseBookmarksMigrationCallback(
         }
     }
 
+    @Throws(NullPointerException::class)
     private fun needsOldFavouritesMigration(): List<Entity> {
         // https://app.asana.com/0/0/1204697337057464/f
         // during the initial migration of favourites we didn't properly add them to bookmarks

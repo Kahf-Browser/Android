@@ -1,0 +1,41 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginHorizontal="5dp"
+    android:layout_gravity="center">
+
+    <ImageView
+        android:id="@+id/ivCheck"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="10dp"
+        android:contentDescription="@string/checkbox_label_title"
+        android:elevation="5dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_check_green" />
+
+    <RelativeLayout
+        android:id="@+id/btnContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:paddingHorizontal="25dp"
+        android:background="@drawable/kahf_button_bg">
+
+        <TextView
+            android:id="@+id/btnLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            tools:text="@string/kahf_high"
+            android:layout_marginVertical="12dp"
+            android:textColor="?attr/kahfCardBackground"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            tools:ignore="DeprecatedWidgetInXml" />
+
+    </RelativeLayout>
+
+</FrameLayout>

@@ -156,10 +156,16 @@
     <string name="privateSearchTitle">Soukromé vyhledávání je povolené</string>
     <string name="privateSearchDescription">Kahf Private Search je tvůj výchozí vyhledávač, takže můžeš hledat na webu, aniž by tě někdo sledoval.</string>
     <string name="privateSearchHeadingSearchSettings">Nastavení vyhledávání</string>
-    <string name="privateSearchAutocompleteToggle">Zobrazit návrhy automatického doplňování</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Další nastavení vyhledávání</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Přizpůsob si jazyk vyhledávání, region a další nastavení</string>
     <string name="privateSearchMoreSearchSettingsTitle">Další nastavení vyhledávání</string>
+    <string name="privateSearchAutocompleteToggle">Zobrazit návrhy automatického doplňování</string>
+    <string name="privateSearchAutocompleteHint">Nech si při psaní zobrazovat návrhy vyhledávání včetně záložek. Všechna vyhledávání jsou soukromá.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Nedávno navštívené stránky</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Zobrazovat poslední navštívené weby v návrzích vyhledávání. Poslední navštívené weby jsou soukromé, ukládají se jen do tvého zařízení a dají se vymazat tlačítkem Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Návrhy automatického doplňování teď zahrnují tvoje nedávno navštívené stránky. Vypnout se dají v nastavení nebo je můžeš kdykoli vymazat tlačítkem 🔥 Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">Stejné soukromí.\nLepší návrhy pro vyhledávání!</string>
+    <string name="openAutoCompleteSettings">Otevřít nastavení</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Ochrana před sledováním na webu</string>
@@ -231,29 +237,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Možná zabere vypnutí ochrany.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Dočasně jsme vypnuli ochranu osobních údajů, protože se zdá, že při načítání stránky způsobuje chyby.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Záložky</string>
-    <string name="bookmarksActivityTitle">Záložky</string>
-    <string name="noBookmarks">Zatím nebyly přidány žádné záložky.</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Další možnosti záložky %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Odstraněno &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Exportovat</string>
-    <string name="exportBookmarksEmpty">Nemáte záložky, nic nebude exportováno</string>
-    <string name="exportBookmarksError">Nepodařilo se exportovat žádné záložky, něco se pokazilo</string>
-    <string name="exportBookmarksSuccess">Všechny záložky byly úspěšně exportovány</string>
-    <string name="importBookmarksMenu">Importovat</string>
-    <string name="importBookmarksFileTitle">Vyberte soubor se záložkami, který chcete importovat</string>
-    <string name="importBookmarksError">Nepodařilo se importovat žádné záložky, něco se pokazilo</string>
-    <string name="importBookmarksEmpty">Soubor nemá žádné záložky k importování</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Úspěšně importovaných %1$d záložek</string>
-    <string name="savedSiteDialogTitleHint">Název</string>
-    <string name="savedSiteDialogUrlHint">URL adresa</string>
-    <string name="savedSiteDialogTitleEdit">Upravit</string>
-    <string name="bookmarksSectionTitle">Záložky</string>
-    <string name="favoritesSectionTitle">Oblíbené</string>
-    <string name="bookmarksEmptyHint">Zatím nebyly přidány žádné záložky.</string>
-    <string name="favoritesEmptyHint">Zatím nebyly přidány žádné oblíbené položky</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Potvrdit</string>
     <string name="dialogSave">Uložit</string>
@@ -274,8 +257,6 @@
     <string name="widgetConfigurationAddWidgetOption">Přidat widget</string>
     <string name="searchWidgetEmtpyFavoritesHint">Zatím nebyly přidány žádné oblíbené položky</string>
     <string name="searchWidgetEmtpyFavoritesCta">Přidat oblíbené</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Na svoje oblíbené stránky se dostaneš snadno.<br/><br/>Přejdi na stránku, která se ti líbí. Pak klepni na ikonu „ ⠇“ a vyber Přidat do oblíbených.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Na svoje oblíbené stránky se dostaneš snadno.&lt;br/&gt;&lt;br/&gt; Přejdi na stránku, která se ti líbí. Pak klepni na ikonu nabídky prohlížeče a vyber Přidat do oblíbených.</string>
     <string name="widgetConfigurationActivityTitle">Konfigurace widgetu</string>
     <string name="favoritesWidgetLabel">Oblíbené</string>
     <string name="searchWidgetLabel">Vyhledávání</string>
@@ -445,14 +426,8 @@
     <string name="systemSearchOnboardingButtonOk">Mám to</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Skrýt</string>
-    <string name="daxDialogPhew">Pche!</string>
-    <string name="daxDialogNext">Další</string>
     <string name="daxDialogHighFive">Plácnutí!</string>
     <string name="daxDialogGotIt">Mám to</string>
-    <string name="hideTipsTitle">Skrýt zbývající tipy?</string>
-    <string name="hideTipsText">Je jich jen pár a snažili jsme se udělat je informativní.</string>
-    <string name="hideTipsButton">Navždy skrýt tipy</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Teď máš zablokované trackery na webu 🎉<br/><br/>Můžu taky blokovat trackery aktivní v aplikacích, i když telefon zrovna nepoužíváš.]]></string>
@@ -463,41 +438,9 @@
     <string name="onboardingWelcomeTitle">"Vítejte v Kahf!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet může být někdy trochu strašidelný.<br/><br/>Nebojte se! Anonymní vyhledávání a procházení je jednodušší, než si myslíte.]]></string>
     <string name="onboardingLetsDoItButton">Pojďme na to!</string>
-    <string name="daxIntroCtaText"><![CDATA[Dále zkuste navštívit některý z Vašich oblíbených webů! <br/><br/>Zablokujeme trackery, aby Vás nemohli špehovat. Pokud to bude možné, upgraduji také zabezpečení Vašeho připojení. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Máte to!<br/><br/>Pamatujte: Pokaždé, když internet procházíte s námi, příšerným reklamám přistřihneme křídla. 👍]]></string>
-    <string name="daxSerpCtaText">Tvoje vyhledávání v Kahf je anonymní. Vždycky. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="few"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="many"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web.]]></item>
-        <item quantity="other"><![CDATA[  a <b>%1$d další</b> se vás snažili tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel s adresou a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme ho!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="few"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="many"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-        <item quantity="other"><![CDATA[ se vás snažil tady vysledovat. <br/><br/>Zablokovali jsme je!<br/><br/>☝️Můžete zkontrolovat panel URL a zjistit, kdo se vás snaží sledovat, když navštívíte nový web. ️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Zatímco Vy budete klepat a přejíždět, já budu blokovat zlovolné sledovače. <br/><br/>Nenechejte se rušit — pokračujte v prohlížení!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Upozornění! Nemůžeme zabránit, aby %1$s viděli vaši aktivitu na stránkách %2$s &lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budete moci omezit, co o vás %3$s celkově ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Upozornění! Vzhledem k tomu, že %2$s vlastní %1$s, nemůžeme jim zabránit, aby viděli vaši aktivitu tady.&lt;br/&gt;&lt;br/&gt;Ale procházejte s námi a budeme moci redukovat, co o vás celkově %3$s ví zablokováním jejich trackerů na mnoha jiných stránkách.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Co tě přivádí na Kahf?</string>
-    <string name="onboardingFeatureOptionsContinue">Pokračovat</string>
-    <string name="onboardingFeatureOptionsSkip">Přeskočit tento krok</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Soukromé vyhledávání</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blokování trackerů</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Menší digitální stopa</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Rychlejší načítání stránek</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Méně reklam</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Smazání dat jedním kliknutím</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Uložit %1$s</string>
@@ -645,31 +588,6 @@
     <string name="emailNotSupported">Zařízení není podporované</string>
     <string name="emailNotSupportedExplanation">Ochrana e-mailu umožňuje vytvářet soukromé e-mailové adresy, pomocí kterých obejdeš trackery e-mailů. Tyhle adresy potřebujeme zašifrovat a uložit přímo v tvém zařízení. Ochrana e-mailů není k dispozici, protože tvoje zařízení nepodporuje šifrování úložiště.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Upravit záložku</string>
-    <string name="favoriteDialogTitleEdit">Upravit oblíbené</string>
-    <string name="locationLabel">Poloha</string>
-    <string name="folderLocationTitle">Vybrat umístění</string>
-    <string name="addFolder">Přidat složku</string>
-    <string name="editFolder">Upravit složku</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Smazat složku a její obsah?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Opravdu chceš smazat "</string>
-    <string name="bookmarkFolderEmpty">Prázdné</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s a %3$d položka?</item>
-        <item quantity="few">%1$s%2$s a %3$d položky?</item>
-        <item quantity="many">%1$s%2$s a %3$d položek?</item>
-        <item quantity="other">%1$s%2$s a %3$d položek?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d položka</item>
-        <item quantity="few">%1$d položky</item>
-        <item quantity="many">%1$d položek</item>
-        <item quantity="other">%1$d položek</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Usnadnění</string>
     <string name="accessibilityActivityTitle">Usnadnění</string>
@@ -689,7 +607,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Zajisti si soukromí při prohlížení webu – v naší aplikaci pro Mac</string>
-    <string name="macos_settings_title">Kahf pro Mac</string>
+    <string name="macos_settings_title">Prohlížeč Kahf pro Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Stahování</string>
@@ -751,7 +669,7 @@
     <string name="downloadsNotifyMeSubtitle">Dostávej oznámení, jakmile skončí stahování.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Kahf pro Windows</string>
+    <string name="windows_settings_title">Prohlížeč Kahf pro Windows</string>
     <string name="windows_settings_description">Zajisti si soukromí na webu – v naší aplikaci pro Windows</string>
     <string name="windows_settings_description_ready">Ke stažení</string>
     <string name="windows_settings_description_list">Jsi na seznamu!</string>
@@ -764,16 +682,6 @@
     <string name="closeAppTabsConfirmationDialogDescription">Opravdu chceš zavřít všechny karty?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Zrušit</string>
     <string name="closeAppTabsConfirmationDialogClose">Zavřít</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Smazat tuhle záložku?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Tímhle smažeš svou záložku &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Smazat tuhle oblíbenou položku?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tímhle smažeš oblíbenou položku &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Smazat tuhle složku záložek?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tímhle smažeš složku záložek &lt;b&gt;%1$s&lt;/b&gt; .</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Zrušit</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Smazat</string>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Přidej si na adresní řádek funkci soukromého hlasového vyhledávání. Zvuk nikde neukládáme a s nikým ho nesdílíme. Ani Kahf se k němu nedostane.</string>
@@ -794,6 +702,60 @@
     <string name="autofillLoginSavedSnackbarMessage">Heslo je uložené</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Heslo je aktualizované</string>
 
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Otevřít v Kahf</string>
+    <string name="runningInDdgMenuItemTitle">Spuštěno v Kahf</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Pozor: Tenhle web může být nezabezpečený</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Tenhle web nemá platný certifikát. Možná se dokonce připojuješ k serveru, který předstírá, že je %1$s. Tvoje důvěrné informace by mohly být ohrožené.</string>
+    <string name="sslErrorLeaveCTA">Opustit tuhle stránku</string>
+    <string name="sslErrorAdvancedCTA">Pokročilé</string>
+    <string name="sslErrorExpandedHeadline">Kahf tě upozorní, když má web neplatný certifikát.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Přijmout riziko a přejít na stránku<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Platnost bezpečnostního certifikátu pro %1$s vypršela. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Bezpečnostní certifikát pro %1$s neodpovídá *.%2$s. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Operační systém tvého zařízení nedůvěřuje bezpečnostnímu certifikátu %1$s. Je možné, že web je nesprávně nakonfigurovaný, že útočník prolomil tvoje připojení nebo že tvoje systémové hodiny jsou nesprávné.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Zdravíme tě.<br/><br/>Těšíš se na lepší internet s větší ochranou soukromí?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Pojďme na to!</string>
+    <string name="preOnboardingDaxDialog2Title">Ochrana osobních údajů je aktivní!</string>
+    <string name="preOnboardingDaxDialog2Button">Vyber si prohlížeč</string>
+    <string name="preOnboardingComparisonChartItem1">Soukromé vyhledávání ve výchozím nastavení</string>
+    <string name="preOnboardingComparisonChartItem2">Blokuj trackery třetích stran</string>
+    <string name="preOnboardingComparisonChartItem3">Blokování vyskakovacích oken ohledně cookies</string>
+    <string name="preOnboardingComparisonChartItem4">Blokování reklam, které tě všude pronásledují</string>
+    <string name="preOnboardingComparisonChartItem5">Rychle vymaž údaje o procházení</string>
+    <string name="preOnboardingDaxDialog3Title">Bezva! Vítej v Kačerově.</string>
+    <string name="preOnboardingDaxDialog3Button">Spustit procházení</string>
+    <string name="onboardingSearchDaxDialogTitle">Vyzkoušejte vyhledávání!</string>
+    <string name="onboardingSearchDaxDialogDescription">Tvoje vyhledávání v Kahf je vždycky anonymní.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">jak se řekne anglicky „kachna“</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">jak se řekne „kachna“ španělsky</string>
+    <string name="onboardingSearchQueryOption1">jak se řekne anglicky kachna</string>
+    <string name="onboardingSearchQueryOption1English">jak se řekne španělsky „kachna“</string>
+    <string name="onboardingSearchDaxDialogOption2">obsazení avatara</string>
+    <string name="onboardingSearchDaxDialogOption2US">herci z filmu Šampióni</string>
+    <string name="onboardingSearchDaxDialogOption3">aktuální počasí</string>
+    <string name="onboardingSearchDaxDialogOption4">Překvap mě!</string>
+    <string name="onboardingSearchQueryOption4">recepty na večeři</string>
+    <string name="onboardingSearchQueryOption4US">recepty na čokoládové sušenky</string>
+    <string name="onboardingSitesDaxDialogTitle">Zkus přejít na nějaký web!</string>
+    <string name="onboardingSitesDaxDialogDescription">Zablokuju trackery, aby tě nemohly šmírovat.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Překvap mě!</string>
+    <string name="onboardingSerpDaxDialogDescription">Tohle je vyhledávač Kahf Search. Soukromý. Rychlý. S méně reklamami.</string>
+    <string name="onboardingSerpDaxDialogButton">Mám to!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">A teď zkus přejít na nějaký web!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ a <b>%1$d další tracker</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+        <item quantity="few"><![CDATA[ a <b>%1$d další trackery</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+        <item quantity="many"><![CDATA[ a <b>%1$d dalšího trackeru</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+        <item quantity="other"><![CDATA[ a <b>%1$d dalších trackerů</b> se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Další informace zobrazíš klepnutím na štít.️]]></item>
+    </plurals>
     <string name="safegaze_popup_report_title">Prosím, nahlaste jakékoliv chyby nebo návrhy pomocí tohoto formuláře</string>
     <string name="safegaze_popup_support_title">Podpořte tento projekt</string>
     <string name="safegaze_popup_woman_title">Jsem žena</string>
@@ -818,7 +780,7 @@
     <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Záložku jsme přidali do složky %1$s</string>
     <string name="addToFavorites">Přidat do oblíbených</string>
     <string name="editBookmark">Upravit záložku</string>
-    <string name="importBookmarksDescription">Pokud máš záložky uložené v jiném prohlížeči, \nmůžeš je importovat do DuckDuckGo.</string>
+    <string name="importBookmarksDescription">Pokud máš záložky uložené v jiném prohlížeči, \nmůžeš je importovat do Kahf.</string>
     <string name="importBookmarks">Importovat záložky</string>
     <string name="noResultsFor" instruction="%1$s is the search term">Žádné výsledky pro dotaz „%1$s“</string>
     <string name="removeFromFavorites">Smazat z oblíbených</string>
@@ -829,5 +791,16 @@
         <item quantity="many">Opravdu chceš smazat tuhle složku a %1$d položky?</item>
         <item quantity="other">Opravdu chceš smazat tuhle složku a %1$d položek?</item>
     </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Opravdu chceš smazat záložku &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ se tě tady snaží sledovat. A tak jsem to zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+        <item quantity="few"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+        <item quantity="many"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+        <item quantity="other"><![CDATA[ se tě tady snaží sledovat. A tak jsem je zablokoval!<br/><br/>☝️ Klepnutím na štít si zobrazíš další informace.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Mám to!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Vcukuletu můžeš smazat svou aktivitu při prohlížení pomocí funkce <b>Fire Button</b>.<br/><br/>Zkus ji! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"A je to!"</string>
+    <string name="onboardingEndDaxDialogDescription">Pamatuj: Když se mnou na webu surfuješ, příšerné reklamy zaženeš. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Všechno je hotové!</string>
+
 </resources>

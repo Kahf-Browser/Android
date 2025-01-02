@@ -97,4 +97,10 @@ object DaoModule {
 
     @Provides
     fun syncRelationsDao(database: AppDatabase) = database.syncRelationsDao()
+
+    @Provides
+    fun kahfImageBlockedDao(database: AppDatabase) = database.kahfImageBlockedDao()
+
+    @Provides
+    fun harmfulSiteBlockedDao(database: AppDatabase) = database.harmfulSiteBlockedDao()
 }

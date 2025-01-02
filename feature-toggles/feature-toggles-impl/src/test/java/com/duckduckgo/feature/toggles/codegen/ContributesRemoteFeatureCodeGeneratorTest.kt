@@ -27,17 +27,20 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureExceptions
 import com.duckduckgo.feature.toggles.api.FeatureSettings
 import com.duckduckgo.feature.toggles.api.FeatureToggles
+import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.Lazy
+import dagger.SingleInstanceIn
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
@@ -64,7 +67,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             appVersionProvider = { appBuildConfig.versionCode },
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
-            forceDefaultVariant = { variantManager.saveVariants(emptyList()) },
+            forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
         ).build().create(TestTriggerFeature::class.java)
         anotherTestFeature = FeatureToggles.Builder(
             toggleStore,
@@ -72,7 +75,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             appVersionProvider = { appBuildConfig.versionCode },
             flavorNameProvider = { appBuildConfig.flavor.name },
             appVariantProvider = { variantManager.getVariantKey() },
-            forceDefaultVariant = { variantManager.saveVariants(emptyList()) },
+            forceDefaultVariant = { variantManager.updateVariants(emptyList()) },
         ).build().create(AnotherTestTriggerFeature::class.java)
     }
 
@@ -102,6 +105,27 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `the generated class is singleInstance annotated in the right scope`() {
+        val generatedClass = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
+            .kotlin
+
+        val annotation = generatedClass.java.getAnnotation(SingleInstanceIn::class.java)!!
+        assertEquals(TriggerTestScope::class, annotation.scope)
+    }
+
+    @Test
+    fun `the generated class is RemoteFeatureStoreNamed annotated in the right scope`() {
+        val generatedClass = Class
+            .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
+            .kotlin
+
+        val annotation = generatedClass.java.getAnnotation(RemoteFeatureStoreNamed::class.java)!!
+        assertEquals(TestTriggerFeature::class, annotation.value)
+    }
+
+    @Test
+    @Ignore("ContributesBinding is only present in kotlin metadata now, we need to fix")
     fun `the generated class contributes the toggle store binding`() {
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
@@ -113,6 +137,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    @Ignore("ContributesMultibinding is only present in kotlin metadata now, we need to fix")
     fun `the generated class contributes the privacy plugin multibinding`() {
         val generatedClass = Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
@@ -582,6 +607,37 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
+    fun `test staged rollout for default-enabled feature flag`() {
+        val feature = generatedFeatureNewInstance()
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "state": "enabled",
+                    "features": {
+                        "defaultTrue": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 0.1
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.defaultTrue().isEnabled())
+    }
+
+    @Test
     fun `the disable state of the feature always wins`() {
         val feature = generatedFeatureNewInstance()
 
@@ -971,8 +1027,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
     }
 
     @Test
-    // see https://app.asana.com/0/488551667048375/1206413338208929
-    fun `backwards compatibility test - feature was enabled remains enabled and rollout threshold not set`() {
+    fun `feature was enabled remains enabled and rollout threshold is set`() {
         whenever(appBuildConfig.versionCode).thenReturn(1)
         val feature = generatedFeatureNewInstance()
 
@@ -1009,8 +1064,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
         assertTrue(testFeature.self().isEnabled())
-        assertTrue(testFeature.fooFeature().isEnabled())
-        assertNull(testFeature.fooFeature().rolloutThreshold())
+        val rolloutThreshold = testFeature.fooFeature().rolloutThreshold()!!
+        assertEquals(rolloutThreshold < 50.0, testFeature.fooFeature().isEnabled())
     }
 
     @Test
@@ -1216,13 +1271,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "rollout": {
                                     "steps": [
                                         {
-                                            "percent": 10
-                                        },
-                                        {
-                                            "percent": 20
-                                        },
-                                        {
-                                            "percent": 30
+                                            "percent": 0
                                         }
                                     ]
                                 }
@@ -1233,12 +1282,87 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        val rolloutThreshold = testFeature.fooFeature().rolloutThreshold()
+        val rolloutThreshold = testFeature.fooFeature().rolloutThreshold()!!
         assertTrue(testFeature.self().isEnabled())
-        // cache rollout
-        assertEquals(rolloutThreshold, testFeature.fooFeature().rolloutThreshold())
-        val wasEnabled = testFeature.fooFeature().isEnabled()
-        val wasEnabledRolloutValue = testFeature.fooFeature().getRawStoredState()!!.rollout!!.last()
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // increment rollout but just disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "disabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "rollout": {
+                                    "steps": [
+                                        {
+                                            "percent": ${rolloutThreshold - 1.0}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // increment rollout but just disabled, still
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "rollout": {
+                                    "steps": [
+                                        {
+                                            "percent": $rolloutThreshold
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+
+        // increment rollout but just enabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                    {
+                        "state": "enabled",
+                        "features": {
+                            "fooFeature": {
+                                "state": "enabled",
+                                "rollout": {
+                                    "steps": [
+                                        {
+                                            "percent": ${rolloutThreshold + 1.0}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
 
         // halt rollout
         assertTrue(
@@ -1253,13 +1377,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "rollout": {
                                     "steps": [
                                         {
-                                            "percent": 10
-                                        },
-                                        {
-                                            "percent": 20
-                                        },
-                                        {
-                                            "percent": 30
+                                            "percent": ${rolloutThreshold + 1.0}
                                         }
                                     ]
                                 }
@@ -1288,13 +1406,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "rollout": {
                                     "steps": [
                                         {
-                                            "percent": 10
-                                        },
-                                        {
-                                            "percent": 20
-                                        },
-                                        {
-                                            "percent": 30
+                                            "percent": ${rolloutThreshold + 1.0}
                                         }
                                     ]
                                 }
@@ -1316,7 +1428,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                 "testFeature",
                 """
                     {
-                        "state": "enabled",
+                        "state": "disabled",
                         "features": {
                             "fooFeature": {
                                 "state": "enabled",
@@ -1324,13 +1436,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "rollout": {
                                     "steps": [
                                         {
-                                            "percent": 10.0
-                                        },
-                                        {
-                                            "percent": 20
-                                        },
-                                        {
-                                            "percent": 30
+                                            "percent": ${rolloutThreshold + 1.0}
                                         }
                                     ]
                                 }
@@ -1341,8 +1447,8 @@ class ContributesRemoteFeatureCodeGeneratorTest {
             ),
         )
 
-        assertTrue(testFeature.self().isEnabled())
-        assertEquals(wasEnabled, testFeature.fooFeature().isEnabled())
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(rolloutThreshold, testFeature.fooFeature().rolloutThreshold())
 
         // finish rollout
@@ -1359,13 +1465,7 @@ class ContributesRemoteFeatureCodeGeneratorTest {
                                 "rollout": {
                                     "steps": [
                                         {
-                                            "percent": 10
-                                        },
-                                        {
-                                            "percent": 20
-                                        },
-                                        {
-                                            "percent": 30
+                                            "percent": ${rolloutThreshold + 1.0}
                                         },
                                         {
                                             "percent": 100
@@ -1382,11 +1482,6 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
         assertEquals(rolloutThreshold, testFeature.fooFeature().rolloutThreshold())
-        if (wasEnabled) {
-            assertTrue(testFeature.fooFeature().rolloutThreshold()!! <= wasEnabledRolloutValue)
-        } else {
-            assertTrue(testFeature.fooFeature().rolloutThreshold()!! <= testFeature.fooFeature().getRawStoredState()!!.rollout!!.last())
-        }
 
         // remove steps
         assertTrue(
@@ -1408,12 +1503,6 @@ class ContributesRemoteFeatureCodeGeneratorTest {
 
         assertTrue(testFeature.self().isEnabled())
         assertTrue(testFeature.fooFeature().isEnabled())
-        // if (wasEnabled) {
-        //     assertEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
-        // } else {
-        //     assertNotEquals(rolloutStep, testFeature.fooFeature().rolloutStep())
-        //     assertEquals(4, testFeature.fooFeature().rolloutStep())
-        // }
     }
 
     @Test
@@ -1780,6 +1869,238 @@ class ContributesRemoteFeatureCodeGeneratorTest {
         )
     }
 
+    @Test
+    fun `test rollout roll back`() {
+        val feature = generatedFeatureNewInstance()
+
+        val privacyPlugin = (feature as PrivacyFeaturePlugin)
+
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "1",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+
+        val fooFeatureRolloutPercentile = testFeature.fooFeature().getRawStoredState()?.rolloutThreshold!!
+        val justEnableRollout = (fooFeatureRolloutPercentile + 1).coerceAtMost(100.0)
+        val justDisabledRollout = (fooFeatureRolloutPercentile - 1).coerceAtLeast(0.0)
+
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+
+        // Roll back to 0% but as fooFeature was enabled before it should remain enabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "2",
+                    "state": "enabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 0
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // Disable fooFeature, should disable the feature
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "3",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "disabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 0
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // Roll fooFeature back to 100% with state still disabled, should remain disabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "4",
+                    "state": "enabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "disabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // re-enable fooFeature, should be enabled
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "5",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+
+        // disable feature
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "6",
+                    "state": "enabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "disabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": 100
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // re-enable but roll back, should disable fooFeature
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "7",
+                    "state": "disabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enable",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": $justDisabledRollout
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        assertFalse(testFeature.self().isEnabled())
+        assertFalse(testFeature.fooFeature().isEnabled())
+
+        // roll out just enough, should enable fooFeature
+        assertTrue(
+            privacyPlugin.store(
+                "testFeature",
+                """
+                {
+                    "hash": "8",
+                    "state": "enabled",
+                    "features": {
+                        "fooFeature": {
+                            "state": "enabled",
+                            "rollout": {
+                                "steps": [
+                                    {
+                                        "percent": $justEnableRollout
+                                    }                    
+                                ]
+                            }
+                        }
+                    }
+                }
+                """.trimIndent(),
+            ),
+        )
+        // ensure it hasn't change
+        assertEquals(
+            fooFeatureRolloutPercentile,
+            testFeature.fooFeature().getRawStoredState()!!.rolloutThreshold,
+        )
+        assertTrue(testFeature.self().isEnabled())
+        assertTrue(testFeature.fooFeature().isEnabled())
+    }
+
     private fun generatedFeatureNewInstance(): Any {
         return Class
             .forName("com.duckduckgo.feature.toggles.codegen.TestTriggerFeature_RemoteFeature")
@@ -1821,7 +2142,7 @@ internal class FakeVariantManager : VariantManager {
         TODO("Not yet implemented")
     }
 
-    override fun saveVariants(variants: List<VariantConfig>) {
+    override fun updateVariants(variants: List<VariantConfig>) {
         saveVariantsCallCounter++
         variant = ""
     }

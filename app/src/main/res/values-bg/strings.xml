@@ -156,10 +156,16 @@
     <string name="privateSearchTitle">Private Search е разрешено</string>
     <string name="privateSearchDescription">Kahf Private Search е търсачката по подразбиране, затова можете да търсите в мрежата, без да бъдете проследявани.</string>
     <string name="privateSearchHeadingSearchSettings">Настройки за търсене</string>
-    <string name="privateSearchAutocompleteToggle">Показване на предложенията за автоматично довършване</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Още настройки за търсене</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Персонализирайте езика за търсене, региона и др.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Още настройки за търсене</string>
+    <string name="privateSearchAutocompleteToggle">Показване на предложенията за автоматично довършване</string>
+    <string name="privateSearchAutocompleteHint">Показване на предложения за търсене при въвеждане, включително от отметките. Всички търсения са поверителни.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Наскоро посетени сайтове</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Показване на наскоро посетени сайтове в предложенията за търсене. Наскоро посетените сайтове са поверителни, съхраняват се само на вашето устройство и могат да бъдат изтрити с Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Предложенията за автоматично попълване вече включват наскоро посетени сайтове. Изключете ги в Настройки, а можете и да ги изтриете по всяко време с 🔥 Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">Същата поверителност.\nПо-добри предложения при търсене!</string>
+    <string name="openAutoCompleteSettings">Отвори Настройки</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Защита от проследяване в мрежата</string>
@@ -231,28 +237,7 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Изключването на защитите може да помогне.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Изключихме временно защитите на поверителността, защото изглежда, че пречат на зареждането на този сайт.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Отметки</string>
-    <string name="bookmarksActivityTitle">Отметки</string>
-    <string name="noBookmarks">Все още няма добавени отметки</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Още опции за отметка %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Изтрито &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Експортиране</string>
-    <string name="exportBookmarksEmpty">Нямате отметки, няма да бъде експортирано нищо</string>
-    <string name="exportBookmarksError">Не успяхме да експортираме отметките, възникна някаква грешка</string>
-    <string name="exportBookmarksSuccess">Всички отметки бяха експортирани успешно</string>
-    <string name="importBookmarksMenu">Импортиране</string>
-    <string name="importBookmarksFileTitle">Изберете файл с отметки за импортиране</string>
-    <string name="importBookmarksError">Не успяхме да импортираме отметките, възникна някаква грешка</string>
-    <string name="importBookmarksEmpty">Във файла няма отметки за импортиране</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d отметки са импортирани успешно</string>
-    <string name="savedSiteDialogTitleHint">Заглавие</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Редактиране</string>
-    <string name="bookmarksSectionTitle">Отметки</string>
-    <string name="favoritesSectionTitle">Любими</string>
-    <string name="bookmarksEmptyHint">Все още няма добавени отметки</string>
-    <string name="favoritesEmptyHint">Все още няма добавени любими</string>
+
 
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Потвърдете</string>
@@ -274,8 +259,6 @@
     <string name="widgetConfigurationAddWidgetOption">Добави приспособлението</string>
     <string name="searchWidgetEmtpyFavoritesHint">Все още няма добавени любими</string>
     <string name="searchWidgetEmtpyFavoritesCta">Добавяне в любими</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Отварянето на вашите предпочитани сайтове става светкавично!<br/><br/>Отворете сайт, който харесвате. След това докоснете иконата \" ⠇\" и изберете „Добавяне към Предпочитани“.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Отварянето на вашите предпочитани сайтове става светкавично! Отворете сайт, който харесвате. След това докоснете иконата за меню на браузъра и изберете „Добавяне към Предпочитани“.</string>
     <string name="widgetConfigurationActivityTitle">Конфигуриране на уиджет</string>
     <string name="favoritesWidgetLabel">Любими</string>
     <string name="searchWidgetLabel">Търсене</string>
@@ -445,14 +428,8 @@
     <string name="systemSearchOnboardingButtonOk">Разбрах</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Скрий</string>
-    <string name="daxDialogPhew">Слава Богу!</string>
-    <string name="daxDialogNext">Следващ</string>
     <string name="daxDialogHighFive">Дай пет!</string>
     <string name="daxDialogGotIt">Разбрах</string>
-    <string name="hideTipsTitle">Скрий оставащите съвети?</string>
-    <string name="hideTipsText">Само няколко са и се постарахме да са информативни.</string>
-    <string name="hideTipsButton">Скрий съветите за постоянно</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Вече блокирате тракерите от мрежата 🎉<br/><br/>Мога също така да блокирам тракери, скрити в другите Ви приложения, дори когато не използвате телефона си.]]></string>
@@ -463,37 +440,9 @@
     <string name="onboardingWelcomeTitle">"Добре дошли в Kahf!"</string>
     <string name="onboardingDaxText"><![CDATA[Интернет може да бъде и страшен.<br/><br/>Не се притеснявайте! Частното търсене и сърфиране е по-лесно, отколкото си мислите.]]></string>
     <string name="onboardingLetsDoItButton">Да го направим!</string>
-    <string name="daxIntroCtaText"><![CDATA[Сега, отворете един от любимите си сайтове! <br/><br/>Ще блокирам тракерите, за да не ви шпионират. Също така ще надстроя сигурността на вашата връзка, ако е възможно. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Вече разбрахте!<br/><br/>Запомнете: Всеки път, когато сърфирате с мен, аз подрязвам крилцата на някоя досадна реклама. 👍]]></string>
-    <string name="daxSerpCtaText">Търсенето в Kahf е анонимно. Винаги. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ и още <b>%1$d друг</b> се опитват да ви проследят тук. <br/><br/>Блокирах ги!<br/><br/> ☝️Вижте адресната лента, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
-        <item quantity="other"><![CDATA[ и още <b>%1$d други</b> се опитват да ви проследят тук. <br/><br/>Блокирах ги!<br/><br/> ☝️Вижте адресната лента, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ се опитва да ви проследи тук. <br/><br/>Блокирах го!<br/><br/> ☝️Вижте лентата с URL адрес, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
-        <item quantity="other"><![CDATA[ се опитват да ви проследят тук. <br/><br/>Блокирах ги!<br/><br/> ☝️Вижте лентата с URL адрес, за да разберете кой се опитва да ви проследи, когато посещавате нов сайт.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Докато докосвате и скролвате, ще блокирам досадните тракери. <br/><br/>Продължавайте - не спирайте да сърфирате!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Внимание! Не мога да направя така, че %1$s да не вижда вашата активност в %2$s.&lt;br/&gt;&lt;br/&gt;Но ако сърфирате с мен, като цяло мога да намаля информацията, която %3$s научава за вас, като блокирам неговите тракери на много други сайтове.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Внимание! Тъй като %1$s притежава %2$s, той вижда какво правите тук а аз не мога да предотвратя това.&lt;br/&gt;&lt;br/&gt;Но ако сърфирайте с мен, като цяло мога да намаля информацията, която %3$s научава за вас, като блокирам неговите тракери на много други сайтове.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Какво Ви води при Kahf?</string>
-    <string name="onboardingFeatureOptionsContinue">Продължи</string>
-    <string name="onboardingFeatureOptionsSkip">Пропускане на тази стъпка</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Поверително търсене</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Блокиране на проследяването</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">По-малък цифров отпечатък</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Бързо зареждане на страници</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">По-малко реклами</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Изчистване с едно кликване</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Запази %1$s</string>
@@ -641,27 +590,6 @@
     <string name="emailNotSupported">Устройството не се поддържа</string>
     <string name="emailNotSupportedExplanation">Защитата на имейла ви позволява да създавате поверителни имейл адреси, които премахват имейл тракерите. Необходимо е да криптираме и съхраняваме създадените от вас адреси локално на вашето устройство. Тъй като вашето устройство не поддържа криптирано съхранение, защитата на имейл не е достъпна.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Редактиране на отметка</string>
-    <string name="favoriteDialogTitleEdit">Редактиране на Предпочитан</string>
-    <string name="locationLabel">Местоположение</string>
-    <string name="folderLocationTitle">Изберете местоположение</string>
-    <string name="addFolder">Добавяне на папка</string>
-    <string name="editFolder">Редактиране на папка</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Изтриване на папката и нейното съдържание?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Сигурни ли сте, че искате да изтриете "</string>
-    <string name="bookmarkFolderEmpty">Празна</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s и %3$d елемент?</item>
-        <item quantity="other">%1$s%2$s и %3$d елемента?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d елемент</item>
-        <item quantity="other">%1$d елемента</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Достъпност</string>
     <string name="accessibilityActivityTitle">Достъпност</string>
@@ -681,7 +609,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Сърфирайте поверително с нашето приложение за Mac</string>
-    <string name="macos_settings_title">Приложение Kahf за Mac</string>
+    <string name="macos_settings_title">Браузър Kahf за Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Изтеглени файлове</string>
@@ -743,7 +671,7 @@
     <string name="downloadsNotifyMeSubtitle">Получавайте известие, когато изтеглянето завърши.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Приложение Kahf за Windows</string>
+    <string name="windows_settings_title">Браузър Kahf за Windows</string>
     <string name="windows_settings_description">Сърфирайте поверително с нашето приложение за Windows</string>
     <string name="windows_settings_description_ready">Налично за изтегляне</string>
     <string name="windows_settings_description_list">Вече сте в списъка!</string>
@@ -756,16 +684,6 @@
     <string name="closeAppTabsConfirmationDialogDescription">Сигурни ли сте, че искате да затворите всички раздели?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Отмени</string>
     <string name="closeAppTabsConfirmationDialogClose">Затваряне</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Изтриване на тази отметка?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Тази операция ще изтрие отметката за &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Изтриване на този любим сайт?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Тази операция ще изтрие добавения към любими сайт за &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Изтриване на тази папка с отметки?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Тази операция ще изтрие папката с отметки &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Отмени</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Изтрий</string>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Добавете опция за поверително гласово търсене към адресната лента. Звукът не се съхранява и не се споделя с никого, включително с Kahf.</string>
@@ -786,6 +704,58 @@
     <string name="autofillLoginSavedSnackbarMessage">Паролата е запазена</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Паролата е актуализирана</string>
 
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Отваряне в Kahf</string>
+    <string name="runningInDdgMenuItemTitle">Работи в Kahf</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Предупреждение: Този сайт може да не е сигурен</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Сертификатът за този сайт е невалиден. Възможно е да се свързвате със сървър, който се представя за &lt;b&gt;%1$s&lt;/b&gt;, което може да изложи поверителната Ви информация на риск.</string>
+    <string name="sslErrorLeaveCTA">Напускане на този сайт</string>
+    <string name="sslErrorAdvancedCTA">Разширени</string>
+    <string name="sslErrorExpandedHeadline">Kahf Ви предупреждава, когато сертификатът на даден уебсайт е невалиден.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Поемане на риска и отваряне на сайта<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Сертификатът за сигурност за %1$s е изтекъл. Възможно е уебсайтът да е конфигуриран грешно, хакер да е компрометирал връзката Ви или системният Ви часовник да е неправилно настроен.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Сертификатът за сигурност за %1$s не съответства на *.%2$s. Възможно е уебсайтът да е конфигуриран грешно, хакер да е компрометирал връзката Ви или системният Ви часовник да е неправилно настроен.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Операционната система на Вашето устройство не се доверява на сертификата за сигурност за %1$s. Възможно е уебсайтът да е конфигуриран грешно, хакер да е компрометирал връзката Ви или системният Ви часовник да е неправилно настроен.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Здравейте.<br/><br/>Готови ли сте за по-добро и по-поверително изживяване в интернет?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Да го направим!</string>
+    <string name="preOnboardingDaxDialog2Title">Защитата на поверителността е активирана!</string>
+    <string name="preOnboardingDaxDialog2Button">Изберете своя браузър</string>
+    <string name="preOnboardingComparisonChartItem1">Поверително търсене по подразбиране</string>
+    <string name="preOnboardingComparisonChartItem2">Блокиране на тракерите на трети страни</string>
+    <string name="preOnboardingComparisonChartItem3">Блокиране на изскачащи прозорци за бисквитки</string>
+    <string name="preOnboardingComparisonChartItem4">Блокиране на досадни реклами</string>
+    <string name="preOnboardingComparisonChartItem5">Бързо изтриване на данните за сърфиране</string>
+    <string name="preOnboardingDaxDialog3Title">Страхотно! Добре дошли от страната на Duck.</string>
+    <string name="preOnboardingDaxDialog3Button">Стартиране на сърфирането</string>
+    <string name="onboardingSearchDaxDialogTitle">Опитайте търсене!</string>
+    <string name="onboardingSearchDaxDialogDescription">Търсенето в Kahf винаги е анонимно.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">как се казва „патица“ на английски</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">как се казва „патица“ на испански</string>
+    <string name="onboardingSearchQueryOption1">как се нарича патицата на английски</string>
+    <string name="onboardingSearchQueryOption1English">как се казва „патица“ на испански</string>
+    <string name="onboardingSearchDaxDialogOption2">актьори в аватар</string>
+    <string name="onboardingSearchDaxDialogOption2US">прогнозата на мощните патици</string>
+    <string name="onboardingSearchDaxDialogOption3">местното време</string>
+    <string name="onboardingSearchDaxDialogOption4">Изненадайте ме!</string>
+    <string name="onboardingSearchQueryOption4">рецепти за вечеря</string>
+    <string name="onboardingSearchQueryOption4US">рецепти за бисквити с парченца шоколад</string>
+    <string name="onboardingSitesDaxDialogTitle">Опитайте да посетите сайт!</string>
+    <string name="onboardingSitesDaxDialogDescription">Ще блокирам тракерите, за да не ви шпионират.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Изненадайте ме!</string>
+    <string name="onboardingSerpDaxDialogDescription">Това е Kahf Search. Поверителен. Бърз. По-малко реклами.</string>
+    <string name="onboardingSerpDaxDialogButton">Разбрах!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Сега опитайте да посетите някой сайт!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ и <b>%1$d друг</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
+        <item quantity="other"><![CDATA[ и <b>%1$d други</b> се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
+    </plurals>
     <string name="safegaze_popup_report_title">Моля, докладвайте за всякакви грешки или предложения на този формуляр</string>
     <string name="safegaze_popup_support_title">Подкрепете този проект</string>
     <string name="safegaze_popup_woman_title">Аз съм жена</string>
@@ -810,7 +780,7 @@
     <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Отметката е добавена в %1$s</string>
     <string name="addToFavorites">Добавяне към любими</string>
     <string name="editBookmark">Редактиране на отметка</string>
-    <string name="importBookmarksDescription">Ако имате запазени отметки в друг браузър, можете\nда ги импортирате в DuckDuckGo.</string>
+    <string name="importBookmarksDescription">Ако имате запазени отметки в друг браузър, можете\nда ги импортирате в Kahf.</string>
     <string name="importBookmarks">Импортиране на отметки</string>
     <string name="noResultsFor" instruction="%1$s is the search term">Няма резултати за \'%1$s\'</string>
     <string name="removeFromFavorites">Премахване от любими</string>
@@ -819,5 +789,14 @@
         <item quantity="one">Сигурни ли сте, че искате да изтриете тази папка и %1$d елемент?</item>
         <item quantity="other">Сигурни ли сте, че искате да изтриете тази папка и %1$d елемента?</item>
     </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Сигурни ли сте, че искате да изтриете отметката за &lt;b&gt;%1$s&lt;/b&gt;?</string>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ се опита да ви проследи тук. Блокирах го!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
+        <item quantity="other"><![CDATA[ се опитваха да ви проследят тук. Блокирах ги!<br/><br/>☝️ Докоснете щита за повече информация.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Разбрах!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Незабавно изчистване на дейностите при сърфиране с <b>Fire Button</b>.<br/><br/>Изпробвайте го! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Справихте се!"</string>
+    <string name="onboardingEndDaxDialogDescription">Запомнете: всеки път, когато сърфирате с мен, аз ще подрязвам крилцата на досадните реклами. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Готово!</string>
+
 </resources>

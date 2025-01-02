@@ -25,7 +25,6 @@ import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.global.ApplicationClearDataState
-import com.duckduckgo.app.global.SingleLiveEvent
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptEmitter
 import com.duckduckgo.app.global.rating.AppEnjoymentPromptOptions
 import com.duckduckgo.app.global.rating.AppEnjoymentUserEventRecorder
@@ -48,6 +47,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
@@ -169,6 +169,17 @@ class BrowserViewModel @Inject constructor(
             AppPixelName.APP_THIRD_PARTY_LAUNCH,
             mapOf(PixelParameter.DEFAULT_BROWSER to defaultBrowserDetector.isDefaultBrowser().toString()),
         )
+    }
+
+    suspend fun relaunchCurrentTab(url: String) {
+        val currentTabId = selectedTab.value?.tabId ?: return
+
+        tabs.value?.firstOrNull { it.tabId == currentTabId }?.let { currentTab ->
+            val newTabId = tabRepository.addNewTabAfterExistingTabAndGetId(url, currentTabId)
+            tabRepository.select(newTabId)
+            tabRepository.markDeletable(currentTab)
+            tabRepository.purgeDeletableTabs()
+        }
     }
 
     suspend fun onTabsUpdated(tabs: List<TabEntity>?) {

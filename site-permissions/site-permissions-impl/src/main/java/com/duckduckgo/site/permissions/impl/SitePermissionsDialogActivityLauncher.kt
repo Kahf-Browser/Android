@@ -22,6 +22,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
 import android.provider.Settings
+import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import androidx.activity.result.ActivityResultCaller
 import androidx.annotation.StringRes
@@ -43,11 +44,12 @@ import com.duckduckgo.site.permissions.store.sitepermissions.SitePermissionsEnti
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar.BaseCallback
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.snackbar.Snackbar.SnackbarLayout
 import com.squareup.anvil.annotations.ContributesBinding
+import java.lang.IllegalStateException
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @ContributesBinding(FragmentScope::class)
 class SitePermissionsDialogActivityLauncher @Inject constructor(
@@ -280,7 +282,12 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     private fun grantPermissions() {
         val permissions = permissionsHandledAutomatically.toTypedArray() + permissionsHandledByUser
-        sitePermissionRequest.grant(permissions)
+        try {
+            sitePermissionRequest.grant(permissions)
+        } catch (e: IllegalStateException) {
+            // IllegalStateException is thrown when grant() or deny() have been called already.
+            Timber.w("IllegalStateException when calling grant() site permissions")
+        }
     }
 
     private fun systemPermissionGranted() {
@@ -326,9 +333,11 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
             }
 
         val snackbar = Snackbar.make(activity.window.decorView.rootView, message, Snackbar.LENGTH_LONG)
-        val layout = snackbar.view as SnackbarLayout
+        val snackbarView = snackbar.view
         if (activity.resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            layout.setPadding(0, 0, 0, 40.toPx())
+            val layoutParams = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
+            layoutParams.setMargins(layoutParams.leftMargin, layoutParams.topMargin, layoutParams.rightMargin, 32.toPx())
+            snackbarView.layoutParams = layoutParams
         }
         snackbar.apply {
             setAction(R.string.sitePermissionsDeniedSnackBarAction) { onPermissionAllowed() }
@@ -349,10 +358,15 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
     }
 
     private fun denyPermissions() {
-        if (permissionsHandledAutomatically.isNotEmpty()) {
-            sitePermissionRequest.grant(permissionsHandledAutomatically.toTypedArray())
-        } else {
-            sitePermissionRequest.deny()
+        try {
+            if (permissionsHandledAutomatically.isNotEmpty()) {
+                sitePermissionRequest.grant(permissionsHandledAutomatically.toTypedArray())
+            } else {
+                sitePermissionRequest.deny()
+            }
+        } catch (e: IllegalStateException) {
+            // IllegalStateException is thrown when grant() or deny() have been called already.
+            Timber.w("IllegalStateException when calling grant() or deny() site permissions")
         }
     }
 
@@ -389,7 +403,7 @@ class SitePermissionsDialogActivityLauncher @Inject constructor(
 
     companion object {
         private const val DRM_LEARN_MORE_ANNOTATION = "drm_learn_more_link"
-        val DRM_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/drm-permission/".toUri()
+        val DRM_LEARN_MORE_URL = "https://kahfbrowser.com/kahfbrowser-help-pages/privacy/drm-permission/".toUri()
     }
 }
 

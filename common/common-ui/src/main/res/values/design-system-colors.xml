@@ -62,6 +62,7 @@
     <attr name="daxColorTextDisabled" format="color"/>
     <attr name="daxColorRipple" format="color"/>
     <attr name="daxLogoTitleText" format="color"/>
+    <attr name="daxOmnibarTextColorHighlight" format="color"/>
 
     <!-- Component Specific Colors -->
     <attr name="daxColorButtonPrimaryContainer" format="color"/>
@@ -82,8 +83,12 @@
 
     <attr name="daxColorSwitchTrackOn" format="color"/>
     <attr name="daxColorSwitchTrackOff" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOn" format="color"/>
+    <attr name="daxColorSwitchTrackDisabledOff" format="color"/>
     <attr name="daxColorSwitchThumbOn" format="color"/>
     <attr name="daxColorSwitchThumbOff" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOn" format="color"/>
+    <attr name="daxColorSwitchThumbDisabledOff" format="color"/>
 
     <attr name="daxColorSliderTrackInactive" format="color"/>
     <attr name="daxColorSliderActive" format="color"/>
@@ -103,6 +108,17 @@
     <color name="alertRedOnDarkTextPressed">#FF7378</color>
     <color name="daxColorBlurLight">#7A626262</color>
     <color name="daxColorBlurDark">#B3111111</color>
+
+    <attr name="kahfBottomNavIcon" format="color"/>
+    <attr name="kahfDivider" format="color"/>
+    <attr name="kahfPrimaryText" format="color"/>
+    <attr name="kahfSecondaryText" format="color"/>
+    <attr name="kahfPrimaryIcon" format="color"/>
+    <attr name="kahfCardBackground" format="color"/>
+    <attr name="kahfCardBackgroundInv" format="color"/>
+    <attr name="kahfCardBackground2" format="color"/>
+    <attr name="kahfItemGradientTop" format="color"/>
+    <attr name="kahfItemGradientBottom" format="color"/>
 
     <!-- Design System Raw Colors -->
     <color name="red20">#F2A18A</color>
@@ -124,6 +140,7 @@
     <color name="gray100">#111111</color>
     <color name="gray95">#494949</color>
     <color name="gray90">#222222</color>
+    <color name="gray86">#363636</color>
     <color name="gray85">#333333</color>
     <color name="gray80">#444444</color>
     <color name="gray70">#666666</color>
@@ -133,6 +150,7 @@
     <color name="gray40">#CCCCCC</color>
     <color name="gray40_40">#66CCCCCC</color>
     <color name="gray40_50">#80CCCCCC</color>
+    <color name="gray36">#5C000000</color>
     <color name="gray30">#DDDDDD</color>
     <color name="gray25">#E5E5E5</color>
     <color name="gray20">#EEEEEE</color>
@@ -146,9 +164,11 @@
     <color name="blue50_14">#243969EF</color>
     <color name="blue60">#2B55CA</color>
     <color name="blue70">#1E42A4</color>
+    <color name="blue10">#803969EF</color>
 
     <color name="black84">#D6000000</color>
     <color name="black60">#99000000</color>
+    <color name="black50">#80000000</color>
     <color name="black48">#7A000000</color>
     <color name="black40">#66000000</color>
     <color name="black36">#5C000000</color>
@@ -209,6 +229,31 @@
     <color name="ic_launcher_purple_background">#7A4BDC</color>
     <color name="ic_launcher_blue_background">#4179ED</color>
     <color name="ic_launcher_black_background">#262626</color>
+
+    <color name="kahf_gradient_80_start">#345D98</color>
+    <color name="kahf_gradient_80_end">#615A98</color>
+    <color name="kahf_blue">#6584EC</color>
+    <color name="kahf_bottom_nav_icon">#C2C2CF</color>
+    <color name="kahf_bottom_nav_icon_inactive">#5C606D</color>
+    <color name="kahf_suggestion_icon">#C6C6C6</color>
+    <color name="kahf_suggestion_bg">@color/black18</color>
+    <color name="kahf_suggestion_text">@color/white</color>
+    <color name="kahf_suggestion_url">#3F8DFF</color>
+    <color name="kahf_appbar_light">#F2F2F2</color>
+    <color name="kahf_unselected_icon_color">#9CB0CD</color>
+    <color name="kahf_tab_text_color">#b3b3b3</color>
+    <color name="kahf_red">#FE102A</color>
+    <color name="kahf_green">#FF4CAF50</color>
+    <color name="kahf_orange">#FFAA46</color>
+    <color name="kahf_onboarding_button_1">#192677</color>
+    <color name="kahf_onboarding_button_2">#4554F5</color>
+    <color name="kahf_onboarding_skip">#222222</color>
+    <color name="kahf_onboarding_title">#BB5cF1</color>
+    <color name="kahf_selected_icon_blue">#3E8DFF</color>
+    <color name="kahf_deselected_icon_gray">#828282</color>
+
+    <attr name="kahfAppBarColor" format="color"/>
+
 </resources>
 
     <!-- Opacity Prefixes

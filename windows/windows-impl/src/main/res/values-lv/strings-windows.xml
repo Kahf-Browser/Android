@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="windows_app">DuckDuckGo lietotne operētājsistēmai Windows</string>
-    <string name="windows_title">Iegūsti DuckDuckGo operētājsistēmai Windows!</string>
-    <string name="windows_description">DuckDuckGo operētājsistēmai Windows sniedz visu, kas nepieciešams, lai pārlūkotu ar lielāku konfidencialitāti – privātu meklēšanu, izsekošanas bloķēšanu, piespiedu šifrēšanu un sīkfailu uznirstošo logu bloķēšanu, kā arī citas savā klasē labākās aizsardzības iespējas.\n\nSavā Windows datorā dodies uz:</string>
-    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_app">Kahf lietotne operētājsistēmai Windows</string>
+    <string name="windows_title">Iegūsti Kahf operētājsistēmai Windows!</string>
+    <string name="windows_description">Kahf operētājsistēmai Windows sniedz visu, kas nepieciešams, lai pārlūkotu ar lielāku konfidencialitāti – privātu meklēšanu, izsekošanas bloķēšanu, piespiedu šifrēšanu un sīkfailu uznirstošo logu bloķēšanu, kā arī citas savā klasē labākās aizsardzības iespējas.\n\nSavā Windows datorā dodies uz:</string>
+    <string name="windows_description_link">kahfbrowser.com/windows</string>
     <string name="windows_share_title">Kopīgot saiti</string>
-    <string name="windows_share_text">Vai esi gatavs sākt privātu pārlūkošanu operētājsistēmā Windows?\n\nApmeklē šo URL savā Windows datorā, lai lejupielādētu:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Vai esi gatavs sākt privātu pārlūkošanu operētājsistēmā Windows?\n\nApmeklē šo URL savā Windows datorā, lai lejupielādētu:\nhttps://kahfbrowser.com/windows</string>
     <string name="windows_mac_link">Vai meklē Mac versiju?</string>
 </resources>

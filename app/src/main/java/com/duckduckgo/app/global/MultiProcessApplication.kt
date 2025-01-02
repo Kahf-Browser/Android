@@ -21,6 +21,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.os.Process
+import com.google.firebase.FirebaseApp
 
 abstract class MultiProcessApplication : Application() {
     private val shortProcessName: String by lazy {
@@ -30,6 +31,7 @@ abstract class MultiProcessApplication : Application() {
 
     final override fun onCreate() {
         super.onCreate()
+        FirebaseApp.initializeApp(this)
         if (isMainProcessCached) {
             onMainProcessCreate()
         } else {

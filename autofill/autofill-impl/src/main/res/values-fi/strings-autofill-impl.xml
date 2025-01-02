@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
     <string name="saveLoginDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Tallenna salasana</string>
     <string name="saveLoginDialogNotNow">Älä tallenna</string>
-    <string name="saveLoginDialogTitle">Haluatko, että DuckDuckGo tallentaa salasanasi?</string>
+    <string name="saveLoginDialogTitle">Haluatko, että Kahf tallentaa salasanasi?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Lisää vaihtoehtoja</string>
 
     <string name="useSavedLoginDialogTitle">Käytetäänkö tallennettua salasanaa?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Päivitä käyttäjätunnus</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Päivitä käyttäjän \n%1$s salasana?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo päivittää tämän tallennetun salasanan laitteellesi.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf päivittää tämän tallennetun salasanan laitteellesi.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Sulje automaattisen täytön valintaikkuna</string>
 
@@ -56,17 +56,23 @@
 
     <string name="credentialManagementSuggestionsLabel">Ehdotettu</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Salasanojen automaattinen täyttäminen ei ole käytettävissä, koska Android WebView -versiosi on liian vanha.</string>
+
     <string name="autofillManagementSearchClearDescription">Tyhjennä hakusyöte</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Ei tuloksia haulla \'%1$s\'</string>
 
     <string name="autofillDeleteLoginDialogCancel">Peruuta</string>
     <string name="autofillDeleteLoginDialogDelete">Poista</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Käyttäjätunnus kopioitu</string>
     <string name="autofillManagementPasswordCopied">Salasana kopioitu</string>
 
-    <string name="autofill_password_generation_offer_title">Käytetäänkö DuckDuckGon vahvaa salasanaa?</string>
+    <string name="autofill_password_generation_offer_title">Käytetäänkö Kahf vahvaa salasanaa?</string>
     <string name="autofill_password_generation_offer_accept">Käytä vahvaa salasanaa</string>
     <string name="autofill_password_generation_offer_decline">Luo oma</string>
 
@@ -120,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Salasanat tallennetaan laitteellesi turvallisesti.</string>
     <string name="autofillManagementAddLogin">Lisää salasana</string>
     <string name="credentialManagementEditLoginTitleHint">Otsikko</string>
-    <string name="autofillDeleteLoginDialogTitle">Haluatko varmasti poistaa tämän salasanan?</string>
     <string name="autofillManagementDeletedConfirmation">Salasana poistettu</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Viimeksi päivitetty %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Haluatko jatkaa salasanojen tallentamista?</string>
@@ -133,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Salasanojen suojaamiseen tarvitaan laitteen lukituskuvio, PIN-koodi tai biometriset tiedot.</string>
     <string name="credentialManagementEditTitle">Muokkaa salasanaa</string>
 
-    <string name="credentials_limit_warning"><b>Synkronointi keskeytetty</b>\nKirjautumisten enimmäismäärä ylitetty. Poista jotain jatkaaksesi synkronointia.\n\n<annotation type="manage_logins">Hallitse kirjautumisia</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Salasanojen synkronointi on keskeytetty</b>\nOlet ylittänyt salasanojen synkronointirajan. Yritä poistaa joitakin salasanoja. Salasanojasi ei varmuuskopioida ennen kuin tämä ongelma on ratkaistu.</string>
+    <string name="credentials_limit_warning"><b>Synkronointi keskeytetty</b>\nSalasanakiintiösi on täynnä. Poista joitain salasanoja jatkaaksesi synkronointia.\n\n<annotation type="manage_logins">Hallitse salasanoja</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Salasanojen synkronointi on keskeytetty</b>\nSalasanakiintiösi on täynnä. Poista joitakin salasanoja jatkaaksesi synkronointia.</string>
+    <string name="credentials_invalid_request_warning"><b>Synkronointi keskeytetty</b>\nJotkin salasanat on muotoiltu väärin tai ovat liian pitkiä, eikä niitä synkronoitu.\n\n<annotation type="manage_logins">Hallitse salasanoja</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Salasanojen synkronointi keskeytetty</b>\nSalasanojen synkronointi on keskeytetty.\n\nJotkin salasanat on muotoiltu väärin tai ovat liian pitkiä, eikä niitä synkronoitu.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Älä kysy enää tällä sivustolla</string>
     <string name="credentialManagementInstructionNeverForThisSite">Jos nollaat poissuljetut sivustot, sinua pyydetään tallentamaan salasanasi, kun seuraavan kerran kirjaudut sisään jollekin näistä sivustoista.</string>
@@ -144,13 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Peruuta</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Poista kaikki salasanat</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="one">Haluatko varmasti poistaa %1$d salasanan?</item>
-        <item quantity="other">Haluatko varmasti poistaa %1$d salasanaa?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Salasanasi poistetaan kaikista synkronoiduista laitteista. Varmista, että pääset yhä käyttämään tiliäsi.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Salasanasi poistetaan kaikista synkronoiduista laitteista. Varmista, että pääset yhä käyttämään tilejäsi.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="one">%1$d salasana poistettu</item>
@@ -159,5 +159,36 @@
 
     <string name="autofill_auth_text_for_delete_all">Vahvista, että haluat poistaa kaikki salasanat.</string>
     <string name="autofill_title_text_for_delete_all">Poista kaikki salasanat</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="one">Sivuston %1$s salasanoja ei voi synkronoida, koska jotkin niiden kentät ylittävät merkkirajoituksen.</item>
+        <item quantity="other">Sivuston %1$s ja %2$d muun salasanoja ei voi synkronoida, koska jotkin niiden kentät ylittävät merkkirajoituksen.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Hallitse salasanoja</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Salasanasi poistetaan tältä laitteelta.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="one">Salasanasi poistetaan tältä laitteelta.</item>
+        <item quantity="other">Salasanasi poistetaan tältä laitteelta.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Salasanasi poistetaan kaikista synkronoiduista laitteista.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="one">Salasanasi poistetaan kaikista synkronoiduista laitteista.</item>
+        <item quantity="other">Salasanasi poistetaan kaikista synkronoiduista laitteista.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Haluatko varmasti poistaa tämän salasanan?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="one">Haluatko varmasti poistaa %1$d salasanan?</item>
+        <item quantity="other">Haluatko varmasti poistaa %1$d salasanaa?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Varmista, että pääset yhä käyttämään tiliäsi.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="one">Varmista, että pääset yhä käyttämään tilejäsi.</item>
+        <item quantity="other">Varmista, että pääset yhä käyttämään tilejäsi.</item>
+    </plurals>
 
 </resources>

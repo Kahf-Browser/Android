@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2022 DuckDuckGo
+  ~ Copyright (c) 2022 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
   -->
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="managementDisabledModeCta"><b>Iestati sadaļā Iestatījumi</b></string>
 
     <string name="saveLoginDialogButtonSave">Saglabāt paroli</string>
     <string name="saveLoginMissingUsernameDialogButtonSave">Saglabāt paroli</string>
     <string name="saveLoginDialogNotNow">Nesaglabāt</string>
-    <string name="saveLoginDialogTitle">Vai vēlies, lai DuckDuckGo saglabātu tavu paroli?</string>
+    <string name="saveLoginDialogTitle">Vai vēlies, lai Kahf saglabātu tavu paroli?</string>
     <string name="saveLoginDialogMoreOptionsButtonLabel">Citas iespējas</string>
 
     <string name="useSavedLoginDialogTitle">Izmantot saglabāto paroli?</string>
@@ -38,7 +38,7 @@
     <string name="updateLoginDialogButtonUpdateUsername">Atjaunināt lietotājvārdu</string>
 
     <string name="updateLoginDialogTitleLine" instruction="Placeholder is the user&apos;s username for this site">Atjaunināt paroli lietotājvārdam \n%1$s?</string>
-    <string name="updateLoginUpdatePasswordExplanation">DuckDuckGo atjauninās tavā ierīcē saglabāto paroli.</string>
+    <string name="updateLoginUpdatePasswordExplanation">Kahf atjauninās tavā ierīcē saglabāto paroli.</string>
 
     <string name="autofillDialogCloseButtonContentDescription">Aizvērt automātiskās aizpildes dialoglodziņu</string>
 
@@ -56,17 +56,23 @@
 
     <string name="credentialManagementSuggestionsLabel">Ieteikts</string>
 
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">Paroļu automātiskā aizpildīšana nav pieejama, jo tava Android WebView versija ir pārāk veca.</string>
+
     <string name="autofillManagementSearchClearDescription">Notīrīt meklēšanas ievadi</string>
     <string name="autofillManagementNoSearchResults" instruction="Placeholder is the query the user has searched for. e.g., No results for &apos;kittens&apos;">Vaicājumam “%1$s” nav rezultātu</string>
 
     <string name="autofillDeleteLoginDialogCancel">Atcelt</string>
     <string name="autofillDeleteLoginDialogDelete">Dzēst</string>
 
+    <!-- Autofill Management Survey Prompt, shown only to English locale so marked as not translatable -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
 
     <string name="autofillManagementUsernameCopied">Lietotājvārds nokopēts</string>
     <string name="autofillManagementPasswordCopied">Parole nokopēta</string>
 
-    <string name="autofill_password_generation_offer_title">Vai izmantot spēcīgu DuckDuckGo paroli?</string>
+    <string name="autofill_password_generation_offer_title">Vai izmantot spēcīgu Kahf paroli?</string>
     <string name="autofill_password_generation_offer_accept">Izmantot spēcīgu paroli</string>
     <string name="autofill_password_generation_offer_decline">Izveidot savu</string>
 
@@ -120,7 +126,6 @@
     <string name="saveLoginDialogSubtitle">Paroles tiek droši glabātas tavā ierīcē.</string>
     <string name="autofillManagementAddLogin">Pievienot paroli</string>
     <string name="credentialManagementEditLoginTitleHint">Nosaukums</string>
-    <string name="autofillDeleteLoginDialogTitle">Vai tiešām vēlies dzēst šo paroli?</string>
     <string name="autofillManagementDeletedConfirmation">Parole dzēsta</string>
     <string name="credentialManagementEditLastUpdated" instruction="Placeholder is a date">Pēdējoreiz atjaunināts %1$s</string>
     <string name="autofillDisableAutofillPromptTitle">Vai vēlaties turpināt saglabāt paroles?</string>
@@ -133,8 +138,10 @@
     <string name="managementDisabledModeSubtitle">Lai aizsargātu tavus pieteikšanās datus, ir nepieciešama ierīces bloķēšanas figūra, PIN kods vai biometriskā aizsardzība.</string>
     <string name="credentialManagementEditTitle">Paroles rediģēšana</string>
 
-    <string name="credentials_limit_warning"><b>Sinhronizācija pārtraukta</b>\nPārsniegts pieteikšanās datu ierobežojums. Izdzēsiet dažus, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_logins">Pārvaldīt pieteikšanās datus</annotation></string>
-    <string name="credentials_limit_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nIr pārsniegts paroļu sinhronizācijas ierobežojums. Mēģini izdzēst dažas paroles. Kamēr šī problēma nebūs atrisināta, paroles netiks dublētas.</string>
+    <string name="credentials_limit_warning"><b>Sinhronizācija pārtraukta</b>\nTu esi sasniedzis maksimālo paroļu skaitu. Lūdzu, izdzēs dažas, lai atsāktu sinhronizāciju.\n\n<annotation type="manage_logins">Pārvaldīt paroles</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nTu esi sasniedzis maksimālo paroļu skaitu. Lūdzu, izdzēs dažas paroles, lai atsāktu sinhronizāciju.</string>
+    <string name="credentials_invalid_request_warning"><b>Sinhronizācija pārtraukta</b>\nDažas paroles ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.\n\n<annotation type="manage_logins">Pārvaldīt paroles</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>Paroļu sinhronizācija ir pārtraukta</b>\nDažas paroles ir formatētas nepareizi vai ir pārāk garas un netika sinhronizētas.</string>
 
     <string name="saveLoginDialogNeverForThisSite">Nekad nejautāt par šo vietni</string>
     <string name="credentialManagementInstructionNeverForThisSite">Ja atiestatīsi izslēgtās vietnes, tev tiks piedāvāts saglabāt savus pieteikšanās datus, kad nākamreiz tajās pierakstīsies.</string>
@@ -144,14 +151,6 @@
     <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">Atcelt</string>
 
     <string name="credentialManagementDeleteAllPasswordsMenu">Dzēst visas paroles</string>
-    <plurals name="credentialManagementDeleteAllPasswordsConfirmationTitle" instruction="Placeholder is a number representing how many passwords will be deleted">
-        <item quantity="zero">Vai tiešām vēlies dzēst %1$d paroles?</item>
-        <item quantity="one">Vai tiešām vēlies dzēst %1$d paroli?</item>
-        <item quantity="other">Vai tiešām vēlies dzēst %1$d paroles?</item>
-    </plurals>
-
-    <string name="credentialManagementDeletePasswordConfirmationMessage">Parole tiks dzēsta no visām sinhronizētajām ierīcēm. Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
-    <string name="credentialManagementDeleteAllPasswordsConfirmationMessage">Paroles tiks dzēstas no visām sinhronizētajām ierīcēm. Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
 
     <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation" instruction="Placeholder is a number representing how many passwords were deleted">
         <item quantity="zero">%1$d paroles izdzēstas</item>
@@ -161,5 +160,41 @@
 
     <string name="autofill_auth_text_for_delete_all">Autentificējies, lai apstiprinātu, ka vēlies dzēst visas paroles</string>
     <string name="autofill_title_text_for_delete_all">Dzēst visas paroles</string>
+
+    <!-- Sync settings screen -->
+    <plurals name="syncCredentialInvalidItemsWarning" instruction="%1$ represents a site name or url, %2$d is the number of other invalid sites">
+        <item quantity="zero">Tavas paroles vietnei %1$s un vēl %2$d vietnēm nevar sinhronizēt, jo daži to lauki pārsniedz rakstzīmju ierobežojumu.</item>
+        <item quantity="one">Tavu paroli vietnei %1$s nevar sinhronizēt, jo kāds no tās laukiem pārsniedz rakstzīmju ierobežojumu.</item>
+        <item quantity="other">Tavas paroles vietnei %1$s un vēl %2$d vietnēm nevar sinhronizēt, jo daži to lauki pārsniedz rakstzīmju ierobežojumu.</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">Pārvaldīt paroles</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">Tavas paroles tiks dzēstas no šīs ierīces.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Tavas paroles tiks dzēstas no šīs ierīces.</item>
+        <item quantity="one">Tava parole tiks dzēsta no šīs ierīces.</item>
+        <item quantity="other">Tavas paroles tiks dzēstas no šīs ierīces.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">Parole tiks dzēsta no visām sinhronizētajām ierīcēm.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
+        <item quantity="one">Tava parole tiks dzēsta no visām sinhronizētajām ierīcēm.</item>
+        <item quantity="other">Tavas paroles tiks dzēstas no visām sinhronizētajām ierīcēm.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">Vai tiešām vēlies dzēst šo paroli?</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural" instruction="Placeholder is a number representing how many passwords will be deleted">
+        <item quantity="zero">Vai tiešām vēlies dzēst %1$d paroles?</item>
+        <item quantity="one">Vai tiešām vēlies dzēst %1$d paroli?</item>
+        <item quantity="other">Vai tiešām vēlies dzēst %1$d paroles?</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural" tools:ignore="ImpliedQuantity">
+        <item quantity="zero">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
+        <item quantity="one">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
+        <item quantity="other">Pārliecinies, vai joprojām varēsi piekļūt savam kontam.</item>
+    </plurals>
 
 </resources>

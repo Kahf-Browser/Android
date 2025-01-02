@@ -281,8 +281,6 @@
     <string name="widgetConfigurationAddWidgetOption">أضف ويدجت</string>
     <string name="searchWidgetEmtpyFavoritesHint">لم تتم إضافة مفضلات بعد</string>
     <string name="searchWidgetEmtpyFavoritesCta">أضف إلى المفضلة</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[زر مواقعك المفضلة بسرعة!<br/><br/>انتقل إلى موقع تحبه. ثم اضغط على أيقونة "&#x2807;" واختر أضف إلى المفضلة.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">زر مواقعك المفضلة بسرعة! انتقل إلى موقع تحبه. ثم اضغط على أيقونة قائمة المتصفح واختر أضف إلى المفضلة.</string>
     <string name="widgetConfigurationActivityTitle">تكوين الويدجت</string>
     <string name="favoritesWidgetLabel">المفضلة</string>
     <string name="searchWidgetLabel">البحث</string>
@@ -452,14 +450,8 @@
     <string name="systemSearchOnboardingButtonOk">فهمت</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">إخفاء</string>
-    <string name="daxDialogPhew">أوف!</string>
-    <string name="daxDialogNext">التالي</string>
     <string name="daxDialogHighFive">تحية!</string>
     <string name="daxDialogGotIt">فهمت</string>
-    <string name="hideTipsTitle">إخفاء النصائح المتبقية؟</string>
-    <string name="hideTipsText">هناك فقط بعض النصائح، وحاولنا أن نجعلها مفيدة.</string>
-    <string name="hideTipsButton">إخفاء النصائح إلى الأبد</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
 
@@ -471,37 +463,9 @@
     <string name="onboardingWelcomeTitle">"مرحباً بك في أصيل!"</string>
     <string name="onboardingDaxText"><![CDATA[يمكن أن يكون الإنترنت مخيفاً نوعاً ما.<br/><br/>لا داعي للقلق! البحث والتصفح بخصوصية أسهل مما تظن.]]></string>
     <string name="onboardingLetsDoItButton">هيا بنا!</string>
-    <string name="daxIntroCtaText"><![CDATA[الخطوة التالية، جرب زيارة واحدة من مواقعك المفضلة!<br/><br/>سأقوم بحظر المتتبعين حتى لا يتمكنوا من التجسس عليك. سأقوم أيضًا بتحسين أمان الاتصال إذا أمكن. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[أنت تستطيع فعل ذلك!<br/><br/>تذكر: في كل مرة تتصفح فيها معي، يفقد إعلان مخيف أجنحته. 👍]]></string>
-    <string name="daxSerpCtaText">بحثك في أصيل مجهول دائمًا. دائمًا. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText" tools:ignore="MissingQuantity">
-        <item quantity="one" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 1 other..."><![CDATA[&#160;و<b>%1$d آخر</b> كانوا يحاولون تتبعك هنا. <br/><br/>لقد قمت بحظرهم!<br/><br/> ☝️يمكنك التحقق من شريط العناوين لرؤية من يحاول تتبعك عند زيارة موقع جديد.]]></item>
-        <item quantity="other" instruction="Placeholder is a number. This sentence is preceded by the name of a company, i.e. Facebook and 3 others..."><![CDATA[&#160;و<b>%1$d آخرين</b> كانوا يحاولون تتبعك هنا. <br/><br/>لقد قمت بحظرهم!<br/><br/> ☝️يمكنك التحقق من شريط العناوين لرؤية من يحاول تتبعك عند زيارة موقع جديد.]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity,MissingQuantity">
-        <item quantity="one" instruction="This sentence is preceded by the name of a company, i.e. Facebook was trying to track..."><![CDATA[&#160;كان يحاول تتبعك هنا. <br/><br/>لقد قمت بحظرهم!<br/><br/> ☝️يمكنك التحقق من شريط URL لرؤية من يحاول تتبعك عند زيارة موقع جديد.]]></item>
-        <item quantity="other" instruction="This sentence is preceded by the name of several companies, i.e. Facebook and Google were trying to track..."><![CDATA[&#160;كانوا يحاولون تتبعك هنا. <br/><br/>لقد قمت بحظرهم!<br/><br/> ☝️يمكنك التحقق من شريط URL لرؤية من يحاول تتبعك عند زيارة موقع جديد.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[بينما تنقر وتتصفح، سأقوم بحظر المتتبعين المزعجين. <br/><br/>تفضل — استمر في التصفح!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">انتبه! لا أستطيع منع %1$s من رؤية نشاطك على %2$s &lt;br/&gt;&lt;br/&gt;لكن تصفح معي، ويمكنني تقليل ما يعرفه %3$s عنك بشكل عام من خلال حظر المتتبعين الخاصين بهم على العديد من المواقع الأخرى.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">انتبه! بما أن %1$s تملك %2$s، لا أستطيع منعهم من رؤية نشاطك هنا.&lt;br/&gt;&lt;br/&gt;لكن تصفح معي، ويمكنني تقليل ما يعرفه %3$s عنك بشكل عام من خلال حظر المتتبعين الخاصين بهم على العديد من المواقع الأخرى.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">ما الذي جاء بك إلى أصيل؟</string>
-    <string name="onboardingFeatureOptionsContinue">استمر</string>
-    <string name="onboardingFeatureOptionsSkip">تخط هذه الخطوة</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">بحث خاص</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">حظر المتتبعين</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">بصمة رقمية أصغر</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">تحميل صفحات أسرع</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">إعلانات أقل</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">مسح البيانات بنقرة واحدة</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationContinue">حفظ في التحميلات</string>

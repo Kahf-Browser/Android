@@ -36,4 +36,7 @@ interface WebTrackersBlockedDao {
         startTime: String,
         endTime: String,
     ): Flow<List<WebTrackerBlocked>>
+
+    @Query("SELECT COUNT(*) FROM web_trackers_blocked")
+    fun getTotalTrackerCount(): Flow<Int>
 }

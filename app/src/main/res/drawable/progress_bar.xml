@@ -1,14 +1,16 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-<item android:id="@android:id/background">
-    <shape>
-        <solid android:color="@android:color/transparent"/>
-    </shape>
-</item>
-<item android:id="@android:id/progress">
-    <clip>
+    <item android:id="@android:id/background">
         <shape>
-            <solid android:color="#0FB2C9"/> <!-- Replace with your desired color -->
+            <corners android:radius="50dp"/>
+            <solid android:color="#D3D3D3"/>
         </shape>
-    </clip>
-</item>
+    </item>
+    <item android:id="@android:id/progress">
+        <clip>
+            <shape>
+                <corners android:radius="50dp" />
+                <solid android:color="@color/kahf_green" />
+            </shape>
+        </clip>
+    </item>
 </layer-list>

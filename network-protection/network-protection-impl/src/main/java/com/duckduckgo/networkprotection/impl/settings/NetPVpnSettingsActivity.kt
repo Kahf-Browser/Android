@@ -16,7 +16,11 @@
 
 package com.duckduckgo.networkprotection.impl.settings
 
+import android.Manifest.permission
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -24,8 +28,11 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.notifyme.NotifyMeView
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.launchAlwaysOnSystemSettings
+import com.duckduckgo.common.utils.extensions.launchApplicationInfoSettings
 import com.duckduckgo.common.utils.extensions.launchIgnoreBatteryOptimizationSettings
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
@@ -35,14 +42,16 @@ import com.duckduckgo.networkprotection.impl.databinding.ActivityNetpVpnSettings
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.RecommendedSettings
 import com.duckduckgo.networkprotection.impl.settings.NetPVpnSettingsViewModel.ViewState
 import javax.inject.Inject
+import kotlin.math.absoluteValue
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import logcat.logcat
 
 @InjectWith(
     scope = ActivityScope::class,
     delayGeneration = true, // VpnSettingPlugin can be contributed from other modules
 )
-@ContributeToActivityStarter(NetPVpnSettingsScreenNoParams::class)
+@ContributeToActivityStarter(NetPVpnSettingsScreenNoParams::class, screenName = "vpn.settings")
 class NetPVpnSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
@@ -98,25 +107,78 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         }
         binding.unrestrictedBatteryUsage.setPrimaryText(getString(batteryTextTitle))
         binding.unrestrictedBatteryUsage.setSecondaryText(getString(batteryTextByline))
-
-        // val alwaysOnLeadingIcon = if (state.alwaysOnState) R.drawable.ic_check_color_24 else R.drawable.ic_alert_color_24
-        // binding.alwaysOn.setLeadingIconResource(alwaysOnLeadingIcon)
     }
 
     private fun renderViewState(viewState: ViewState) {
+        binding.vpnNotifications.quietlySetIsChecked(viewState.vpnNotifications) { _, isChecked ->
+            viewModel.onVPNotificationsToggled(isChecked)
+        }
+
         binding.excludeLocalNetworks.quietlySetIsChecked(viewState.excludeLocalNetworks) { _, isChecked ->
             viewModel.onExcludeLocalRoutes(isChecked)
         }
+
+        binding.pauseWhileCalling.quietlySetIsChecked(viewState.pauseDuringWifiCalls) { _, isChecked ->
+            if (isChecked && hasPhoneStatePermission()) {
+                viewModel.onEnablePauseDuringWifiCalls()
+            } else if (isChecked) {
+                binding.pauseWhileCalling.setIsChecked(false)
+                if (shouldShowRequestPermissionRationale(permission.READ_PHONE_STATE)) {
+                    TextAlertDialogBuilder(this)
+                        .setTitle(R.string.netpGrantPhonePermissionTitle)
+                        .setMessage(R.string.netpGrantPhonePermissionByline)
+                        .setPositiveButton(R.string.netpGrantPhonePermissionActionPositive)
+                        .setNegativeButton(R.string.netpGrantPhonePermissionActionNegative)
+                        .addEventListener(
+                            object : TextAlertDialogBuilder.EventListener() {
+                                override fun onPositiveButtonClicked() {
+                                    // User denied the permission 2+ times
+                                    this@NetPVpnSettingsActivity.launchApplicationInfoSettings()
+                                }
+                            },
+                        )
+                        .show()
+                } else {
+                    requestPermissions(arrayOf(permission.READ_PHONE_STATE), permission.READ_PHONE_STATE.hashCode().absoluteValue)
+                }
+            } else {
+                binding.pauseWhileCalling.setIsChecked(false)
+                viewModel.onDisablePauseDuringWifiCalls()
+            }
+        }
+
         binding.unrestrictedBatteryUsage.setOnClickListener {
             this.launchIgnoreBatteryOptimizationSettings()
         }
     }
 
-    private fun setupUiElements() {
-        binding.vpnNotifications.setClickListener {
-            globalActivityStarter.start(this, NetPNotificationSettingsScreenNoParams)
-        }
+    private fun hasPhoneStatePermission(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this,
+            permission.READ_PHONE_STATE,
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            permission.READ_PHONE_STATE.hashCode().absoluteValue -> {
+                val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                binding.pauseWhileCalling.setIsChecked(granted)
+                if (!granted) {
+                    logcat { "READ_PHONE_STATE permission denied" }
+                }
+            }
+
+            else -> {}
+        }
+    }
+
+    private fun setupUiElements() {
         binding.excludeLocalNetworks.setOnCheckedChangeListener { _, isChecked ->
             viewModel.onExcludeLocalRoutes(isChecked)
         }
@@ -124,6 +186,18 @@ class NetPVpnSettingsActivity : DuckDuckGoActivity() {
         binding.alwaysOn.setOnClickListener {
             this.launchAlwaysOnSystemSettings()
         }
+
+        binding.vpnNotificationSettingsNotifyMe.setOnVisibilityChange(
+            object : NotifyMeView.OnVisibilityChangedListener {
+                override fun onVisibilityChange(
+                    v: View?,
+                    isVisible: Boolean,
+                ) {
+                    // The settings are only interactable when the notifyMe component is not visible
+                    binding.vpnNotifications.isEnabled = !isVisible
+                }
+            },
+        )
     }
 
     private fun setupRemoteSettings() {

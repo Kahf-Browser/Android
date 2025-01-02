@@ -54,7 +54,7 @@ class SurveyAvailableNotification @Inject constructor(
         get() = "com.duckduckgo.survey.availablesurvey${formatter.format((Date()))}"
 
     override suspend fun canShow(): Boolean {
-        return !notificationDao.exists(id)
+        return false // !notificationDao.exists(id)
     }
 
     override suspend fun buildSpecification(): NotificationSpec {

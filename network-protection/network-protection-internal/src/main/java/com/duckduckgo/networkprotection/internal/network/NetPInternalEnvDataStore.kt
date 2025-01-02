@@ -17,30 +17,16 @@
 package com.duckduckgo.networkprotection.internal.network
 
 import android.content.SharedPreferences
-import androidx.core.content.edit
-import com.duckduckgo.mobile.android.vpn.prefs.VpnSharedPreferencesProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import javax.inject.Inject
 
-class NetPInternalEnvDataStore @Inject constructor(vpnSharedPreferencesProvider: VpnSharedPreferencesProvider) {
+class NetPInternalEnvDataStore @Inject constructor(sharedPreferencesProvider: SharedPreferencesProvider) {
 
     private val preferences: SharedPreferences by lazy {
-        vpnSharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
+        sharedPreferencesProvider.getSharedPreferences(FILENAME, multiprocess = true, migrate = false)
     }
-
-    var netpCustomEnvironmentUrl: String?
-        get() = preferences.getString(KEY_NETP_ENVIRONMENT_URL, null)
-        set(value) = preferences.edit { putString(KEY_NETP_ENVIRONMENT_URL, value) }
-    var useNetpCustomEnvironmentUrl: Boolean
-        get() = preferences.getBoolean(KEY_NETP_USE_ENVIRONMENT_URL, false)
-        set(enabled) = preferences.edit { putBoolean(KEY_NETP_USE_ENVIRONMENT_URL, enabled) }
-    var customDns: String?
-        get() = preferences.getString(KEY_NETP_CUSTOM_DNS, null)
-        set(value) = preferences.edit { putString(KEY_NETP_CUSTOM_DNS, value) }
 
     companion object {
         private const val FILENAME = "com.duckduckgo.netp.internal.env.store.v1"
-        private const val KEY_NETP_ENVIRONMENT_URL = "KEY_NETP_ENVIRONMENT_URL"
-        private const val KEY_NETP_USE_ENVIRONMENT_URL = "KEY_NETP_USE_ENVIRONMENT_URL"
-        private const val KEY_NETP_CUSTOM_DNS = "KEY_NETP_CUSTOM_DNS"
     }
 }

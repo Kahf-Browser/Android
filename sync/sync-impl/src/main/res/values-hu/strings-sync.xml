@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2021 DuckDuckGo
+  ~ Copyright (c) 2021 Kahf
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -19,24 +19,27 @@
 <resources>
     <!-- Sync Disabled messages -->
     <string name="sync_flows_disabled"><b>A szinkronizálás és a biztonságai másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
-    <string name="sync_flows_disabled_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a DuckDuckGo a legújabb verziójára.</string>
+    <string name="sync_flows_disabled_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a Kahf a legújabb verziójára.</string>
     <string name="sync_create_account_disabled"><b>A szinkronizálás és a biztonságai másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
-    <string name="sync_create_account_disabled_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a DuckDuckGo a legújabb verziójára.</string>
+    <string name="sync_create_account_disabled_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés nem érhető el</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a Kahf a legújabb verziójára.</string>
     <string name="sync_disabled_authenticated_user"><b>A szinkronizálás és a biztonságai másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
-    <string name="sync_disabled_authenticated_user_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a DuckDuckGo a legújabb verziójára.</string>
+    <string name="sync_disabled_authenticated_user_new_version"><b>A szinkronizálás és a biztonsági másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés az alkalmazás ezen verziójában sajnos már nem érhető el. A folytatáshoz frissíts a Kahf a legújabb verziójára.</string>
     <string name="sync_paused_notification"><b>A szinkronizálás és a biztonságai másolatkészítés szünetel</b>\nA szinkronizálás és biztonsági másolatkészítés jelenleg sajnos nem érhető el. Próbálkozz újra később.</string>
+    <string name="sync_error_notification"><b>Szinkronizálási hiba</b>\nA szinkronizálás és biztonsági mentés átmenetileg nem érhető el.</string>
+    <string name="sync_error_warning"><b>Szinkronizálási hiba</b>\nA Sync &amp; Backup funkció átmenetileg nem érhető el.</string>
+    <string name="sync_signed_out_notification"><b>Szinkronizálás szüneteltetve</b>\nA szinkronizálás szüneteltetve lett. Ha folytatni szeretnéd az eszköz szinkronizálását, csatlakozz újra egy másik eszközzel vagy a helyreállítási kóddal.</string>
 
     <!-- Settings screen -->
     <string name="sync_screen_title">Szinkronizálás és biztonsági mentés</string>
     <string name="sync_setup_begin_syncing">Szinkronizálás megkezdése</string>
     <string name="sync_setup_with_another_device_cta_title">Szinkronizálás másik eszközzel</string>
     <string name="sync_setup_with_another_device_cta_subtitle">Szinkronizáld biztonságosan a könyvjelzőket és jelszavakat az eszközök között.</string>
-    <string name="sync_off_hint">Az adataid végponttól végpontig titkosítva vannak, a DuckDuckGo pedig nem fér hozzá a titkosítási kulcshoz.</string>
+    <string name="sync_off_hint">Az adataid végponttól végpontig titkosítva vannak, a Kahf pedig nem fér hozzá a titkosítási kulcshoz.</string>
     <string name="sync_setup_single_device_title">Egyeszközös beállítás</string>
     <string name="sync_setup_single_recover_data_cta_title">Szinkronizált adatok helyreállítása</string>
     <string name="sync_setup_single_sync_this_device_cta_title">Az eszköz szinkronizálása és biztonsági mentése</string>
 
-    <string name="sync_off_encrypted_hint">Az adataid végponttól végpontig titkosítva vannak, a DuckDuckGo pedig nem fér hozzá a dekódolási kulcshoz.</string>
+    <string name="sync_off_encrypted_hint">Az adataid végponttól végpontig titkosítva vannak, a Kahf pedig nem fér hozzá a dekódolási kulcshoz.</string>
 
     <!-- Setup screen -->
     <string name="sync_enable_sync_title">Szinkronizálás és biztonsági mentés beállítása!</string>
@@ -46,7 +49,7 @@
     <string name="sync_enable_option_favicons_subtitle">A szinkronizált könyvjelzők ikonjainak automatikus letöltése.</string>
     <string name="sync_enable_connecting">Csatlakozás…</string>
     <string name="sync_intro_enable_title">Az eszköz szinkronizálása és biztonsági mentése</string>
-    <string name="sync_intro_enable_content">Ez a DuckDuckGo biztonságos szerverén egy titkosított biztonsági másolatot készít a könyvjelzőidről és jelszavaidról, amelyet más eszközökkel szinkronizálhatsz. A titkosítási kulcsot csak az eszközöd tárolja, a DuckDuckGo nem fér hozzá…</string>
+    <string name="sync_intro_enable_content">Ez a Kahf biztonságos szerverén egy titkosított biztonsági másolatot készít a könyvjelzőidről és jelszavaidról, amelyet más eszközökkel szinkronizálhatsz. A titkosítási kulcsot csak az eszközöd tárolja, a Kahf nem fér hozzá…</string>
     <string name="sync_intro_enable_footer">Később szinkronizálhatod más eszközeidet.</string>
     <string name="sync_intro_enable_cta">Szinkronizálás és biztonsági mentés bekapcsolása</string>
     <string name="sync_intro_recover_title">Szinkronizált adatok helyreállítása</string>
@@ -61,7 +64,7 @@
 
     <!-- Connect screen -->
     <string name="connect_screen_title">QR-kód beolvasása</string>
-    <string name="connect_screen_scan_qr_hint">Egy másik eszköz DuckDuckGo böngészőjében lépj a <b>Beállítások &gt; Szinkronizálás és biztonsági mentés</b> menüpontra, és válaszd ki a „Szinkronizálás másik eszközzel” lehetőséget.</string>
+    <string name="connect_screen_scan_qr_hint">Egy másik eszköz Kahf böngészőjében lépj a <b>Beállítások &gt; Szinkronizálás és biztonsági mentés</b> menüpontra, és válaszd ki a „Szinkronizálás másik eszközzel” lehetőséget.</string>
     <string name="connect_screen_enter_code_cta">Vagy manuálisan add meg a kódot</string>
     <string name="connect_screen_connect_qr_hint_title">Mobilról mobilra?</string>
     <string name="connect_screen_connect_qr_hint_content">A szinkronizáláshoz olvasd be ezt a kódot egy másik eszközzel.</string>
@@ -69,7 +72,7 @@
 
     <!-- Enter Code screen -->
     <string name="enter_code_screen_title">Kód manuális megadása</string>
-    <string name="sync_enter_code_hint">Egy másik szinkronizált eszköz DuckDuckGo alkalmazásában lépj a <b>Beállítások &gt; Szinkronizálás és biztonsági mentés &gt; Szinkronizálás másik eszközzel</b> menüpontra, és válaszd ki a <b>Szövegkód megtekintése</b> opciót, és illeszd be ide a kódot az eszköz szinkronizálásához.</string>
+    <string name="sync_enter_code_hint">Egy másik szinkronizált eszköz Kahf alkalmazásában lépj a <b>Beállítások &gt; Szinkronizálás és biztonsági mentés &gt; Szinkronizálás másik eszközzel</b> menüpontra, és válaszd ki a <b>Szövegkód megtekintése</b> opciót, és illeszd be ide a kódot az eszköz szinkronizálásához.</string>
     <string name="sync_enter_code_verifying">Kód ellenőrzése</string>
     <string name="sync_enter_code_invalid">⚠️ Érvénytelen kód</string>
     <string name="sync_enter_code_paste">Kód beillesztése</string>
@@ -94,7 +97,7 @@
 
     <string name="synced_devices_section_title">Szinkronizált eszközök</string>
     <string name="sync_new_device_section_title">Új eszköz szinkronizálása</string>
-    <string name="sync_new_device_hint">Egy másik eszköz DuckDuckGo alkalmazásában lépj a Beállítások &gt; Szinkronizálás és biztonsági mentés menüpontra, és végezd el a beolvasását az azonnali csatlakozáshoz.</string>
+    <string name="sync_new_device_hint">Egy másik eszköz Kahf alkalmazásában lépj a Beállítások &gt; Szinkronizálás és biztonsági mentés menüpontra, és végezd el a beolvasását az azonnali csatlakozáshoz.</string>
     <string name="sync_show_text_code_item">Szöveges kód megjelenítése</string>
     <string name="sync_show_qr_code_item">QR-kód beolvasása</string>
     <string name="sync_save_recovery_code_item">Helyreállítási PDF-fájl mentése</string>
@@ -114,8 +117,8 @@
     <string name="sync_pdf_description">A helyreállítási kód lehetővé teszi a könyvjelzők több eszközön történő szinkronizálását, illetve az eszközhöz való hozzáférés elvesztése esetén a szinkronizált adatok helyreállítását.</string>
     <string name="sync_code_box_title">Tartsd biztonságban ezeket az információkat.</string>
     <string name="sync_instructions_title">Hogy működik?</string>
-    <string name="sync_instructions_step1">Egy másik eszközön nyisd meg a DuckDuckGo alkalmazást, és válaszd a Beállítások menü Szinkronizálás elemét.</string>
-    <string name="sync_instructions_step2">Olvasd be a QR-kódot, vagy másold és illeszd be a szöveges kódot a másik DuckDuckGo alkalmazásba.</string>
+    <string name="sync_instructions_step1">Egy másik eszközön nyisd meg a Kahf alkalmazást, és válaszd a Beállítások menü Szinkronizálás elemét.</string>
+    <string name="sync_instructions_step2">Olvasd be a QR-kódot, vagy másold és illeszd be a szöveges kódot a másik Kahf alkalmazásba.</string>
     <string name="sync_instructions_step3">A szinkronizálás aktiválódik, és ismét hozzáférhetsz minden adathoz.</string>
     <string name="remove_device_dialog_title">Eszköz eltávolítása?</string>
     <string name="remove_device_dialog_content" instruction="Placeholder is a device name">A(z) „%1$s” többé nem férhet hozzá a szinkronizált adatokhoz.</string>
@@ -139,4 +142,33 @@
     <string name="sync_notification_channel_name">Szinkronizálás</string>
     <string name="sync_notify_me_title">Az értesítések le vannak tiltva</string>
     <string name="sync_notify_me_description">Értesítést kaphatsz, ha a szinkronizálás és biztonsági mentés funkció hibát észlel.</string>
+
+    <!-- setup errors -->
+    <string name="sync_turn_off_error">Nem sikerült kikapcsolni a Szinkronizálás és biztonsági mentés funkciót.</string>
+    <string name="sync_edit_device_error">Nem sikerült frissíteni az eszköz nevét.</string>
+    <string name="sync_remove_device_error">Az eszközt nem sikerült eltávolítani a Szinkronizálás és biztonsági mentés funkcióból.</string>
+    <string name="sync_delete_data_error">Nem sikerült adatokat törölni a szerveren.</string>
+    <string name="sync_login_authenticated_device_error">"Az eszközök párosításához kapcsold ki a Szinkronizálás és biztonsági mentés funkciót az egyik eszközön, majd koppints a Szinkronizálás másik eszközzel lehetőségre a másik eszközön."</string>
+    <string name="sync_connect_generic_error">Nem sikerült csatlakozni a szerverhez.</string>
+    <string name="sync_connect_login_error">Nem sikerült a másik eszközzel szinkronizálni.</string>
+    <string name="sync_create_account_generic_error">Nem sikerült csatlakozni a szerverhez.</string>
+    <string name="sync_invalid_code_error">Ez a kód sajnos érvénytelen. Győződj meg róla, hogy a helyes kódot adtad meg vagy olvastad be.</string>
+    <string name="sync_recovery_pdf_error">Nem sikerült létrehozni a helyreállítási PDF-fájlt.</string>
+    <string name="sync_dialog_error_ok">OK</string>
+    <string name="sync_dialog_error_title">Szinkronizálás és biztonsági mentés</string>
+    <string name="sync_encryption_not_supported_error_title">Az eszköz nem támogatott</string>
+    <string name="sync_encryption_not_supported_error">A Sync &amp; Backup funkció végpontok közötti titkosítást használ, és képesnek kell lennie az adatok eszközön való titkosítására és tárolására. Mivel az eszközöd nem támogatja a titkosított tárhelyet, a Sync &amp; Backup funkció nem érhető el.</string>
+
+    <!-- Sync Device Authentication -->
+    <string name="sync_auth_text_for_access">Oldd fel az eszközt a Szinkronizálás és biztonsági mentés funkció eléréséhez.</string>
+    <string name="sync_biometric_prompt_title">A Szinkronizálás és biztonsági mentés funkció zárolva</string>
+    <string name="sync_require_device_passcode_dialog_title">Eszköz lezárása a Sync &amp; Backup használatához</string>
+    <string name="sync_require_device_passcode_dialog_body">A Sync &amp; Backup funkció használatához az eszköz zárolási mintája, PIN-kód vagy biometrikus adatok szükségesek.</string>
+    <string name="sync_require_device_passcode_dialog_action">Lépj a Beállítások menübe</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_delete_server_data_dialog_title">Szerveradatok törlése?</string>
+    <string name="sync_delete_server_data_dialog_content">A rendszer minden eszközt lecsatlakoztat, és a szinkronizált adatokat törli a szerverről.</string>
+    <string name="sync_delete_server_data_dialog_primary_button">Adatok törlése</string>
+    <string name="sync_delete_server_data_dialog_secondary_button">Mégsem</string>
 </resources>

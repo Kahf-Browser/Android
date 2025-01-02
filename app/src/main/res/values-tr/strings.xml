@@ -156,10 +156,16 @@
     <string name="privateSearchTitle">Private Search Etkinleştirildi</string>
     <string name="privateSearchDescription">Kahf Private Search, varsayılan arama motorunuz olduğunda web\'de izlenmeden arama yapabilirsiniz.</string>
     <string name="privateSearchHeadingSearchSettings">Arama Ayarları</string>
-    <string name="privateSearchAutocompleteToggle">Otomatik Tamamlama Önerileri</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Diğer Arama Ayarları</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Arama dilinizi, bölgenizi ve daha fazlasını özelleştirin</string>
     <string name="privateSearchMoreSearchSettingsTitle">Diğer Arama Ayarları</string>
+    <string name="privateSearchAutocompleteToggle">Otomatik Tamamlama Önerileri</string>
+    <string name="privateSearchAutocompleteHint">Yazarken yer imleriniz de dahil olmak üzere arama önerilerini gösterin. Tüm aramalar özeldir.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Son Ziyaret Edilen Siteler</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Son ziyaret edilen siteleri arama önerilerinde göster. Son ziyaret edilen siteler özeldir, yalnızca cihazınızda saklanır ve Fire Button ile temizlenebilir.</string>
+    <string name="improvedAutoCompleteIAMContent">Otomatik tamamlama önerileri artık son ziyaret ettiğiniz siteleri de içeriyor. Bunları ayarlardan kapatabilir veya istediğiniz zaman 🔥 Fire Button ile temizleyebilirsiniz.</string>
+    <string name="improvedAutoCompleteIAMTitle">Aynı gizlilik.\nDaha iyi arama önerileri!</string>
+    <string name="openAutoCompleteSettings">Ayarları Aç</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Web İzleme Koruması</string>
@@ -231,29 +237,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Korumaları KAPALI duruma getirmek yardımcı olabilir.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Bu sitede hatalara neden olduğu için Gizlilik Korumalarını geçici olarak kapattık.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Yer İmleri</string>
-    <string name="bookmarksActivityTitle">Yer İmleri</string>
-    <string name="noBookmarks">Henüz yer işareti eklenmedi</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">%1$s yer imi için diğer seçenekler</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; silindi</string>
-    <string name="exportBookmarksMenu">Dışa Aktar</string>
-    <string name="exportBookmarksEmpty">Yer işaretiniz olmadığından hiçbir şey dışa aktarılmayacak</string>
-    <string name="exportBookmarksError">Yer işaretleri dışa aktarılamadı, bir hata oluştu</string>
-    <string name="exportBookmarksSuccess">Tüm yer işaretleri başarıyla dışa aktarıldı</string>
-    <string name="importBookmarksMenu">İçe Aktar</string>
-    <string name="importBookmarksFileTitle">İçe aktarılacak bir yer işareti dosyası seçin</string>
-    <string name="importBookmarksError">Yer işaretleri içe aktarılamadı, bir hata oluştu</string>
-    <string name="importBookmarksEmpty">Dosyada içe aktarılacak yer işareti yok</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d yer işareti başarıyla içe aktarıldı</string>
-    <string name="savedSiteDialogTitleHint">Title</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Düzenle</string>
-    <string name="bookmarksSectionTitle">Yer İmleri</string>
-    <string name="favoritesSectionTitle">Favoriler</string>
-    <string name="bookmarksEmptyHint">Henüz yer işareti eklenmedi</string>
-    <string name="favoritesEmptyHint">Henüz hiç favori eklenmedi</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Onayla</string>
     <string name="dialogSave">Kaydet</string>
@@ -274,8 +257,6 @@
     <string name="widgetConfigurationAddWidgetOption">Widget ekle</string>
     <string name="searchWidgetEmtpyFavoritesHint">Henüz hiç favori eklenmedi</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favori Ekle</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[En sevdiğiniz siteleri anında ziyaret edin!<br/><br/>Sevdiğiniz bir siteye gidin. Ardından \" ⠇\" simgesine dokunun ve Favorilere Ekle\'yi seçin.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">En sevdiğiniz siteleri anında ziyaret edin! Sevdiğiniz bir siteye gidin. Ardından tarayıcıdaki menü simgesine dokunun ve Favori Ekle\'yi seçin.</string>
     <string name="widgetConfigurationActivityTitle">Widget Yapılandırması</string>
     <string name="favoritesWidgetLabel">Favoriler</string>
     <string name="searchWidgetLabel">Arama yap</string>
@@ -445,14 +426,8 @@
     <string name="systemSearchOnboardingButtonOk">Anladım</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Gizle</string>
-    <string name="daxDialogPhew">Uf!</string>
-    <string name="daxDialogNext">Sonraki</string>
     <string name="daxDialogHighFive">Çak Bir Beşlik!</string>
     <string name="daxDialogGotIt">Anladım</string>
-    <string name="hideTipsTitle">Kalan ipuçları gizlensin mi?</string>
-    <string name="hideTipsText">Sadece birkaç tane var ve onları da bilgilendirici hâle getirmeye çalıştık.</string>
-    <string name="hideTipsButton">İpuçlarını Sonsuza Kadar Gizle</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Artık web genelinde izleyicileri engelliyorsunuz 🎉<br/><br/>Telefonunuzu kullanmadığınız zamanlarda bile diğer uygulamalarınızda gizlenen izleyicileri de engelleyebilirim.]]></string>
@@ -463,37 +438,9 @@
     <string name="onboardingWelcomeTitle">"Kahf'ya Hoş Geldiniz!"</string>
     <string name="onboardingDaxText"><![CDATA[İnternet biraz ürkütücü olabilir.<br/><br/>Endişelenmeyin! Özel olarak arama yapmak ve sitelere göz atmak düşündüğünüzden daha kolaydır.]]></string>
     <string name="onboardingLetsDoItButton">Hadi Başlayalım!</string>
-    <string name="daxIntroCtaText"><![CDATA[Şimdi favori sitelerinizden birini ziyaret etmeyi deneyin! <br/><br/>İzleyicileri engelleyeceğim, böylece sizi gözetlemeyecekler. Mümkünse bağlantınızın güvenliğini de yükselteceğim. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[İşte bu kadar!<br/><br/>Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👍]]></string>
-    <string name="daxSerpCtaText">Kahf aramalarınız anonimdir. Her zaman. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ ve <b>%1$d diğer</b> site sizi burada izlemeye çalışıyordu.<br/><br/>Onları engelledim!<br/><br/>☝️ Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-        <item quantity="other"><![CDATA[ ve <b>%1$d diğer</b> site sizi burada izlemeye çalışıyordu.<br/><br/>Onları engelledim!<br/><br/>☝️ Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-        <item quantity="other"><![CDATA[ sizi burada izlemeye çalışıyordu. <br/><br/>Onları engelledim!<br/><br/> ☝️Yeni bir siteyi ziyaret ettiğinizde sizi kimin izlemeye çalıştığını görmek için URL çubuğunu kontrol edebilirsiniz.]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Siz gezintinize devam ederken sinir bozucu izleyicileri engelleyeceğim. <br/><br/>Hadi, gezinmeye devam edin!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Dikkat! %2$s üzerindeki etkinliğinizin %1$s tarafından görülmesini önleyemiyorum&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer birçok sitedeki izleyicisini engelleyerek %3$s tarafından sizinle ilgili olarak toplanan bilgilerin miktarını genel anlamda azaltabilirim.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Dikkat! %2$s sitesinin sahibi %1$s olduğundan, onların buradaki etkinliğinizi görmesini engelleyemem.&lt;br/&gt;&lt;br/&gt;Ama benimle gezinirseniz diğer sitelerdeki pek çok izleyicisini engelleyerek sizin hakkınızda %3$s tarafından bilinenleri genel anlamda azaltabilirim.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Sizi Kahf\'ya getiren nedir?</string>
-    <string name="onboardingFeatureOptionsContinue">Devam et</string>
-    <string name="onboardingFeatureOptionsSkip">Bu Adımı Atlayın</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Gizli Arama</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">İzleyici engelleme</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Daha küçük dijital ayak izi</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Daha hızlı sayfa yükleme</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Daha az reklam</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Tek tıkla veri temizleme</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Kaydet %1$s</string>
@@ -641,27 +588,6 @@
     <string name="emailNotSupported">Cihaz desteklenmiyor</string>
     <string name="emailNotSupportedExplanation">E-posta Koruması, e-posta izleyicilerini devre dışı bırakan özel e-posta adresleri oluşturmanıza olanak tanır. Oluşturduğunuz bu adresleri cihazınızda yerel olarak şifrelememiz ve depolamamız gerekir. Cihazınız şifreli depolama alanını desteklemediğinden E-posta Koruması kullanılamıyor.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Yer İşaretini Düzenle</string>
-    <string name="favoriteDialogTitleEdit">Favoriyi Düzenle</string>
-    <string name="locationLabel">Konum</string>
-    <string name="folderLocationTitle">Konum Seç</string>
-    <string name="addFolder">Klasör Ekle</string>
-    <string name="editFolder">Klasörü Düzenle</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Klasör ve içeriği silinsin mi?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Silmek istediğinizden emin misiniz: "</string>
-    <string name="bookmarkFolderEmpty">Boş</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ve %3$d öge?</item>
-        <item quantity="other">%1$s%2$s ve %3$d öge?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d öge</item>
-        <item quantity="other">%1$d öge</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Erişilebilirlik</string>
     <string name="accessibilityActivityTitle">Erişilebilirlik</string>
@@ -681,7 +607,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Mac için uygulamamızla internette gezinirken gizliliğinizi koruyun</string>
-    <string name="macos_settings_title">Kahf Mac Uygulaması</string>
+    <string name="macos_settings_title">Kahf Mac Tarayıcısı</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">İndirilenler</string>
@@ -743,7 +669,7 @@
     <string name="downloadsNotifyMeSubtitle">İndirmeler tamamlandığında bir bildirim alın.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Kahf Windows Uygulaması</string>
+    <string name="windows_settings_title">Kahf Windows Tarayıcısı</string>
     <string name="windows_settings_description">Windows uygulamamızla gizliliğinizi koruyarak gezinin</string>
     <string name="windows_settings_description_ready">İndirme mevcut</string>
     <string name="windows_settings_description_list">Listedesiniz!</string>
@@ -756,16 +682,6 @@
     <string name="closeAppTabsConfirmationDialogDescription">Tüm sekmeleri kapatmak istediğinizden emin misiniz?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Vazgeç</string>
     <string name="closeAppTabsConfirmationDialogClose">Kapat</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Bu yer işareti silinsin mi?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; için yer işaretinizi siler.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Bu favori silinsin mi?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; için favorinizi silecektir.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Bu yer işareti klasörü silinsin mi?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Bu işlem &lt;b&gt;%1$s&lt;/b&gt; yer işareti klasörünüzü silecektir.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Vazgeç</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Sil</string>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adres çubuğuna Gizli Sesli Arama seçeneğini ekleyin. Ses kaydı depolanmaz veya Kahf dâhil olmak üzere kimseyle paylaşılmaz.</string>
@@ -786,6 +702,58 @@
     <string name="autofillLoginSavedSnackbarMessage">Şifre kaydedildi</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Şifre güncellendi</string>
 
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Kahf\'da aç</string>
+    <string name="runningInDdgMenuItemTitle">Kahf\'da Çalışıyor</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Uyarı: Bu site güvenli olmayabilir</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Bu sitenin sertifikası geçersiz. %1$s gibi görünen ve gizli bilgilerinizi riske atabilecek bir sunucuya bağlanıyor olabilirsiniz.</string>
+    <string name="sslErrorLeaveCTA">Bu Siteden Ayrılın</string>
+    <string name="sslErrorAdvancedCTA">Gelişmiş</string>
+    <string name="sslErrorExpandedHeadline">Kahf, bir web sitesinin sertifikası geçersiz olduğunda sizi uyarır.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Riski Kabul Edin ve Siteyi Ziyaret Edin<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikasının süresi doldu. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s için güvenlik sertifikası eşleşmiyor *.%2$s. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Cihazınızın işletim sistemi, %1$s güvenlik sertifikasına güvenmiyor. Web sitesi yanlış yapılandırılmış, bir saldırgan bağlantınızı tehlikeye atmış veya sistem saatiniz yanlış ayarlanmış olabilir.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Merhaba.<br/><br/>Daha iyi, daha özel bir internete hazır mısınız?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Hadi başlayalım!</string>
+    <string name="preOnboardingDaxDialog2Title">Gizlilik korumaları etkinleştirildi!</string>
+    <string name="preOnboardingDaxDialog2Button">Tarayıcınızı Seçin</string>
+    <string name="preOnboardingComparisonChartItem1">Varsayılan olarak gizli arama yapın</string>
+    <string name="preOnboardingComparisonChartItem2">Üçüncü taraf izleyicileri engelleyin</string>
+    <string name="preOnboardingComparisonChartItem3">Çerez açılır pencerelerini engelle</string>
+    <string name="preOnboardingComparisonChartItem4">Tekinsiz reklamları engelleyin</string>
+    <string name="preOnboardingComparisonChartItem5">Tarama verilerini hızlıca silin</string>
+    <string name="preOnboardingDaxDialog3Title">Harika! Duck Side\'a hoş geldiniz.</string>
+    <string name="preOnboardingDaxDialog3Button">Gezinmeye Başla</string>
+    <string name="onboardingSearchDaxDialogTitle">Bir şeyler arayın!</string>
+    <string name="onboardingSearchDaxDialogDescription">Kahf aramalarınız her zaman anonimdir.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">ingilizcede \"ördek\" nasıl denir</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">ispanyolca \"ördek\" nasıl denir</string>
+    <string name="onboardingSearchQueryOption1">ingilizcede ördek nasıl denir</string>
+    <string name="onboardingSearchQueryOption1English">ispanyolcada ördek nasıl denir</string>
+    <string name="onboardingSearchDaxDialogOption2">avatar oyuncu kadrosu</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks oyuncu kadrosu</string>
+    <string name="onboardingSearchDaxDialogOption3">yerel hava durumu</string>
+    <string name="onboardingSearchDaxDialogOption4">Şaşırt beni!</string>
+    <string name="onboardingSearchQueryOption4">akşam yemeği tarifleri</string>
+    <string name="onboardingSearchQueryOption4US">çikolata parçacıklı kurabiye tarifleri</string>
+    <string name="onboardingSitesDaxDialogTitle">Bir siteyi ziyaret etmeyi deneyin!</string>
+    <string name="onboardingSitesDaxDialogDescription">Sizi gözetlemelerini önlemek için izleyicileri engelleyeceğim.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Şaşırt beni!</string>
+    <string name="onboardingSerpDaxDialogDescription">Kahf Search bu işte. Özel. Hızlı. Daha az reklam.</string>
+    <string name="onboardingSerpDaxDialogButton">Anladım!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Sonra, bir siteyi ziyaret etmeyi deneyin!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other"><![CDATA[ ve <b>%1$d site daha</b> sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+    </plurals>
     <string name="safegaze_popup_report_title">Lütfen bu form aracılığıyla herhangi bir hata veya öneriyi bildirin</string>
     <string name="safegaze_popup_support_title">Bu projeyi destekleyin</string>
     <string name="safegaze_popup_woman_title">Ben Kadınım</string>
@@ -809,7 +777,7 @@
     <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Yer imi %1$s klasörüne eklendi</string>
     <string name="addToFavorites">Favorilere Ekle</string>
     <string name="editBookmark">Yer İşaretini Düzenle</string>
-    <string name="importBookmarksDescription">Yer imleriniz başka bir tarayıcıda kayıtlıysa, bunları DuckDuckGo\'ya aktarabilirsiniz.</string>
+    <string name="importBookmarksDescription">Yer imleriniz başka bir tarayıcıda kayıtlıysa, bunları Kahf\'ya aktarabilirsiniz.</string>
     <string name="importBookmarks">Yer İmlerini İçe Aktar</string>
     <string name="noResultsFor" instruction="%1$s is the search term">\'%1$s\' için sonuç yok</string>
     <string name="removeFromFavorites">Favorilerden Kaldır</string>
@@ -818,5 +786,14 @@
         <item quantity="one">Bu klasörü ve %1$d ögeyi silmek istediğinizden emin misiniz?</item>
         <item quantity="other">Bu klasörü ve %1$d ögeyi silmek istediğinizden emin misiniz?</item>
     </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; yer iminizi silmek istediğinizden emin misiniz?</string>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+        <item quantity="other"><![CDATA[ sizi burada takip etmeye çalışıyordu. Onları engelledim!<br/><br/>☝️ Daha fazla bilgi için kalkana dokunun.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Anladım!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>Fire Button</b> ile göz atma etkinliğinizi anında temizleyin.<br/><br/>Hemen deneyin! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"İşte bu kadar!"</string>
+    <string name="onboardingEndDaxDialogDescription">Unutmayın: İnterneti benimle ne kadar çok gezerseniz rahatsız edici reklamları da o kadar az görürsünüz. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Hepsi tamam!</string>
+
 </resources>

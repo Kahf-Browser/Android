@@ -17,11 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
-    <string name="windows_app">DuckDuckGo-app for Windows</string>
-    <string name="windows_title">Skaff deg DuckDuckGo for Windows!</string>
-    <string name="windows_description">DuckDuckGo for Windows har det du trenger for å surfe med mer personvern – privat søk, sporingsblokkering, tvungen kryptering, blokkering av popup-vinduer om informasjonskapsler og enda flere førsteklasses beskyttelser som er på vei.\n\nPå en Windows-datamaskin går du til:</string>
-    <string name="windows_description_link">duckduckgo.com/windows</string>
+    <string name="windows_app">Kahf-app for Windows</string>
+    <string name="windows_title">Skaff deg Kahf for Windows!</string>
+    <string name="windows_description">Kahf for Windows har det du trenger for å surfe med mer personvern – privat søk, sporingsblokkering, tvungen kryptering, blokkering av popup-vinduer om informasjonskapsler og enda flere førsteklasses beskyttelser som er på vei.\n\nPå en Windows-datamaskin går du til:</string>
+    <string name="windows_description_link">kahfbrowser.com/windows</string>
     <string name="windows_share_title">Del lenke</string>
-    <string name="windows_share_text">Er du klar til å begynne å surfe privat på Windows?\n\nGå til denne URL-adressen på Windows-datamaskinen din for å laste ned:\nhttps://duckduckgo.com/windows</string>
+    <string name="windows_share_text">Er du klar til å begynne å surfe privat på Windows?\n\nGå til denne URL-adressen på Windows-datamaskinen din for å laste ned:\nhttps://kahfbrowser.com/windows</string>
     <string name="windows_mac_link">Ser du etter Mac-versjonen?</string>
 </resources>

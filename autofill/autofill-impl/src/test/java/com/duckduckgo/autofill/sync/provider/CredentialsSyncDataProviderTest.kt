@@ -20,11 +20,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
+import com.duckduckgo.autofill.impl.FakePasswordStoreEventPlugin
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
 import com.duckduckgo.autofill.sync.CredentialsFixtures
 import com.duckduckgo.autofill.sync.CredentialsFixtures.toWebsiteLoginCredentials
 import com.duckduckgo.autofill.sync.CredentialsSync
 import com.duckduckgo.autofill.sync.CredentialsSyncMetadata
+import com.duckduckgo.autofill.sync.FakeCredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.FakeCredentialsSyncStore
 import com.duckduckgo.autofill.sync.FakeCrypto
 import com.duckduckgo.autofill.sync.FakeSecureStorage
@@ -53,7 +55,14 @@ internal class CredentialsSyncDataProviderTest {
     private val secureStorage = FakeSecureStorage()
     private val credentialsSyncMetadata = CredentialsSyncMetadata(db.credentialsSyncDao())
     private val credentialsSyncStore = FakeCredentialsSyncStore()
-    private val credentialsSync = CredentialsSync(secureStorage, credentialsSyncStore, credentialsSyncMetadata, FakeCrypto())
+    private val credentialsSync = CredentialsSync(
+        secureStorage,
+        credentialsSyncStore,
+        credentialsSyncMetadata,
+        FakeCrypto(),
+        FakeCredentialsSyncLocalValidationFeature(),
+        FakePasswordStoreEventPlugin(),
+    )
     private val appBuildConfig = mock<AppBuildConfig>().apply {
         whenever(this.flavor).thenReturn(BuildFlavor.PLAY)
     }

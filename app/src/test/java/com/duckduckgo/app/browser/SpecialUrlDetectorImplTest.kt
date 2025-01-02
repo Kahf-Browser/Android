@@ -27,10 +27,12 @@ import com.duckduckgo.app.browser.SpecialUrlDetector.UrlType.*
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.EMAIL_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.PHONE_MAX_LENGTH
 import com.duckduckgo.app.browser.SpecialUrlDetectorImpl.Companion.SMS_MAX_LENGTH
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.privacy.config.api.AmpLinkType
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
+import com.duckduckgo.subscriptions.api.Subscriptions
 import java.net.URISyntaxException
 import junit.framework.TestCase.assertNull
 import junit.framework.TestCase.assertTrue
@@ -59,7 +61,13 @@ class SpecialUrlDetectorImplTest {
     lateinit var mockTrackingParameters: TrackingParameters
 
     @Mock
-    lateinit var appBuildConfig: AppBuildConfig
+    lateinit var subscriptions: Subscriptions
+
+    @Mock
+    lateinit var externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature
+
+    @Mock
+    lateinit var mockToggle: Toggle
 
     @Before
     fun setup() {
@@ -68,6 +76,8 @@ class SpecialUrlDetectorImplTest {
             packageManager = mockPackageManager,
             ampLinks = mockAmpLinks,
             trackingParameters = mockTrackingParameters,
+            subscriptions = subscriptions,
+            externalAppIntentFlagsFeature = externalAppIntentFlagsFeature,
         )
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(emptyList())
     }
@@ -113,7 +123,30 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenOneNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
+    fun whenDefaultNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(buildAppResolveInfo())
+        whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
+            listOf(
+                buildBrowserResolveInfo(),
+                buildAppResolveInfo(),
+                ResolveInfo(),
+            ),
+        )
+        val type = testee.determineType("https://example.com")
+        verify(mockPackageManager).queryIntentActivities(
+            argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
+            eq(PackageManager.GET_RESOLVED_FILTER),
+        )
+        assertTrue(type is AppLink)
+        val appLinkType = type as AppLink
+        assertEquals("https://example.com", appLinkType.uriString)
+        assertEquals(EXAMPLE_APP_PACKAGE, appLinkType.appIntent!!.component!!.packageName)
+        assertEquals(EXAMPLE_APP_ACTIVITY_NAME, appLinkType.appIntent!!.component!!.className)
+    }
+
+    @Test
+    fun whenFirstNonBrowserActivityFoundThenReturnAppLinkWithIntent() {
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
             listOf(
                 buildAppResolveInfo(),
@@ -131,16 +164,15 @@ class SpecialUrlDetectorImplTest {
         assertEquals("https://example.com", appLinkType.uriString)
         assertEquals(EXAMPLE_APP_PACKAGE, appLinkType.appIntent!!.component!!.packageName)
         assertEquals(EXAMPLE_APP_ACTIVITY_NAME, appLinkType.appIntent!!.component!!.className)
-        assertNull(appLinkType.excludedComponents)
     }
 
     @Test
-    fun whenMultipleNonBrowserActivitiesFoundThenReturnAppLinkWithExcludedComponents() {
+    fun whenNoNonBrowserActivityFoundThenReturnWebType() {
+        whenever(mockPackageManager.resolveActivity(any(), eq(PackageManager.MATCH_DEFAULT_ONLY))).thenReturn(null)
         whenever(mockPackageManager.queryIntentActivities(any(), anyInt())).thenReturn(
             listOf(
-                buildAppResolveInfo(),
-                buildAppResolveInfo(),
                 buildBrowserResolveInfo(),
+                buildAppResolveInfo(),
                 ResolveInfo(),
             ),
         )
@@ -149,13 +181,7 @@ class SpecialUrlDetectorImplTest {
             argThat { hasCategory(Intent.CATEGORY_BROWSABLE) },
             eq(PackageManager.GET_RESOLVED_FILTER),
         )
-        assertTrue(type is AppLink)
-        val appLinkType = type as AppLink
-        assertEquals("https://example.com", appLinkType.uriString)
-        assertEquals(1, appLinkType.excludedComponents!!.size)
-        assertEquals(EXAMPLE_BROWSER_PACKAGE, appLinkType.excludedComponents!![0].packageName)
-        assertEquals(EXAMPLE_BROWSER_ACTIVITY_NAME, appLinkType.excludedComponents!![0].className)
-        assertNull(appLinkType.appIntent)
+        assertTrue(type is Web)
     }
 
     @Test
@@ -231,9 +257,37 @@ class SpecialUrlDetectorImplTest {
     }
 
     @Test
-    fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetected() {
+    fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithAdditionalIntentFlags() {
+        whenever(mockToggle.isEnabled()).thenReturn(true)
+        whenever(externalAppIntentFlagsFeature.self()).thenReturn(mockToggle)
         val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
         assertEquals("myapp:foo bar", type.uriString)
+        assertEquals(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP, type.intent.flags)
+        assertEquals(Intent.CATEGORY_BROWSABLE, type.intent.categories.first())
+    }
+
+    @Test
+    fun whenUrlIsCustomUriSchemeThenNonHttpAppLinkTypeDetectedWithoutAdditionalIntentFlags() {
+        whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(externalAppIntentFlagsFeature.self()).thenReturn(mockToggle)
+        val type = testee.determineType("myapp:foo bar") as NonHttpAppLink
+        assertEquals("myapp:foo bar", type.uriString)
+        assertEquals(0, type.intent.flags)
+        assertNull(type.intent.categories)
+    }
+
+    @Test
+    fun whenUrlIsNotPrivacyProThenQueryTypeDetected() {
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(false)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is SearchQuery)
+    }
+
+    @Test
+    fun whenUrlIsPrivacyProThenPrivacyProTypeDetected() {
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
+        val result = testee.determineType("duckduckgo.com")
+        assertTrue(result is ShouldLaunchPrivacyProLink)
     }
 
     @Test
@@ -292,6 +346,12 @@ class SpecialUrlDetectorImplTest {
     fun whenUrlIsSiteSchemeThenFullQueryRetained() {
         val type = testee.determineType("site:example.com") as SearchQuery
         assertEquals("site:example.com", type.query)
+    }
+
+    @Test
+    fun whenUrlIsBlobSchemeThenFullQueryRetained() {
+        val type = testee.determineType("blob:example.com") as SearchQuery
+        assertEquals("blob:example.com", type.query)
     }
 
     @Test
@@ -358,6 +418,15 @@ class SpecialUrlDetectorImplTest {
             testee.determineType(initiatingUrl = "https://www.example.com", uri = "https://www.example.com/query.html?utm_example=something".toUri())
         assertEquals(expected, actual::class)
         assertEquals("https://www.example.com/query.html", (actual as TrackingParameterLink).cleanedUrl)
+    }
+
+    @Test
+    fun whenUrlIsPrivacyProThenPrivacyProLinkDetected() {
+        whenever(subscriptions.shouldLaunchPrivacyProForUrl(any())).thenReturn(true)
+
+        val actual =
+            testee.determineType(initiatingUrl = "https://www.example.com", uri = "https://www.example.com".toUri())
+        assertTrue(actual is ShouldLaunchPrivacyProLink)
     }
 
     private fun randomString(length: Int): String {

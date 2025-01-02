@@ -18,29 +18,49 @@ package com.duckduckgo.app.browser.di
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
-import com.duckduckgo.app.browser.*
+import com.duckduckgo.app.analytics.AnalyticsService
+import com.duckduckgo.app.analytics.FirebaseAnalyticsService
+import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
+import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.LongPressHandler
+import com.duckduckgo.app.browser.RequestInterceptor
+import com.duckduckgo.app.browser.RequestRewriter
+import com.duckduckgo.app.browser.SpecialUrlDetector
+import com.duckduckgo.app.browser.SpecialUrlDetectorImpl
+import com.duckduckgo.app.browser.WebDataManager
+import com.duckduckgo.app.browser.WebViewDataManager
+import com.duckduckgo.app.browser.WebViewLongPressHandler
+import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.addtohome.AddToHomeCapabilityDetector
 import com.duckduckgo.app.browser.addtohome.AddToHomeSystemCapabilityDetector
+import com.duckduckgo.app.browser.applinks.ExternalAppIntentFlagsFeature
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.AppThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
 import com.duckduckgo.app.browser.cookies.db.AuthCookiesAllowedDomainsRepository
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserObserver
-import com.duckduckgo.app.browser.downloader.*
+import com.duckduckgo.app.browser.downloader.BlobConverterInjector
+import com.duckduckgo.app.browser.downloader.BlobConverterInjectorJs
 import com.duckduckgo.app.browser.favicon.FaviconPersister
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
-import com.duckduckgo.app.browser.logindetection.*
+import com.duckduckgo.app.browser.logindetection.BrowserTabFireproofDialogsEventHandler
+import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
+import com.duckduckgo.app.browser.logindetection.FireproofDialogsEventHandler
+import com.duckduckgo.app.browser.logindetection.JsLoginDetector
+import com.duckduckgo.app.browser.logindetection.NavigationAwareLoginDetector
+import com.duckduckgo.app.browser.logindetection.NextPageLoginDetection
 import com.duckduckgo.app.browser.mediaplayback.store.ALL_MIGRATIONS
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDao
 import com.duckduckgo.app.browser.mediaplayback.store.MediaPlaybackDatabase
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelDao
-import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.helper.HostBlockerHelper
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelDao
 import com.duckduckgo.app.browser.session.WebViewSessionInMemoryStorage
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.tabpreview.FileBasedWebViewPreviewGenerator
@@ -52,8 +72,13 @@ import com.duckduckgo.app.browser.urlextraction.JsUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
-import com.duckduckgo.app.fire.*
+import com.duckduckgo.app.fire.AuthDatabaseLocator
+import com.duckduckgo.app.fire.DatabaseCleaner
+import com.duckduckgo.app.fire.DatabaseCleanerHelper
+import com.duckduckgo.app.fire.DatabaseLocator
+import com.duckduckgo.app.fire.WebViewDatabaseLocator
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
+import com.duckduckgo.app.global.GlobalData
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.file.FileDeleter
@@ -61,6 +86,11 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
+import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
+import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
+import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
+import com.duckduckgo.app.safegaze.poseDetection.TrackerType.BOUNDING_BOX
+import com.duckduckgo.app.safegaze.poseDetection.Type
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -69,8 +99,11 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
+import com.duckduckgo.cookies.api.ThirdPartyCookieNames
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
@@ -82,13 +115,15 @@ import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import javax.inject.Named
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Named
 
 @Module
 class BrowserModule {
@@ -130,8 +165,9 @@ class BrowserModule {
     fun webViewLongPressHandler(
         context: Context,
         pixel: Pixel,
+        customTabDetector: CustomTabDetector,
     ): LongPressHandler {
-        return WebViewLongPressHandler(context, pixel)
+        return WebViewLongPressHandler(context, pixel, customTabDetector)
     }
 
     @Provides
@@ -175,7 +211,9 @@ class BrowserModule {
         packageManager: PackageManager,
         ampLinks: AmpLinks,
         trackingParameters: TrackingParameters,
-    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters)
+        subscriptions: Subscriptions,
+        externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
+    ): SpecialUrlDetector = SpecialUrlDetectorImpl(packageManager, ampLinks, trackingParameters, subscriptions, externalAppIntentFlagsFeature)
 
     @Provides
     fun webViewRequestInterceptor(
@@ -188,6 +226,7 @@ class BrowserModule {
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
+        customDnsResolver: CustomDnsResolver
     ): RequestInterceptor =
         WebViewRequestInterceptor(
             resourceSurrogates,
@@ -199,6 +238,7 @@ class BrowserModule {
             adClickManager,
             cloakedCnameDetector,
             requestFilterer,
+            dnsResolver = customDnsResolver
         )
 
     @Provides
@@ -299,14 +339,21 @@ class BrowserModule {
     fun thirdPartyCookieManager(
         cookieManagerProvider: CookieManagerProvider,
         authCookiesAllowedDomainsRepository: AuthCookiesAllowedDomainsRepository,
+        thirdPartyCookieNames: ThirdPartyCookieNames,
     ): ThirdPartyCookieManager {
-        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository)
+        return AppThirdPartyCookieManager(cookieManagerProvider, authCookiesAllowedDomainsRepository, thirdPartyCookieNames)
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun providePageLoadedPixelDao(appDatabase: AppDatabase): PageLoadedPixelDao {
         return appDatabase.pageLoadedPixelDao()
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providePagePaintedPixelDao(appDatabase: AppDatabase): PagePaintedPixelDao {
+        return appDatabase.pagePaintedPixelDao()
     }
 
     @Provides
@@ -327,7 +374,50 @@ class BrowserModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesDnsResolver(dispatcherProvider: DispatcherProvider): CustomDnsResolver {
-        return CustomDnsResolver(dispatcherProvider)
+    fun providesDnsResolver(
+        dispatcherProvider: DispatcherProvider,
+        sharedPreferences: SharedPreferences,
+        analyticsService: AnalyticsService
+    ): CustomDnsResolver {
+        return CustomDnsResolver(dispatcherProvider, analyticsService, sharedPreferences)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesNsfwDetector(context: Context): NsfwDetector {
+        return NsfwDetector(context)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesGenderDetector(context: Context): GenderDetector {
+        return GenderDetector(context)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providePoseDetector(context: Context): MoveNetMultiPose {
+        return MoveNetMultiPose.create(context, Type.Dynamic).apply {
+            setTracker(BOUNDING_BOX)
+        }
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesKahfSharedPreference(context: Context): SharedPreferences {
+        return context.getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideAnalyticsService(context: Context): AnalyticsService {
+        val f = FirebaseAnalytics.getInstance(context.applicationContext)
+        return FirebaseAnalyticsService(f)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideGlobalData(): GlobalData {
+        return GlobalData(false)
     }
 }

@@ -156,10 +156,16 @@
     <string name="privateSearchTitle">„Private Search“ įjungta</string>
     <string name="privateSearchDescription">„Kahf Private Search“ yra jūsų numatytoji paieškos sistema, todėl galite ieškoti žiniatinklyje nesekami.</string>
     <string name="privateSearchHeadingSearchSettings">Paieškos nustatymai</string>
-    <string name="privateSearchAutocompleteToggle">Rodyti automatinio užbaigimo pasiūlymus</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Daugiau paieškos nustatymų</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Tinkinkite savo paieškos kalbą, regioną ir kt.</string>
     <string name="privateSearchMoreSearchSettingsTitle">Daugiau paieškos nustatymų</string>
+    <string name="privateSearchAutocompleteToggle">Rodyti automatinio užbaigimo pasiūlymus</string>
+    <string name="privateSearchAutocompleteHint">Įvesdami tekstą matysite paieškos pasiūlymus, įskaitant žymes. Visos paieškos yra privačios.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Neseniai aplankytos svetainės</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Rodyti neseniai aplankytas interneto svetaines paieškos pasiūlymuose. Neseniai aplankytos interneto svetainės yra privačios, saugomos tik jūsų įrenginyje ir gali būti išvalytos naudojant mygtuką „Fire Button“.</string>
+    <string name="improvedAutoCompleteIAMContent">Dabar automatinio užbaigimo pasiūlymuose bus rodomos ir neseniai aplankytos svetainės. Išjunkite nustatymuose arba bet kada išvalykite naudodami mygtuką 🔥 „Fire Button“.</string>
+    <string name="improvedAutoCompleteIAMTitle">Tas pats privatumas.\nGeresni paieškos pasiūlymai!</string>
+    <string name="openAutoCompleteSettings">Atidaryti nustatymus</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Apsauga nuo žiniatinklio sekimo</string>
@@ -231,29 +237,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Gali padėti apsaugos priemonių išjungimas.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Laikinai išjungėme privatumo apsaugą, nes atrodo, kad ji trikdo šios svetainės veikimą.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Žymės</string>
-    <string name="bookmarksActivityTitle">Žymės</string>
-    <string name="noBookmarks">Žymių dar nepridėta</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Daugiau parinkčių žymei %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">Ištrinta &lt;b&gt;%1$s&lt;/b&gt;</string>
-    <string name="exportBookmarksMenu">Eksportuoti</string>
-    <string name="exportBookmarksEmpty">Neturite žymelių, niekas nebus eksportuota</string>
-    <string name="exportBookmarksError">Nepavyko eksportuoti jokių žymelių, įvyko klaida</string>
-    <string name="exportBookmarksSuccess">Visos žymelės bus sėkmingai eksportuotos</string>
-    <string name="importBookmarksMenu">Importuoti</string>
-    <string name="importBookmarksFileTitle">Pasirinkti importuotiną žymelės failą</string>
-    <string name="importBookmarksError">Nepavyko importuoti jokių žymelių, įvyko klaida</string>
-    <string name="importBookmarksEmpty">Faile nėra jokių importuotinų žymelių</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">Sėkmingos importuotos %1$d žymelės</string>
-    <string name="savedSiteDialogTitleHint">Pavadinimas</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Redaguoti</string>
-    <string name="bookmarksSectionTitle">Žymės</string>
-    <string name="favoritesSectionTitle">Mėgstami</string>
-    <string name="bookmarksEmptyHint">Žymių dar nepridėta</string>
-    <string name="favoritesEmptyHint">Mėgstamų dar nepridėta</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Patvirtinti</string>
     <string name="dialogSave">Išsaugoti</string>
@@ -274,8 +257,6 @@
     <string name="widgetConfigurationAddWidgetOption">Pridėti valdiklį</string>
     <string name="searchWidgetEmtpyFavoritesHint">Mėgstamų dar nepridėta</string>
     <string name="searchWidgetEmtpyFavoritesCta">Pridėti mėgstamą</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Akimirksniu apsilankykite savo mėgstamose svetainėse!\n\nEikite į savo mėgstamą svetainę. Bakstelėkite „⠇“ piktogramą ir pasirinkite Pridėti mėgstamą.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Akimirksniu apsilankykite savo mėgstamose svetainėse! Eikite į savo mėgstamą svetainę. Tada bakstelėkite naršyklės meniu piktogramą ir pasirinkite Pridėti mėgstamą.</string>
     <string name="widgetConfigurationActivityTitle">Valdiklio konfigūracija</string>
     <string name="favoritesWidgetLabel">Mėgstami</string>
     <string name="searchWidgetLabel">Paieška</string>
@@ -445,14 +426,8 @@
     <string name="systemSearchOnboardingButtonOk">Supratau</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Slėpti</string>
-    <string name="daxDialogPhew">Oi!</string>
-    <string name="daxDialogNext">Kitas</string>
     <string name="daxDialogHighFive">Duok penkis!</string>
     <string name="daxDialogGotIt">Supratau</string>
-    <string name="hideTipsTitle">Slėpti likusius patarimus?</string>
-    <string name="hideTipsText">Jų tik keletas, stengėmės, kad jie būtų informatyvūs.</string>
-    <string name="hideTipsButton">Slėpti patarimus visam laikui</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Dabar blokuojate sekimo įrenginius internete 🎉<br/><br/>Taip pat galiu blokuoti kitose programėlėse pasislėpusius sekimo įrenginius, net kai nenaudojate telefono.]]></string>
@@ -463,41 +438,9 @@
     <string name="onboardingWelcomeTitle">"Sveiki atvykę į „Kahf“!"</string>
     <string name="onboardingDaxText"><![CDATA[Internetas gali būti bauginantis.<br/><br/>Nesijaudinkite! Ieškoti ir naršyti privačiai yra lengviau, nei manote.]]></string>
     <string name="onboardingLetsDoItButton">Pasiekime tai!</string>
-    <string name="daxIntroCtaText"><![CDATA[Toliau pabandykite apsilankyti viename mėgstamiausių tinklalapių! <br/><br/>Užblokuosiu sekimo įrenginius, kad jie negalėtų jūsų šnipinėti. Jei įmanoma, atnaujinsiu jūsų ryšio saugumą. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Atlikta!<br/><br/>Įsidėmėkite: kiekvieną kartą, kai naršote su manimi, bauginantis skelbimas praranda galią. 👍]]></string>
-    <string name="daxSerpCtaText">Jūsų „Kahf“ paieškos yra anoniminės. Visada. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ ir <b>%1$d kitas</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-        <item quantity="few"><![CDATA[ ir <b>%1$d kiti</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-        <item quantity="many"><![CDATA[ ir <b>%1$d kitų</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-        <item quantity="other"><![CDATA[ ir <b>%1$d kitų</b> bandė tave stebėti. <br/><br/>Užblokavau juos!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-        <item quantity="few"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-        <item quantity="many"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-        <item quantity="other"><![CDATA[ bandė tave stebėti. <br/><br/>Užblokavau!<br/><br/> ☝️Patikrink URL juostą ir pamatyk, kas bando tave stebėti, kai lankaisi naujoje svetainėje.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Bakstelėjus ir slenkant, bus blokuojami įkyrūs sekimo įrenginiai. <br/><br/>Pirmyn – naršykite toliau!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Būk atidus! Negaliu neleisti %1$s matyti tavo veiklos %2$s &lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Įspėjimas! Kadangi %1$s priklauso %2$s, negaliu neleisti jiems matyti tavo veiklos.&lt;br/&gt;&lt;br/&gt;Tačiau naršyk kartu su manimi ir aš sumažinsiu informacijos, kurią %3$s žino apie tave, kiekį užblokuodamas stebėjimo priemones kitose svetainėse.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Kas jus atvedė į „Kahf“?</string>
-    <string name="onboardingFeatureOptionsContinue">Tęsti</string>
-    <string name="onboardingFeatureOptionsSkip">Praleisti šį žingsnį</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privati paieška</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Sekimo blokavimas</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Maž. skaitmeninis pėdsakas</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Greitesnis puslapio įkėlimas</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Mažiau reklamų</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Duomenų išvalymas vienu spustelėjimu</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Išsaugoti %1$s</string>
@@ -645,31 +588,6 @@
     <string name="emailNotSupported">Nepalaikomas įrenginys</string>
     <string name="emailNotSupportedExplanation">El. pašto apsauga leidžia jums sukurti privačius el. pašto adresus, kurie pašalina el. laiškų sekimo priemones. Mums reikia užšifruoti ir saugoti šiuos adresus, kuriuos lokaliai sukuriate įrenginyje. Kadangi jūsų įrenginys nepalaiko užšifruotos talpyklos funkcijos, El. pašto apsaugos funkcija neprieinama.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Redaguoti žymę</string>
-    <string name="favoriteDialogTitleEdit">Redaguoti mėgstamiausią</string>
-    <string name="locationLabel">Vieta</string>
-    <string name="folderLocationTitle">Pasirinkti vietą</string>
-    <string name="addFolder">Pridėti aplanką</string>
-    <string name="editFolder">Redaguoti aplanką</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Ištrinti aplanką ir jo turinį?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Ar tikrai norite ištrinti "</string>
-    <string name="bookmarkFolderEmpty">Tuščia</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s%2$s ir %3$d prekė?</item>
-        <item quantity="few">%1$s%2$s ir %3$d prekės?</item>
-        <item quantity="many">%1$s%2$s ir %3$d prekės?</item>
-        <item quantity="other">%1$s%2$s ir %3$d prekės?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d prekė</item>
-        <item quantity="few">%1$d prekės</item>
-        <item quantity="many">%1$d prekės</item>
-        <item quantity="other">%1$d prekės</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Pritaikymas neįgaliems</string>
     <string name="accessibilityActivityTitle">Pritaikymas neįgaliems</string>
@@ -689,7 +607,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Naršykite privačiai su mūsų „Mac“ skirta programa</string>
-    <string name="macos_settings_title">„Kahf“ programa „Mac“</string>
+    <string name="macos_settings_title">„Kahf“ naršyklė, skirta „Mac“</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Atsisiuntimai</string>
@@ -751,7 +669,7 @@
     <string name="downloadsNotifyMeSubtitle">Gaukite pranešimą, kai atsisiuntimas bus baigtas.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">„Kahf“ programa „Windows“</string>
+    <string name="windows_settings_title">„Kahf“ naršyklė, skirta „Windows“</string>
     <string name="windows_settings_description">Naršykite privačiai naudodami mūsų programą, skirtą „Windows“</string>
     <string name="windows_settings_description_ready">Galima atsisiųsti</string>
     <string name="windows_settings_description_list">Jūs jau sąraše!</string>
@@ -764,16 +682,6 @@
     <string name="closeAppTabsConfirmationDialogDescription">Ar tikrai norite uždaryti visus skirtukus?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Atšaukti</string>
     <string name="closeAppTabsConfirmationDialogClose">Uždaryti</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Ištrinti šią žymę?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymę.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Ištrinti šį parankinį?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; parankinį.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Ištrinti šį žymių aplanką?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Tai ištrins jūsų &lt;b&gt;%1$s&lt;/b&gt; žymių aplanką.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Atšaukti</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Trinti</string>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Adreso juostoje pridėkite privačios paieškos balsu parinktį. Garso įrašai nesaugomi ir jais su niekuo nesidalijama, įskaitant „Kahf“.</string>
@@ -794,6 +702,60 @@
     <string name="autofillLoginSavedSnackbarMessage">Slaptažodis išsaugotas</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Slaptažodis atnaujintas</string>
 
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Atidaryti „Kahf“</string>
+    <string name="runningInDdgMenuItemTitle">Veikia sistemoje „Kahf“</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Įspėjimas: ši svetainė gali būti nesaugi</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Šios svetainės sertifikatas negalioja. Galbūt jungiatės prie serverio, kuris apsimeta %1$s, o tai gali kelti pavojų jūsų konfidencialiai informacijai.</string>
+    <string name="sslErrorLeaveCTA">Išeiti iš šios svetainės</string>
+    <string name="sslErrorAdvancedCTA">Išplėstinė</string>
+    <string name="sslErrorExpandedHeadline">„Kahf“ įspėja jus, kai svetainėje yra netinkamas sertifikatas.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Priimti riziką ir apsilankyti svetainėje<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s saugumo sertifikato galiojimas yra pasibaigęs. Gali būti, kad svetainė neteisingai sukonfigūruota arba atakos vykdytojas pakenkė jūsų ryšiui arba kad jūsų sistemos laikrodžio rodomas laikas yra neteisingas.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s saugos sertifikatas neatitinka *.%2$s. Gali būti, kad svetainė neteisingai sukonfigūruota arba atakos vykdytojas pakenkė jūsų ryšiui arba kad jūsų sistemos laikrodžio rodomas laikas yra neteisingas.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">%1$s saugos sertifikatu nepasitiki jūsų įrenginio operacinė sistema. Gali būti, kad svetainė neteisingai sukonfigūruota arba atakos vykdytojas pakenkė jūsų ryšiui arba kad jūsų sistemos laikrodžio rodomas laikas yra neteisingas.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Sveiki.<br/><br/>Ar esate pasiruošę geresniam ir privatesniam internetui?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Padarykime tai!</string>
+    <string name="preOnboardingDaxDialog2Title">Privatumo apsaugos priemonės įjungtos!</string>
+    <string name="preOnboardingDaxDialog2Button">Pasirinkite naršyklę</string>
+    <string name="preOnboardingComparisonChartItem1">Vykdykite paiešką privačiai pagal numatytąjį nustatymą</string>
+    <string name="preOnboardingComparisonChartItem2">Blokuoja trečiųjų šalių stebėjimo priemones</string>
+    <string name="preOnboardingComparisonChartItem3">Blokuoti slapukų iššokančiuosius langus</string>
+    <string name="preOnboardingComparisonChartItem4">Blokuokite taikomus skelbimus</string>
+    <string name="preOnboardingComparisonChartItem5">Greitai ištrinkite naršymo duomenis</string>
+    <string name="preOnboardingDaxDialog3Title">Nuostabu! Sveiki prisijungę prie „Duck“!</string>
+    <string name="preOnboardingDaxDialog3Button">Pradėti naršyti</string>
+    <string name="onboardingSearchDaxDialogTitle">Išmėgink paiešką!</string>
+    <string name="onboardingSearchDaxDialogDescription">Jūsų „Kahf“ paieškos visada yra anoniminės.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">kaip pasakyti „antis“ anglų kalba</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">kaip pasakyti „antis“ ispanų kalba</string>
+    <string name="onboardingSearchQueryOption1">kaip pasakyti antis anglų kalba</string>
+    <string name="onboardingSearchQueryOption1English">kaip pasakyti antis ispanų kalba</string>
+    <string name="onboardingSearchDaxDialogOption2">įsikūnijimo aktoriai</string>
+    <string name="onboardingSearchDaxDialogOption2US">mighty ducks aktoriai</string>
+    <string name="onboardingSearchDaxDialogOption3">vietinis oras</string>
+    <string name="onboardingSearchDaxDialogOption4">Nustebink mane!</string>
+    <string name="onboardingSearchQueryOption4">vakarienės receptai</string>
+    <string name="onboardingSearchQueryOption4US">šokolado drožlių sausainių receptai</string>
+    <string name="onboardingSitesDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
+    <string name="onboardingSitesDaxDialogDescription">Užblokuosiu stebėjimo priemones, kad jos negalėtų tavęs šnipinėti.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Nustebink mane!</string>
+    <string name="onboardingSerpDaxDialogDescription">Tai „Kahf Search“. Privati. Sparti. Mažiau reklamų.</string>
+    <string name="onboardingSerpDaxDialogButton">Supratau!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Pabandyk apsilankyti svetainėje!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ ir dar <b>%1$d žmogus </b> bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
+        <item quantity="few"><![CDATA[ ir dar <b>%1$d žmonės</b> bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
+        <item quantity="many"><![CDATA[ ir dar <b>%1$d žmogaus</b> bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
+        <item quantity="other"><![CDATA[ ir dar <b>%1$d žmonių</b> bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
+    </plurals>
     <string name="safegaze_popup_report_title">Prašome pranešti apie bet kokius klaidas arba pasiūlymus naudodami šią formą</string>
     <string name="safegaze_popup_support_title">Palaikykite šį projektą</string>
     <string name="safegaze_popup_woman_title">Aš esu moteris</string>
@@ -818,7 +780,7 @@
     <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Žymė įtraukta į %1$s</string>
     <string name="addToFavorites">Pridėti prie mėgstamų</string>
     <string name="editBookmark">Redaguoti žymę</string>
-    <string name="importBookmarksDescription">Jei žymės yra išsaugotos kitoje naršyklėje,\ngalite jas importuoti į „DuckDuckGo“.</string>
+    <string name="importBookmarksDescription">Jei žymės yra išsaugotos kitoje naršyklėje,\ngalite jas importuoti į „Kahf“.</string>
     <string name="importBookmarks">Importuoti žymes</string>
     <string name="noResultsFor" instruction="%1$s is the search term">Rezultatų pagal paiešką „%1$s“ nerasta</string>
     <string name="removeFromFavorites">Pašalinti iš adresyno</string>
@@ -829,5 +791,16 @@
         <item quantity="many">Ar tikrai norite ištrinti šį aplanką ir %1$d elemento?</item>
         <item quantity="other">Ar tikrai norite ištrinti šį aplanką ir %1$d elementų?</item>
     </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Ar tikrai norite ištrinti &lt;b&gt;%1$s&lt;/b&gt; žymę?</string>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Palieskite skydą, kad gautumėte daugiau informacijos.️]]></item>
+        <item quantity="few"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Bakstelėkite skydą, kad gautumėte daugiau informacijos.️]]></item>
+        <item quantity="many"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Bakstelėkite skydą, kad gautumėte daugiau informacijos.️]]></item>
+        <item quantity="other"><![CDATA[ bandė jus stebėti čia. Aš juos užblokavau!<br/><br/>☝️ Bakstelėkite skydą, kad gautumėte daugiau informacijos.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Supratau!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Akimirksniu išvalykite naršymo veiklą naudodami <b>Fire Button</b>.<br/><br/>Išbandykite! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Atlikote!"</string>
+    <string name="onboardingEndDaxDialogDescription">Įsidėmėkite: kiekvieną kartą, kai naršai su manimi, bauginantis skelbimas praranda galią. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Viskas!</string>
+
 </resources>

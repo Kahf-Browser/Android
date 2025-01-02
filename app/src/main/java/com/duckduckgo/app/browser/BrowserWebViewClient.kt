@@ -21,9 +21,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.AssetManager
 import android.graphics.Bitmap
-import android.graphics.Bitmap.CompressFormat.PNG
 import android.net.Uri
 import android.net.http.SslError
+import android.net.http.SslError.SSL_DATE_INVALID
+import android.net.http.SslError.SSL_EXPIRED
+import android.net.http.SslError.SSL_IDMISMATCH
 import android.net.http.SslError.SSL_UNTRUSTED
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
@@ -38,10 +40,13 @@ import androidx.annotation.UiThread
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
 import androidx.fragment.app.FragmentActivity
-import com.bumptech.glide.Glide
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.app.browser.R.string
+import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
+import com.duckduckgo.app.browser.SSLErrorType.GENERIC
+import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
+import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
@@ -50,7 +55,6 @@ import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
-import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.helper.HostBlockerHelper
 import com.duckduckgo.app.browser.httpauth.WebViewHttpAuthStore
 import com.duckduckgo.app.browser.logindetection.DOMLoginDetector
 import com.duckduckgo.app.browser.logindetection.WebNavigationEvent
@@ -58,30 +62,38 @@ import com.duckduckgo.app.browser.mediaplayback.MediaPlayback
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
+import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
+import com.duckduckgo.app.kahftube.PrivateDnsLevel
+import com.duckduckgo.app.kahftube.SafeGazeLevel
 import com.duckduckgo.app.kahftube.SharedPreferenceManager
 import com.duckduckgo.app.kahftube.SharedPreferenceManager.KeyString
-import com.duckduckgo.app.safegaze.ondeviceobjectdetection.ObjectDetectionHelper
-import com.duckduckgo.app.pixels.remoteconfig.OptimizeTrackerEvaluationRCWrapper
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
-import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.SAFE_GAZE_ACTIVE
+import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
+import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
+import com.duckduckgo.common.utils.SAFE_GAZE_MODE
 import com.duckduckgo.common.utils.SAFE_GAZE_BLUR_PROGRESS
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_BLUR_VALUE
+import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
+import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
 import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
 import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
-import com.duckduckgo.common.utils.SAFE_GAZE_PRIVATE_DNS
+import com.duckduckgo.common.utils.extensions.isDataUri
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
+import com.duckduckgo.subscriptions.api.Subscriptions
+import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -89,8 +101,6 @@ import kotlinx.coroutines.withContext
 import org.halalz.kahftube.extentions.injectJavascriptFileFromAsset
 import timber.log.Timber
 import java.io.BufferedReader
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -125,24 +135,32 @@ class BrowserWebViewClient @Inject constructor(
     private val jsPlugins: PluginPoint<JsInjectorPlugin>,
     private val context: Context,
     private val currentTimeProvider: CurrentTimeProvider,
-    private val shouldSendPageLoadedPixel: PageLoadedHandler,
-    private val optimizeTrackerEvaluationRCWrapper: OptimizeTrackerEvaluationRCWrapper,
+    private val pageLoadedHandler: PageLoadedHandler,
+    private val shouldSendPagePaintedPixel: PagePaintedHandler,
+    private val navigationHistory: NavigationHistory,
     private val mediaPlayback: MediaPlayback,
-    private val dnsResolver: CustomDnsResolver
+    private val subscriptions: Subscriptions,
+    private val dnsResolver: CustomDnsResolver,
 ) : WebViewClient() {
+
     var webViewClientListener: WebViewClientListener? = null
+    var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var isMainJSLoaded = false
     private var isEmailAccessForKahfTubeDialogShowed = false
     lateinit var activity: FragmentActivity
     private var start: Long? = null
     private var sharedPreferences: SharedPreferences = context.getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
-    private var editor: SharedPreferences.Editor = sharedPreferences.edit()
-    private val hostBlockerHelper = HostBlockerHelper()
+    private var safeGazeWhiteList: MutableSet<String> = mutableSetOf()
+
+    init {
+        loadSafeGazeWhiteList()
+    }
 
     /**
      * This is the method of url overriding available from API 24 onwards
      */
+    @UiThread
     override fun shouldOverrideUrlLoading(
         view: WebView,
         request: WebResourceRequest,
@@ -159,147 +177,168 @@ class BrowserWebViewClient @Inject constructor(
         url: Uri,
         isForMainFrame: Boolean,
     ): Boolean {
-        val privateDnsEnabled = sharedPreferences.getBoolean(SAFE_GAZE_PRIVATE_DNS, false)
+        try {
+            Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
+            webViewClientListener?.onShouldOverride()
+            if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
+                webView.loadUrl("about:blank")
+                webViewClientListener?.dosAttackDetected()
+                return false
+            }
 
-        if (privateDnsEnabled) {
-            try {
-                shouldBlockSafeGaze(url.toString())
-
-                if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
-                    webView.loadUrl("about:blank")
-                    webViewClientListener?.dosAttackDetected()
-                    return false
+            return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
+                is SpecialUrlDetector.UrlType.ShouldLaunchPrivacyProLink -> {
+                    subscriptions.launchPrivacyPro(webView.context, url)
+                    true
+                }
+                is SpecialUrlDetector.UrlType.Email -> {
+                    webViewClientListener?.sendEmailRequested(urlType.emailAddress)
+                    true
                 }
 
-                return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
-                    is SpecialUrlDetector.UrlType.Email -> {
-                        webViewClientListener?.sendEmailRequested(urlType.emailAddress)
-                        true
-                    }
+                is SpecialUrlDetector.UrlType.Telephone -> {
+                    webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber)
+                    true
+                }
 
-                    is SpecialUrlDetector.UrlType.Telephone -> {
-                        webViewClientListener?.dialTelephoneNumberRequested(urlType.telephoneNumber)
-                        true
-                    }
+                is SpecialUrlDetector.UrlType.Sms -> {
+                    webViewClientListener?.sendSmsRequested(urlType.telephoneNumber)
+                    true
+                }
 
-                    is SpecialUrlDetector.UrlType.Sms -> {
-                        webViewClientListener?.sendSmsRequested(urlType.telephoneNumber)
-                        true
+                is SpecialUrlDetector.UrlType.AppLink -> {
+                    Timber.i("Found app link for ${urlType.uriString}")
+                    webViewClientListener?.let { listener ->
+                        return listener.handleAppLink(urlType, isForMainFrame)
                     }
+                    false
+                }
 
-                    is SpecialUrlDetector.UrlType.AppLink -> {
-                        Timber.i("Found app link for ${urlType.uriString}")
+                is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
+                    Timber.i("Found non-http app link for ${urlType.uriString}")
+                    if (isForMainFrame) {
                         webViewClientListener?.let { listener ->
-                            return listener.handleAppLink(urlType, isForMainFrame)
+                            return listener.handleNonHttpAppLink(urlType)
                         }
-                        false
                     }
+                    true
+                }
 
-                    is SpecialUrlDetector.UrlType.NonHttpAppLink -> {
-                        Timber.i("Found non-http app link for ${urlType.uriString}")
-                        if (isForMainFrame) {
-                            webViewClientListener?.let { listener ->
-                                return listener.handleNonHttpAppLink(urlType)
+                is SpecialUrlDetector.UrlType.Unknown -> {
+                    Timber.w("Unable to process link type for ${urlType.uriString}")
+                    webView.originalUrl?.let {
+                        webView.loadUrl(it)
+                    }
+                    false
+                }
+
+                is SpecialUrlDetector.UrlType.SearchQuery -> false
+
+                is SpecialUrlDetector.UrlType.Web -> {
+                    if (requestRewriter.shouldRewriteRequest(url)) {
+                        webViewClientListener?.let { listener ->
+                            val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
+                            loadUrl(listener, webView, newUri.toString())
+                            return true
+                        }
+                    }
+                    if (isForMainFrame) {
+                        webViewClientListener?.let { listener ->
+                            listener.willOverrideUrl(url.toString())
+                            clientProvider?.let { provider ->
+                                if (provider.shouldChangeBranding(url.toString())) {
+                                    provider.setOn(webView.settings, url.toString())
+                                    loadUrl(listener, webView, url.toString())
+                                    return true
+                                } else {
+                                    return false
+                                }
                             }
+                            return false
                         }
-                        true
                     }
+                    false
+                }
 
-                    is SpecialUrlDetector.UrlType.Unknown -> {
-                        Timber.w("Unable to process link type for ${urlType.uriString}")
-                        webView.originalUrl?.let {
-                            webView.loadUrl(it)
+                is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
+                    if (isForMainFrame) {
+                        webViewClientListener?.let { listener ->
+                            listener.startProcessingTrackingLink()
+                            Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
+                            loadUrl(listener, webView, urlType.extractedUrl)
+                            return true
                         }
-                        false
                     }
+                    false
+                }
 
-                    is SpecialUrlDetector.UrlType.SearchQuery -> false
-
-                    is SpecialUrlDetector.UrlType.Web -> {
-                        if (requestRewriter.shouldRewriteRequest(url)) {
-                            webViewClientListener?.let { listener ->
-                                val newUri = requestRewriter.rewriteRequestWithCustomQueryParams(url)
-                                loadUrl(listener, webView, newUri.toString())
-                                return true
-                            }
+                is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
+                    val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
+                    if (isForMainFrame && (lastAmpLinkInfo == null || lastPageStarted != lastAmpLinkInfo.destinationUrl)) {
+                        webViewClientListener?.let { listener ->
+                            listener.handleCloakedAmpLink(urlType.ampUrl)
+                            return true
                         }
-                        if (isForMainFrame) {
-                            webViewClientListener?.willOverrideUrl(url.toString())
-                        }
-                        false
                     }
+                    false
+                }
 
-                    is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
-                        if (isForMainFrame) {
-                            webViewClientListener?.let { listener ->
-                                listener.startProcessingTrackingLink()
-                                Timber.d("AMP link detection: Loading extracted URL: ${urlType.extractedUrl}")
-                                loadUrl(listener, webView, urlType.extractedUrl)
-                                return true
-                            }
-                        }
-                        false
-                    }
+                is SpecialUrlDetector.UrlType.TrackingParameterLink -> {
+                    if (isForMainFrame) {
+                        webViewClientListener?.let { listener ->
+                            listener.startProcessingTrackingLink()
+                            Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
 
-                    is SpecialUrlDetector.UrlType.CloakedAmpLink -> {
-                        val lastAmpLinkInfo = ampLinks.lastAmpLinkInfo
-                        if (isForMainFrame && (lastAmpLinkInfo == null || lastPageStarted != lastAmpLinkInfo.destinationUrl)) {
-                            webViewClientListener?.let { listener ->
-                                listener.handleCloakedAmpLink(urlType.ampUrl)
-                                return true
-                            }
-                        }
-                        false
-                    }
+                            return when (
+                                val parameterStrippedType =
+                                    specialUrlDetector.processUrl(initiatingUrl = webView.originalUrl, uriString = urlType.cleanedUrl)
+                            ) {
+                                is SpecialUrlDetector.UrlType.AppLink -> {
+                                    loadUrl(listener, webView, urlType.cleanedUrl)
+                                    listener.handleAppLink(parameterStrippedType, isForMainFrame)
+                                }
 
-                    is SpecialUrlDetector.UrlType.TrackingParameterLink -> {
-                        if (isForMainFrame) {
-                            webViewClientListener?.let { listener ->
-                                listener.startProcessingTrackingLink()
-                                Timber.d("Loading parameter cleaned URL: ${urlType.cleanedUrl}")
+                                is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
+                                    Timber.d("AMP link detection: Loading extracted URL: ${parameterStrippedType.extractedUrl}")
+                                    loadUrl(listener, webView, parameterStrippedType.extractedUrl)
+                                    true
+                                }
 
-                                return when (
-                                    val parameterStrippedType =
-                                        specialUrlDetector.processUrl(initiatingUrl = webView.originalUrl, uriString = urlType.cleanedUrl)
-                                ) {
-                                    is SpecialUrlDetector.UrlType.AppLink -> {
-                                        loadUrl(listener, webView, urlType.cleanedUrl)
-                                        listener.handleAppLink(parameterStrippedType, isForMainFrame)
-                                    }
-
-                                    is SpecialUrlDetector.UrlType.ExtractedAmpLink -> {
-                                        Timber.d("AMP link detection: Loading extracted URL: ${parameterStrippedType.extractedUrl}")
-                                        loadUrl(listener, webView, parameterStrippedType.extractedUrl)
-                                        true
-                                    }
-
-                                    else -> {
-                                        loadUrl(listener, webView, urlType.cleanedUrl)
-                                        true
-                                    }
+                                else -> {
+                                    loadUrl(listener, webView, urlType.cleanedUrl)
+                                    true
                                 }
                             }
                         }
-                        false
                     }
-                    else -> false
+                    false
                 }
-            } catch (e: Throwable) {
-                crashLogger.logCrash(CrashLogger.Crash(shortName = "m_webview_should_override", t = e))
-                return false
+                else -> false
             }
+        } catch (e: Throwable) {
+            crashLogger.logCrash(CrashLogger.Crash(shortName = "m_webview_should_override", t = e))
+            return false
         }
-        return false
+    }
+
+    @UiThread
+    override fun onPageCommitVisible(webView: WebView, url: String) {
+        Timber.v("onPageCommitVisible webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
+        // Show only when the commit matches the tab state
+        if (webView.url == url) {
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
+            webViewClientListener?.onPageContentStart(url)
+        }
     }
 
     @SuppressLint("SdCardPath")
-    private fun shouldBlockSafeGaze(url: String?): Boolean {
+    private fun loadSafeGazeWhiteList() {
         try {
             val safeGazeTxtFilePath = "${context.filesDir}/safe_gaze.txt"
-            val host = extractHost(url)
             val file = File(safeGazeTxtFilePath)
             if (!file.exists()) {
-                return false
+                return
             }
 
             val inputStream = FileInputStream(file)
@@ -313,24 +352,14 @@ class BrowserWebViewClient @Inject constructor(
                 val components = line?.split("\\s+".toRegex())
                 if (components != null) {
                     val domain = components[0]
-                    if (host.contains(domain)) {
-                        handleSafeGazeActivation(false)
-                        return true
-                    } else {
-                        handleSafeGazeActivation(true)
-                    }
+                    safeGazeWhiteList.add(domain)
                 }
             }
-            return false
-        } catch (e: Exception) {
-            Timber.d("Safe Gaze Blocker Catch: ${e.localizedMessage ?: e.message ?: e}")
-            return false
-        }
-    }
 
-    private fun handleSafeGazeActivation(shouldBeActive: Boolean){
-        editor.putBoolean(SAFE_GAZE_ACTIVE, shouldBeActive)
-        editor.apply()
+            Timber.d("SG_BlockList: ${safeGazeWhiteList.joinToString(", ")}")
+        } catch (e: Exception) {
+            Timber.d("SG_BlockList Catch: ${e.localizedMessage ?: e.message ?: e}")
+        }
     }
 
     private fun extractHost(url: String?): String {
@@ -343,11 +372,11 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun handleSafeGaze(webView: WebView) {
-        val sharedPreferences = context.getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
-        val isSafeGazeActive = sharedPreferences.getBoolean(SAFE_GAZE_ACTIVE, true)
+    private fun handleSafeGaze(webView: WebView, url: String?) {
+        val currentMode = sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: SAFE_GAZE_DEFAULT
+        val isUrlWhiteListed = safeGazeWhiteList.contains(extractHost(url))
 
-        if (isSafeGazeActive) {
+        if (SafeGazeLevel.isEnabled(currentMode) && !isUrlWhiteListed) {
             // Set blur intensity
             val blurIntensity = sharedPreferences.getInt(SAFE_GAZE_BLUR_PROGRESS, SAFE_GAZE_DEFAULT_BLUR_VALUE).toFloat() / 100f
             val jsFunction = "window.blurIntensity = $blurIntensity;"
@@ -421,20 +450,14 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private suspend fun resolveDns(uri: Uri): String {
+    private suspend fun resolveDns(uri: Uri): Pair<String, String> {
         return suspendCoroutine { continuation ->
             CoroutineScope(dispatcherProvider.io()).launch {
-                // val initialTime = System.currentTimeMillis()
-                val ip = dnsResolver.sendDnsQueries(uri)
-
-                val resolvedDomain = when (ip) {
-                    null -> uri.toString() // failed to resolve
-                    "0.0.0.0" -> "0.0.0.0"
-                    else -> uri.toString() // "${uri.scheme}://${ip}${uri.path}${uri.query?.let { "?$it" } ?: ""}"
-                }
-
-                // Timber.d("ipLog $ip || lookup time ${System.currentTimeMillis() - initialTime}ms || ${uri.host}")
-                continuation.resume(resolvedDomain)
+                val initialTime = System.currentTimeMillis()
+                val ip = dnsResolver.resolveDomain(uri)
+                Timber.d("ipLog $ip || lookup time ${System.currentTimeMillis() - initialTime}ms || ${uri.host}")
+                continuation.resume(ip ?: Pair("", uri.toString()))
+                "${uri.scheme}://${ip}${uri.path}${uri.query?.let { "?$it" } ?: ""}"
             }
         }
     }
@@ -446,14 +469,15 @@ class BrowserWebViewClient @Inject constructor(
         favicon: Bitmap?,
     ) {
         isMainJSLoaded = false
-        Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url")
+        Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
         if (url?.contains("m.youtube.com") != true) {
-            handleSafeGaze(webView)
+            handleSafeGaze(webView, url)
         }
         //handleKahfTube(webView, url)
         url?.let {
+            // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != "about:blank" && start == null) {
-                start = currentTimeProvider.getTimeInMillis()
+                start = currentTimeProvider.elapsedRealtime()
             }
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
@@ -477,7 +501,10 @@ class BrowserWebViewClient @Inject constructor(
         loginDetector.onEvent(WebNavigationEvent.OnPageStarted(webView))
     }
 
-    private fun handleMediaPlayback(webView: WebView, url: String) {
+    private fun handleMediaPlayback(
+        webView: WebView,
+        url: String,
+    ) {
         // The default value for this flag is `true`.
         webView.settings.mediaPlaybackRequiresUserGesture = mediaPlayback.doesMediaPlaybackRequireUserGestureForUrl(url)
     }
@@ -487,31 +514,36 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: String?,
     ) {
-        super.onPageFinished(webView, url)
+        Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
         //handleKahfTube(webView, url)
-        jsPlugins.getPlugins().forEach {
-            it.onPageFinished(webView, url, webViewClientListener?.getSite())
-        }
-        url?.let {
-            // We call this for any url but it will only be processed for an internal tester verification url
-            internalTestUserChecker.verifyVerificationCompleted(it)
-        }
-        Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url")
-        val navigationList = webView.safeCopyBackForwardList() ?: return
-        webViewClientListener?.run {
-            navigationStateChanged(WebViewNavigationState(navigationList))
-            url?.let { prefetchFavicon(url) }
-        }
-        flushCookies()
-        printInjector.injectPrint(webView)
+        // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
+        if (webView.progress == 100) {
+            jsPlugins.getPlugins().forEach {
+                it.onPageFinished(webView, url, webViewClientListener?.getSite())
+            }
+            url?.let {
+                // We call this for any url but it will only be processed for an internal tester verification url
+                internalTestUserChecker.verifyVerificationCompleted(it)
+            }
+            val navigationList = webView.safeCopyBackForwardList() ?: return
+            webViewClientListener?.run {
+                navigationStateChanged(WebViewNavigationState(navigationList))
+                url?.let { prefetchFavicon(url) }
+            }
+            flushCookies()
+            printInjector.injectPrint(webView)
 
-        url?.let {
-            start?.let { safeStart ->
-                val progress = webView.progress
-                // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
-                if (url != ABOUT_BLANK && progress == 100) {
-                    shouldSendPageLoadedPixel(it, safeStart, currentTimeProvider.getTimeInMillis())
-                    start = null
+            url?.let {
+                if (url != ABOUT_BLANK) {
+                    start?.let { safeStart ->
+                        // TODO (cbarreiro - 22/05/2024): Extract to plugins
+                        pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
+                        shouldSendPagePaintedPixel(webView = webView, url = it)
+                        appCoroutineScope.launch(dispatcherProvider.io()) {
+                            navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
+                        }
+                        start = null
+                    }
                 }
             }
         }
@@ -547,34 +579,46 @@ class BrowserWebViewClient @Inject constructor(
         request: WebResourceRequest,
     ): WebResourceResponse? {
         val url = request.url.toString()
-        val privateDnsEnabled = sharedPreferences.getBoolean(SAFE_GAZE_PRIVATE_DNS, false)
+        if (request.url.host == KAHF_GUARD_BLOCKED_URL || url.isDataUri()) return null
+        val privateDnsMode = sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: KAHF_GUARD_DEFAULT
+        val privateDnsEnabled = PrivateDnsLevel.isEnabled(privateDnsMode)
 
         return runBlocking {
             withContext(dispatcherProvider.io()) {
                 try {
-                    if (privateDnsEnabled && resolveDns(Uri.parse(url)) == "0.0.0.0") {
-                        if (!request.isForMainFrame) {
-                            WebResourceResponse(null, null, null)
-                        } else {
-                            hostBlockerHelper.blockedResourceResponse
+                    if (privateDnsEnabled && request.isForMainFrame && resolveDns(Uri.parse(url)).second == KAHF_GUARD_BLOCKED_URL) {
+                        withContext(dispatcherProvider.main()) {
+                            webViewClientListener?.onUrlBlocked(url)
                         }
+                        WebResourceResponse(null, null, null)
                     } else {
                         val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
                         withContext(dispatcherProvider.main()) {
                             loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
                         }
                         Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-                        if (optimizeTrackerEvaluationRCWrapper.enabled) {
-                            requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener)
-                        } else {
-                            requestInterceptor.shouldIntercept(request, webView, documentUrl, webViewClientListener)
-                        }
+                        requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener, privateDnsEnabled)
                     }
                 } catch (e: Exception) {
                     null
                 }
             }
         }
+
+        /*return runBlocking {
+            withContext(dispatcherProvider.io()) {
+                try {
+                    val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
+                    withContext(dispatcherProvider.main()) {
+                        loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+                    }
+                    Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+                    requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener, privateDnsEnabled)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        }*/
     }
 
     private fun isImageUrl(url: String): Boolean {
@@ -591,54 +635,7 @@ class BrowserWebViewClient @Inject constructor(
             .setMessage(context.getString(string.kahf_tube_email_access_message))
             .setPositiveButton(string.allow)
             .setNegativeButton(string.cancel)
-            //.setView(inputBinding)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        super.onPositiveButtonClicked()
-                    }
-
-                    override fun onNegativeButtonClicked() {
-                        super.onNegativeButtonClicked()
-                    }
-                },
-            )
             .show()
-    }
-
-    private fun checkForFacesAndMask(
-        webView: WebView,
-        url: Uri
-    ): WebResourceResponse? {
-        try {
-            val bitmap: Bitmap = Glide
-                .with(webView.context)
-                .asBitmap()
-                .load(url)
-                .submit()
-                .get()
-
-            val isImageContainsHuman = ObjectDetectionHelper(webView.context).isImageContainsHuman(bitmap)
-
-            return if (isImageContainsHuman) {
-                val changedBitmap: Bitmap = Glide
-                    .with(webView.context)
-                    .asBitmap()
-                    .load("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTYQxPL5nl4tqOAYUdFb28nY82mPkqvJDkQrg&usqp=CAU")
-                    .submit()
-                    .get()
-                val byteArrayOutputStream = ByteArrayOutputStream()
-                changedBitmap.compress(PNG, 90, byteArrayOutputStream)
-                val inputStream = ByteArrayInputStream(byteArrayOutputStream.toByteArray())
-
-                WebResourceResponse("image/png", "utf-8", inputStream)
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return null
-        }
     }
 
     override fun onRenderProcessGone(
@@ -690,6 +687,7 @@ class BrowserWebViewClient @Inject constructor(
         error: SslError,
     ) {
         var trusted: CertificateValidationState = CertificateValidationState.UntrustedChain
+
         when (error.primaryError) {
             SSL_UNTRUSTED -> {
                 Timber.d("The certificate authority ${error.certificate.issuedBy.dName} is not trusted")
@@ -700,7 +698,23 @@ class BrowserWebViewClient @Inject constructor(
         }
 
         Timber.d("The certificate authority validation result is $trusted")
-        if (trusted is CertificateValidationState.TrustedChain) handler.proceed() else super.onReceivedSslError(view, handler, error)
+        if (trusted is CertificateValidationState.TrustedChain) {
+            handler.proceed()
+        } else {
+            webViewClientListener?.onReceivedSslError(handler, parseSSlErrorResponse(error))
+        }
+    }
+
+    private fun parseSSlErrorResponse(sslError: SslError): SslErrorResponse {
+        Timber.d("SSL Certificate: parseSSlErrorResponse ${sslError.primaryError}")
+        val sslErrorType = when (sslError.primaryError) {
+            SSL_UNTRUSTED -> UNTRUSTED_HOST
+            SSL_EXPIRED -> EXPIRED
+            SSL_DATE_INVALID -> EXPIRED
+            SSL_IDMISMATCH -> WRONG_HOST
+            else -> GENERIC
+        }
+        return SslErrorResponse(sslError, sslErrorType, sslError.url)
     }
 
     private fun requestAuthentication(
@@ -811,6 +825,7 @@ enum class WebViewPixelName(override val pixelName: String) : Pixel.PixelName {
     WEB_RENDERER_GONE_CRASH("m_web_view_renderer_gone_crash"),
     WEB_RENDERER_GONE_KILLED("m_web_view_renderer_gone_killed"),
     WEB_PAGE_LOADED("m_web_view_page_loaded"),
+    WEB_PAGE_PAINTED("m_web_view_page_painted"),
 }
 
 enum class WebViewErrorResponse(@StringRes val errorId: Int) {
@@ -819,4 +834,13 @@ enum class WebViewErrorResponse(@StringRes val errorId: Int) {
     OMITTED(string.webViewErrorNoConnection),
     LOADING(string.webViewErrorNoConnection),
     SSL_PROTOCOL_ERROR(string.webViewErrorSslProtocol),
+}
+
+data class SslErrorResponse(val error: SslError, val errorType: SSLErrorType, val url: String)
+enum class SSLErrorType(@StringRes val errorId: Int) {
+    EXPIRED(R.string.sslErrorExpiredMessage),
+    WRONG_HOST(R.string.sslErrorWrongHostMessage),
+    UNTRUSTED_HOST(R.string.sslErrorUntrustedMessage),
+    GENERIC(R.string.sslErrorUntrustedMessage),
+    NONE(R.string.sslErrorUntrustedMessage),
 }

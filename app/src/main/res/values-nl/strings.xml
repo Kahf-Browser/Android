@@ -156,10 +156,16 @@
     <string name="privateSearchTitle">Private Search is ingeschakeld</string>
     <string name="privateSearchDescription">Kahf Private Search is je standaardzoekmachine, zodat je op het web kunt zoeken zonder gevolgd te worden.</string>
     <string name="privateSearchHeadingSearchSettings">Zoekinstellingen</string>
-    <string name="privateSearchAutocompleteToggle">Suggesties voor automatisch aanvullen weergeven</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">Meer zoekinstellingen</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Pas je zoektaal, regio en meer aan</string>
     <string name="privateSearchMoreSearchSettingsTitle">Meer zoekinstellingen</string>
+    <string name="privateSearchAutocompleteToggle">Suggesties voor automatisch aanvullen weergeven</string>
+    <string name="privateSearchAutocompleteHint">Toon suggesties voor zoekopdrachten terwijl je typt, inclusief je bladwijzers. Alle zoekopdrachten zijn privé.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Onlangs bezochte websites</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Toon onlangs bezochte websites in zoeksuggesties. Onlangs bezochte websites zijn privé, worden alleen op je apparaat opgeslagen en kunnen worden gewist met de Fire Button.</string>
+    <string name="improvedAutoCompleteIAMContent">Automatische suggesties bevatten nu ook je recent bezochte sites. Je kunt suggesties uitschakelen in de instellingen of ze op elk gewenst moment wissen met de 🔥 Fire Button.</string>
+    <string name="improvedAutoCompleteIAMTitle">Dezelfde privacy.\nBetere zoeksuggesties!</string>
+    <string name="openAutoCompleteSettings">Open Instellingen</string>
 
     <!-- Web Tracking Protection -->
     <string name="webTrackingProtectionActivityTitle">Bescherming tegen webtracking</string>
@@ -231,29 +237,6 @@
     <string name="brokenSiteProtectionsOnBannerMessage">Het kan helpen om de beveiliging uit te schakelen.</string>
     <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">We hebben privacybescherming tijdelijk uitgeschakeld, omdat het erop lijkt dat deze site hierdoor niet goed meer werkt.</string>
 
-    <!-- Bookmarks Activity -->
-    <string name="bookmarksMenuTitle">Bladwijzers</string>
-    <string name="bookmarksActivityTitle">Bladwijzers</string>
-    <string name="noBookmarks">Nog geen bladwijzers toegevoegd</string>
-    <string name="bookmarkOverflowContentDescription" instruction="Placeholder is the title of the bookmark">Meer opties voor bladwijzer %1$s</string>
-    <string name="bookmarkDeleteConfirmationMessage" instruction="Placeholder is the title of the bookmark">&lt;b&gt;%1$s&lt;/b&gt; verwijderd</string>
-    <string name="exportBookmarksMenu">Exporteren</string>
-    <string name="exportBookmarksEmpty">Je hebt geen bladwijzers, dus er wordt niets geëxporteerd</string>
-    <string name="exportBookmarksError">Er is iets misgegaan, er kunnen geen bladwijzers worden geëxporteerd</string>
-    <string name="exportBookmarksSuccess">Alle bladwijzers zijn geëxporteerd</string>
-    <string name="importBookmarksMenu">Importeren</string>
-    <string name="importBookmarksFileTitle">Selecteer een bladwijzerbestand om te importeren</string>
-    <string name="importBookmarksError">Er is iets misgegaan, er kunnen geen bladwijzers worden geïmporteerd</string>
-    <string name="importBookmarksEmpty">Dit bestand bevat geen bladwijzers om te importeren</string>
-    <string name="importBookmarksSuccess" instruction="Placeholder is a number">%1$d bladwijzers geïmporteerd</string>
-    <string name="savedSiteDialogTitleHint">Titel</string>
-    <string name="savedSiteDialogUrlHint">URL</string>
-    <string name="savedSiteDialogTitleEdit">Bewerken</string>
-    <string name="bookmarksSectionTitle">Bladwijzers</string>
-    <string name="favoritesSectionTitle">Favorieten</string>
-    <string name="bookmarksEmptyHint">Nog geen bladwijzers toegevoegd</string>
-    <string name="favoritesEmptyHint">Nog geen favorieten toegevoegd</string>
-
     <!-- Dialogs -->
     <string name="dialogConfirmTitle">Bevestigen</string>
     <string name="dialogSave">Opslaan</string>
@@ -274,8 +257,6 @@
     <string name="widgetConfigurationAddWidgetOption">Widget toevoegen</string>
     <string name="searchWidgetEmtpyFavoritesHint">Nog geen favorieten toegevoegd</string>
     <string name="searchWidgetEmtpyFavoritesCta">Favoriet toevoegen</string>
-    <string name="daxFavoritesOnboardingCtaText"><![CDATA[Bezoek je favoriete websites in een oogwenk!<br/><br/>Ga naar een van je favoriete sites. Tik vervolgens op het pictogram \" ⠇\" en selecteer \'Toevoegen aan favorieten\'.]]></string>
-    <string name="daxFavoritesOnboardingCtaContentDescription">Bezoek je favoriete websites in een oogwenk! Ga naar een van je favoriete sites. Tik vervolgens op het browsermenupictogram en selecteer \'Toevoegen aan favorieten\'.</string>
     <string name="widgetConfigurationActivityTitle">Widgetconfiguratie</string>
     <string name="favoritesWidgetLabel">Favorieten</string>
     <string name="searchWidgetLabel">Zoeken</string>
@@ -445,14 +426,8 @@
     <string name="systemSearchOnboardingButtonOk">Ik snap het</string>
 
     <!-- Dax Dialog -->
-    <string name="daxDialogHideButton">Verbergen</string>
-    <string name="daxDialogPhew">Opluchting!</string>
-    <string name="daxDialogNext">Volgende</string>
     <string name="daxDialogHighFive">High Five!</string>
     <string name="daxDialogGotIt">Ik snap het</string>
-    <string name="hideTipsTitle">Resterende tips verbergen?</string>
-    <string name="hideTipsText">Het zijn er maar een paar en we hebben geprobeerd ze informatief te maken.</string>
-    <string name="hideTipsButton">Tips voor altijd verbergen</string>
 
     <!-- AppTP Retention Experiment Dax Dialog -->
     <string name="daxDialogAppTpRetentionText"><![CDATA[Je blokkeert verborgen trackers op het web 🎉<br/><br/>Ik kan ook trackers blokkeren die in andere apps verborgen zitten, zelfs als je je telefoon niet gebruikt.]]></string>
@@ -463,37 +438,9 @@
     <string name="onboardingWelcomeTitle">"Welkom bij Kahf!"</string>
     <string name="onboardingDaxText"><![CDATA[Internet kan best eng zijn.\n\nMaak je geen zorgen! Privé zoeken en browsen is eenvoudiger dan je denkt.]]></string>
     <string name="onboardingLetsDoItButton">Laten we het doen!</string>
-    <string name="daxIntroCtaText"><![CDATA[Probeer vervolgens een van je favoriete sites te bezoeken!<br/><br/>Ik blokkeer trackers zodat ze je niet kunnen bespioneren. Indien mogelijk upgrade ik ook de beveiliging van je verbinding. 🔒]]></string>
-    <string name="daxEndCtaText"><![CDATA[Je kunt het!<br/><br/>Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👍]]></string>
-    <string name="daxSerpCtaText">Je Kahf-zoekopdrachten zijn anoniem. Altijd. 🙌</string>
-    <plurals name="daxTrackersBlockedCtaText">
-        <item quantity="one"><![CDATA[ en <b>%1$d andere </b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
-        <item quantity="other"><![CDATA[ en <b>%1$d anderen</b> probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
-    </plurals>
-    <plurals name="daxTrackersBlockedCtaZeroText" tools:ignore="ImpliedQuantity">
-        <item quantity="one"><![CDATA[ probeerde je hier te volgen. <br/><br/>Ik heb het geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
-        <item quantity="other"><![CDATA[ probeerden je hier te volgen. <br/><br/>Ik heb ze geblokkeerd!<br/><br/> ☝️Je kunt de URL-balk bekijken om te zien wie je probeert te volgen wanneer je een nieuwe site bezoekt.️]]></item>
-    </plurals>
     <string name="daxNonSerpCtaText"><![CDATA[Terwijl je tikt en scrolt, blokkeer ik vervelende trackers.<br/><br/>Ga je gang, blijf browsen!]]></string>
     <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Opgelet! Ik kan niet voorkomen dat %1$s jouw activiteit op %2$s kan zien\n\nMaar als je met mij browset, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op veel andere sites te blokkeren.</string>
     <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Opgelet! Omdat %1$s eigenaar is van %2$s, kan ik niet voorkomen dat ze jouw activiteit hier kunnen zien.&lt;br/&gt;&lt;br/&gt;Maar als je met mij surft, kan ik ervoor zorgen dat %3$s minder over je te weten komt door hun trackers op andere sites te blokkeren.</string>
-
-    <!-- Onboarding DDG Feature Options -->
-    <string name="onboardingFeatureOptionsTitle">Wat brengt je naar Kahf?</string>
-    <string name="onboardingFeatureOptionsContinue">Doorgaan</string>
-    <string name="onboardingFeatureOptionsSkip">Deze stap overslaan</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionPrivateSearch">Privé zoeken</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionTrackerBlocking">Blokkeren van trackers</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionSmallerDigitalFootprint">Kleinere digitale voetafdruk</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFasterPageLoads">Sneller laden van pagina\'s</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionFewerAds">Minder advertenties</string>
-    <!-- smartling.character_limit = 28 -->
-    <string name="onboardingFeatureOptionOneClickDataClearing">Gegevens wissen met één klik</string>
 
     <!-- Download Confirmation -->
     <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">%1$s opslaan</string>
@@ -641,27 +588,6 @@
     <string name="emailNotSupported">Apparaat wordt niet ondersteund</string>
     <string name="emailNotSupportedExplanation">Met E-mailbescherming maak je privémailadressen die e-mailtrackers verwijderen. De adressen die je lokaal op je apparaat maakt, dienen we te versleutelen en opslaan. E-mailbescherming is niet beschikbaar omdat je apparaat geen versleutelde opslag ondersteunt.</string>
 
-    <!-- Bookmark folders -->
-    <string name="bookmarkDialogTitleEdit">Bladwijzer bewerken</string>
-    <string name="favoriteDialogTitleEdit">Favoriet bewerken</string>
-    <string name="locationLabel">Locatie</string>
-    <string name="folderLocationTitle">Locatie selecteren</string>
-    <string name="addFolder">Map toevoegen</string>
-    <string name="editFolder">Map bewerken</string>
-    <string name="bookmarkFolderDeleteDialogTitle" instruction="Dialog title for deleting a folder with bookmarks">"Map en inhoud verwijderen?"</string>
-    <string name="bookmarkFolderDeleteDialogMessage">"Doorgaan met het verwijderen van "</string>
-    <string name="bookmarkFolderEmpty">Leeg</string>
-
-    <plurals name="bookmarkFolderDeleteDialogMessage">
-        <item quantity="one">%1$s %2$s en %3$d item?</item>
-        <item quantity="other">%1$s %2$s en %3$d items?</item>
-    </plurals>
-
-    <plurals name="bookmarkFolderItems">
-        <item quantity="one">%1$d item</item>
-        <item quantity="other">%1$d items</item>
-    </plurals>
-
     <!-- Accessibility-->
     <string name="settingsAccessibility">Toegankelijkheid</string>
     <string name="accessibilityActivityTitle">Toegankelijkheid</string>
@@ -681,7 +607,7 @@
 
     <!-- MacOs Settings -->
     <string name="macos_settings_description">Browse privé met onze app voor Mac</string>
-    <string name="macos_settings_title">Kahf-app voor Mac</string>
+    <string name="macos_settings_title">Kahf-browser voor Mac</string>
 
     <!-- Downloads -->
     <string name="downloadsMenuItem">Downloads</string>
@@ -743,7 +669,7 @@
     <string name="downloadsNotifyMeSubtitle">Ontvang een melding wanneer downloads zijn voltooid.</string>
 
     <!-- Windows Settings -->
-    <string name="windows_settings_title">Kahf-app voor Windows</string>
+    <string name="windows_settings_title">Kahf-browser voor Windows</string>
     <string name="windows_settings_description">Browse privé met onze app voor Windows</string>
     <string name="windows_settings_description_ready">Download beschikbaar</string>
     <string name="windows_settings_description_list">Je staat op de lijst!</string>
@@ -756,16 +682,6 @@
     <string name="closeAppTabsConfirmationDialogDescription">Weet je zeker dat je alle tabbladen wilt sluiten?</string>
     <string name="closeAppTabsConfirmationDialogCancel">Annuleren</string>
     <string name="closeAppTabsConfirmationDialogClose">Sluiten</string>
-
-    <!-- Edit Saved Site screen, "Delete Saved Site" confirmation prompt -->
-    <string name="deleteBookmarkConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark">Deze bladwijzer verwijderen?</string>
-    <string name="deleteBookmarkConfirmationDialogDescription" instruction="Placeholder is the name of the bookmark">Hiermee verwijder je de bladwijzer voor &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteFavoriteConfirmationDialogTitle" instruction="Dialog title for deleting a favorite site">Deze website als favoriet verwijderen?</string>
-    <string name="deleteFavoriteConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Hiermee verwijder je de website &lt;b&gt;%1$s&lt;/b&gt; als favoriet.</string>
-    <string name="deleteBookmarkFolderConfirmationDialogTitle" instruction="Dialog title for deleting a bookmark folder">Deze bladwijzermap verwijderen?</string>
-    <string name="deleteBookmarkFolderConfirmationDialogDescription" instruction="Placeholder is the name of the favorite site">Hiermee verwijder je de bladwijzermap voor &lt;b&gt;%1$s&lt;/b&gt;.</string>
-    <string name="deleteSavedSiteConfirmationDialogCancel">Annuleren</string>
-    <string name="deleteSavedSiteConfirmationDialogDelete">Verwijderen</string>
 
     <!-- Private voice search -->
     <string name="accessibilityVoiceSearchSubtitle">Voeg de optie \'Private spraakopdracht\' toe aan de adresbalk. Audio wordt niet opgeslagen en met niemand gedeeld, ook niet met Kahf.</string>
@@ -786,6 +702,58 @@
     <string name="autofillLoginSavedSnackbarMessage">Wachtwoord opgeslagen</string>
     <string name="autofillLoginUpdatedSnackbarMessage">Wachtwoord bijgewerkt</string>
 
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Openen in Kahf</string>
+    <string name="runningInDdgMenuItemTitle">Uitgevoerd in Kahf</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Waarschuwing: Deze website is mogelijk onveilig</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Het certificaat voor deze website is ongeldig. Mogelijk maak je verbinding met een server die zich voordoet als %1$s, waardoor je vertrouwelijke informatie in gevaar kan komen.</string>
+    <string name="sslErrorLeaveCTA">Deze website verlaten</string>
+    <string name="sslErrorAdvancedCTA">Geavanceerd</string>
+    <string name="sslErrorExpandedHeadline">Kahf waarschuwt je wanneer een website een ongeldig certificaat heeft.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Risico accepteren en site bezoeken<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Het beveiligingscertificaat voor %1$s is verlopen. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Het beveiligingscertificaat voor %1$s komt niet overeen met *.%2$s. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Het besturingssysteem van je apparaat vertrouwt het beveiligingscertificaat voor %1$s niet. Mogelijk is de website verkeerd geconfigureerd, heeft een aanvaller je verbinding gecompromitteerd of staat de klok van je systeem niet goed.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hoi.<br/><br/>Klaar voor een beter internet met meer privacy?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Laten we het doen!</string>
+    <string name="preOnboardingDaxDialog2Title">Privacybescherming geactiveerd!</string>
+    <string name="preOnboardingDaxDialog2Button">Kies je browser</string>
+    <string name="preOnboardingComparisonChartItem1">Standaard privé zoeken</string>
+    <string name="preOnboardingComparisonChartItem2">Blokkeer trackers van derden</string>
+    <string name="preOnboardingComparisonChartItem3">Blokkeer cookiepop-ups</string>
+    <string name="preOnboardingComparisonChartItem4">Blokkeer enge advertenties</string>
+    <string name="preOnboardingComparisonChartItem5">Wis browsegegevens in een handomdraai</string>
+    <string name="preOnboardingDaxDialog3Title">Geweldig! Welkom aan de Duck-kant.</string>
+    <string name="preOnboardingDaxDialog3Button">Beginnen met browsen</string>
+    <string name="onboardingSearchDaxDialogTitle">Probeer een zoekopdracht!</string>
+    <string name="onboardingSearchDaxDialogDescription">Je Kahf-zoekopdrachten zijn altijd anoniem.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate &apos;duck&apos; too.">hoe zeg je \'eend\' in het Engels?</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate &apos;duck&apos; too. Don&apos;t add question mark">hoe zeg je \'eend\' in het Spaans?</string>
+    <string name="onboardingSearchQueryOption1">hoe zeg je \'eend\' in het Engels?</string>
+    <string name="onboardingSearchQueryOption1English">hoe zeg je \'eend\' in het Spaans?</string>
+    <string name="onboardingSearchDaxDialogOption2">cast van avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">cast van Mighty Ducks</string>
+    <string name="onboardingSearchDaxDialogOption3">lokaal weer</string>
+    <string name="onboardingSearchDaxDialogOption4">Verras me!</string>
+    <string name="onboardingSearchQueryOption4">recepten voor het avondeten</string>
+    <string name="onboardingSearchQueryOption4US">Recepten voor chocoladekoekjes</string>
+    <string name="onboardingSitesDaxDialogTitle">Bezoek eens een site!</string>
+    <string name="onboardingSitesDaxDialogDescription">Ik blokkeer trackers zodat ze je niet kunnen bespioneren.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Verras me!</string>
+    <string name="onboardingSerpDaxDialogDescription">Dat is Kahf Search. Privé. Snel. Minder advertenties.</string>
+    <string name="onboardingSerpDaxDialogButton">Ik snap het!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Probeer nu een site te bezoeken!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[ en nog <b>%1$d ander</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
+        <item quantity="other"><![CDATA[ en nog <b>%1$d anderen</b> probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer informatie.️]]></item>
+    </plurals>
     <string name="safegaze_popup_report_title">Gelieve alle fouten of suggesties te melden via dit formulier</string>
     <string name="safegaze_popup_support_title">Ondersteun dit project</string>
     <string name="safegaze_popup_woman_title">Ik ben een vrouw</string>
@@ -810,7 +778,7 @@
     <string name="bookmarkAddedInBookmarks" instruction="%1$s is the folder name">Bladwijzer toegevoegd in %1$s</string>
     <string name="addToFavorites">Toevoegen aan favorieten</string>
     <string name="editBookmark">Bladwijzer bewerken</string>
-    <string name="importBookmarksDescription">Als je bladwijzers in een andere browser zijn opgeslagen,\nkun je ze in DuckDuckGo importeren.</string>
+    <string name="importBookmarksDescription">Als je bladwijzers in een andere browser zijn opgeslagen,\nkun je ze in Kahf importeren.</string>
     <string name="importBookmarks">Bladwijzers importeren</string>
     <string name="noResultsFor" instruction="%1$s is the search term">Geen resultaten voor \'%1$s\'</string>
     <string name="removeFromFavorites">Verwijderen uit favorieten</string>
@@ -819,5 +787,14 @@
         <item quantity="one">Weet je zeker dat je deze deze map en %1$d item wilt verwijderen?</item>
         <item quantity="other">Weet je zeker dat je deze map en %1$d items wilt verwijderen?</item>
     </plurals>
-    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Weet je zeker dat je bladwijzer voor &lt;b&gt;%1$s&lt;/b&gt; wilt verwijderen?</string>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[ probeerde je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
+        <item quantity="other"><![CDATA[ probeerden je hier te volgen. Ik heb ze geblokkeerd!<br/><br/>☝️ Tik op het schild voor meer info.️]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Ik snap het!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Wis je browse-activiteit direct met de <b>Fire Button</b>.<br/><br/>Probeer het maar! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">"Je kunt het!"</string>
+    <string name="onboardingEndDaxDialogDescription">Denk eraan: elke keer als je met mij browset, verliest een enge advertentie zijn vleugels. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Helemaal klaar!</string>
+
 </resources>
