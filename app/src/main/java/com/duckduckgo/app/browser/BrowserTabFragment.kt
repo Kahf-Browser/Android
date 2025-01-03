@@ -1054,7 +1054,7 @@ class BrowserTabFragment :
                     onShareClicked = {
                         val shareIntent = Intent(Intent.ACTION_SEND)
                         shareIntent.type = "text/plain"
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=org.kahf.browser")
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${requireContext().packageName}")
                         startActivity(Intent.createChooser(shareIntent, "Share via"))
                     },
                     onSupportClicked = {
