@@ -139,11 +139,11 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             SafeGazeBlockListAndWallpaperWorker::class.java, 1, TimeUnit.DAYS
         ).build()
 
-        // val jsDownloadWorkReq = OneTimeWorkRequestBuilder<JsDownloadWorker>().addTag("jsDownloader").build()
+        val jsDownloadWorkReq = OneTimeWorkRequestBuilder<JsDownloadWorker>().addTag("jsDownloader").build()
 
         val workManager = WorkManager.getInstance(this)
         workManager.apply {
-            // enqueue(jsDownloadWorkReq)
+            enqueue(jsDownloadWorkReq)
             enqueue(periodicWorkRequest)
         }
     }

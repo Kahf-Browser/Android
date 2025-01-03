@@ -21,7 +21,8 @@ import android.icu.text.SimpleDateFormat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
-import com.duckduckgo.common.utils.SAFE_GAZE_JS_URL
+import com.duckduckgo.common.utils.SAFE_GAZE_JS_URL_DEV
+import com.duckduckgo.common.utils.SAFE_GAZE_JS_URL_PROD
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
@@ -48,7 +49,10 @@ class JsDownloadWorker(context: Context, workerParams: WorkerParameters) : Worke
             localJsFile.parentFile?.mkdirs()
         }
 
-        val jsFileData = URL(SAFE_GAZE_JS_URL).readBytes()
+        // get package name
+        val jsFileData = URL(
+            if (applicationContext.packageName == "io.kahf.browser") SAFE_GAZE_JS_URL_PROD else SAFE_GAZE_JS_URL_DEV
+        ).readBytes()
 
         FileOutputStream(localJsFile).use { fos ->
             fos.write(jsFileData)
