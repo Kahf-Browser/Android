@@ -2554,12 +2554,22 @@ class BrowserTabFragment :
                 viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 if (hasFocus) {
+                    // show the full url
+                    omnibar.omnibarTextInput.setText(viewModel.omnibarViewState.value?.omnibarText ?: "")
+
                     cancelPendingAutofillRequestsToChooseCredentials()
                     omnibar.omniBarContainer.isPressed = true
                 } else {
                     omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
                     omnibar.omniBarContainer.isPressed = false
+
+                    // show the domain name only
+                    viewModel.getOmnibarDomain().let {
+                        if (it.isNotBlank()) {
+                            omnibar.omnibarTextInput.setText(it)
+                        }
+                    }
                 }
             }
 
@@ -4026,7 +4036,8 @@ class BrowserTabFragment :
                 }
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                    omnibar.omnibarTextInput.setText(viewState.omnibarText)
+                    // show the domain name only
+                    omnibar.omnibarTextInput.setText(viewModel.getOmnibarDomain(url = viewState.omnibarText))
                     if (viewState.forceExpand) {
                         omnibar.appBarLayout.setExpanded(true, true)
                         bottomNav.botNav.showIt()
