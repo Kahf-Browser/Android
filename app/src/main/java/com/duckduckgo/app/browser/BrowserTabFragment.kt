@@ -3871,10 +3871,10 @@ class BrowserTabFragment :
                     viewModel.onFindInPageSelected()
                 }
                 onMenuItemClicked(menuBinding.privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
-                onMenuItemClicked(menuBinding.brokenSiteMenuItem) {
+                /*onMenuItemClicked(menuBinding.brokenSiteMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
-                }
+                }*/
                 onMenuItemClicked(menuBinding.downloadsMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
                     browserActivity?.launchDownloads()
