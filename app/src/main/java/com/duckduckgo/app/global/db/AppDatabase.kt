@@ -70,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 57,
+    version = 58,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -105,6 +105,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         Relation::class,
         KahfImageBlocked::class,
         HarmfulSiteBlocked::class,
+        ImageBlockCount::class,
     ],
 )
 
@@ -154,6 +155,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
     abstract fun kahfImageBlockedDao(): KahfImageBlockedDao
     abstract fun harmfulSiteBlockedDao(): HarmfulSiteBlockedDao
+    abstract fun imageBlockCountDao(): ImageBlockCountDao
 
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
 
@@ -728,6 +730,20 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    private val MIGRATION_57_TO_58 = object : Migration(57, 58) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `image_block_count` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`count` INTEGER NOT NULL)",
+            )
+
+            db.execSQL(
+                "INSERT INTO `image_block_count` (id, count) " +
+                    "SELECT 0, COUNT(*) FROM `kahf_image_blocked` WHERE isIndecent = 1",
+            )
+        }
+    }
+
 
     /**
      * WARNING ⚠️
@@ -810,7 +826,8 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_53_TO_54,
             MIGRATION_54_TO_55,
             MIGRATION_55_TO_56,
-            MIGRATION_56_TO_57
+            MIGRATION_56_TO_57,
+            MIGRATION_57_TO_58,
         )
 
     @Deprecated(

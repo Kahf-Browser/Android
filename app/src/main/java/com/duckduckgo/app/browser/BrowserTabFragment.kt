@@ -238,6 +238,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.trackerdetection.db.HarmfulSiteBlockedDao
+import com.duckduckgo.app.trackerdetection.db.ImageBlockCountDao
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -593,6 +594,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var harmfulSiteBlockedDao: HarmfulSiteBlockedDao
+
+    @Inject
+    lateinit var imageBlockCountDao: ImageBlockCountDao
 
     @Inject
     lateinit var analyticsService: AnalyticsService
@@ -1068,7 +1072,7 @@ class BrowserTabFragment :
                 )
 
                 lifecycleScope.launch {
-                    val count = kahfImageBlockedDao.getTotalBlockCount().first()
+                    val count = imageBlockCountDao.getCount().first()
                     popupBinding.imageBlurCount.setFormattedCount(count)
 
                     val siteBlockCount = harmfulSiteBlockedDao.getTotalBlockCount().first()
@@ -2616,10 +2620,14 @@ class BrowserTabFragment :
                         webView?.evaluateJavascript(jsFunction, null)
                     }
                 },
-                onImageClassified = { uid, detectionResultJson, base64Image ->
+                onImageClassified = { uid, detectionResultJson, base64Image, updateBlurCount ->
                     val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson', `$base64Image`);"
                     webView?.post {
                         webView?.evaluateJavascript(jsFunctionCall, null)
+                    }
+
+                    if (updateBlurCount) {
+                        imageBlockCountDao.incrementCount()
                     }
 
                     if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0 && genderDetector.modelInitializationTime > 0 && poseDetector.modelInitializationTime() > 0) {
@@ -4415,7 +4423,7 @@ class BrowserTabFragment :
             }.launchIn(lifecycleScope)
 
             // App Statistics section
-            kahfImageBlockedDao.getTotalBlockCount()
+            imageBlockCountDao.getCount()
                 .flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
                 .onEach { newBrowserTab.imageBlockedCount.setFormattedCount(it) }
