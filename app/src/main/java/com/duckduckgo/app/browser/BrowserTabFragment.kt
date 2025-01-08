@@ -238,6 +238,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.trackerdetection.db.HarmfulSiteBlockedDao
+import com.duckduckgo.app.trackerdetection.db.ImageBlockCountDao
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -593,6 +594,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var harmfulSiteBlockedDao: HarmfulSiteBlockedDao
+
+    @Inject
+    lateinit var imageBlockCountDao: ImageBlockCountDao
 
     @Inject
     lateinit var analyticsService: AnalyticsService
@@ -1054,7 +1058,7 @@ class BrowserTabFragment :
                     onShareClicked = {
                         val shareIntent = Intent(Intent.ACTION_SEND)
                         shareIntent.type = "text/plain"
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=org.kahf.browser")
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${requireContext().packageName}")
                         startActivity(Intent.createChooser(shareIntent, "Share via"))
                     },
                     onSupportClicked = {
@@ -1068,7 +1072,7 @@ class BrowserTabFragment :
                 )
 
                 lifecycleScope.launch {
-                    val count = kahfImageBlockedDao.getTotalBlockCount().first()
+                    val count = imageBlockCountDao.getCount().first()
                     popupBinding.imageBlurCount.setFormattedCount(count)
 
                     val siteBlockCount = harmfulSiteBlockedDao.getTotalBlockCount().first()
@@ -2550,12 +2554,22 @@ class BrowserTabFragment :
                 viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 if (hasFocus) {
+                    // show the full url
+                    omnibar.omnibarTextInput.setText(viewModel.omnibarViewState.value?.omnibarText ?: "")
+
                     cancelPendingAutofillRequestsToChooseCredentials()
                     omnibar.omniBarContainer.isPressed = true
                 } else {
                     omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
                     omnibar.omniBarContainer.isPressed = false
+
+                    // show the domain name only
+                    viewModel.getOmnibarDomain().let {
+                        if (it.isNotBlank()) {
+                            omnibar.omnibarTextInput.setText(it)
+                        }
+                    }
                 }
             }
 
@@ -2616,10 +2630,14 @@ class BrowserTabFragment :
                         webView?.evaluateJavascript(jsFunction, null)
                     }
                 },
-                onImageClassified = { uid, detectionResultJson, base64Image ->
+                onImageClassified = { uid, detectionResultJson, base64Image, updateBlurCount ->
                     val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson', `$base64Image`);"
                     webView?.post {
                         webView?.evaluateJavascript(jsFunctionCall, null)
+                    }
+
+                    if (updateBlurCount) {
+                        imageBlockCountDao.incrementCount()
                     }
 
                     if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0 && genderDetector.modelInitializationTime > 0 && poseDetector.modelInitializationTime() > 0) {
@@ -3853,10 +3871,10 @@ class BrowserTabFragment :
                     viewModel.onFindInPageSelected()
                 }
                 onMenuItemClicked(menuBinding.privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
-                onMenuItemClicked(menuBinding.brokenSiteMenuItem) {
+                /*onMenuItemClicked(menuBinding.brokenSiteMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
-                }
+                }*/
                 onMenuItemClicked(menuBinding.downloadsMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
                     browserActivity?.launchDownloads()
@@ -4018,7 +4036,8 @@ class BrowserTabFragment :
                 }
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                    omnibar.omnibarTextInput.setText(viewState.omnibarText)
+                    // show the domain name only
+                    omnibar.omnibarTextInput.setText(viewModel.getOmnibarDomain(url = viewState.omnibarText))
                     if (viewState.forceExpand) {
                         omnibar.appBarLayout.setExpanded(true, true)
                         bottomNav.botNav.showIt()
@@ -4415,7 +4434,7 @@ class BrowserTabFragment :
             }.launchIn(lifecycleScope)
 
             // App Statistics section
-            kahfImageBlockedDao.getTotalBlockCount()
+            imageBlockCountDao.getCount()
                 .flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
                 .onEach { newBrowserTab.imageBlockedCount.setFormattedCount(it) }

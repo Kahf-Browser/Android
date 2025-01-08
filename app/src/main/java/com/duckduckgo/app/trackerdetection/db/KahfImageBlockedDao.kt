@@ -21,6 +21,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import java.time.Duration
+import java.time.Instant
 
 @Dao
 interface KahfImageBlockedDao {
@@ -36,4 +38,11 @@ interface KahfImageBlockedDao {
 
     @Query("SELECT SUM(CASE WHEN isIndecent THEN 1 ELSE 0 END) FROM kahf_image_blocked")
     fun getTotalBlockCount(): Flow<Int>
+
+    @Query("DELETE FROM kahf_image_blocked WHERE modifiedAt < :milliseconds")
+    fun deleteImagesOlderThan(milliseconds: Long): Int
+
+    fun deleteOlderImages(days: Long): Int {
+        return deleteImagesOlderThan(Instant.now().minus(Duration.ofDays(days)).toEpochMilli())
+    }
 }

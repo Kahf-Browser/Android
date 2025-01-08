@@ -1029,6 +1029,12 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun getOmnibarDomain(url: String = ""): String {
+        val omnibarUrl = url.ifBlank { omnibarViewState.value?.omnibarText?.trim() ?: "" }
+        val host = omnibarUrl.toUri().host?.removePrefix("www.") ?: ""
+        return host.ifBlank { omnibarUrl }
+    }
+
     private fun fireQueryChangedPixel(omnibarText: String) {
         val oldQuery = currentOmnibarViewState().omnibarText.toUri()
         val newQuery = omnibarText.toUri()

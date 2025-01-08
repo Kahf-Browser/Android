@@ -84,7 +84,7 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? {
         val inputConnection = super.onCreateInputConnection(outAttrs) ?: return null
 
-        addNoPersonalisedFlag(outAttrs)
+        // addNoPersonalisedFlag(outAttrs)
 
         return inputConnection
     }

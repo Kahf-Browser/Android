@@ -59,6 +59,7 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.sitepermissions.SitePermissionsActivity
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -118,6 +119,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
+    @Inject
+    lateinit var kahfImageBlockedDao: KahfImageBlockedDao
+
     private val lastActiveTabs = TabList()
 
     private var currentTab: BrowserTabFragment? = null
@@ -171,6 +175,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
             viewModel.onLaunchedFromNotification(it)
         }
         configureOnBackPressedListener()
+
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            kahfImageBlockedDao.deleteOlderImages(30)
+        }
     }
 
     override fun onStop() {
