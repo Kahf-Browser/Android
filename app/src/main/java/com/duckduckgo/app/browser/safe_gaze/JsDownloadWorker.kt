@@ -34,10 +34,10 @@ class JsDownloadWorker(context: Context, workerParams: WorkerParameters) : Worke
     override fun doWork(): Result {
         return try {
             fetchJs()
-            Timber.d("SafeGazeJs: File downloaded and overwritten successfully.")
+            Timber.d("fLog: File downloaded and overwritten successfully.")
             Result.success()
         } catch (e: Exception) {
-            Timber.e("SafeGazeJs: Error writing to the local js file: $e")
+            Timber.e("fLog: Error writing to the local js file: $e")
             Result.failure()
         }
     }
