@@ -27,6 +27,8 @@ class AppUrl {
         const val ABOUT = "https://$HOST/about"
         const val PIXEL = "https://improving.kahfbrowser.com"
         const val EMAIL_SEGMENT = "email"
+        // kahf specific urls
+        const val GOOGLE_HOST = "google.com"
     }
 
     object ParamKey {
