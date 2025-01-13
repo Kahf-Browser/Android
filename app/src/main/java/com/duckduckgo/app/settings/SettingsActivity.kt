@@ -136,7 +136,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun configureUiEventHandlers() {
         with(viewsPrivacy) {
             setAsDefaultBrowserSetting.setClickListener { viewModel.onDefaultBrowserSettingClicked() }
-            privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
+            // privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
             webTrackingProtectionSetting.setClickListener { viewModel.onWebTrackingProtectionSettingClicked() }
             cookiePopupProtectionSetting.setClickListener { viewModel.onCookiePopupProtectionSettingClicked() }
             emailSetting.setClickListener { viewModel.onEmailProtectionSettingClicked() }
@@ -146,6 +146,7 @@ class SettingsActivity : DuckDuckGoActivity() {
         with(viewsSettings) {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
+            privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
             syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
             // fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }

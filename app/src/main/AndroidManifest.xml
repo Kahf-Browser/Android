@@ -421,7 +421,7 @@
         <activity
             android:name="com.duckduckgo.app.privatesearch.PrivateSearchActivity"
             android:exported="false"
-            android:label="@string/privateSearchActivityTitle"
+            android:label="@string/privateSearchHeadingSearchSettings"
             android:parentActivityName="com.duckduckgo.app.settings.SettingsActivity" />
         <activity
             android:name="com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionActivity"

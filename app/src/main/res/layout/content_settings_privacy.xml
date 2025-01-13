@@ -34,14 +34,14 @@
         app:primaryText="@string/settingsDefaultBrowserTitle"
         app:secondaryText="@string/settingsDefaultBrowserNotSetDescription"/>
 
-    <com.duckduckgo.common.ui.view.listitem.CheckListItem
+    <!--<com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/privateSearchSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:itemState="enabled"
         app:primaryText="@string/settingsPrivateSearchTitle"
         app:primaryTextTruncated="false"
-        app:secondaryText="@string/settingsPrivateSearchDescription" />
+        app:secondaryText="@string/settingsPrivateSearchDescription" />-->
 
     <com.duckduckgo.common.ui.view.listitem.CheckListItem
         android:id="@+id/webTrackingProtectionSetting"

@@ -72,8 +72,10 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     private fun setupDescription() {
-        val title = getString(R.string.privateSearchDescription).replaceFirst("Kahf", "DuckDuckGo")
-        binding.privateSearchDescription.text = title
+        binding.privateSearchMoreSearchSettings.isVisible = false
+        binding.privateSearchHeaderImage.isVisible = false
+        binding.privateSearchTitle.isVisible = false
+        binding.privateSearchDescription.isVisible = false
     }
 
     private fun observeViewModel() {
@@ -121,6 +123,6 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val DUCKDUCKGO_SETTINGS_WEB_LINK = "https://duckduckgo.com/settings"
+        private const val DUCKDUCKGO_SETTINGS_WEB_LINK = "https://www.google.com/preferences"
     }
 }
