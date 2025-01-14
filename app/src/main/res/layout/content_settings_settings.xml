@@ -43,11 +43,11 @@
         android:layout_height="wrap_content"
         app:primaryText="@string/settingsAutofillLoginsSetting" />
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+    <!--<com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/syncSetting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/settingsSyncSetting" />
+        app:primaryText="@string/settingsSyncSetting" />-->
 
     <com.duckduckgo.common.ui.view.listitem.OneLineListItem
         android:id="@+id/homeScreenWidgetSetting"

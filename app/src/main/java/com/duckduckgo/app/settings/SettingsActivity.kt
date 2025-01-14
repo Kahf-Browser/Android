@@ -147,7 +147,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
-            syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
+            // syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
             // fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
             appearanceSetting.setClickListener { viewModel.onAppearanceSettingClicked() }
@@ -197,7 +197,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     )*/
                     updateEmailSubtitle(it.emailAddress)
                     updateAutofill(it.showAutofill)
-                    updateSyncSetting(visible = it.showSyncSetting)
+                    // updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
                 }
@@ -237,11 +237,11 @@ class SettingsActivity : DuckDuckGoActivity() {
         }*/
     }
 
-    private fun updateSyncSetting(visible: Boolean) {
+    /*private fun updateSyncSetting(visible: Boolean) {
         with(viewsSettings.syncSetting) {
             isVisible = visible
         }
-    }
+    }*/
 
     private fun updateAutoconsent(enabled: Boolean) {
         if (enabled) {
