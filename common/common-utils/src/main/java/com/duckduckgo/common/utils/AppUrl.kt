@@ -29,6 +29,7 @@ class AppUrl {
         const val EMAIL_SEGMENT = "email"
         // kahf specific urls
         const val GOOGLE_HOST = "google.com"
+        const val GOOGLE_AUTOSUGG_API = "https://suggestqueries.google.com/complete/search"
     }
 
     object ParamKey {

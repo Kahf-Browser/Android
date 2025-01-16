@@ -222,16 +222,16 @@ class AutoCompleteApi @Inject constructor(
         return entry.visits.size > 3 || entry.url.isRoot()
     }
 
-    private fun getAutoCompleteSearchResults(query: String) =
-        autoCompleteService.autoComplete(query)
+    private fun getAutoCompleteSearchResults(query: String) = autoCompleteService.autoComplete(query)
+            .map { response ->
+                (response.getOrNull(1) as? List<*>)?.map { item ->
+                    AutoCompleteServiceRawResult(item.toString(), false)
+                } ?: emptyList()
+            }
             .flatMapIterable { it }
-            .map {
-                AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = (it.isNav ?: UriString.isWebUrl(it.phrase)))
-            }
+            .map { AutoCompleteSearchSuggestion(phrase = it.phrase, isUrl = it.isNav ?: false) }
             .toList()
-            .onErrorReturn {
-                if (it is InterruptedIOException) throw it else emptyList<AutoCompleteSearchSuggestion>()
-            }
+            .onErrorReturn { if (it is InterruptedIOException) throw it else emptyList<AutoCompleteSearchSuggestion>() }
             .toObservable()
 
     private fun getAutoCompleteBookmarkResults(query: String): Observable<MutableList<RankedSuggestion<AutoCompleteBookmarkSuggestion>>> =
