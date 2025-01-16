@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import timber.log.Timber;
+
 public class SocketHelper {
 
     private static final Logger LOGGER = Logger.getLogger(SocketHelper.class.getName());
@@ -64,12 +66,14 @@ public class SocketHelper {
      */
     private static GenericObjectPoolConfig getDefaultConfig() {
         GenericObjectPoolConfig defaultConfig = new GenericObjectPoolConfig();
+        defaultConfig.setMinIdle(1);
         defaultConfig.setJmxEnabled(false);
         return defaultConfig;
     }
 
     public SocketClient getSocket() {
         try {
+//            logStatus();
             return this.socketPool.borrowObject();
         } catch (Exception ex) {
             Logger.getLogger(SocketHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -104,7 +108,7 @@ public class SocketHelper {
         try {
             this.socketPool.preparePool();
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Error tratanto de resetear el pool", ex);
+            LOGGER.log(Level.SEVERE, "Error trying to reset the pool", ex);
         }
     }
 
@@ -114,14 +118,14 @@ public class SocketHelper {
     public String logStatus() {
         StringBuilder sb = new StringBuilder();
         sb.append("\n-------------------------------------").append("\n")
-                .append("[Max Size:").append(this.socketPool.getMaxTotal()).append("]")
-                .append("[Min Size:").append(this.socketPool.getMinIdle()).append("]")
+                .append("[Total Instances: ").append(this.socketPool.getNumIdle() + this.socketPool.getNumActive()).append("]")
                 .append("[Used Instances:").append(this.socketPool.getNumActive()).append("]")
                 .append("[Unused Instances: ").append(this.socketPool.getNumIdle()).append("]")
-                .append("[Total Instances: ").append(this.socketPool.getNumIdle() + this.socketPool.getNumActive()).append("]")
+                .append("[Max Size:").append(this.socketPool.getMaxTotal()).append("]")
+                .append("[Min Size:").append(this.socketPool.getMinIdle()).append("]")
                 .append("[Requests in Queue: ").append(this.socketPool.getNumWaiters()).append("]")
                 .append("\n-------------------------------------").append("\n");
-        LOGGER.log(Level.INFO, sb.toString());
+        Timber.d("tpLog %s", sb);
 
         return sb.toString();
     }

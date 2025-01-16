@@ -4,8 +4,14 @@ import android.os.Build;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +19,8 @@ import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
+
+import timber.log.Timber;
 
 public class SocketClient {
 
@@ -29,23 +37,49 @@ public class SocketClient {
     }
 
     private void create(String host, int port, String dnsHostName) {
-        // create a socket with a timeout
+        ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
             SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            this.client = (SSLSocket) socketFactory.createSocket(host, port);
+            Future<?> future = executor.submit(() -> {
+                try {
+                    client = (SSLSocket) socketFactory.createSocket(host, port);
+                } catch (Exception e) {
+                    throw new RuntimeException("Socket creation failed", e);
+                }
+            });
 
-            this.client.setSoTimeout(TIMEOUT_IN_MS);
-            this.client.setTcpNoDelay(true);
-            this.client.setKeepAlive(true);
-            this.client.setSSLParameters(getTLSHeader(dnsHostName));
+            try {
+                // Wait for the socket creation to complete, with a timeout
+                future.get(1500, TimeUnit.MILLISECONDS);
+            } catch (TimeoutException e) {
+                future.cancel(true); // Attempt to interrupt the task
+                throw new Exception("Socket creation timed out", e);
+            } catch (Exception e) {
+                throw new Exception("Socket creation thread interrupted", e);
+            }
 
-            this.input = new DataInputStream(this.client.getInputStream());
-            this.output = new DataOutputStream(this.client.getOutputStream());
-            this.output.flush();
+            configureSocket(dnsHostName);
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-            throw new SocketClientException("Could not create a new connection to the Socket. Host:" + host + ", port:" + port, ex);
+            handleSocketCreationException(ex, host, port);
+        } finally {
+            executor.shutdownNow(); // Ensure the thread is stopped
         }
+    }
+
+    private void configureSocket(String dnsHostName) throws IOException {
+        this.client.setSoTimeout(TIMEOUT_IN_MS);
+        this.client.setTcpNoDelay(true);
+        this.client.setKeepAlive(true);
+        this.client.setSSLParameters(getTLSHeader(dnsHostName));
+
+        this.input = new DataInputStream(this.client.getInputStream());
+        this.output = new DataOutputStream(this.client.getOutputStream());
+        this.output.flush();
+    }
+
+    private void handleSocketCreationException(Exception ex, String host, int port) {
+        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
+        throw new SocketClientException("Could not create a new connection to the Socket. Host:" + host + ", port:" + port, ex);
     }
 
     private SSLParameters getTLSHeader(String dnsHostName) {
