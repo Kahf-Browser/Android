@@ -169,7 +169,9 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.newtab.FocusedViewProvider
+import com.duckduckgo.app.browser.newtab.HistoryQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.newtab.SpaceItemDecoration
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -322,6 +324,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.history.impl.RealNavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -603,6 +606,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var globalData: GlobalData
+
+    @Inject
+    lateinit var historyRepository: RealNavigationHistory
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -4423,15 +4429,15 @@ class BrowserTabFragment :
                 }
             }
 
-            newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-                newBrowserTab.newTabContainerLayout.addView(
-                    newTabPage.getView(requireContext()),
-                    LayoutParams(
-                        LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT,
-                    ),
-                )
-            }.launchIn(lifecycleScope)
+            // newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
+            //     newBrowserTab.newTabContainerLayout.addView(
+            //         newTabPage.getView(requireContext()),
+            //         LayoutParams(
+            //             LayoutParams.MATCH_PARENT,
+            //             LayoutParams.MATCH_PARENT,
+            //         ),
+            //     )
+            // }.launchIn(lifecycleScope)
 
             // App Statistics section
             imageBlockCountDao.getCount()
@@ -4451,6 +4457,45 @@ class BrowserTabFragment :
                 .distinctUntilChanged()
                 .onEach { newBrowserTab.siteBlockCount.setFormattedCount(it) }
                 .launchIn(lifecycleScope)
+
+            // Recent history section
+            lifecycleScope.launch(dispatchers.main()) {
+                historyRepository.getHistorySingle().subscribe(
+                    { historyEntries ->
+                        val uniqueItems = historyEntries.distinctBy { it.url.host }
+
+                        uniqueItems.forEach {
+                            Timber.d("History: ${it.title} ${it.url}")
+                        }
+
+                        newBrowserTab.historyRecyclerView.let { rv->
+                            rv.addItemDecoration(SpaceItemDecoration(resources.getDimensionPixelSize(R.dimen._08dp)))
+                            rv.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                            rv.adapter = HistoryQuickAccessAdapter(
+                                lifecycleOwner = viewLifecycleOwner,
+                                faviconManager = faviconManager,
+                                items = uniqueItems,
+                                onItemClick = {
+                                    viewModel.onUserSubmittedQuery(it.url.toString())
+                                },
+                                onDeleteItem = {
+                                    lifecycleScope.launch(dispatchers.io()) {
+                                        historyRepository.clearEntry(it)
+                                    }
+                                },
+                                onClearAll = {
+                                    lifecycleScope.launch(dispatchers.io()) {
+                                        historyRepository.clearHistory()
+                                    }
+                                },
+                            )
+                        }
+                    },
+                    { e ->
+                        Timber.e(e)
+                    },
+                )
+            }
 
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()

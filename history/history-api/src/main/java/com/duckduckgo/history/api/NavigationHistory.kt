@@ -60,4 +60,6 @@ interface NavigationHistory {
      * @return [Boolean] true if has [HistoryEntry], false if there are no [HistoryEntry]
      */
     suspend fun hasHistory(): Boolean
+
+    suspend fun clearEntry(entry: HistoryEntry)
 }

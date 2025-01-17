@@ -45,6 +45,8 @@ interface HistoryRepository {
     suspend fun clearEntriesOlderThan(dateTime: LocalDateTime)
 
     suspend fun hasHistory(): Boolean
+
+    suspend fun clearEntry(entry: HistoryEntry)
 }
 
 class RealHistoryRepository(
@@ -127,6 +129,15 @@ class RealHistoryRepository(
         return withContext(dispatcherProvider.io()) {
             (cachedHistoryEntries ?: fetchAndCacheHistoryEntries()).let {
                 it.isNotEmpty()
+            }
+        }
+    }
+
+    override suspend fun clearEntry(entry: HistoryEntry) {
+        withContext(dispatcherProvider.io()) {
+            historyDao.getHistoryEntryByUrl(entry.url.toString())?.let {
+                historyDao.delete(it)
+                fetchAndCacheHistoryEntries()
             }
         }
     }

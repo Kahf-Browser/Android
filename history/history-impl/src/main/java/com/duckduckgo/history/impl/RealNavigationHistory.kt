@@ -82,4 +82,8 @@ class RealNavigationHistory @Inject constructor(
     override suspend fun hasHistory(): Boolean {
         return historyRepository.hasHistory()
     }
+
+    override suspend fun clearEntry(entry: HistoryEntry) {
+        return historyRepository.clearEntry(entry)
+    }
 }
