@@ -1,11 +1,15 @@
 package com.duckduckgo.app.browser.newtab
 
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.databinding.ItemHistoryEntryBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
@@ -17,25 +21,36 @@ import kotlinx.coroutines.launch
 class HistoryQuickAccessAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val faviconManager: FaviconManager,
-    private var items: List<HistoryEntry> = emptyList(),
     private val onItemClick: (HistoryEntry) -> Unit,
     private val onDeleteItem: (HistoryEntry) -> Unit,
     private val onClearAll: () -> Unit,
-) : RecyclerView.Adapter<HistoryQuickAccessViewHolder>() {
+) : ListAdapter<HistoryEntry, HistoryQuickAccessViewHolder>(HistoryDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryQuickAccessViewHolder {
         val binding = ItemHistoryEntryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return HistoryQuickAccessViewHolder(binding, faviconManager, lifecycleOwner, onDeleteItem, onClearAll)
     }
 
-    override fun getItemCount(): Int {
-        return items.size
-    }
-
     override fun onBindViewHolder(holder: HistoryQuickAccessViewHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position)
         holder.bind(item)
         holder.itemView.setOnClickListener { onItemClick(item) }
+    }
+}
+
+private class HistoryDiffCallback : DiffUtil.ItemCallback<HistoryEntry>() {
+    override fun areItemsTheSame(
+        oldItem: HistoryEntry,
+        newItem: HistoryEntry,
+    ): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(
+        oldItem: HistoryEntry,
+        newItem: HistoryEntry,
+    ): Boolean {
+        return oldItem == newItem
     }
 }
 

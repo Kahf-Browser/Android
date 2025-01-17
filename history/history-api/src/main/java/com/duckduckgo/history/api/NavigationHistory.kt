@@ -17,6 +17,7 @@
 package com.duckduckgo.history.api
 
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 interface NavigationHistory {
 
@@ -34,6 +35,8 @@ interface NavigationHistory {
      */
     @Deprecated("RxJava is deprecated, except for Auto-Complete")
     fun getHistorySingle(): Single<List<HistoryEntry>>
+
+    fun getHistoryFlow(): Flow<List<HistoryEntry>>
 
     /**
      * Clears all history entries.

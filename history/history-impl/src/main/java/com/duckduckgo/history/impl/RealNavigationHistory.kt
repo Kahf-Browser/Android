@@ -25,6 +25,7 @@ import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.history.impl.remoteconfig.HistoryFeature
 import com.squareup.anvil.annotations.ContributesBinding
 import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import kotlinx.coroutines.runBlocking
 
@@ -57,6 +58,10 @@ class RealNavigationHistory @Inject constructor(
     override fun getHistorySingle(): Single<List<HistoryEntry>> {
         val isHistoryUserEnabled = runBlocking(dispatcherProvider.io()) { isHistoryUserEnabled() }
         return if (isHistoryFeatureAvailable() && isHistoryUserEnabled) historyRepository.getHistoryObservable() else Single.just(emptyList())
+    }
+
+    override fun getHistoryFlow(): Flow<List<HistoryEntry>> {
+        return historyRepository.getHistoryFlow()
     }
 
     override suspend fun clearHistory() {

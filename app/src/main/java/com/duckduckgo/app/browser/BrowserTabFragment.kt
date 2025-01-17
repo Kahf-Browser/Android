@@ -4459,43 +4459,38 @@ class BrowserTabFragment :
                 .launchIn(lifecycleScope)
 
             // Recent history section
-            lifecycleScope.launch(dispatchers.main()) {
-                historyRepository.getHistorySingle().subscribe(
-                    { historyEntries ->
-                        val uniqueItems = historyEntries.distinctBy { it.url.host }
+            val historyAdapter = HistoryQuickAccessAdapter(
+                lifecycleOwner = viewLifecycleOwner,
+                faviconManager = faviconManager,
+                onItemClick = {
+                    viewModel.onUserSubmittedQuery(it.url.toString())
+                },
+                onDeleteItem = {
+                    lifecycleScope.launch(dispatchers.io()) {
+                        historyRepository.clearEntry(it)
+                    }
+                },
+                onClearAll = {
+                    lifecycleScope.launch(dispatchers.io()) {
+                        historyRepository.clearHistory()
+                    }
+                },
+            )
 
-                        uniqueItems.forEach {
-                            Timber.d("History: ${it.title} ${it.url}")
-                        }
-
-                        newBrowserTab.historyRecyclerView.let { rv->
-                            rv.addItemDecoration(SpaceItemDecoration(resources.getDimensionPixelSize(R.dimen._08dp)))
-                            rv.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
-                            rv.adapter = HistoryQuickAccessAdapter(
-                                lifecycleOwner = viewLifecycleOwner,
-                                faviconManager = faviconManager,
-                                items = uniqueItems,
-                                onItemClick = {
-                                    viewModel.onUserSubmittedQuery(it.url.toString())
-                                },
-                                onDeleteItem = {
-                                    lifecycleScope.launch(dispatchers.io()) {
-                                        historyRepository.clearEntry(it)
-                                    }
-                                },
-                                onClearAll = {
-                                    lifecycleScope.launch(dispatchers.io()) {
-                                        historyRepository.clearHistory()
-                                    }
-                                },
-                            )
-                        }
-                    },
-                    { e ->
-                        Timber.e(e)
-                    },
-                )
+            newBrowserTab.historyRecyclerView.let { rv->
+                rv.addItemDecoration(SpaceItemDecoration(resources.getDimensionPixelSize(R.dimen._08dp)))
+                rv.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                rv.adapter = historyAdapter
             }
+
+            historyRepository.getHistoryFlow().flowWithLifecycle(lifecycle)
+                .distinctUntilChanged()
+                .onEach {
+                    val uniqueItems = it.distinctBy { it.url.host }
+                    historyAdapter.submitList(uniqueItems)
+                    Timber.d("History updated. Should update UI now. ${uniqueItems.size}")
+                }
+                .launchIn(lifecycleScope)
 
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
