@@ -1,7 +1,5 @@
 package com.duckduckgo.app.browser.newtab
 
-import android.animation.ObjectAnimator
-import android.animation.PropertyValuesHolder
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
@@ -64,11 +62,9 @@ class HistoryQuickAccessViewHolder(
 
     fun bind(item: HistoryEntry) {
         lifecycleOwner.lifecycleScope.launch {
-            faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(
-                url = item.url.toString(),
-                view = binding.historyItemImage,
-                fetchFromRemote = true,
-            )
+            faviconManager.getFaviconFromGlide(item.url)?.let { bitmap ->
+                binding.historyItemImage.setImageBitmap(bitmap)
+            }
         }
         binding.historyItemLabel.text = item.title
 

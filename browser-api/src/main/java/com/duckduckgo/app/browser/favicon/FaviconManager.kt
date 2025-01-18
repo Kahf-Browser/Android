@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser.favicon
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.widget.ImageView
 import java.io.File
 
@@ -75,6 +76,8 @@ interface FaviconManager {
     )
 
     suspend fun deleteAllTemp()
+
+    suspend fun getFaviconFromGlide(uri: Uri): Bitmap?
 
     /**
      * Generates a drawable which can be used as a placeholder for a favicon when a real one cannot be found
