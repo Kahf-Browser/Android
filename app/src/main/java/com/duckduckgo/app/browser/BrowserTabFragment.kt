@@ -298,6 +298,7 @@ import com.duckduckgo.common.ui.view.setFormattedCount
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -1027,18 +1028,24 @@ class BrowserTabFragment :
                     binding = popupBinding,
                     sharedPreferences = sharedPreferences,
                     editor = editor,
-                    onDnsModeChanged = {
-                        val updated = updateDnsSettings(it)
+                    onDnsModeChanged = { dnsLevel ->
+                        val updated = updateDnsSettings(dnsLevel)
                         if (updated) {
-                            dnsResolver.updateDohServerUrl(it)
+                            dnsResolver.updateDohServerUrl(dnsLevel)
                             popupWindow.dismiss()
                             // Just reloading the WebView doesn't work. Relaunch the tab is required.
                             webView?.url?.let { url ->
-                                (requireActivity() as BrowserActivity).relaunchCurrentTab(url)
+                                val uri = Uri.parse(url).buildUpon().clearQuery().apply {
+                                    url.toUri().queryParameterNames.filter { it != AppUrl.ParamKey.SAFE }.forEach {
+                                        appendQueryParameter(it, url.toUri().getQueryParameter(it))
+                                    }
+                                }.build()
+
+                                (requireActivity() as BrowserActivity).relaunchCurrentTab(uri.toString())
                             }
                         }
 
-                        if (it == PrivateDnsLevel.Off) {
+                        if (dnsLevel == PrivateDnsLevel.Off) {
                             analyticsService.logEvent(
                                 AnalyticsEvent.SafeInternetToggled,
                                 mapOf(AnalyticsParam.IsEnabled to "false")
@@ -1046,7 +1053,7 @@ class BrowserTabFragment :
                         } else {
                             analyticsService.logEvent(
                                 AnalyticsEvent.SafeInternetToggled,
-                                mapOf(AnalyticsParam.IsEnabled to "true", AnalyticsParam.Mode to it.name)
+                                mapOf(AnalyticsParam.IsEnabled to "true", AnalyticsParam.Mode to dnsLevel.name)
                             )
                         }
                     },

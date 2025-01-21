@@ -34,6 +34,7 @@ class AppUrl {
 
     object ParamKey {
         const val QUERY = "q"
+        const val SAFE = "safe"
         const val SOURCE = "t"
         const val ATB = "atb"
         const val RETENTION_ATB = "set_atb"

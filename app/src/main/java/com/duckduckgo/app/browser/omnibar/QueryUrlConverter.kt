@@ -52,8 +52,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
         val uriBuilder = Uri.Builder()
             .scheme(https)
             .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
-            .appendQueryParameter("sclient", "mobile-gws-wiz-hp")
-            .appendQueryParameter("safe", "strict")
+            .appendQueryParameter(AppUrl.ParamKey.SAFE, "strict")
             .authority(Url.GOOGLE_HOST)
             .appendPath("search")
 
