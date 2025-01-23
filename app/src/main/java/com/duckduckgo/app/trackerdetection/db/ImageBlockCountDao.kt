@@ -17,8 +17,6 @@
 package com.duckduckgo.app.trackerdetection.db
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
@@ -26,8 +24,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ImageBlockCountDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(count: ImageBlockCount)
+    @Query("INSERT INTO image_block_count (id, count) VALUES (0, 1)")
+    fun insertItemWithIdZero()
 
     @Update
     fun update(count: ImageBlockCount)
@@ -38,8 +36,13 @@ interface ImageBlockCountDao {
     @Query("SELECT COALESCE((SELECT count FROM image_block_count WHERE id = 0), 0)")
     fun getCountSync(): Int
 
+    @Query("SELECT * FROM image_block_count WHERE id = :id")
+    fun hasItemWithId(id: Int): ImageBlockCount?
+
     @Transaction
     fun incrementCount() {
-        update(ImageBlockCount(0, getCountSync() + 1))
+        hasItemWithId(0)?.let {
+            update(ImageBlockCount(0, getCountSync() + 1))
+        } ?: insertItemWithIdZero()
     }
 }

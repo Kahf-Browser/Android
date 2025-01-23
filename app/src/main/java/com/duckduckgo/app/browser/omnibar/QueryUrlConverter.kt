@@ -52,7 +52,10 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
         val uriBuilder = Uri.Builder()
             .scheme(https)
             .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
-            .authority(Url.HOST)
+            .appendQueryParameter("sclient", "mobile-gws-wiz-hp")
+            .appendQueryParameter("safe", "strict")
+            .authority(Url.GOOGLE_HOST)
+            .appendPath("search")
 
         if (vertical != null && majorVerticals.contains(vertical)) {
             uriBuilder.appendQueryParameter(AppUrl.ParamKey.VERTICAL_REWRITE, vertical)

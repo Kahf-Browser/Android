@@ -25,8 +25,11 @@ class AppUrl {
         const val COOKIES = "https://$HOST"
         const val SURVEY_COOKIES = "https://surveys.$HOST"
         const val ABOUT = "https://$HOST/about"
-        const val PIXEL = "https://improving.asil.co"
+        const val PIXEL = "https://improving.kahfbrowser.com"
         const val EMAIL_SEGMENT = "email"
+        // kahf specific urls
+        const val GOOGLE_HOST = "google.com"
+        const val GOOGLE_AUTOSUGG_API = "https://suggestqueries.google.com/complete/search"
     }
 
     object ParamKey {

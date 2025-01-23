@@ -948,4 +948,7 @@
         <item quantity="one">Are you sure you want to delete this folder and %1$d item?</item>
         <item quantity="other">Are you sure you want to delete this folder and %1$d items?</item>
     </plurals>
+
+    <string name="removeFromRecent">Remove from recent</string>
+    <string name="clearAllRecent">Remove all</string>
 </resources>
