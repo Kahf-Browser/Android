@@ -21,6 +21,7 @@ import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
 import com.duckduckgo.app.safegaze.poseDetection.Person
 import com.duckduckgo.app.safegaze.poseDetection.VisualizationUtils
+import io.kahf.video_filter.VideoFilter
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -60,7 +61,8 @@ class SafeGazeJsInterface(
     private val dispatcher: DispatcherProvider,
     private val analytics: AnalyticsService,
     private val onUpdateBlur: (blur: Float) -> Unit,
-    private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?, updateBlurCount: Boolean) -> Unit
+    private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?, updateBlurCount: Boolean) -> Unit,
+    private val onVideoFrameClassified: (result: String?) -> Unit
 ) {
     private val onDeviceModelCachedResults = mutableMapOf<String, String>()
     private val inferenceTimes = mutableListOf<Long>()
@@ -72,6 +74,7 @@ class SafeGazeJsInterface(
     private var paused: AtomicBoolean = AtomicBoolean(false)
     private val gson = Gson()
     private val faceDetector = FaceDetector(context)
+    private val videoDetector = VideoFilter(context, dispatcher)
 
     companion object {
         private const val MAX_INFERENCE_TIME_MS = 2000L
@@ -247,6 +250,21 @@ class SafeGazeJsInterface(
                     addTaskToQueue(uid, imageUrl, imageData)
                 }
             }
+        }
+    }
+
+    @JavascriptInterface
+    fun sendMessageFromWebView(messageType: String, data: String) {
+        when (messageType) {
+            // "detectImg" -> handleImageDetection(data)
+            "detectVideoFrame" -> runVideoDetection(data)
+        }
+    }
+
+    private fun runVideoDetection(frameData: String) {
+        CoroutineScope(dispatcher.io()).launch {
+            val result = videoDetector.detectVideoFrame(frameData)
+            onVideoFrameClassified(result)
         }
     }
 
