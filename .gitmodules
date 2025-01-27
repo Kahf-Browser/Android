@@ -4,3 +4,6 @@
 [submodule "submodules/privacy-grade"]
 	path = submodules/privacy-grade
 	url = https://github.com/duckduckgo/privacy-grade
+[submodule "video-filter."]
+	path = video-filter.
+	url = https://github.com/Kahf-Browser/private.git
