@@ -413,7 +413,7 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         url: String?
     ) {
-        val contentJs = readAssetFile(context.assets, "video_blur.js")
+        val contentJs = readAssetFile(context.assets, "video_filter.js")
         webView.evaluateJavascript(contentJs, null)
     }
 

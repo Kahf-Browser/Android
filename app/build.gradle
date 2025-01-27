@@ -355,7 +355,7 @@ dependencies {
     implementation project(':survey-api')
     implementation project(':survey-impl')
 
-    implementation project(":video-filter")
+    implementation project(":video_filters")
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
