@@ -4493,8 +4493,9 @@ class BrowserTabFragment :
             historyRepository.getHistoryFlow().flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
                 .onEach {
-                    val uniqueItems = it.distinctBy { it.url.host }
+                    val uniqueItems = it.distinctBy { history -> history.url.host }
                     historyAdapter.submitList(uniqueItems)
+                    newBrowserTab.historyRecyclerView.isVisible = uniqueItems.isNotEmpty()
                     Timber.d("History updated. Should update UI now. ${uniqueItems.size}")
                 }
                 .launchIn(lifecycleScope)

@@ -44,14 +44,15 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <com.duckduckgo.common.ui.view.text.DaxTextView
+    <TextView
         android:id="@+id/historyItemLabel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         app:typography="caption"
         app:textType="secondary"
-        tools:text="Label is long and ling "
+        tools:text="It's a long label"
+        android:textColor="@android:color/white"
         android:gravity="center"
         android:maxLines="2"
         android:paddingHorizontal="3dp"
