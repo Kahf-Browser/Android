@@ -71,7 +71,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/ripple_bottom_oval"
                 android:padding="16dp"
-                android:src="@drawable/ic_backward"
+                android:src="@drawable/ic_arrow_left_24"
                 android:visibility="gone"
                 app:tint="?attr/kahfBottomNavIcon"
                 tools:ignore="ContentDescription" />
@@ -83,7 +83,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/ripple_bottom_oval"
                 android:padding="16dp"
-                android:src="@drawable/ic_forward"
+                android:src="@drawable/ic_arrow_right_24"
                 android:visibility="gone"
                 app:tint="?attr/kahfBottomNavIcon"
                 tools:ignore="ContentDescription" />
