@@ -19,10 +19,10 @@ package com.duckduckgo.common.utils
 const val SAFE_GAZE_JS_URL_DEV = "https://raw.githubusercontent.com/AsilHQ/Android/js_code_dev/node_modules/%40duckduckgo/privacy-dashboard/build/app/safe_gaze_v2.js"
 const val SAFE_GAZE_JS_URL_PROD = "https://raw.githubusercontent.com/AsilHQ/Android/js_code_release/node_modules/%40duckduckgo/privacy-dashboard/build/app/safe_gaze_v2.js"
 const val SAFE_GAZE_JS_FILENAME = "safe_gaze.js"
-const val SAFE_GAZE_BLUR_PROGRESS = "safe_gaze_blur_progress"
+const val SAFE_GAZE_SOLID_COLOR_EFFECT = "safe_gaze_solid_color_effect"
 const val SAFE_GAZE_INTERFACE = "SafeGazeInterface"
 const val SAFE_GAZE_PREFERENCES = "safe_gaze_preferences"
-const val SAFE_GAZE_DEFAULT_BLUR_VALUE = 50
+const val SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT = true
 const val SAFE_GAZE_MIN_FACE_SIZE = 15
 const val SAFE_GAZE_MIN_IMG_SIZE = 45
 const val SAFE_GAZE_MAX_IMG_SIZE= 800
