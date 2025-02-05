@@ -233,11 +233,12 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/switch_safe_gaze">
 
-                        <androidx.appcompat.widget.AppCompatImageView
+                        <com.google.android.material.imageview.ShapeableImageView
                             android:id="@+id/ivBlurGrey"
                             android:layout_width="85dp"
                             android:layout_height="85dp"
-                            android:src="@drawable/blur_grey" />
+                            android:src="@drawable/blur_grey"
+                            app:shapeAppearanceOverlay="@style/roundedImageView"/>
 
                         <ImageView
                             android:id="@+id/ivCheckGrey"
@@ -262,10 +263,11 @@
                         app:layout_constraintEnd_toStartOf="@id/ivBlurGreyContainer"
                         app:layout_constraintTop_toBottomOf="@id/switch_safe_gaze">
 
-                        <androidx.appcompat.widget.AppCompatImageView
+                        <com.google.android.material.imageview.ShapeableImageView
                             android:id="@+id/ivBlurPixelation"
                             android:layout_width="85dp"
                             android:layout_height="85dp"
+                            app:shapeAppearanceOverlay="@style/roundedImageView"
                             android:src="@drawable/blur_pixelation" />
 
                         <ImageView
