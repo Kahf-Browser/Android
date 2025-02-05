@@ -28,7 +28,9 @@ import com.duckduckgo.common.ui.view.scaleIndependentTextSize
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
+import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
+import com.duckduckgo.common.utils.SAFE_GAZE_SOLID_COLOR_EFFECT
 
 class SafeGazePopupHandler(
     private val binding: SafeGazePopupBinding,
@@ -38,7 +40,8 @@ class SafeGazePopupHandler(
     onSafeGazeModeChanged: (mode: SafeGazeLevel) -> Unit,
     onShareClicked: () -> Unit,
     onSupportClicked: () -> Unit,
-    onThemeChanged: () -> Unit
+    onThemeChanged: () -> Unit,
+    onBlurEffectChanged: (pixelation: Boolean) -> Unit,
 ) {
     init {
         var btnHigh: PopupButton? = null
@@ -47,6 +50,7 @@ class SafeGazePopupHandler(
 
         val preSelectedDns: PrivateDnsLevel = PrivateDnsLevel.get(sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT)!!)
         val preSelectedSG: SafeGazeLevel = SafeGazeLevel.get(sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT)!!)
+        val isSolidColorBlur: Boolean = sharedPreferences.getBoolean(SAFE_GAZE_SOLID_COLOR_EFFECT, SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT)
 
         btnHigh = PopupButton(
             binding.btnHigh,
@@ -95,6 +99,21 @@ class SafeGazePopupHandler(
         binding.switchKahdGuard.isChecked = preSelectedDns != PrivateDnsLevel.Off
         binding.switchSafeGaze.isChecked = preSelectedSG != SafeGazeLevel.Off
         binding.privateDnsGroup.isVisible = preSelectedDns != PrivateDnsLevel.Off
+
+        // Set initially selected image blur effect
+        binding.ivCheckGrey.isVisible = isSolidColorBlur == true
+        binding.ivCheckPixelation.isVisible = isSolidColorBlur == false
+
+        binding.ivBlurGreyContainer.setOnClickListener {
+            onBlurEffectChanged(true)
+            binding.ivCheckGrey.isVisible = true
+            binding.ivCheckPixelation.isVisible = false
+        }
+        binding.ivBlurPixelationContainer.setOnClickListener {
+            onBlurEffectChanged(false)
+            binding.ivCheckGrey.isVisible = false
+            binding.ivCheckPixelation.isVisible = true
+        }
 
         // Toggle private dns (Kahf Guard)
         binding.switchKahdGuard.setOnCheckedChangeListener { _, isChecked ->

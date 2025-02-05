@@ -78,9 +78,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
-import com.duckduckgo.common.utils.SAFE_GAZE_BLUR_PROGRESS
+import com.duckduckgo.common.utils.SAFE_GAZE_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
-import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_BLUR_VALUE
+import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
 import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
@@ -372,18 +372,9 @@ class BrowserWebViewClient @Inject constructor(
         val isUrlWhiteListed = safeGazeWhiteList.contains(extractHost(url))
 
         if (SafeGazeLevel.isEnabled(currentMode) && !isUrlWhiteListed) {
-            // Set blur intensity
-            val blurIntensity = sharedPreferences.getInt(SAFE_GAZE_BLUR_PROGRESS, SAFE_GAZE_DEFAULT_BLUR_VALUE).toFloat() / 100f
-            val jsFunction = "window.blurIntensity = $blurIntensity;"
-            webView.evaluateJavascript(jsFunction, null)
-            webView.evaluateJavascript("""
-                window.sendMessage = sendMessage;
-
-                function sendMessage(message) {
-                    console.log(message);
-                    SafeGazeInterface.sendMessage(message);
-                }
-            """.trimIndent(), null)
+            // Set solid color effect. True: Grey masking, False: Pixelation
+            val solidColorEffect = sharedPreferences.getBoolean(SAFE_GAZE_SOLID_COLOR_EFFECT, SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT)
+            webView.evaluateJavascript("window.solidColorEffect = $solidColorEffect", null)
 
             // Run SafeGaze script
             try {

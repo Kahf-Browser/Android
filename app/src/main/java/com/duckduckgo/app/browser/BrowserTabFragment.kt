@@ -304,9 +304,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
-import com.duckduckgo.common.utils.SAFE_GAZE_BLUR_PROGRESS
+import com.duckduckgo.common.utils.SAFE_GAZE_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
-import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_BLUR_VALUE
+import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
 import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
@@ -1011,7 +1011,6 @@ class BrowserTabFragment :
     private fun handleSafeGazePopUp() {
         val popupBinding = SafeGazePopupBinding.inflate(LayoutInflater.from(context))
         val popupWindow = PopupWindow(popupBinding.root, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
-        safeGazeInterface.updateBlur(sharedPreferences.getInt(SAFE_GAZE_BLUR_PROGRESS, SAFE_GAZE_DEFAULT_BLUR_VALUE).toFloat())
 
         safeGazeIcon.setOnClickListener {
             val iconRect = Rect()
@@ -1067,6 +1066,13 @@ class BrowserTabFragment :
                             popupWindow.dismiss()
                             webView?.reload()
                         }
+                    },
+                    onBlurEffectChanged = {
+                        val updated = updateBlurSettings(it)
+                        if (updated) {
+                            webView?.reload()
+                        }
+                        popupWindow.dismiss()
                     },
                     onShareClicked = {
                         val shareIntent = Intent(Intent.ACTION_SEND)
@@ -1137,6 +1143,15 @@ class BrowserTabFragment :
 
         // val safeGazeEnabled = SafeGazeLevel.isEnabled(selection.name)
         editor.putString(SAFE_GAZE_MODE, selection.name).apply()
+        return true
+    }
+
+    private fun updateBlurSettings(isSolidColor: Boolean): Boolean {
+        val currentMode = sharedPreferences.getBoolean(SAFE_GAZE_SOLID_COLOR_EFFECT, SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT)
+        if (currentMode == isSolidColor) {
+            return false
+        }
+        editor.putBoolean(SAFE_GAZE_SOLID_COLOR_EFFECT, isSolidColor).apply()
         return true
     }
 
