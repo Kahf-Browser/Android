@@ -20,11 +20,7 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import androidx.work.WorkQuery
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.safe_gaze.JsDownloadWorker
 import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker
@@ -44,7 +40,6 @@ import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
