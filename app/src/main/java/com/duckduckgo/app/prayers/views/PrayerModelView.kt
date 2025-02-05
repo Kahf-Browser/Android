@@ -89,12 +89,7 @@ class PrayerModelView(
                         }
                         PrayersConstants.NotificationTypes.UNMUTED -> {
                             binding.notificationTypeImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_prayer_unmuted))
-                            NotificationUtils.scheduleNotification(context, "It is prayer time for ${prayerModel.label}", prayerModel.date.time, notificationId)
-                            fragment.saveToSharedPref(notificationId, notificationType)
-                        }
-                        PrayersConstants.NotificationTypes.VOICE_ENABLED -> {
-                            binding.notificationTypeImage.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_prayer_voice_enabled))
-                            NotificationUtils.scheduleNotification(context, "It is prayer time for ${prayerModel.label}", prayerModel.date.time, notificationId)
+                            NotificationUtils.scheduleNotification(context, "It's ${prayerModel.label} time", prayerModel.date.time, notificationId)
                             fragment.saveToSharedPref(notificationId, notificationType)
                         }
                         else -> {}

@@ -5,7 +5,6 @@ class PrayersConstants {
     object NotificationTypes {
         const val MUTED = "MUTED"
         const val UNMUTED = "UNMUTED"
-        const val VOICE_ENABLED = "VOICE_ENABLED"
     }
 
     enum class PrayerTime(val type: String) {

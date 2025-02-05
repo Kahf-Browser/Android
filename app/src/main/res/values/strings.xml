@@ -939,7 +939,7 @@
     <string name="kahf_notification_message">Notification Message (Sound Only)</string>
     <string name="kahf_full_adhan_notification">Full Adhan and Notification</string>
     <string name="kahf_silent">Silent</string>
-    <string name="kahf_no_notification_adhan">No Notification and Adhan</string>
+    <string name="kahf_no_notification_adhan">No Notification</string>
     <string name="kahf_adhan_and_notification">Adhan &amp; Notification</string>
     <string name="kahf_update_location">Update location</string>
     <string name="kahf_location_updated">Location updated</string>

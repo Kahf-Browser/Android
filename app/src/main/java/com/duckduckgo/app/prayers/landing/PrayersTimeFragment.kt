@@ -29,6 +29,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.batoulapps.adhan.CalculationMethod
 import com.batoulapps.adhan.CalculationParameters
@@ -59,6 +60,7 @@ import com.duckduckgo.app.prayers.views.PrayerModelView
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -68,7 +70,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -85,6 +86,13 @@ class PrayersTimeFragment : DuckDuckGoFragment(R.layout.prayers_landing_fragment
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var viewModelFactory: FragmentViewModelFactory
+
+    private val viewModel: PrayerTimeViewModel by lazy {
+        ViewModelProvider(this, viewModelFactory)[PrayerTimeViewModel::class.java]
+    }
 
     private lateinit var binding: PrayersLandingFragmentBinding
     private var prayerModelViews: List<PrayerModelView>? = null
