@@ -69,16 +69,22 @@ class RealSavedSitesImporter(
                 savedSitesParser.parseHtml(document, savedSitesRepository)
             }
 
+            val existingBookmarks = savedSitesRepository.getBookmarksTree()
+
             val bookmarks = savedSites.filterIsInstance<SavedSite.Bookmark>()
             val bookmarksAndFolders = savedSites.filterNot { it is SavedSite.Favorite }
 
             bookmarksAndFolders.map { item ->
                 when (item) {
                     is SavedSite.Bookmark -> {
-                        Pair(
-                            Relation(folderId = item.parentId, entityId = item.id),
-                            Entity(item.id, title = item.title, url = item.url, type = BOOKMARK),
-                        )
+                        if (existingBookmarks.any { it.url == item.url }) {
+                            Pair(null, null)
+                        } else {
+                            Pair(
+                                Relation(folderId = item.parentId, entityId = item.id),
+                                Entity(item.id, title = item.title, url = item.url, type = BOOKMARK),
+                            )
+                        }
                     }
                     is BookmarkFolder -> {
                         Pair(
