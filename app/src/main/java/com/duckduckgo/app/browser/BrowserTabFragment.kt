@@ -119,6 +119,9 @@ import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
+import co.kahf.adsdk.KahfAdConfig
+import co.kahf.adsdk.KahfAdSdk
+import co.kahf.adsdk.KahfSdkConfig
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -304,12 +307,12 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
-import com.duckduckgo.common.utils.SAFE_GAZE_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
 import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
+import com.duckduckgo.common.utils.SAFE_GAZE_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.extensions.dpToPx
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
@@ -901,6 +904,18 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
+    private val kahfSdkConfig = KahfSdkConfig(
+        publisherId = "muslims-day",
+        campaignTypes = "paid|publisher-house|community|house",
+        format = "json"
+    )
+
+    private val kahfAdConfig = KahfAdConfig(
+        adType = "image-320x100",
+        divId = "center-of-home-page",
+        screenName = "home-page",
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called for tabId=$tabId")
@@ -941,6 +956,11 @@ class BrowserTabFragment :
             }
             pendingUploadTask = null
         }
+
+        KahfAdSdk.initialize(
+            requireContext(),
+            kahfSdkConfig
+        )
     }
 
     override fun onDetach() {
@@ -4451,15 +4471,11 @@ class BrowserTabFragment :
                 }
             }
 
-            // newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-            //     newBrowserTab.newTabContainerLayout.addView(
-            //         newTabPage.getView(requireContext()),
-            //         LayoutParams(
-            //             LayoutParams.MATCH_PARENT,
-            //             LayoutParams.MATCH_PARENT,
-            //         ),
-            //     )
-            // }.launchIn(lifecycleScope)
+            // Kahf Ad
+            newBrowserTab.kahfBannerAd?.loadAd(kahfAdConfig)
+            newBrowserTab.kahfBannerAd?.setAdClickListener {
+                viewModel.onUserSubmittedQuery(it)
+            }
 
             // App Statistics section
             imageBlockCountDao.getCount()

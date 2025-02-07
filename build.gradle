@@ -50,6 +50,22 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Muslims-Day/kahf-ad-sdk")
+            credentials {
+                def secretsFile = file("$rootProject.projectDir/gradle-secrets.properties")
+                if (secretsFile.exists()) {
+                    def properties = new Properties()
+                    properties.load(new FileInputStream(secretsFile))
+                    username = properties.getProperty("gpr.user")
+                    password = properties.getProperty("gpr.key")
+                } else {
+                    username = System.getenv("GITHUB_USERNAME")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
+        }
     }
     configurations.all {
         resolutionStrategy.force 'org.objenesis:objenesis:2.6'
