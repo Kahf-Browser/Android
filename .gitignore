@@ -95,3 +95,4 @@ report
 /node_modules/@duckduckgo/content-scope-scripts/build/android/*
 !/node_modules/@duckduckgo/content-scope-scripts/build/android/contentScope.js
 /app/src/main/ml/*.tflite
+/gradle-secrets.properties

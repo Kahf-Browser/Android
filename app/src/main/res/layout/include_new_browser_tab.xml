@@ -188,6 +188,15 @@
 
         </LinearLayout>
 
+        <co.kahf.adsdk.adviews.KahfBannerAdView
+            android:id="@+id/kahfBannerAd"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/keyline_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/textContainer" />
+
         <LinearLayout
             android:id="@+id/textContainer"
             android:layout_width="match_parent"
