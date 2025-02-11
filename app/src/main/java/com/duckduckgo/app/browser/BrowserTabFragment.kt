@@ -905,14 +905,14 @@ class BrowserTabFragment :
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
     private val kahfSdkConfig = KahfSdkConfig(
-        publisherId = "muslims-day",
+        publisherId = "muslims-day-web",
         campaignTypes = "paid|publisher-house|community|house",
         format = "json"
     )
 
     private val kahfAdConfig = KahfAdConfig(
         adType = "image-320x100",
-        divId = "center-of-home-page",
+        divId = "under-saalat-time",
         screenName = "home-page",
     )
 
