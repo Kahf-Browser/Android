@@ -15,6 +15,7 @@ import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import okhttp3.Dns
 import org.xbill.DNS.DClass
 import org.xbill.DNS.Message
@@ -150,7 +151,15 @@ class CustomDnsResolver(
         val queryBytes = query.toWire()
 
         return withContext(dispatcher.io()) {
-            val socketClient = socketHelper.socket
+            val socketClient = try {
+                withTimeout(1900) {
+                    Timber.e("tpLog Trying to get a socket")
+                    socketHelper.socket
+                }
+            } catch (e: Exception) {
+                Timber.e("tpLog Error getting socket: ${e.message}")
+                return@withContext null
+            }
 
             try {
                 val ans = socketClient.execute(queryBytes)

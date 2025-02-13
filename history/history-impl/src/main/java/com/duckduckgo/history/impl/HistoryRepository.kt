@@ -23,11 +23,15 @@ import com.duckduckgo.history.impl.store.HistoryDataStore
 import io.reactivex.Single
 import java.time.LocalDateTime
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 interface HistoryRepository {
     fun getHistoryObservable(): Single<List<HistoryEntry>>
+
+    fun getHistoryFlow(): Flow<List<HistoryEntry>>
 
     suspend fun saveToHistory(
         url: String,
@@ -45,6 +49,8 @@ interface HistoryRepository {
     suspend fun clearEntriesOlderThan(dateTime: LocalDateTime)
 
     suspend fun hasHistory(): Boolean
+
+    suspend fun clearEntry(entry: HistoryEntry)
 }
 
 class RealHistoryRepository(
@@ -69,6 +75,12 @@ class RealHistoryRepository(
                     }
                 }
             }
+        }
+    }
+
+    override fun getHistoryFlow(): Flow<List<HistoryEntry>> {
+        return historyDao.getHistoryEntriesFlow().map { entities ->
+            entities.mapNotNull { i-> i.toHistoryEntry() }
         }
     }
 
@@ -127,6 +139,15 @@ class RealHistoryRepository(
         return withContext(dispatcherProvider.io()) {
             (cachedHistoryEntries ?: fetchAndCacheHistoryEntries()).let {
                 it.isNotEmpty()
+            }
+        }
+    }
+
+    override suspend fun clearEntry(entry: HistoryEntry) {
+        withContext(dispatcherProvider.io()) {
+            historyDao.getHistoryEntryByUrl(entry.url.toString())?.let {
+                historyDao.delete(it)
+                fetchAndCacheHistoryEntries()
             }
         }
     }

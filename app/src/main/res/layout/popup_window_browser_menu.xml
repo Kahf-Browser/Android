@@ -182,12 +182,12 @@
                 app:iconDrawable="@drawable/ic_protections_blocked_16"
                 app:primaryText="@string/enablePrivacyProtection" />
 
-            <com.duckduckgo.common.ui.view.MenuItemView
+            <!--<com.duckduckgo.common.ui.view.MenuItemView
                 android:id="@+id/brokenSiteMenuItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:iconDrawable="@drawable/ic_feedback_16"
-                app:primaryText="@string/brokenSiteReportBrokenSiteMenuItem" />
+                app:primaryText="@string/brokenSiteReportBrokenSiteMenuItem" />-->
 
             <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                 android:id="@+id/settingsMenuDivider"

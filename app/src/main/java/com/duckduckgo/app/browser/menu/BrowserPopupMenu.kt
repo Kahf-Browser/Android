@@ -111,7 +111,7 @@ class BrowserPopupMenu(
             binding.privacyProtectionMenuItem.setIcon(
                 if (viewState.isPrivacyProtectionDisabled) drawable.ic_protections_16 else drawable.ic_protections_blocked_16,
             )
-            binding.brokenSiteMenuItem.isVisible = viewState.canReportSite && !displayedInCustomTabScreen
+            // binding.brokenSiteMenuItem.isVisible = viewState.canReportSite && !displayedInCustomTabScreen
 
             binding.siteOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen
             binding.browserOptionsMenuDivider.isVisible = viewState.browserShowing && !displayedInCustomTabScreen

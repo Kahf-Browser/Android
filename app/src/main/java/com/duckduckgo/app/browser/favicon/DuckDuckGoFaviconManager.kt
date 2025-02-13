@@ -22,6 +22,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.widget.ImageView
 import androidx.core.net.toUri
+import com.bumptech.glide.Glide
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_PERSISTED_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.FAVICON_TEMP_DIR
 import com.duckduckgo.app.browser.favicon.FileBasedFaviconPersister.Companion.NO_SUBFOLDER
@@ -221,6 +222,12 @@ class DuckDuckGoFaviconManager(
         domain: String,
     ): Drawable {
         return generateDefaultDrawable(context, domain, placeholder)
+    }
+
+    override suspend fun getFaviconFromGlide(uri: Uri): Bitmap? {
+        return uri.host?.let {
+            faviconDownloader.getFaviconFromGoogleApi(it)
+        }
     }
 
     private suspend fun saveFavicon(

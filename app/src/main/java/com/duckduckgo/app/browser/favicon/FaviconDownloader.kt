@@ -37,6 +37,8 @@ interface FaviconDownloader {
     ): Bitmap?
 
     suspend fun getFaviconFromUrl(uri: Uri): Bitmap?
+
+    suspend fun getFaviconFromGoogleApi(url: String): Bitmap?
 }
 
 class GlideFaviconDownloader @Inject constructor(
@@ -79,6 +81,22 @@ class GlideFaviconDownloader @Inject constructor(
     }
 
     override suspend fun getFaviconFromUrl(uri: Uri): Bitmap? {
+        return withContext(dispatcherProvider.io()) {
+            return@withContext runCatching {
+                Glide.with(context)
+                    .asBitmap()
+                    .load(uri)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(true)
+                    .submit()
+                    .get()
+            }.getOrNull()
+        }
+    }
+
+    override suspend fun getFaviconFromGoogleApi(url: String): Bitmap? {
+        val uri = Uri.parse("https://www.google.com/s2/favicons?domain=$url&sz=64")
+
         return withContext(dispatcherProvider.io()) {
             return@withContext runCatching {
                 Glide.with(context)

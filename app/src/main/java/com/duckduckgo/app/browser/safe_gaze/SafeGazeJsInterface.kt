@@ -26,6 +26,7 @@ import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SAFE_GAZE_MAX_IMG_SIZE
 import com.duckduckgo.common.utils.SAFE_GAZE_MIN_IMG_SIZE
+import com.duckduckgo.common.utils.extensions.isDataUri
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -59,7 +60,7 @@ class SafeGazeJsInterface(
     private val dispatcher: DispatcherProvider,
     private val analytics: AnalyticsService,
     private val onUpdateBlur: (blur: Float) -> Unit,
-    private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?) -> Unit
+    private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?, updateBlurCount: Boolean) -> Unit
 ) {
     private val onDeviceModelCachedResults = mutableMapOf<String, String>()
     private val inferenceTimes = mutableListOf<Long>()
@@ -218,9 +219,10 @@ class SafeGazeJsInterface(
     fun callSafegazeOnDeviceModelHandler(
         uid: String,
         detectionResultJson: String,
-        base64Image: String?
+        base64Image: String?,
+        updateBlurCount: Boolean
     ) {
-        onImageClassified(uid, detectionResultJson, base64Image)
+        onImageClassified(uid, detectionResultJson, base64Image, updateBlurCount)
     }
 
     @JavascriptInterface
@@ -256,7 +258,8 @@ class SafeGazeJsInterface(
             callSafegazeOnDeviceModelHandler(
                 uid,
                 detectionResultJson = onDeviceModelCachedResults[imageUrl] ?: "null",
-                base64Image = base64Image
+                base64Image = base64Image,
+                false,
             )
         }
     }
@@ -272,7 +275,7 @@ class SafeGazeJsInterface(
         }
         // Skip if image is svg, gif, placeholder
         if (isInvalidImageUrl(url)) {
-            callSafegazeOnDeviceModelHandler(uid, nsfwJson(false), null)
+            callSafegazeOnDeviceModelHandler(uid, nsfwJson(false), null, false)
             return
         }
 
@@ -324,7 +327,7 @@ class SafeGazeJsInterface(
 
                         // If result is null, then timeout occurred. No need to process further or cache the result
                         if (result == null) {
-                            callSafegazeOnDeviceModelHandler(it.uid, "null", "null")
+                            callSafegazeOnDeviceModelHandler(it.uid, "null", "null", false)
                             return@let
                         }
 
@@ -343,17 +346,17 @@ class SafeGazeJsInterface(
                         if (result.base64Image.isNullOrEmpty()) {
                             // Image download failed or image is too small or image is svg/gif
                             resultJson = "null"
-                            callSafegazeOnDeviceModelHandler(it.uid, resultJson, "null")
+                            callSafegazeOnDeviceModelHandler(it.uid, resultJson, "null", false)
 
                             Timber.d("kLog invalid or failed image: -- ${it.url}")
                         } else if (result.persons.isNotEmpty()) {
                             resultJson = VisualizationUtils.toJson(gson, result)
-                            callSafegazeOnDeviceModelHandler(it.uid, resultJson, result.base64Image)
+                            callSafegazeOnDeviceModelHandler(it.uid, resultJson, result.base64Image, result.persons.any { p -> p.isFemale })
 
                             Timber.d("kLog Inference time: $inferenceTime ms -- ${it.url}")
                         } else {
                             resultJson = nsfwJson(result.isNsfw)
-                            callSafegazeOnDeviceModelHandler(it.uid, resultJson, result.base64Image)
+                            callSafegazeOnDeviceModelHandler(it.uid, resultJson, result.base64Image, result.isNsfw)
 
                             Timber.d("kLog Inference time: $inferenceTime ms  --  ${it.url}")
                         }
@@ -361,16 +364,19 @@ class SafeGazeJsInterface(
                         // Insert to local DB
                         onDeviceModelCachedResults[it.url] = resultJson
 
-                        kahfImageBlockedDao.insert(
-                            KahfImageBlocked(
-                                imageUrl = it.url,
-                                responseStr = resultJson,
-                                isIndecent = result.isNsfw || result.persons.any { p -> p.isFemale },
-                                imageWidth = result.imageWidth.toFloat(),
-                                imageHeight = result.imageHeight.toFloat(),
-                                modifiedAt = System.currentTimeMillis()
-                            ),
-                        )
+                        // Don't save data uri images to save space
+                        if (it.url.isDataUri().not()) {
+                            kahfImageBlockedDao.insert(
+                                KahfImageBlocked(
+                                    imageUrl = it.url,
+                                    responseStr = resultJson,
+                                    isIndecent = result.isNsfw || result.persons.any { p -> p.isFemale },
+                                    imageWidth = result.imageWidth.toFloat(),
+                                    imageHeight = result.imageHeight.toFloat(),
+                                    modifiedAt = System.currentTimeMillis()
+                                ),
+                            )
+                        }
                     }
                 }
             }

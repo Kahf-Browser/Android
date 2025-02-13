@@ -59,6 +59,7 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
 
         setContentView(binding.root)
         setupToolbar(binding.includeToolbar.toolbar)
+        setupDescription()
 
         configureUiEventHandlers()
         observeViewModel()
@@ -68,6 +69,13 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
         binding.privateSearchAutocompleteToggle.setOnCheckedChangeListener(autocompleteToggleListener)
         binding.privateSearchAutocompleteRecentlyVisitedSitesToggle.setOnCheckedChangeListener(autocompleteRecentlyVisitedSitesToggleListener)
         binding.privateSearchMoreSearchSettings.setOnClickListener { viewModel.onPrivateSearchMoreSearchSettingsClicked() }
+    }
+
+    private fun setupDescription() {
+        binding.privateSearchMoreSearchSettings.isVisible = false
+        binding.privateSearchHeaderImage.isVisible = false
+        binding.privateSearchTitle.isVisible = false
+        binding.privateSearchDescription.isVisible = false
     }
 
     private fun observeViewModel() {
@@ -115,6 +123,6 @@ class PrivateSearchActivity : DuckDuckGoActivity() {
     }
 
     companion object {
-        private const val DUCKDUCKGO_SETTINGS_WEB_LINK = "https://kahfbrowser.com/settings"
+        private const val DUCKDUCKGO_SETTINGS_WEB_LINK = "https://www.google.com/preferences"
     }
 }

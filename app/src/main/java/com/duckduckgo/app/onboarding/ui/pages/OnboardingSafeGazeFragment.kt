@@ -121,7 +121,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
                 requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatcher, analytics,
                 { _ -> // No op - onUpdateBlur
                 },
-                { _, _, _ -> // No op - onImageClassified
+                { _, _, _, _ -> // No op - onImageClassified
                 },
             )
 

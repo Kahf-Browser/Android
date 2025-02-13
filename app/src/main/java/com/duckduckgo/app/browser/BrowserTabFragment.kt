@@ -169,7 +169,9 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.newtab.FocusedViewProvider
+import com.duckduckgo.app.browser.newtab.HistoryQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
+import com.duckduckgo.app.browser.newtab.SpaceItemDecoration
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -238,6 +240,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.trackerdetection.db.HarmfulSiteBlockedDao
+import com.duckduckgo.app.trackerdetection.db.ImageBlockCountDao
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.widget.AddWidgetLauncher
@@ -321,6 +324,7 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.history.impl.RealNavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
@@ -595,10 +599,16 @@ class BrowserTabFragment :
     lateinit var harmfulSiteBlockedDao: HarmfulSiteBlockedDao
 
     @Inject
+    lateinit var imageBlockCountDao: ImageBlockCountDao
+
+    @Inject
     lateinit var analyticsService: AnalyticsService
 
     @Inject
     lateinit var globalData: GlobalData
+
+    @Inject
+    lateinit var historyRepository: RealNavigationHistory
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -1054,7 +1064,7 @@ class BrowserTabFragment :
                     onShareClicked = {
                         val shareIntent = Intent(Intent.ACTION_SEND)
                         shareIntent.type = "text/plain"
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=org.kahf.browser")
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${requireContext().packageName}")
                         startActivity(Intent.createChooser(shareIntent, "Share via"))
                     },
                     onSupportClicked = {
@@ -1068,7 +1078,7 @@ class BrowserTabFragment :
                 )
 
                 lifecycleScope.launch {
-                    val count = kahfImageBlockedDao.getTotalBlockCount().first()
+                    val count = imageBlockCountDao.getCount().first()
                     popupBinding.imageBlurCount.setFormattedCount(count)
 
                     val siteBlockCount = harmfulSiteBlockedDao.getTotalBlockCount().first()
@@ -2550,12 +2560,22 @@ class BrowserTabFragment :
                 viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 if (hasFocus) {
+                    // show the full url
+                    omnibar.omnibarTextInput.setText(viewModel.omnibarViewState.value?.omnibarText ?: "")
+
                     cancelPendingAutofillRequestsToChooseCredentials()
                     omnibar.omniBarContainer.isPressed = true
                 } else {
                     omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
                     omnibar.omniBarContainer.isPressed = false
+
+                    // show the domain name only
+                    viewModel.getOmnibarDomain().let {
+                        if (it.isNotBlank()) {
+                            omnibar.omnibarTextInput.setText(it)
+                        }
+                    }
                 }
             }
 
@@ -2616,10 +2636,14 @@ class BrowserTabFragment :
                         webView?.evaluateJavascript(jsFunction, null)
                     }
                 },
-                onImageClassified = { uid, detectionResultJson, base64Image ->
+                onImageClassified = { uid, detectionResultJson, base64Image, updateBlurCount ->
                     val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson', `$base64Image`);"
                     webView?.post {
                         webView?.evaluateJavascript(jsFunctionCall, null)
+                    }
+
+                    if (updateBlurCount) {
+                        imageBlockCountDao.incrementCount()
                     }
 
                     if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0 && genderDetector.modelInitializationTime > 0 && poseDetector.modelInitializationTime() > 0) {
@@ -3853,10 +3877,10 @@ class BrowserTabFragment :
                     viewModel.onFindInPageSelected()
                 }
                 onMenuItemClicked(menuBinding.privacyProtectionMenuItem) { viewModel.onPrivacyProtectionMenuClicked(isActiveCustomTab()) }
-                onMenuItemClicked(menuBinding.brokenSiteMenuItem) {
+                /*onMenuItemClicked(menuBinding.brokenSiteMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_REPORT_BROKEN_SITE_PRESSED)
                     viewModel.onBrokenSiteSelected()
-                }
+                }*/
                 onMenuItemClicked(menuBinding.downloadsMenuItem) {
                     pixel.fire(AppPixelName.MENU_ACTION_DOWNLOADS_PRESSED)
                     browserActivity?.launchDownloads()
@@ -4018,7 +4042,8 @@ class BrowserTabFragment :
                 }
 
                 if (shouldUpdateOmnibarTextInput(viewState, viewState.omnibarText)) {
-                    omnibar.omnibarTextInput.setText(viewState.omnibarText)
+                    // show the domain name only
+                    omnibar.omnibarTextInput.setText(viewModel.getOmnibarDomain(url = viewState.omnibarText))
                     if (viewState.forceExpand) {
                         omnibar.appBarLayout.setExpanded(true, true)
                         bottomNav.botNav.showIt()
@@ -4404,18 +4429,18 @@ class BrowserTabFragment :
                 }
             }
 
-            newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
-                newBrowserTab.newTabContainerLayout.addView(
-                    newTabPage.getView(requireContext()),
-                    LayoutParams(
-                        LayoutParams.MATCH_PARENT,
-                        LayoutParams.MATCH_PARENT,
-                    ),
-                )
-            }.launchIn(lifecycleScope)
+            // newTabPageProvider.provideNewTabPageVersion().onEach { newTabPage ->
+            //     newBrowserTab.newTabContainerLayout.addView(
+            //         newTabPage.getView(requireContext()),
+            //         LayoutParams(
+            //             LayoutParams.MATCH_PARENT,
+            //             LayoutParams.MATCH_PARENT,
+            //         ),
+            //     )
+            // }.launchIn(lifecycleScope)
 
             // App Statistics section
-            kahfImageBlockedDao.getTotalBlockCount()
+            imageBlockCountDao.getCount()
                 .flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
                 .onEach { newBrowserTab.imageBlockedCount.setFormattedCount(it) }
@@ -4431,6 +4456,40 @@ class BrowserTabFragment :
                 .flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
                 .onEach { newBrowserTab.siteBlockCount.setFormattedCount(it) }
+                .launchIn(lifecycleScope)
+
+            // Recent history section
+            val historyAdapter = HistoryQuickAccessAdapter(
+                lifecycleOwner = viewLifecycleOwner,
+                faviconManager = faviconManager,
+                onItemClick = {
+                    viewModel.onUserSubmittedQuery(it.url.toString())
+                },
+                onDeleteItem = {
+                    lifecycleScope.launch(dispatchers.io()) {
+                        historyRepository.clearEntry(it)
+                    }
+                },
+                onClearAll = {
+                    lifecycleScope.launch(dispatchers.io()) {
+                        historyRepository.clearHistory()
+                    }
+                },
+            )
+
+            newBrowserTab.historyRecyclerView.let { rv->
+                rv.addItemDecoration(SpaceItemDecoration(resources.getDimensionPixelSize(R.dimen._08dp)))
+                rv.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                rv.adapter = historyAdapter
+            }
+
+            historyRepository.getHistoryFlow().flowWithLifecycle(lifecycle)
+                .distinctUntilChanged()
+                .onEach {
+                    val uniqueItems = it.distinctBy { it.url.host }
+                    historyAdapter.submitList(uniqueItems)
+                    Timber.d("History updated. Should update UI now. ${uniqueItems.size}")
+                }
                 .launchIn(lifecycleScope)
 
             newBrowserTab.newTabContainerLayout.show()

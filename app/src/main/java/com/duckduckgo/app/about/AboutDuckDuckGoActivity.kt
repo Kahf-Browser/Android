@@ -139,7 +139,7 @@ class AboutDuckDuckGoActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val ABOUT_US_URL = "https://kahfbrowser.com/about/"
-        private const val PRIVACY_POLICY_WEB_LINK = "https://asil.co/privacy"
-        private const val PRIVACY_PROTECTIONS_WEB_LINK = "https://asil.co/asil-help-pages/privacy/web-tracking-protections/"
+        private const val PRIVACY_POLICY_WEB_LINK = "https://kahfbrowser.com/privacy"
+        private const val PRIVACY_PROTECTIONS_WEB_LINK = "https://kahfbrowser.com/privacy/web-tracking-protections/"
     }
 }

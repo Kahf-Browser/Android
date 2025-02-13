@@ -226,6 +226,20 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/historyRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:layout_marginVertical="5dp"
+                android:paddingHorizontal="@dimen/keyline_2"
+                tools:itemCount="7"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                tools:listitem="@layout/item_history_entry" />
+
         </LinearLayout>
 
         <include

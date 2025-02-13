@@ -103,4 +103,7 @@ object DaoModule {
 
     @Provides
     fun harmfulSiteBlockedDao(database: AppDatabase) = database.harmfulSiteBlockedDao()
+
+    @Provides
+    fun imageBlockCountDao(database: AppDatabase) = database.imageBlockCountDao()
 }

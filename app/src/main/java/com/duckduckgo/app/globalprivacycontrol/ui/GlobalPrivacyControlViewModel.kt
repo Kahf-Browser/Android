@@ -80,6 +80,6 @@ class GlobalPrivacyControlViewModel @Inject constructor(
     }
 
     companion object {
-        const val LEARN_MORE_URL = "https://asil.co/asil-help-pages/privacy/gpc/"
+        const val LEARN_MORE_URL = "https://kahfbrowser.com/privacy/gpc/"
     }
 }
