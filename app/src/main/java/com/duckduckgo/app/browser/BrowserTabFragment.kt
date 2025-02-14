@@ -4468,6 +4468,10 @@ class BrowserTabFragment :
                     photoCredit.setOnClickListener {
                         viewModel.onUserSubmittedQuery(data.url)
                     }
+
+                    title.isVisible = data.title.isNotEmpty()
+                    subtitle.isVisible = data.subtitle.isNotEmpty()
+                    photoCredit.isVisible = data.credit.isNotEmpty()
                 }
             }
 
