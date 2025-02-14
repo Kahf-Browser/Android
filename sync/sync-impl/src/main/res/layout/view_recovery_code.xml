@@ -258,7 +258,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:srcCompat="@drawable/ic_dax_stacked"
+        app:srcCompat="@drawable/ic_dax_icon"
         android:layout_gravity="center_horizontal"
         tools:ignore="ContentDescription"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

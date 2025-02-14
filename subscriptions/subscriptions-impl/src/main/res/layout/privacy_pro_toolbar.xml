@@ -36,7 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                app:srcCompat="@drawable/ic_subs_toolbar_logo"/>
+                app:srcCompat="@drawable/ic_dax_icon"/>
         <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/titleToolbar"
                 android:layout_width="wrap_content"

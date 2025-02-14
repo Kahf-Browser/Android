@@ -74,7 +74,7 @@ fun RemoteMessage.asMessage(): Message {
 private fun Placeholder.drawable(): Int {
     return when (this) {
         ANNOUNCE -> R.drawable.ic_announce
-        DDG_ANNOUNCE -> R.drawable.ic_ddg_announce
+        DDG_ANNOUNCE -> R.drawable.ic_dax_icon
         CRITICAL_UPDATE -> R.drawable.ic_critical_update
         APP_UPDATE -> R.drawable.ic_app_update
         MAC_AND_WINDOWS -> R.drawable.desktop_promo_artwork
