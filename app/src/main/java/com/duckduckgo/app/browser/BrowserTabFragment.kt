@@ -911,7 +911,7 @@ class BrowserTabFragment :
     )
 
     private val kahfAdConfig = KahfAdConfig(
-        adType = "image-320x100",
+        adType = "image-640x200",
         divId = "under-saalat-time",
         screenName = "home-page",
     )
