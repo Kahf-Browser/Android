@@ -1701,8 +1701,8 @@ class BrowserTabFragment :
                 viewModel.onDeleteSavedSiteSnackbarDismissed(it)
             }
 
-            is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
-            is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
+            // is Command.ShowFireproofWebSiteConfirmation -> fireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
+            // is Command.DeleteFireproofConfirmation -> removeFireproofWebsiteConfirmation(it.fireproofWebsiteEntity)
             is Command.ShowPrivacyProtectionEnabledConfirmation -> privacyProtectionEnabledConfirmation(it.domain)
             is Command.ShowPrivacyProtectionDisabledConfirmation -> privacyProtectionDisabledConfirmation(it.domain)
             is NavigationCommand.Navigate -> {
@@ -1838,8 +1838,8 @@ class BrowserTabFragment :
             is Command.RequestSystemLocationPermission -> requestLocationPermissions()
             is Command.AskDomainPermission -> askSiteLocationPermission(it.locationPermission)
             is Command.RefreshUserAgent -> refreshUserAgent(it.url, it.isDesktop)
-            is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
-            is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
+            // is Command.AskToFireproofWebsite -> askToFireproofWebsite(requireContext(), it.fireproofWebsite)
+            // is Command.AskToAutomateFireproofWebsite -> askToAutomateFireproofWebsite(requireContext(), it.fireproofWebsite)
             is Command.AskToDisableLoginDetection -> askToDisableLoginDetection(requireContext())
             is Command.ShowDomainHasPermissionMessage -> showDomainHasLocationPermission(it.domain)
             is Command.ConvertBlobToDataUri -> convertBlobToDataUri(it)
