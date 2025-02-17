@@ -1064,24 +1064,23 @@ class BrowserTabFragment :
                             }
                         }
 
-                        if (dnsLevel == PrivateDnsLevel.Off) {
-                            analyticsService.logEvent(
-                                AnalyticsEvent.SafeInternetToggled,
-                                mapOf(AnalyticsParam.IsEnabled to "false")
-                            )
-                        } else {
-                            analyticsService.logEvent(
-                                AnalyticsEvent.SafeInternetToggled,
-                                mapOf(AnalyticsParam.IsEnabled to "true", AnalyticsParam.Mode to dnsLevel.name)
-                            )
-                        }
+                        analyticsService.logEvent(
+                            when (dnsLevel) {
+                                PrivateDnsLevel.High -> AnalyticsEvent.PrivateDnsHigh
+                                PrivateDnsLevel.Medium -> AnalyticsEvent.PrivateDnsMedium
+                                PrivateDnsLevel.Low -> AnalyticsEvent.PrivateDnsLow
+                                PrivateDnsLevel.Off -> AnalyticsEvent.PrivateDnsDisable
+                            }
+                        )
                     },
                     onSafeGazeModeChanged = {
                         val updated = updateSafeGazeSettings(it)
                         if (updated) {
                             analyticsService.logEvent(
-                                AnalyticsEvent.DecentInternetToggled,
-                                mapOf(AnalyticsParam.IsEnabled to (it != SafeGazeLevel.Off).toString())
+                                when (it) {
+                                    SafeGazeLevel.Off -> AnalyticsEvent.ImageFilerDisable
+                                    else -> AnalyticsEvent.ImageFilerEnable
+                                }
                             )
                             popupWindow.dismiss()
                             webView?.reload()

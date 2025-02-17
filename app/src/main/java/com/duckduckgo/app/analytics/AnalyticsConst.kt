@@ -20,9 +20,17 @@ sealed class AnalyticsEvent(val name: String) {
     data object NewTabOpened : AnalyticsEvent("new_tab_opened")
     data object PageBlocked : AnalyticsEvent("page_blocked")
     data object SettingsClicked : AnalyticsEvent("settings_clicked")
-    data object SafeInternetToggled : AnalyticsEvent("safe_internet_toggled")
-    data object DecentInternetToggled : AnalyticsEvent("decent_internet_toggled")
     data object PrayerTimeOpened : AnalyticsEvent("prayer_time_opened")
+
+    // Private DNS (Safe Internet)
+    data object PrivateDnsDisable : AnalyticsEvent("private_dns_disable")
+    data object PrivateDnsHigh : AnalyticsEvent("private_dns_high")
+    data object PrivateDnsMedium : AnalyticsEvent("private_dns_medium")
+    data object PrivateDnsLow : AnalyticsEvent("private_dns_low")
+
+    // Image Filter (Decent Internet)
+    data object ImageFilerEnable : AnalyticsEvent("image_filter_enable")
+    data object ImageFilerDisable : AnalyticsEvent("image_filter_disable")
     data object P90ImageProcessing : AnalyticsEvent("p90_image_processing")
     data object P90DnsResolution : AnalyticsEvent("p90_dns_resolution")
     data object AvgQueueTime : AnalyticsEvent("avg_queue_time")
@@ -47,8 +55,6 @@ sealed class AnalyticsEvent(val name: String) {
 sealed class AnalyticsParam(val name: String) {
     data object Url : AnalyticsParam("url")
     data object TimedOutImageUrl : AnalyticsParam("timed_out_image_url")
-    data object IsEnabled : AnalyticsParam("enabled")
-    data object Mode : AnalyticsParam("safe_internet_mode")
     data object DnsResolutionTime : AnalyticsParam("dns_resolution_time_ms")
     data object ImageProcessingTime : AnalyticsParam("image_processing_time_ms")
     data object AvgQueueTimeMs : AnalyticsParam("avg_queue_time_ms")
