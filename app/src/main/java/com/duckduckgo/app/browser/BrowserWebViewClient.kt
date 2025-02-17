@@ -66,10 +66,10 @@ import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
-import com.duckduckgo.app.kahftube.PrivateDnsLevel
-import com.duckduckgo.app.kahftube.SafeGazeLevel
 import com.duckduckgo.app.kahftube.SharedPreferenceManager
 import com.duckduckgo.app.kahftube.SharedPreferenceManager.KeyString
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
+import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill

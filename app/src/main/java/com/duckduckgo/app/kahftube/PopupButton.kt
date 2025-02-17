@@ -21,45 +21,12 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafegazeButtonBinding
-import com.duckduckgo.app.kahftube.PrivateDnsLevel.High
-import com.duckduckgo.app.kahftube.PrivateDnsLevel.Low
-import com.duckduckgo.app.kahftube.PrivateDnsLevel.Medium
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel.High
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel.Low
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel.Medium
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
-
-sealed class PrivateDnsLevel(val name: String, val url: String, val dnsServerIps: Array<String>) {
-    data object High : PrivateDnsLevel("High", "high.kahfguard.com", arrayOf("51.142.0.101", "51.142.0.102"))
-    data object Medium : PrivateDnsLevel("Medium", "medium.kahfguard.com", arrayOf("51.142.0.99", "51.142.0.100"))
-    data object Low : PrivateDnsLevel("Low", "low.kahfguard.com", arrayOf("51.142.0.97", "51.142.0.98"))
-    data object Off : PrivateDnsLevel("Off", "dns.google", arrayOf("8.8.8.8", "8.8.4.4"))
-
-    companion object {
-        fun get(name: String) = when (name) {
-            "High" -> High
-            "Medium" -> Medium
-            "Low" -> Low
-            else -> Off
-        }
-
-        fun isEnabled(name: String) = get(name) != Off
-    }
-}
-
-sealed class SafeGazeLevel(val name: String) {
-    data object FullImage : SafeGazeLevel("FullImage")
-    data object HumanOnly : SafeGazeLevel("HumanOnly")
-    data object Off : SafeGazeLevel("Off")
-
-    companion object {
-        fun get(name: String) = when (name) {
-            "FullImage" -> FullImage
-            "HumanOnly" -> HumanOnly
-            else -> Off
-        }
-
-        fun isEnabled(name: String) = get(name) != Off
-    }
-}
 
 class PopupButton(
     private val binding: SafegazeButtonBinding,

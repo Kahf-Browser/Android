@@ -6,7 +6,7 @@ import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.dns.socket_pool.SocketHelper
-import com.duckduckgo.app.kahftube.PrivateDnsLevel
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_IP
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL

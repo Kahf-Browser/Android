@@ -24,6 +24,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
+import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
