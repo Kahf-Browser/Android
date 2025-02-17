@@ -30,9 +30,7 @@ import com.duckduckgo.common.ui.view.scaleIndependentTextSize
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
-import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
-import com.duckduckgo.common.utils.SAFE_GAZE_SOLID_COLOR_EFFECT
 
 class SafeGazePopupHandler(
     private val binding: SafeGazePopupBinding,
@@ -43,16 +41,15 @@ class SafeGazePopupHandler(
     onShareClicked: () -> Unit,
     onSupportClicked: () -> Unit,
     onThemeChanged: () -> Unit,
-    onBlurEffectChanged: (pixelation: Boolean) -> Unit,
+    onBlurEffectChanged: (sgLevel: SafeGazeLevel) -> Unit,
 ) {
     init {
         var btnHigh: PopupButton? = null
         var btnMed: PopupButton? = null
         var btnLow: PopupButton? = null
 
-        val preSelectedDns: PrivateDnsLevel = PrivateDnsLevel.get(sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT)!!)
-        val preSelectedSG: SafeGazeLevel = SafeGazeLevel.get(sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT)!!)
-        val isSolidColorBlur: Boolean = sharedPreferences.getBoolean(SAFE_GAZE_SOLID_COLOR_EFFECT, SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT)
+        val preSelectedDns: PrivateDnsLevel = PrivateDnsLevel.get(sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: "")
+        val preSelectedSG: SafeGazeLevel = SafeGazeLevel.get(sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: "")
 
         btnHigh = PopupButton(
             binding.btnHigh,
@@ -103,16 +100,16 @@ class SafeGazePopupHandler(
         binding.privateDnsGroup.isVisible = preSelectedDns != PrivateDnsLevel.Off
 
         // Set initially selected image blur effect
-        binding.ivCheckGrey.isVisible = isSolidColorBlur == true
-        binding.ivCheckPixelation.isVisible = isSolidColorBlur == false
+        binding.ivCheckGrey.isVisible = preSelectedSG == SafeGazeLevel.Blur
+        binding.ivCheckPixelation.isVisible = preSelectedSG == SafeGazeLevel.Pixelation
 
         binding.ivBlurGreyContainer.setOnClickListener {
-            onBlurEffectChanged(true)
+            onBlurEffectChanged(SafeGazeLevel.Blur)
             binding.ivCheckGrey.isVisible = true
             binding.ivCheckPixelation.isVisible = false
         }
         binding.ivBlurPixelationContainer.setOnClickListener {
-            onBlurEffectChanged(false)
+            onBlurEffectChanged(SafeGazeLevel.Pixelation)
             binding.ivCheckGrey.isVisible = false
             binding.ivCheckPixelation.isVisible = true
         }
@@ -131,7 +128,7 @@ class SafeGazePopupHandler(
         // Toggle image blur (Safe Gaze)
         binding.switchSafeGaze.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                onSafeGazeModeChanged(SafeGazeLevel.FullImage)
+                onSafeGazeModeChanged(SafeGazeLevel.Pixelation)
             } else {
                 onSafeGazeModeChanged(SafeGazeLevel.Off)
             }

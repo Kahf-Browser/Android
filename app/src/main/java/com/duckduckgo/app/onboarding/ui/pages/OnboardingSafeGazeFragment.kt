@@ -168,7 +168,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
     private fun onEnableSafeGazeClicked() {
         val preferences = requireContext().getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
-        preferences.edit().putString(SAFE_GAZE_MODE, SafeGazeLevel.FullImage.name).apply()
+        preferences.edit().putString(SAFE_GAZE_MODE, SafeGazeLevel.Pixelation.name).apply()
 
         (requireActivity() as KahfOnboardingActivity).onContinueClicked()
     }

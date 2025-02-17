@@ -308,11 +308,9 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
-import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
 import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
-import com.duckduckgo.common.utils.SAFE_GAZE_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.extensions.dpToPx
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
@@ -1165,12 +1163,12 @@ class BrowserTabFragment :
         return true
     }
 
-    private fun updateBlurSettings(isSolidColor: Boolean): Boolean {
-        val currentMode = sharedPreferences.getBoolean(SAFE_GAZE_SOLID_COLOR_EFFECT, SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT)
-        if (currentMode == isSolidColor) {
+    private fun updateBlurSettings(selectedSgLevel: SafeGazeLevel): Boolean {
+        val currentSgLevel: SafeGazeLevel = SafeGazeLevel.get(sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: "")
+        if (selectedSgLevel == currentSgLevel) {
             return false
         }
-        editor.putBoolean(SAFE_GAZE_SOLID_COLOR_EFFECT, isSolidColor).apply()
+        editor.putString(SAFE_GAZE_MODE, selectedSgLevel.name).apply()
         return true
     }
 

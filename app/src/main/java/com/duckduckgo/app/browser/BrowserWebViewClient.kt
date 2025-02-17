@@ -82,9 +82,7 @@ import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
 import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
 import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
-import com.duckduckgo.common.utils.SAFE_GAZE_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
-import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT
 import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
 import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
 import com.duckduckgo.common.utils.extensions.isDataUri
@@ -377,9 +375,8 @@ class BrowserWebViewClient @Inject constructor(
         val isUrlWhiteListed = safeGazeWhiteList.contains(extractHost(url))
 
         if (SafeGazeLevel.isEnabled(currentMode) && !isUrlWhiteListed) {
-            // Set solid color effect. True: Grey masking, False: Pixelation
-            val solidColorEffect = sharedPreferences.getBoolean(SAFE_GAZE_SOLID_COLOR_EFFECT, SAFE_GAZE_DEFAULT_SOLID_COLOR_EFFECT)
-            webView.evaluateJavascript("window.solidColorEffect = $solidColorEffect", null)
+            val sgLevel: SafeGazeLevel = SafeGazeLevel.get(sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: "")
+            webView.evaluateJavascript("window.solidColorEffect = ${sgLevel == SafeGazeLevel.Blur}", null)
 
             // Run SafeGaze script
             try {
