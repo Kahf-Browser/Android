@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.di
 
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import androidx.room.Room
 import androidx.work.WorkManager
@@ -99,11 +98,11 @@ import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
 import com.duckduckgo.app.trackerdetection.TrackerDetector
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.customtabs.api.CustomTabDetector
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.impl.AndroidFileDownloader
@@ -376,10 +375,10 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun providesDnsResolver(
         dispatcherProvider: DispatcherProvider,
-        sharedPreferences: SharedPreferences,
+        sharedPreferences: SharedPreferencesProvider,
         analyticsService: AnalyticsService
     ): CustomDnsResolver {
-        return CustomDnsResolver(dispatcherProvider, analyticsService, sharedPreferences)
+        return CustomDnsResolver(dispatcherProvider, analyticsService, sharedPreferences.getKahfSharedPreferences())
     }
 
     @Provides
@@ -400,12 +399,6 @@ class BrowserModule {
         return MoveNetMultiPose.create(context, Type.Dynamic).apply {
             setTracker(BOUNDING_BOX)
         }
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providesKahfSharedPreference(context: Context): SharedPreferences {
-        return context.getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
     }
 
     @Provides

@@ -212,6 +212,7 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.SiteFactory
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.global.model.domainMatchesUrl
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
 import com.duckduckgo.app.location.GeoLocationPermissions
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.location.data.LocationPermissionsRepository
@@ -261,6 +262,7 @@ import com.duckduckgo.common.utils.extensions.isDataUri
 import com.duckduckgo.common.utils.extensions.md5
 import com.duckduckgo.common.utils.isMobileSite
 import com.duckduckgo.common.utils.toDesktopUri
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DownloadCommand
 import com.duckduckgo.downloads.api.DownloadStateListener
@@ -394,6 +396,7 @@ class BrowserTabViewModel @Inject constructor(
     private val dnsResolver: CustomDnsResolver,
     private val harmfulSiteBlockedDao: HarmfulSiteBlockedDao,
     private val analyticsService: AnalyticsService,
+    private val spProvider: SharedPreferencesProvider,
 ) : WebViewClientListener,
     EditSavedSiteListener,
     DeleteBookmarkListener,
@@ -917,7 +920,12 @@ class BrowserTabViewModel @Inject constructor(
         }
 
         val verticalParameter = extractVerticalParameter(url)
-        var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
+        var urlToNavigate = queryUrlConverter.convertQueryToUrl(
+            trimmedInput,
+            verticalParameter,
+            queryOrigin,
+            privateDnsLevel = PrivateDnsLevel.getCurrentLevel(spProvider.getKahfSharedPreferences()),
+        )
 
         // verticalParameter is only null when the user types a query in the address bar
         if (verticalParameter == null && urlToNavigate.isNotEmpty()) {

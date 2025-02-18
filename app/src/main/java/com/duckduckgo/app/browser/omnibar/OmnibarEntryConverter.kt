@@ -16,12 +16,15 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
+
 interface OmnibarEntryConverter {
 
     fun convertQueryToUrl(
         searchQuery: String,
         vertical: String? = null,
         queryOrigin: QueryOrigin = QueryOrigin.FromUser,
+        privateDnsLevel: PrivateDnsLevel = PrivateDnsLevel.High,
     ): String
 }
 

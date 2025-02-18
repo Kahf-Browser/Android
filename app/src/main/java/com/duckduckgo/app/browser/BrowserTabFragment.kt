@@ -1139,15 +1139,15 @@ class BrowserTabFragment :
     }
 
     private fun updateDnsSettings(selection: PrivateDnsLevel): Boolean {
-        val currentMode = sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: KAHF_GUARD_DEFAULT
-        if (PrivateDnsLevel.get(currentMode) == selection) {
+        val currentMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
+        if (currentMode == selection) {
             return false
         }
 
         editor.putString(KAHF_GUARD_INTENSITY, selection.name)
         editor.apply()
 
-        viewModel.privateDnsEnabled = PrivateDnsLevel.isEnabled(currentMode)
+        viewModel.privateDnsEnabled = PrivateDnsLevel.isEnabled(currentMode.name)
         return true
     }
 

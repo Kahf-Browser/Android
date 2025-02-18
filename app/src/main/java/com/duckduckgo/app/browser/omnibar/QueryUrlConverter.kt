@@ -20,6 +20,7 @@ import android.net.Uri
 import android.webkit.URLUtil
 import com.duckduckgo.app.browser.RequestRewriter
 import com.duckduckgo.app.browser.UriString
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
@@ -35,6 +36,7 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
         searchQuery: String,
         vertical: String?,
         queryOrigin: QueryOrigin,
+        privateDnsLevel: PrivateDnsLevel,
     ): String {
         val isUrl = when (queryOrigin) {
             is QueryOrigin.FromAutocomplete -> queryOrigin.isNav
@@ -49,10 +51,16 @@ class QueryUrlConverter @Inject constructor(private val requestRewriter: Request
             return searchQuery
         }
 
+        val safeMode = when (privateDnsLevel) {
+            PrivateDnsLevel.High -> "strict"
+            PrivateDnsLevel.Medium -> "active"
+            else -> "off"
+        }
+
         val uriBuilder = Uri.Builder()
             .scheme(https)
             .appendQueryParameter(AppUrl.ParamKey.QUERY, searchQuery)
-            .appendQueryParameter(AppUrl.ParamKey.SAFE, "strict")
+            .appendQueryParameter(AppUrl.ParamKey.SAFE, safeMode)
             .authority(Url.GOOGLE_HOST)
             .appendPath("search")
 
