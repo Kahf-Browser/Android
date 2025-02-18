@@ -30,4 +30,8 @@ class FakeSharedPreferencesProvider : SharedPreferencesProvider {
     ): SharedPreferences {
         return getSharedPreferences(name, multiprocess)
     }
+
+    override fun getKahfSharedPreferences(): SharedPreferences {
+        return InMemorySharedPreferences()
+    }
 }

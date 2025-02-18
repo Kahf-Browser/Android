@@ -35,4 +35,6 @@ interface SharedPreferencesProvider {
      * @return the encrypted shared preferences of null if there was any error (eg. devices doesn't support it)
      */
     fun getEncryptedSharedPreferences(name: String, multiprocess: Boolean = false): SharedPreferences?
+
+    fun getKahfSharedPreferences(): SharedPreferences
 }

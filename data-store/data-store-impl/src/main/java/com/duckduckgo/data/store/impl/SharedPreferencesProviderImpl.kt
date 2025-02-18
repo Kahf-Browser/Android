@@ -23,6 +23,7 @@ import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import androidx.security.crypto.MasterKeys
+import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
@@ -57,6 +58,10 @@ class SharedPreferencesProviderImpl @Inject constructor(
         multiprocess: Boolean,
     ): SharedPreferences? {
         return runCatching { getEncryptedSharedPreferencesInternal(name, multiprocess) }.getOrNull()
+    }
+
+    override fun getKahfSharedPreferences(): SharedPreferences {
+        return getSharedPreferences(SAFE_GAZE_PREFERENCES, multiprocess = false, migrate = false)
     }
 
     private fun getEncryptedSharedPreferencesInternal(
