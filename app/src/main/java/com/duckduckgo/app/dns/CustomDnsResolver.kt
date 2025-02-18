@@ -11,8 +11,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_IP
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_WITH_DOT
-import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
-import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
@@ -50,8 +48,7 @@ class CustomDnsResolver(
     }
 
     init {
-        val currentMode = sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: KAHF_GUARD_DEFAULT
-        privateDns = PrivateDnsLevel.get(currentMode)
+        privateDns = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
 
         runBlocking {
             socketHelper = SocketHelper.getInstance(privateDns.dnsServerIps.random(), 853, privateDns.url)

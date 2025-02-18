@@ -227,8 +227,8 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
 import com.duckduckgo.app.kahftube.SafeGazePopupHandler
+import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
 import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
@@ -305,18 +305,14 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
-import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
-import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
-import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
-import com.duckduckgo.common.utils.SAFE_GAZE_MODE
-import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
 import com.duckduckgo.common.utils.extensions.dpToPx
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extensions.websiteFromGeoLocationsApiOrigin
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_DELAY
 import com.duckduckgo.downloads.api.DOWNLOAD_SNACKBAR_LENGTH
@@ -612,6 +608,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var historyRepository: RealNavigationHistory
 
+    @Inject
+    lateinit var spProvider: SharedPreferencesProvider
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -666,8 +665,6 @@ class BrowserTabFragment :
     private lateinit var webViewContainer: FrameLayout
 
     private lateinit var sharedPreferences: SharedPreferences
-
-    private lateinit var editor: SharedPreferences.Editor
 
     private var bookmarksBottomSheetDialog: BookmarksBottomSheetDialog.Builder? = null
 
@@ -921,8 +918,7 @@ class BrowserTabFragment :
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
         decorator = BrowserTabFragmentDecorator()
-        sharedPreferences = requireContext().getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
-        editor = sharedPreferences.edit()
+        sharedPreferences = spProvider.getKahfSharedPreferences()
         voiceSearchLauncher.registerResultsCallback(this, requireActivity(), BROWSER) {
             when (it) {
                 is VoiceSearchLauncher.Event.VoiceRecognitionSuccess -> {
@@ -1044,7 +1040,7 @@ class BrowserTabFragment :
                 SafeGazePopupHandler(
                     binding = popupBinding,
                     sharedPreferences = sharedPreferences,
-                    editor = editor,
+                    editor = sharedPreferences.edit(),
                     onDnsModeChanged = { dnsLevel ->
                         val updated = updateDnsSettings(dnsLevel)
                         if (updated) {
@@ -1085,7 +1081,7 @@ class BrowserTabFragment :
                         }
                     },
                     onBlurEffectChanged = {
-                        val updated = updateBlurSettings(it)
+                        val updated = updateSafeGazeSettings(it)
                         if (updated) {
                             webView?.reload()
                         }
@@ -1143,38 +1139,24 @@ class BrowserTabFragment :
         if (currentMode == selection) {
             return false
         }
-
-        editor.putString(KAHF_GUARD_INTENSITY, selection.name)
-        editor.apply()
+        PrivateDnsLevel.updateLevel(sharedPreferences, selection)
 
         viewModel.privateDnsEnabled = PrivateDnsLevel.isEnabled(currentMode.name)
         return true
     }
 
     private fun updateSafeGazeSettings(selection: SafeGazeLevel): Boolean {
-        val currentMode = sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: SAFE_GAZE_DEFAULT
-
-        if (SafeGazeLevel.get(currentMode) == selection) {
+        val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
+        if (currentMode == selection) {
             return false
         }
 
-        // val safeGazeEnabled = SafeGazeLevel.isEnabled(selection.name)
-        editor.putString(SAFE_GAZE_MODE, selection.name).apply()
-        return true
-    }
-
-    private fun updateBlurSettings(selectedSgLevel: SafeGazeLevel): Boolean {
-        val currentSgLevel: SafeGazeLevel = SafeGazeLevel.get(sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: "")
-        if (selectedSgLevel == currentSgLevel) {
-            return false
-        }
-        editor.putString(SAFE_GAZE_MODE, selectedSgLevel.name).apply()
+        SafeGazeLevel.updateLevel(spProvider.getKahfSharedPreferences(), selection)
         return true
     }
 
     private fun isPrivateDnsEnabled(): Boolean {
-        val level = sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: KAHF_GUARD_DEFAULT
-        return PrivateDnsLevel.get(level) != PrivateDnsLevel.Off
+        return PrivateDnsLevel.getCurrentLevel(sharedPreferences) != PrivateDnsLevel.Off
     }
 
     @Suppress("DEPRECATION")

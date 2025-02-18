@@ -20,8 +20,7 @@ import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.SAFE_GAZE_MODE
-import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -51,6 +50,9 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
     @Inject
     lateinit var dispatcher: DispatcherProvider
+
+    @Inject
+    lateinit var spProvider: SharedPreferencesProvider
 
     lateinit var binding: FragmentOnboardingSafegazeBinding
 
@@ -167,9 +169,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
     }
 
     private fun onEnableSafeGazeClicked() {
-        val preferences = requireContext().getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
-        preferences.edit().putString(SAFE_GAZE_MODE, SafeGazeLevel.Pixelation.name).apply()
-
+        SafeGazeLevel.updateLevel(spProvider.getKahfSharedPreferences(), SafeGazeLevel.Pixelation)
         (requireActivity() as KahfOnboardingActivity).onContinueClicked()
     }
 

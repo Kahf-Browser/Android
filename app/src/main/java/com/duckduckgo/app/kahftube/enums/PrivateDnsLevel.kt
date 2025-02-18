@@ -23,6 +23,10 @@ sealed class PrivateDnsLevel(val name: String, val url: String, val dnsServerIps
             return get(currentMode)
         }
 
+        fun updateLevel(pref: SharedPreferences, level: PrivateDnsLevel) {
+            pref.edit().putString(KAHF_GUARD_INTENSITY, level.name).apply()
+        }
+
         fun isEnabled(name: String) = get(name) != Off
     }
 }

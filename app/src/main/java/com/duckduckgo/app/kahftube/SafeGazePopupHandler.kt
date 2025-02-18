@@ -27,10 +27,6 @@ import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
 import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
 import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
-import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
-import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
-import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
-import com.duckduckgo.common.utils.SAFE_GAZE_MODE
 
 class SafeGazePopupHandler(
     private val binding: SafeGazePopupBinding,
@@ -48,8 +44,8 @@ class SafeGazePopupHandler(
         var btnMed: PopupButton? = null
         var btnLow: PopupButton? = null
 
-        val preSelectedDns: PrivateDnsLevel = PrivateDnsLevel.get(sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: "")
-        val preSelectedSG: SafeGazeLevel = SafeGazeLevel.get(sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: "")
+        val preSelectedDns: PrivateDnsLevel = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
+        val preSelectedSG: SafeGazeLevel = SafeGazeLevel.getCurrentLevel(sharedPreferences)
 
         btnHigh = PopupButton(
             binding.btnHigh,

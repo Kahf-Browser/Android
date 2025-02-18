@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.net.Uri
@@ -79,15 +78,11 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
-import com.duckduckgo.common.utils.KAHF_GUARD_DEFAULT
-import com.duckduckgo.common.utils.SAFE_GAZE_MODE
-import com.duckduckgo.common.utils.KAHF_GUARD_INTENSITY
-import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
 import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
-import com.duckduckgo.common.utils.SAFE_GAZE_PREFERENCES
 import com.duckduckgo.common.utils.extensions.isDataUri
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -139,6 +134,7 @@ class BrowserWebViewClient @Inject constructor(
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
     private val dnsResolver: CustomDnsResolver,
+    spProvider: SharedPreferencesProvider
 ) : WebViewClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -148,7 +144,7 @@ class BrowserWebViewClient @Inject constructor(
     private var isEmailAccessForKahfTubeDialogShowed = false
     lateinit var activity: FragmentActivity
     private var start: Long? = null
-    private var sharedPreferences: SharedPreferences = context.getSharedPreferences(SAFE_GAZE_PREFERENCES, Context.MODE_PRIVATE)
+    private var sharedPreferences = spProvider.getKahfSharedPreferences()
     private var safeGazeWhiteList: MutableSet<String> = mutableSetOf()
 
     init {
@@ -371,12 +367,11 @@ class BrowserWebViewClient @Inject constructor(
     }
 
     private fun handleSafeGaze(webView: WebView, url: String?) {
-        val currentMode = sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: SAFE_GAZE_DEFAULT
+        val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
         val isUrlWhiteListed = safeGazeWhiteList.contains(extractHost(url))
 
-        if (SafeGazeLevel.isEnabled(currentMode) && !isUrlWhiteListed) {
-            val sgLevel: SafeGazeLevel = SafeGazeLevel.get(sharedPreferences.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: "")
-            webView.evaluateJavascript("window.solidColorEffect = ${sgLevel == SafeGazeLevel.Blur}", null)
+        if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
+            webView.evaluateJavascript("window.solidColorEffect = ${currentMode == SafeGazeLevel.Blur}", null)
 
             // Run SafeGaze script
             try {
@@ -568,8 +563,8 @@ class BrowserWebViewClient @Inject constructor(
     ): WebResourceResponse? {
         val url = request.url.toString()
         if (request.url.host == KAHF_GUARD_BLOCKED_URL || url.isDataUri()) return null
-        val privateDnsMode = sharedPreferences.getString(KAHF_GUARD_INTENSITY, KAHF_GUARD_DEFAULT) ?: KAHF_GUARD_DEFAULT
-        val privateDnsEnabled = PrivateDnsLevel.isEnabled(privateDnsMode)
+        val privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
+        val privateDnsEnabled = privateDnsMode != PrivateDnsLevel.Off
 
         return runBlocking {
             withContext(dispatcherProvider.io()) {
