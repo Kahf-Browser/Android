@@ -67,11 +67,12 @@
 
     <TextView
         android:id="@+id/titleText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="25dp"
         android:fontFamily="@font/poppins_bold"
         android:gravity="center"
+        android:layout_marginEnd="10dp"
         android:text="@string/kahf_onboarding_get_what_you_want"
         android:textColor="?attr/daxColorWhite"
         android:textSize="35sp"
