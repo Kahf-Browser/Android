@@ -20,11 +20,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
+import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
 import android.view.KeyEvent
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
@@ -140,6 +142,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var openMessageInNewTabJob: Job? = null
 
+    private var layoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
+
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
 
@@ -179,6 +183,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lifecycleScope.launch(dispatcherProvider.io()) {
             kahfImageBlockedDao.deleteOlderImages(30)
         }
+
+        observeKeyboardVisibility()
     }
 
     override fun onStop() {
@@ -188,6 +194,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     override fun onDestroy() {
         currentTab = null
+        layoutListener?.let {
+            window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(it)
+            layoutListener = null
+        }
         super.onDestroy()
     }
 
@@ -535,6 +545,25 @@ open class BrowserActivity : DuckDuckGoActivity() {
             },
             300,
         )
+    }
+
+    private fun observeKeyboardVisibility() {
+        var previousHeight = 0
+        val keyboardVisibilityListener = ViewTreeObserver.OnGlobalLayoutListener {
+            val visibleWindowRect = Rect()
+            window.decorView.getWindowVisibleDisplayFrame(visibleWindowRect)
+
+            val totalScreenHeight = window.decorView.height
+            val keyboardHeight = totalScreenHeight - visibleWindowRect.bottom
+            val isKeyboardVisible = keyboardHeight > totalScreenHeight * 0.15
+
+            if (keyboardHeight != previousHeight) {
+                currentTab?.onKeyboardVisibilityChanged(isKeyboardVisible)
+                previousHeight = keyboardHeight
+            }
+        }
+
+        window.decorView.viewTreeObserver.addOnGlobalLayoutListener(keyboardVisibilityListener)
     }
 
     companion object {

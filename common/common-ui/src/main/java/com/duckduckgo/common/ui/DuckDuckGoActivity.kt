@@ -26,11 +26,8 @@ import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewTreeObserver
 import android.view.WindowManager.LayoutParams
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -119,23 +116,6 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
                         or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR)
             }
         }
-    }
-
-    fun getNavigationBarHeight(callback: (Int) -> Unit) {
-        val listener = object : ViewTreeObserver.OnGlobalLayoutListener {
-            override fun onGlobalLayout() {
-                val windowInsetsCompat = ViewCompat.getRootWindowInsets(window.decorView)
-                val navigationBarInsets = windowInsetsCompat?.getInsets(WindowInsetsCompat.Type.navigationBars())
-                val height = navigationBarInsets?.bottom ?: 0
-
-                // Remove the listener to avoid multiple triggers
-                window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(this)
-
-                callback(height)
-            }
-        }
-
-        window.decorView.viewTreeObserver.addOnGlobalLayoutListener(listener)
     }
 
     fun isDarkThemeEnabled(): Boolean {

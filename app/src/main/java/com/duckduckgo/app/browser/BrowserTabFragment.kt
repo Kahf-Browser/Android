@@ -107,6 +107,7 @@ import androidx.fragment.app.commitNow
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.transaction
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -3431,6 +3432,23 @@ class BrowserTabFragment :
         downloadMessagesJob += lifecycleScope.launch {
             viewModel.downloadCommands().cancellable().collect {
                 processFileDownloadedCommand(it)
+            }
+        }
+    }
+
+    fun onKeyboardVisibilityChanged(isKbVisible: Boolean) {
+        if (fragmentIsVisible() && lifecycle.currentState.isAtLeast(State.RESUMED)) {
+
+            // Hide ad when keyboard is visible
+            binding.includeNewBrowserTab.kahfBannerAd.let { view->
+                if (isKbVisible) {
+                    view.isVisible = false
+                } else {
+                    // Delay the visibility change to avoid flickering
+                    view.postDelayed({
+                        view.isVisible = true
+                    }, 200)
+                }
             }
         }
     }
