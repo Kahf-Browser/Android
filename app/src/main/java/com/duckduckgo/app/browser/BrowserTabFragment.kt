@@ -152,6 +152,7 @@ import com.duckduckgo.app.browser.databinding.ContentSystemLocationPermissionDia
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.databinding.IncludeBrowserBottomNavBinding
+import com.duckduckgo.app.browser.databinding.IncludeNewBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.IncludeOmnibarToolbarBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
@@ -3463,6 +3464,13 @@ class BrowserTabFragment :
         decorator.recreatePopupMenu()
         privacyProtectionsPopup.onConfigurationChanged()
         viewModel.onConfigurationChanged()
+        showNewTabForCurrentOrientation()
+    }
+
+    private fun showNewTabForCurrentOrientation() {
+        (binding.includeNewBrowserTab.root as ViewGroup).removeAllViews()
+        val v = IncludeNewBrowserTabBinding.inflate(layoutInflater, binding.includeNewBrowserTab.root, true)
+        renderer.showNewTab(v)
     }
 
     fun onBackPressed(isCustomTab: Boolean = false): Boolean {
@@ -4325,7 +4333,9 @@ class BrowserTabFragment :
 
             renderIfChanged(viewState, lastSeenCtaViewState) {
                 lastSeenCtaViewState = viewState
-                showNewTab()
+                if (!viewModel.newTabShown) {
+                    showNewTab(binding.includeNewBrowserTab)
+                }
                 /*when {
                     viewState.cta != null -> {
                         hideNewTab()
@@ -4441,11 +4451,7 @@ class BrowserTabFragment :
             viewModel.onCtaShown()
         }
 
-        private fun showNewTab() {
-            if (viewModel.newTabShown) {
-                return
-            }
-            viewModel.newTabShown = true
+        fun showNewTab(newBrowserTab: IncludeNewBrowserTabBinding) {
             Timber.d("New Tab: showNewTab")
 
             // Wallpaper and text
@@ -4473,8 +4479,8 @@ class BrowserTabFragment :
             }
 
             // Kahf Ad
-            newBrowserTab.kahfBannerAd?.loadAd(kahfAdConfig)
-            newBrowserTab.kahfBannerAd?.setAdClickListener {
+            newBrowserTab.kahfBannerAd.loadAd(kahfAdConfig)
+            newBrowserTab.kahfBannerAd.setAdClickListener {
                 viewModel.onUserSubmittedQuery(it)
             }
 
@@ -4534,6 +4540,8 @@ class BrowserTabFragment :
 
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
+
+            viewModel.newTabShown = true
         }
 
         private fun hideNewTab() {

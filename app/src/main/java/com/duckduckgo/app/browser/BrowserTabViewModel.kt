@@ -433,6 +433,7 @@ class BrowserTabViewModel @Inject constructor(
     var pageUpdatedLiveData: MutableLiveData<Unit> = MutableLiveData()
     val privacyShieldViewState: MutableLiveData<PrivacyShieldViewState> = MutableLiveData()
 
+    private var wpData: WallpaperData? = null
     var privateDnsEnabled = true
     // if navigating from home, want to know if a site was loaded previously to decide whether to reset WebView
     private var returnedHomeAfterSiteLoaded = false
@@ -3553,7 +3554,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun getWallpaper(path: String): WallpaperData? {
-        val imageDirectory = File("$path/wp")
+        if (wpData != null) {
+            return wpData
+        }
+
+        val imageDirectory = try {
+            File("$path/wp")
+        } catch (e: NullPointerException) {
+            return null
+        }
         val filesList = imageDirectory.listFiles()?.toList().orEmpty()
 
         if (filesList.isEmpty()) {
@@ -3575,9 +3584,11 @@ class BrowserTabViewModel @Inject constructor(
         val wallpaperData = wallpaperDataList.firstOrNull { it.downloadUrl.md5() == randomFile.name }
         val bitmap = BitmapFactory.decodeFile(randomFile.absolutePath)
 
-        return bitmap?.let {
+        wpData = bitmap?.let {
             wallpaperData?.copy(bitmap = it) ?: WallpaperData(bitmap = it)
         }
+
+        return wpData
     }
 
     fun appendClipboardUrlToSuggestions(
