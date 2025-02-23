@@ -27,6 +27,7 @@
     <dimen name="keyline_6">32dp</dimen>
     <dimen name="keyline_7">48dp</dimen>
     <dimen name="kahf_suggestion_padding">14dp</dimen>
+    <dimen name="kahf_bottom_nav_height">60dp</dimen>
 
     <!-- Shape radius -->
     <dimen name="tinyShapeCornerRadius">4dp</dimen>

@@ -29,7 +29,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:foreground="@android:color/transparent"
-        android:paddingHorizontal="@dimen/keyline_1"
         android:paddingTop="?attr/actionBarSize">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -54,6 +53,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineTop"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                app:layout_constraintGuide_percent="0.02" />
+
             <LinearLayout
                 android:id="@+id/statContainer"
                 android:layout_width="0dp"
@@ -65,7 +71,9 @@
                 android:layout_marginTop="@dimen/keyline_1"
                 android:weightSum="3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/historyRecyclerView"
+                app:layout_constraintTop_toTopOf="@id/historyRecyclerView"
+                app:layout_constraintBottom_toBottomOf="@id/historyRecyclerView"
                 app:layout_constraintWidth_percent="0.49">
 
                 <LinearLayout
@@ -165,21 +173,18 @@
                 android:id="@+id/historyRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="5dp"
+                android:layout_marginEnd="5dp"
                 android:background="@drawable/app_statistics_bg"
                 android:clipToPadding="false"
                 android:orientation="horizontal"
                 android:overScrollMode="never"
-                android:layout_marginTop="@dimen/keyline_1"
                 android:paddingHorizontal="@dimen/keyline_1"
                 android:paddingTop="@dimen/keyline_2"
                 android:visibility="visible"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/statContainer"
-                app:layout_constraintTop_toTopOf="@id/statContainer"
-                app:layout_constraintBottom_toBottomOf="@id/statContainer"
+                app:layout_constraintTop_toBottomOf="@id/guidelineTop"
                 app:layout_constraintWidth_percent="0.5"
                 tools:itemCount="7"
                 tools:listitem="@layout/item_history_entry" />
@@ -190,10 +195,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_1"
                 android:layout_marginTop="@dimen/keyline_1"
-                android:layout_marginBottom="@dimen/keyline_2"
-                app:layout_constraintEnd_toEndOf="@id/statContainer"
-                app:layout_constraintStart_toStartOf="@id/statContainer"
-                app:layout_constraintTop_toBottomOf="@id/statContainer" />
+                android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
             <LinearLayout
                 android:id="@+id/textContainer"
@@ -203,10 +208,11 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="@id/kahfBannerAd"
+                android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
+                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/kahfBannerAd"
-                app:layout_constraintTop_toTopOf="@id/kahfBannerAd"
                 tools:visibility="visible">
 
                 <TextView
