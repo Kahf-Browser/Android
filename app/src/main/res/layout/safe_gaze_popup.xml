@@ -268,7 +268,8 @@
                             android:layout_width="85dp"
                             android:layout_height="85dp"
                             app:shapeAppearanceOverlay="@style/roundedImageView"
-                            android:src="@drawable/blur_pixelation" />
+                            android:src="@drawable/blur_pixelation"
+                            android:visibility="gone"/>
 
                         <ImageView
                             android:id="@+id/ivCheckPixelation"
