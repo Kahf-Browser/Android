@@ -106,4 +106,7 @@ object DaoModule {
 
     @Provides
     fun imageBlockCountDao(database: AppDatabase) = database.imageBlockCountDao()
+
+    @Provides
+    fun provideSafeGazeWhitelistDao(database: AppDatabase) = database.safeGazeWhitelistDao()
 }

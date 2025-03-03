@@ -70,6 +70,7 @@ import com.duckduckgo.app.kahftube.SharedPreferenceManager.KeyString
 import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
 import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -95,7 +96,6 @@ import org.halalz.kahftube.extentions.injectJavascriptFileFromAsset
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
-import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URI
@@ -134,6 +134,7 @@ class BrowserWebViewClient @Inject constructor(
     private val mediaPlayback: MediaPlayback,
     private val subscriptions: Subscriptions,
     private val dnsResolver: CustomDnsResolver,
+    private val sgWhitelistDao: SafeGazeWhitelistDao,
     spProvider: SharedPreferencesProvider
 ) : WebViewClient() {
 
@@ -145,11 +146,6 @@ class BrowserWebViewClient @Inject constructor(
     lateinit var activity: FragmentActivity
     private var start: Long? = null
     private var sharedPreferences = spProvider.getKahfSharedPreferences()
-    private var safeGazeWhiteList: MutableSet<String> = mutableSetOf()
-
-    init {
-        loadSafeGazeWhiteList()
-    }
 
     /**
      * This is the method of url overriding available from API 24 onwards
@@ -326,76 +322,45 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    @SuppressLint("SdCardPath")
-    private fun loadSafeGazeWhiteList() {
-        try {
-            val safeGazeTxtFilePath = "${context.filesDir}/safe_gaze.txt"
-            val file = File(safeGazeTxtFilePath)
-            if (!file.exists()) {
-                return
-            }
-
-            val inputStream = FileInputStream(file)
-            val reader = BufferedReader(InputStreamReader(inputStream))
-            var line: String?
-
-            while (reader.readLine().also { line = it } != null) {
-                if (line?.contains("#") == true || line?.isEmpty() == true) {
-                    continue
-                }
-                val components = line?.split("\\s+".toRegex())
-                if (components != null) {
-                    val domain = components[0]
-                    safeGazeWhiteList.add(domain)
-                }
-            }
-
-            Timber.d("SG_BlockList: ${safeGazeWhiteList.joinToString(", ")}")
-        } catch (e: Exception) {
-            Timber.d("SG_BlockList Catch: ${e.localizedMessage ?: e.message ?: e}")
-        }
-    }
-
-    private fun extractHost(url: String?): String {
-        return try {
-            val uri = URI(url)
-            uri.host ?: ""
-        } catch (e: Exception) {
-            Timber.d("Error extracting host: ${e.message}")
-            ""
-        }
-    }
-
     private fun handleSafeGaze(webView: WebView, url: String?) {
-        val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
-        val isUrlWhiteListed = safeGazeWhiteList.contains(extractHost(url))
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
+            val isUrlWhiteListed = sgWhitelistDao.isHostWhitelisted(url?.toUri()?.host ?: "")
 
-        if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
-            // webView.evaluateJavascript("window.solidColorEffect = ${currentMode == SafeGazeLevel.Blur}", null)
-            webView.evaluateJavascript("window.solidColorEffect = true", null)
-
-            // Run SafeGaze script
-            try {
-                val localJsFile = File("${context.filesDir}/${SAFE_GAZE_JS_FILENAME}")
-                val jsCode = localJsFile.readText(Charsets.UTF_8)
-
-                if (jsCode.endsWith("--eof--\n")) {
-                    webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
-                    Timber.d("SafeGazeJs: Injecting remote version")
-                } else {
-                    loadLocalJs(webView)
-                    Timber.d("SafeGazeJs: Injecting local version. Because no --eof--")
+            if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
+                withContext(dispatcherProvider.main()) {
+                    // webView.evaluateJavascript("window.solidColorEffect = ${currentMode == SafeGazeLevel.Blur}", null)
+                    webView.evaluateJavascript("window.solidColorEffect = true", null)
                 }
-            } catch (e: Exception) {
-                loadLocalJs(webView)
-                Timber.d("SafeGazeJs: Injecting local version. Because $e")
+
+                // Run SafeGaze script
+                try {
+                    val localJsFile = File("${context.filesDir}/${SAFE_GAZE_JS_FILENAME}")
+                    val jsCode = localJsFile.readText(Charsets.UTF_8)
+
+                    if (jsCode.endsWith("--eof--\n")) {
+                        withContext(dispatcherProvider.main()) {
+                            webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
+                        }
+                        Timber.d("SafeGazeJs: Injecting remote version")
+                    } else {
+                        loadLocalJs(webView)
+                        Timber.d("SafeGazeJs: Injecting local version. Because no --eof--")
+                    }
+                } catch (e: Exception) {
+                    loadLocalJs(webView)
+                    Timber.d("SafeGazeJs: Injecting local version. Because $e")
+                }
             }
         }
     }
 
-    private fun loadLocalJs(webView: WebView) {
+    @WorkerThread
+    private suspend fun loadLocalJs(webView: WebView) {
         val jsCode = readAssetFile(context.assets, "safe_gaze_v2.js")
-        webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
+        withContext(dispatcherProvider.main()) {
+            webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
+        }
     }
 
     private fun handleKahfTube(

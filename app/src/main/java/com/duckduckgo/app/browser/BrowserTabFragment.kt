@@ -247,6 +247,8 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
 import com.duckduckgo.app.trackerdetection.db.HarmfulSiteBlockedDao
 import com.duckduckgo.app.trackerdetection.db.ImageBlockCountDao
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
+import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
+import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -600,6 +602,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var imageBlockCountDao: ImageBlockCountDao
+
+    @Inject
+    lateinit var safeGazeWhitelistDao: SafeGazeWhitelistDao
 
     @Inject
     lateinit var analyticsService: AnalyticsService
@@ -1041,8 +1046,10 @@ class BrowserTabFragment :
             safeGazeIcon.post {
                 SafeGazePopupHandler(
                     binding = popupBinding,
+                    currentUrl = webView?.url,
                     sharedPreferences = sharedPreferences,
-                    editor = sharedPreferences.edit(),
+                    sgWhitelistDao = safeGazeWhitelistDao,
+                    dispatcher = dispatchers,
                     onDnsModeChanged = { dnsLevel ->
                         val updated = updateDnsSettings(dnsLevel)
                         if (updated) {
@@ -1103,6 +1110,10 @@ class BrowserTabFragment :
                         popupWindow.dismiss()
                         (requireActivity() as DuckDuckGoActivity).toggleTheme()
                     },
+                    onSgWhitelistUpdated = { host, isWhitelisted ->
+                        webView?.reload()
+                        popupWindow.dismiss()
+                    }
                 )
 
                 lifecycleScope.launch {

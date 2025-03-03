@@ -23,7 +23,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.safe_gaze.JsDownloadWorker
-import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker
+import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.WallpaperDownloadWorker
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.DaggerAppComponent
@@ -134,7 +134,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     private fun scheduleTasks() {
         val jsDownloadWorkReq = OneTimeWorkRequest.from(JsDownloadWorker::class.java)
-        val wallpaperDownloadWorkReq = OneTimeWorkRequest.from(SafeGazeBlockListAndWallpaperWorker::class.java)
+        val wallpaperDownloadWorkReq = OneTimeWorkRequest.from(WallpaperDownloadWorker::class.java)
 
         val workManager = WorkManager.getInstance(this)
 

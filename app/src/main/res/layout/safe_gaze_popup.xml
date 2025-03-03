@@ -299,6 +299,20 @@
                         app:layout_constraintTop_toBottomOf="@+id/tvDecent"
                         tools:ignore="DeprecatedWidgetInXml" />
 
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnToggleSiteBlur"
+                        android:layout_width="wrap_content"
+                        android:layout_height="38dp"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="@font/lato"
+                        android:paddingHorizontal="12dp"
+                        app:backgroundTint="@color/blue0_50"
+                        android:text="@string/kahf_pause_on_site"
+                        android:textColor="?attr/kahfPrimaryText"
+                        android:textSize="12sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/blueIndecentPhotosText" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider

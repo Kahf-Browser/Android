@@ -70,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 58,
+    version = 59,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -106,6 +106,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         KahfImageBlocked::class,
         HarmfulSiteBlocked::class,
         ImageBlockCount::class,
+        SafeGazeWhitelistEntity::class,
     ],
 )
 
@@ -156,6 +157,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun kahfImageBlockedDao(): KahfImageBlockedDao
     abstract fun harmfulSiteBlockedDao(): HarmfulSiteBlockedDao
     abstract fun imageBlockCountDao(): ImageBlockCountDao
+    abstract fun safeGazeWhitelistDao(): SafeGazeWhitelistDao
 
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
 
@@ -744,6 +746,17 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    val MIGRATION_58_TO_59 = object : Migration(58, 59) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `safegaze_whitelist` (" +
+                    "`host` TEXT NOT NULL, " +
+                    "`timestamp` INTEGER NOT NULL, " +
+                    "PRIMARY KEY(`host`))"
+            )
+        }
+    }
+
 
     /**
      * WARNING ⚠️
@@ -828,6 +841,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_55_TO_56,
             MIGRATION_56_TO_57,
             MIGRATION_57_TO_58,
+            MIGRATION_58_TO_59,
         )
 
     @Deprecated(

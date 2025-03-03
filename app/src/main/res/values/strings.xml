@@ -951,4 +951,6 @@
 
     <string name="removeFromRecent">Remove from recent</string>
     <string name="clearAllRecent">Remove all</string>
+    <string name="kahf_pause_on_site">Pause on this site</string>
+    <string name="kahf_resume_blurring">Resume blurring</string>
 </resources>

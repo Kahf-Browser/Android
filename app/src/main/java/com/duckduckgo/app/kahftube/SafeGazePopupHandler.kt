@@ -18,26 +18,35 @@ package com.duckduckgo.app.kahftube
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
-import android.content.SharedPreferences.Editor
 import android.content.res.ColorStateList
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
 import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
 import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
+import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
+import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class SafeGazePopupHandler(
     private val binding: SafeGazePopupBinding,
+    private val currentUrl: String?,
     sharedPreferences: SharedPreferences,
-    val editor: Editor,
+    private val dispatcher: DispatcherProvider,
+    private val sgWhitelistDao: SafeGazeWhitelistDao,
     onDnsModeChanged: (mode: PrivateDnsLevel) -> Unit,
     onSafeGazeModeChanged: (mode: SafeGazeLevel) -> Unit,
     onShareClicked: () -> Unit,
     onSupportClicked: () -> Unit,
     onThemeChanged: () -> Unit,
     onBlurEffectChanged: (sgLevel: SafeGazeLevel) -> Unit,
+    onSgWhitelistUpdated: (host: String, isWhitelisted: Boolean) -> Unit,
 ) {
     init {
         var btnHigh: PopupButton? = null
@@ -130,6 +139,37 @@ class SafeGazePopupHandler(
             }
         }
 
+
+        binding.btnToggleSiteBlur.let { btn->
+            val host = currentUrl?.toUri()?.host ?: ""
+            btn.isVisible = currentUrl != null && preSelectedSG != SafeGazeLevel.Off
+
+            CoroutineScope(dispatcher.io()).launch {
+                val isWhitelisted = sgWhitelistDao.isHostWhitelisted(host)
+
+                withContext(dispatcher.main()) {
+                    btn.text = btn.context.getString(
+                        if (isWhitelisted) R.string.kahf_resume_blurring else R.string.kahf_pause_on_site,
+                    )
+                }
+            }
+
+            btn.setOnClickListener {
+                CoroutineScope(dispatcher.io()).launch {
+                    val isWhitelisted = sgWhitelistDao.isHostWhitelisted(host)
+                    if (isWhitelisted) {
+                        sgWhitelistDao.delete(host)
+                    } else {
+                        sgWhitelistDao.insert(SafeGazeWhitelistEntity(host))
+                    }
+
+                    withContext(dispatcher.main()) {
+                        onSgWhitelistUpdated(host, false)
+                    }
+                }
+            }
+        }
+
         setFontSize()
 
         // Set build number
@@ -154,6 +194,7 @@ class SafeGazePopupHandler(
             tvOnOffImage.scaleIndependentTextSize(14f)
             tvDecent.scaleIndependentTextSize(18f)
             blueIndecentPhotosText.scaleIndependentTextSize(14f)
+            btnToggleSiteBlur.scaleIndependentTextSize(12f)
 
             // Statistics
             statTitle.scaleIndependentTextSize(20f)
