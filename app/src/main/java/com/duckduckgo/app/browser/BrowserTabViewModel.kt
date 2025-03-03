@@ -3553,28 +3553,28 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
-    fun getWallpaper(path: String): WallpaperData? {
+    suspend fun getWallpaper(path: String): WallpaperData? = withContext(dispatchers.io()) {
         if (wpData != null) {
-            return wpData
+            return@withContext wpData
         }
 
         val imageDirectory = try {
             File("$path/wp")
         } catch (e: NullPointerException) {
-            return null
+            return@withContext null
         }
         val filesList = imageDirectory.listFiles()?.toList().orEmpty()
 
         if (filesList.isEmpty()) {
             Timber.d("fLog Directory not exists or is empty")
-            return null
+            return@withContext null
         }
 
         val randomFile = filesList.random()
         val jsonFile = File("$path/labels.json")
 
         if (!jsonFile.exists()) {
-            return null
+            return@withContext null
         }
 
         val jsonArrayStr = jsonFile.readText()
@@ -3588,7 +3588,7 @@ class BrowserTabViewModel @Inject constructor(
             wallpaperData?.copy(bitmap = it) ?: WallpaperData(bitmap = it)
         }
 
-        return wpData
+        return@withContext wpData
     }
 
     fun appendClipboardUrlToSuggestions(

@@ -4467,25 +4467,31 @@ class BrowserTabFragment :
 
             // Wallpaper and text
             newBrowserTab.apply {
-                val wallpaper = viewModel.getWallpaper("${requireContext().filesDir}")
+                lifecycleScope.launch(dispatchers.io()) {
+                    val wallpaper = viewModel.getWallpaper("${requireContext().filesDir}")
 
-                Glide.with(requireContext())
-                    .load(wallpaper?.bitmap ?: R.drawable.background_mosque)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .skipMemoryCache(false)
-                    .into(newTabWallpaper)
+                    withContext(dispatchers.main()) {
+                        Glide.with(requireContext())
+                            .load(wallpaper?.bitmap ?: R.drawable.background_mosque)
+                            .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                            .skipMemoryCache(false)
+                            .into(newTabWallpaper)
 
-                wallpaper?.let { data ->
-                    title.text = data.title
-                    subtitle.text = data.subtitle
-                    photoCredit.text = Html.fromHtml(data.credit, Html.FROM_HTML_MODE_COMPACT)
-                    photoCredit.setOnClickListener {
-                        viewModel.onUserSubmittedQuery(data.url)
+                        newTabWallpaper.isVisible = true
+
+                        wallpaper?.let { data ->
+                            title.text = data.title
+                            subtitle.text = data.subtitle
+                            photoCredit.text = Html.fromHtml(data.credit, Html.FROM_HTML_MODE_COMPACT)
+                            photoCredit.setOnClickListener {
+                                viewModel.onUserSubmittedQuery(data.url)
+                            }
+
+                            title.isVisible = data.title.isNotEmpty()
+                            subtitle.isVisible = data.subtitle.isNotEmpty()
+                            photoCredit.isVisible = data.credit.isNotEmpty()
+                        }
                     }
-
-                    title.isVisible = data.title.isNotEmpty()
-                    subtitle.isVisible = data.subtitle.isNotEmpty()
-                    photoCredit.isVisible = data.credit.isNotEmpty()
                 }
             }
 

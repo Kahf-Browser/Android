@@ -363,28 +363,6 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun handleKahfTube(
-        webView: WebView,
-        url: String?
-    ) {
-        Timber.v("handleKahfTube:: Url: $url")
-        Timber.v("handleKahfTube:: lastPageStarted: ${url == lastPageStarted}")
-        /*if (url == "https://m.youtube.com/?noapp") {
-            webView.injectJavascriptFileFromAsset("kahftube/email.js")
-        } else */
-        if (!isMainJSLoaded && url?.contains("m.youtube.com") == true) {
-            if (!isEmailAccessForKahfTubeDialogShowed
-                && (SharedPreferenceManager(context).getValue(KeyString.NAME).isEmpty()
-                    || SharedPreferenceManager(context).getValue(KeyString.NAME).contentEquals("Guest", true))
-            ) {
-                isEmailAccessForKahfTubeDialogShowed = true
-                showEmailAccessForKahfTubeDialog()
-            }
-            isMainJSLoaded = true
-            webView.injectJavascriptFileFromAsset("kahftube/main.js")
-        }
-    }
-
     private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
