@@ -878,7 +878,7 @@
     <string name="kahf_mode_desc_medium">Harmful Website + Block Ads + Safe Search</string>
     <string name="kahf_mode_desc_low">Harmful Websites + Block Ads only</string>
     <string name="kahf_decent_internet">Decent Internet</string>
-    <string name="kahf_desc_blur_full_image">Hide inappropriate images. Avoid major sins</string>
+    <string name="kahf_desc_blur_full_image">Hide inappropriate images. Avoid major sins. <font color="#FF2400">Blurring is not 100% accurate.</font></string>
     <string name="kahf_human_only">Human only</string>
     <string name="kahf_premium">(Premium)</string>
     <string name="kahf_full_image">Full Image</string>
