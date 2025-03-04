@@ -17,8 +17,11 @@
 package com.duckduckgo.app.kahftube
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
+import android.os.Build
+import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
@@ -30,9 +33,11 @@ import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class SafeGazePopupHandler(
     private val binding: SafeGazePopupBinding,
@@ -174,9 +179,18 @@ class SafeGazePopupHandler(
 
         // Set build number
         binding.root.context.let {
-            val versionName = it.packageManager.getPackageInfo(it.packageName, 0).versionName.toString()
-            val buildNumber = it.packageManager.getPackageInfo(it.packageName, 0).versionCode.toString()
-            binding.tvBuildNumber.text = it.getString(R.string.settingsVersionFull, versionName, buildNumber)
+            CoroutineScope(dispatcher.main()).launch {
+                val versionName = it.packageManager.getPackageInfo(it.packageName, 0).versionName.toString()
+                val buildNumber = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    it.packageManager.getPackageInfo(it.packageName, 0).longVersionCode.toString()
+                } else {
+                    @Suppress("DEPRECATION")
+                    it.packageManager.getPackageInfo(it.packageName, 0).versionCode.toString()
+                }
+                val jsVersion = getJsVersion(it)
+
+                binding.tvBuildNumber.text = it.getString(R.string.settingsVersionFull, versionName, buildNumber, jsVersion)
+            }
         }
     }
 
@@ -245,5 +259,23 @@ class SafeGazePopupHandler(
     @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
     private fun handleProgressBar() {
         // No op
+    }
+
+    @WorkerThread
+    private suspend fun getJsVersion(context: Context): String {
+        return withContext(dispatcher.io()) {
+            val safeGazeJs = File("${context.filesDir}/$SAFE_GAZE_JS_FILENAME")
+            if (safeGazeJs.exists()) {
+                val firstLine = safeGazeJs.bufferedReader().use { it.readLine() ?: "" }
+
+                if (firstLine.startsWith("// v")) {
+                    firstLine.substringAfter("// v")
+                } else {
+                    "1.0.0"
+                }
+            } else {
+                ""
+            }
+        }
     }
 }

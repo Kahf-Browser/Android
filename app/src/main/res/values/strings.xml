@@ -123,7 +123,7 @@
     <string name="settingsHeadingAbout">About</string>
     <string name="settingsAboutAsil">About Kahf</string>
     <string name="settingsVersion">Version</string>
-    <string name="settingsVersionFull" translatable="false">Version: %1$s (%2$s) </string>
+    <string name="settingsVersionFull" translatable="false">Version: %1$s (%2$s) - JS %3$s</string>
     <string name="leaveFeedback">Share Feedback</string>
     <string name="settingsEmailProtectionTitle">Email Protection</string>
     <string name="settingsEmailProtectionSubtitle">Block email trackers and hide your address</string>
