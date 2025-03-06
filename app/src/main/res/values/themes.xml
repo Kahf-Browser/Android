@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.KahfTube" parent="Theme.MaterialComponents.DayNight.NoActionBar" />
-
-    <style name="backgroundStyle" parent="Theme.KahfTube">
-        <item name="android:background">@color/whiteFive</item>
-    </style>
-
-    <style name="circleImageView" parent="Theme.KahfTube">
+    <style name="circleImageView" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
 
-    <style name="roundedImageView" parent="Theme.KahfTube">
+    <style name="roundedImageView" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">15%</item>
     </style>
 
-    <style name="textViewStyle" parent="Theme.KahfTube">
-        <item name="android:textColor">@color/black60</item>
-    </style>
-
-    <style name="profileViewBGStyle" parent="Theme.KahfTube">
-        <item name="android:background">@color/white84</item>
-    </style>
 </resources>

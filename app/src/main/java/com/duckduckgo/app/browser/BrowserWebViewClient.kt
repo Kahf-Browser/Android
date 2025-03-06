@@ -65,8 +65,6 @@ import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
-import com.duckduckgo.app.kahftube.SharedPreferenceManager
-import com.duckduckgo.app.kahftube.SharedPreferenceManager.KeyString
 import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
 import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -75,7 +73,6 @@ import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
 import com.duckduckgo.browser.api.JsInjectorPlugin
-import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
@@ -92,7 +89,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.halalz.kahftube.extentions.injectJavascriptFileFromAsset
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.File
@@ -142,7 +138,6 @@ class BrowserWebViewClient @Inject constructor(
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
     private var isMainJSLoaded = false
-    private var isEmailAccessForKahfTubeDialogShowed = false
     lateinit var activity: FragmentActivity
     private var start: Long? = null
     private var sharedPreferences = spProvider.getKahfSharedPreferences()
@@ -400,7 +395,7 @@ class BrowserWebViewClient @Inject constructor(
         if (url?.contains("m.youtube.com") != true) {
             handleSafeGaze(webView, url)
         }
-        //handleKahfTube(webView, url)
+
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != "about:blank" && start == null) {
@@ -442,7 +437,7 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
     ) {
         Timber.v("onPageFinished webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
-        //handleKahfTube(webView, url)
+
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
             jsPlugins.getPlugins().forEach {
@@ -546,23 +541,6 @@ class BrowserWebViewClient @Inject constructor(
                 }
             }
         }*/
-    }
-
-    private fun isImageUrl(url: String): Boolean {
-        val keywords = listOf("images", "jpg", "png", "jpeg", "webp", "svg")
-        for (keyword in keywords) {
-            if (url.contains(keyword, true)) return true
-        }
-        return false
-    }
-
-    private fun showEmailAccessForKahfTubeDialog() {
-        TextAlertDialogBuilder(activity)
-            .setTitle(context.getString(string.kahftube))
-            .setMessage(context.getString(string.kahf_tube_email_access_message))
-            .setPositiveButton(string.allow)
-            .setNegativeButton(string.cancel)
-            .show()
     }
 
     override fun onRenderProcessGone(
