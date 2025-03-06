@@ -65,8 +65,8 @@ import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
-import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
+import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.autoconsent.api.Autoconsent

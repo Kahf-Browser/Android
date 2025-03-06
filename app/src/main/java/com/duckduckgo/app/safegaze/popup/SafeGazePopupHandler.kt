@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.kahftube
+package com.duckduckgo.app.safegaze.popup
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -27,8 +27,8 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
-import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
+import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize

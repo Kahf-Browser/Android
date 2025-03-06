@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.omnibar
 
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 
 interface OmnibarEntryConverter {
 

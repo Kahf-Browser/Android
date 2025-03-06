@@ -1,6 +1,5 @@
 package com.duckduckgo.app.onboarding.ui.pages
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,7 @@ import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboardingSafegazeBinding
 import com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface
-import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
+import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
 import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector

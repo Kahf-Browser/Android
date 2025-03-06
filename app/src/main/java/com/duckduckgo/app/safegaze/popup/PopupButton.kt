@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2025 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.kahftube
+package com.duckduckgo.app.safegaze.popup
 
 import android.content.res.ColorStateList
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.ContextCompat
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafegazeButtonBinding
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel.High
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel.Low
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel.Medium
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel.High
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel.Low
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel.Medium
 import com.duckduckgo.common.ui.view.hide
 import com.duckduckgo.common.ui.view.show
 
