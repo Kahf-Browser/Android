@@ -10,6 +10,8 @@ import android.webkit.JavascriptInterface
 import androidx.core.graphics.toRect
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.duckduckgo.app.analytics.AnalyticsEvent
@@ -90,27 +92,28 @@ class SafeGazeJsInterface(
     ): SafeGazeResult {
         return suspendCoroutine { continuation ->
             scope.launch {
-            var bitmap = if (imageData != null) {
-                base64ToBitmap(imageData)
-            } else {
-                getBitmapFromUrl(url)
-            }
-
-            if (bitmap == null || bitmap.height < SAFE_GAZE_MIN_IMG_SIZE || bitmap.width < SAFE_GAZE_MIN_IMG_SIZE) {
-                continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
-                return@launch
-            }
-
-            // if image is too big, we need to resize it
-            if (bitmap.height > SAFE_GAZE_MAX_IMG_SIZE || bitmap.width > SAFE_GAZE_MAX_IMG_SIZE) {
-                if (bitmap.height > bitmap.width) {
-                    val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.height
-                    bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * ratio).toInt(), SAFE_GAZE_MAX_IMG_SIZE, true)
+                var bitmap = if (imageData != null) {
+                    base64ToBitmap(imageData)
                 } else {
-                    val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.width
-                    bitmap = Bitmap.createScaledBitmap(bitmap, SAFE_GAZE_MAX_IMG_SIZE, (bitmap.height * ratio).toInt(), true)
+                    getBitmapFromUrl(url)
                 }
-            }
+
+                if (bitmap == null || bitmap.height < SAFE_GAZE_MIN_IMG_SIZE || bitmap.width < SAFE_GAZE_MIN_IMG_SIZE) {
+                    continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
+                    recycleBitmap(bitmap)
+                    return@launch
+                }
+
+                // if image is too big, we need to resize it
+                if (bitmap.height > SAFE_GAZE_MAX_IMG_SIZE || bitmap.width > SAFE_GAZE_MAX_IMG_SIZE) {
+                    if (bitmap.height > bitmap.width) {
+                        val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.height
+                        bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * ratio).toInt(), SAFE_GAZE_MAX_IMG_SIZE, true)
+                    } else {
+                        val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.width
+                        bitmap = Bitmap.createScaledBitmap(bitmap, SAFE_GAZE_MAX_IMG_SIZE, (bitmap.height * ratio).toInt(), true)
+                    }
+                }
 
                 val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
 
@@ -143,6 +146,7 @@ class SafeGazeJsInterface(
                     }
                     val imageDataFinal = imageData ?: VisualizationUtils.bitmapToBase64(bitmap)
                     continuation.resume(SafeGazeResult(false, personList, bitmap.width, bitmap.height, imageDataFinal))
+                    recycleBitmap(bitmap)
                 }
             }
         }
@@ -191,6 +195,7 @@ class SafeGazeJsInterface(
             Glide.with(context)
                 .asBitmap()
                 .load(url)
+                .apply(RequestOptions().downsample(DownsampleStrategy.AT_MOST))
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(object : CustomTarget<Bitmap>() {
                     override fun onResourceReady(
@@ -209,7 +214,7 @@ class SafeGazeJsInterface(
                     }
 
                     override fun onLoadCleared(placeholder: Drawable?) {
-                        // No need to resume the continuation here
+                        // No-op
                     }
                 })
         }
@@ -236,6 +241,13 @@ class SafeGazeJsInterface(
             val parts = message.split("/-/")
             val imageUrl = if (parts.size >= 2) parts[1] else ""
             val uid = (if (parts.size >= 3) parts[2] else "0")
+
+            // Skip if image is svg, gif, placeholder
+            if (isInvalidImageUrl(imageUrl)) {
+                callSafegazeOnDeviceModelHandler(uid, nsfwJson(false), null, false)
+                return
+            }
+
             val imageData = if (parts.size >= 4) parts[3] else ""
 
             if (onDeviceModelCachedResults.containsKey(imageUrl)) {
@@ -271,11 +283,6 @@ class SafeGazeJsInterface(
     ) {
         // If same url is already in queue, don't add it again
         if (urlQueue.any { it.url == url }) {
-            return
-        }
-        // Skip if image is svg, gif, placeholder
-        if (isInvalidImageUrl(url)) {
-            callSafegazeOnDeviceModelHandler(uid, nsfwJson(false), null, false)
             return
         }
 
@@ -465,6 +472,12 @@ class SafeGazeJsInterface(
         } else {
             Timber.d("kLog Will run fine: $inferenceTime ms")
             true
+        }
+    }
+
+    private fun recycleBitmap(bitmap: Bitmap?) {
+        if (bitmap != null && !bitmap.isRecycled) {
+            bitmap.recycle()
         }
     }
 
