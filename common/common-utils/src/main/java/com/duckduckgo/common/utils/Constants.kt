@@ -36,5 +36,5 @@ const val KAHF_GUARD_INTENSITY = "kahf_guard_intensity"
 const val KAHF_GUARD_DEFAULT = "High"
 
 // SafeGaze (image blur) Settings
-const val SAFE_GAZE_DEFAULT = "Blur"
+const val SAFE_GAZE_DEFAULT = "Pixelation"
 const val SAFE_GAZE_MODE = "safe_gaze_mode"

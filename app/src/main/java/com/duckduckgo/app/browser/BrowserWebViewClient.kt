@@ -324,8 +324,7 @@ class BrowserWebViewClient @Inject constructor(
 
             if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
                 withContext(dispatcherProvider.main()) {
-                    // webView.evaluateJavascript("window.solidColorEffect = ${currentMode == SafeGazeLevel.Blur}", null)
-                    webView.evaluateJavascript("window.solidColorEffect = true", null)
+                    webView.evaluateJavascript("window.solidColorEffect = ${currentMode == SafeGazeLevel.Blur}", null)
                 }
 
                 // Run SafeGaze script
