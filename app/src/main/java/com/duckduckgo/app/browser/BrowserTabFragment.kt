@@ -128,6 +128,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsEvent.ImageFilerDisable
+import com.duckduckgo.app.analytics.AnalyticsEvent.ImageFilerEnable
+import com.duckduckgo.app.analytics.AnalyticsEvent.PrivateDnsDisable
+import com.duckduckgo.app.analytics.AnalyticsEvent.PrivateDnsHigh
+import com.duckduckgo.app.analytics.AnalyticsEvent.PrivateDnsLow
+import com.duckduckgo.app.analytics.AnalyticsEvent.PrivateDnsMedium
 import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
@@ -229,9 +235,9 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.kahftube.SafeGazePopupHandler
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
-import com.duckduckgo.app.kahftube.enums.SafeGazeLevel
+import com.duckduckgo.app.safegaze.popup.SafeGazePopupHandler
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
+import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
@@ -248,7 +254,6 @@ import com.duckduckgo.app.trackerdetection.db.HarmfulSiteBlockedDao
 import com.duckduckgo.app.trackerdetection.db.ImageBlockCountDao
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
-import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -305,7 +310,7 @@ import com.duckduckgo.common.ui.view.setFormattedCount
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
-import com.duckduckgo.common.utils.AppUrl
+import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
@@ -1058,7 +1063,7 @@ class BrowserTabFragment :
                             // Just reloading the WebView doesn't work. Relaunch the tab is required.
                             webView?.url?.let { url ->
                                 val uri = Uri.parse(url).buildUpon().clearQuery().apply {
-                                    url.toUri().queryParameterNames.filter { it != AppUrl.ParamKey.SAFE }.forEach {
+                                    url.toUri().queryParameterNames.filter { it != ParamKey.SAFE }.forEach {
                                         appendQueryParameter(it, url.toUri().getQueryParameter(it))
                                     }
                                 }.build()
@@ -1069,10 +1074,10 @@ class BrowserTabFragment :
 
                         analyticsService.logEvent(
                             when (dnsLevel) {
-                                PrivateDnsLevel.High -> AnalyticsEvent.PrivateDnsHigh
-                                PrivateDnsLevel.Medium -> AnalyticsEvent.PrivateDnsMedium
-                                PrivateDnsLevel.Low -> AnalyticsEvent.PrivateDnsLow
-                                PrivateDnsLevel.Off -> AnalyticsEvent.PrivateDnsDisable
+                                PrivateDnsLevel.High -> PrivateDnsHigh
+                                PrivateDnsLevel.Medium -> PrivateDnsMedium
+                                PrivateDnsLevel.Low -> PrivateDnsLow
+                                PrivateDnsLevel.Off -> PrivateDnsDisable
                             }
                         )
                     },
@@ -1081,8 +1086,8 @@ class BrowserTabFragment :
                         if (updated) {
                             analyticsService.logEvent(
                                 when (it) {
-                                    SafeGazeLevel.Off -> AnalyticsEvent.ImageFilerDisable
-                                    else -> AnalyticsEvent.ImageFilerEnable
+                                    SafeGazeLevel.Off -> ImageFilerDisable
+                                    else -> ImageFilerEnable
                                 }
                             )
                             popupWindow.dismiss()

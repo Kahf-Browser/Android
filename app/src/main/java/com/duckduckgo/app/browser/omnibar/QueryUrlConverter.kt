@@ -20,7 +20,7 @@ import android.net.Uri
 import android.webkit.URLUtil
 import com.duckduckgo.app.browser.RequestRewriter
 import com.duckduckgo.app.browser.UriString
-import com.duckduckgo.app.kahftube.enums.PrivateDnsLevel
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.UrlScheme.Companion.https

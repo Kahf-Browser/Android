@@ -41,4 +41,7 @@ interface SafeGazeWhitelistDao {
 
     @Query("DELETE FROM safegaze_whitelist")
     fun deleteAll()
+
+    @Query("SELECT COUNT(*) FROM safegaze_whitelist")
+    fun count(): Int
 }

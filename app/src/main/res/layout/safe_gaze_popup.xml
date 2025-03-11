@@ -261,15 +261,14 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginEnd="5dp"
                         app:layout_constraintEnd_toStartOf="@id/ivBlurGreyContainer"
-                        app:layout_constraintTop_toBottomOf="@id/switch_safe_gaze"
-                        android:visibility="gone">
+                        app:layout_constraintTop_toBottomOf="@id/switch_safe_gaze">
 
                         <com.google.android.material.imageview.ShapeableImageView
                             android:id="@+id/ivBlurPixelation"
                             android:layout_width="85dp"
                             android:layout_height="85dp"
                             app:shapeAppearanceOverlay="@style/roundedImageView"
-                            android:src="@drawable/blur_pixelation" />
+                            android:src="@drawable/blur_pixelation"/>
 
                         <ImageView
                             android:id="@+id/ivCheckPixelation"

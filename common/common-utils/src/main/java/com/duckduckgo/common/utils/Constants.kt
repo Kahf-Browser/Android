@@ -18,6 +18,9 @@ package com.duckduckgo.common.utils
 
 const val SAFE_GAZE_JS_URL_DEV = "https://raw.githubusercontent.com/AsilHQ/Android/js_code_dev/node_modules/%40duckduckgo/privacy-dashboard/build/app/safe_gaze_v2.js"
 const val SAFE_GAZE_JS_URL_PROD = "https://raw.githubusercontent.com/AsilHQ/Android/js_code_release/node_modules/%40duckduckgo/privacy-dashboard/build/app/safe_gaze_v2.js"
+const val SAFE_GAZE_WHITELIST = "https://raw.githubusercontent.com/Kahf-Browser/public/refs/heads/main/config/whitelist.txt"
+const val KAHF_FEEDBACK_FORM = "https://tally.so/r/mKkz2K"
+
 const val SAFE_GAZE_JS_FILENAME = "safe_gaze.js"
 const val SAFE_GAZE_INTERFACE = "SafeGazeInterface"
 const val SAFE_GAZE_PREFERENCES = "safe_gaze_preferences"
@@ -33,5 +36,5 @@ const val KAHF_GUARD_INTENSITY = "kahf_guard_intensity"
 const val KAHF_GUARD_DEFAULT = "High"
 
 // SafeGaze (image blur) Settings
-const val SAFE_GAZE_DEFAULT = "Blur"
+const val SAFE_GAZE_DEFAULT = "Pixelation"
 const val SAFE_GAZE_MODE = "safe_gaze_mode"
