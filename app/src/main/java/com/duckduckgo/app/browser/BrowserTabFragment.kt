@@ -4560,6 +4560,7 @@ class BrowserTabFragment :
                 }
                 .launchIn(lifecycleScope)
 
+            newBrowserTab.browserBackground.show()
             newBrowserTab.newTabContainerLayout.show()
             newBrowserTab.newTabLayout.show()
 
@@ -4568,7 +4569,7 @@ class BrowserTabFragment :
 
         private fun hideNewTab() {
             Timber.d("New Tab: hideNewTab")
-            newBrowserTab.newTabContainerLayout.gone()
+            newBrowserTab.browserBackground.gone()
         }
 
         private fun hideDaxCta() {
