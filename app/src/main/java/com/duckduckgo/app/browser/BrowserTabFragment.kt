@@ -122,6 +122,7 @@ import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
 import co.kahf.adsdk.KahfAdConfig
 import co.kahf.adsdk.KahfAdSdk
+import co.kahf.adsdk.KahfAdType
 import co.kahf.adsdk.KahfSdkConfig
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -918,7 +919,7 @@ class BrowserTabFragment :
     )
 
     private val kahfAdConfig = KahfAdConfig(
-        adType = "image-640x200",
+        adType = KahfAdType.BANNER_AD,
         divId = "under-saalat-time",
         screenName = "home-page",
     )
