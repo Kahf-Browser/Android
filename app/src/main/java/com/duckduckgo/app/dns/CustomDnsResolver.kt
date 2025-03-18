@@ -25,6 +25,7 @@ import timber.log.Timber
 import java.io.IOException
 import java.net.InetAddress
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.system.measureTimeMillis
 
 data class CachedDnsResponse(
     val message: Message,
@@ -40,7 +41,7 @@ class CustomDnsResolver(
 ) : Dns {
     private var privateDns: PrivateDnsLevel
     private var socketHelper: SocketHelper
-    private val resolutionTimes = mutableListOf<Long>()
+    private var responseTimeStat = Pair(0L, 0)
 
     companion object {
         private const val MAX_RETRY = 2
@@ -79,20 +80,16 @@ class CustomDnsResolver(
                 cache.remove(host)
 
                 try {
-                    val t1 = System.currentTimeMillis()
                     val queryMessage = Message.newQuery(Record.newRecord(Name.fromString(host), Type.A, DClass.IN))
                     val responseMessage = sendDoTQuery(queryMessage)
-                    calculateResolutionTimeAndLogP90(t1)
                     responseMessage
                 } catch (e: Exception) {
                     null
                 }
             }
         } ?: try {
-            val t1 = System.currentTimeMillis()
             val queryMessage = Message.newQuery(Record.newRecord(Name.fromString(host), Type.A, DClass.IN))
             val responseMessage = sendDoTQuery(queryMessage)
-            calculateResolutionTimeAndLogP90(t1)
             responseMessage
         } catch (e: Exception) {
             null
@@ -159,10 +156,16 @@ class CustomDnsResolver(
             }
 
             try {
-                val ans = socketClient.execute(queryBytes)
-                val message = Message(ans)
+                var dotResponse: Message
+                val queryDurationMs = measureTimeMillis {
+                    val ans = socketClient.execute(queryBytes)
+                    dotResponse = Message(ans)
+                }
+                Timber.d("tpLog DoT query time: $queryDurationMs ms")
+                logResponseTime(queryDurationMs)
+
                 socketHelper.returnSocket(socketClient)
-                message
+                dotResponse
             } catch (e: IOException) {
                 Timber.e("tpLog DoT query error 1: ${e.message ?: e.toString()}")
                 // socketHelper.returnSocket(socketClient) // intentionally not invalidating the socket here
@@ -200,22 +203,19 @@ class CustomDnsResolver(
         }
     }
 
-    fun calculateResolutionTimeAndLogP90(t1: Long) {
-        val t2 = System.currentTimeMillis()
-        val inferenceTime = t2 - t1
-        resolutionTimes.add(inferenceTime)
+    private fun logResponseTime(queryDurationMs: Long) {
+        responseTimeStat = Pair(responseTimeStat.first + queryDurationMs, responseTimeStat.second + 1)
 
-        // Log P90 DNS resolution time for every 30 images to GA
-        if (resolutionTimes.size >= 30) {
-            val p90 = resolutionTimes.sorted()[resolutionTimes.size * 90 / 100]
+        if (responseTimeStat.second >= 50) {
+            val avgDuration = responseTimeStat.first / responseTimeStat.second
             analytics.logEvent(
-                AnalyticsEvent.P90DnsResolution,
+                AnalyticsEvent.AvgKahfGuardResponseTime,
                 mapOf(
-                    AnalyticsParam.DnsResolutionTime to p90.toString(),
+                    AnalyticsParam.AvgKahfGuardTimeMs to avgDuration.toString(),
                     AnalyticsParam.DnsResolver to privateDns.url,
-                ),
+                )
             )
-            resolutionTimes.clear()
+            responseTimeStat = Pair(0L, 0)
         }
     }
 }

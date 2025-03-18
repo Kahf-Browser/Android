@@ -28,6 +28,8 @@ sealed class AnalyticsEvent(val name: String) {
     data object PrivateDnsHigh : AnalyticsEvent("private_dns_high")
     data object PrivateDnsMedium : AnalyticsEvent("private_dns_medium")
     data object PrivateDnsLow : AnalyticsEvent("private_dns_low")
+    data object AvgDnsResolutionTime : AnalyticsEvent("avg_dns_resolution_time")
+    data object AvgKahfGuardResponseTime : AnalyticsEvent("avg_kahf_guard_response_time")
 
     // Image Filter (Decent Internet)
     data object ImageFilerEnable : AnalyticsEvent("image_filter_enable")
@@ -61,6 +63,8 @@ sealed class AnalyticsParam(val name: String) {
     data object AvgQueueTimeMs : AnalyticsParam("avg_queue_time_ms")
     data object DnsResolver : AnalyticsParam("dns_resolver")
     data object ModelInitTimeMS : AnalyticsParam("model_initialization_time_ms")
+    data object AvgResolutionTimeMs : AnalyticsParam("avg_resolution_time_ms")
+    data object AvgKahfGuardTimeMs : AnalyticsParam("avg_kahf_guard_time_ms")
 
     // Search
     data object SuggestionSearchEngine : AnalyticsParam("autosuggestion_search_engine")
