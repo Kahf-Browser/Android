@@ -45,6 +45,8 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.ceil
+import kotlin.system.measureTimeMillis
 
 internal data class UrlInfo(
     val url: String,
@@ -92,7 +94,7 @@ class SafeGazeJsInterface(
     ): SafeGazeResult {
         return suspendCoroutine { continuation ->
             scope.launch {
-                var bitmap = if (imageData != null) {
+                val bitmap = if (imageData != null) {
                     base64ToBitmap(imageData)
                 } else {
                     getBitmapFromUrl(url)
@@ -102,17 +104,6 @@ class SafeGazeJsInterface(
                     continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
                     recycleBitmap(bitmap)
                     return@launch
-                }
-
-                // if image is too big, we need to resize it
-                if (bitmap.height > SAFE_GAZE_MAX_IMG_SIZE || bitmap.width > SAFE_GAZE_MAX_IMG_SIZE) {
-                    if (bitmap.height > bitmap.width) {
-                        val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.height
-                        bitmap = Bitmap.createScaledBitmap(bitmap, (bitmap.width * ratio).toInt(), SAFE_GAZE_MAX_IMG_SIZE, true)
-                    } else {
-                        val ratio = SAFE_GAZE_MAX_IMG_SIZE.toFloat() / bitmap.width
-                        bitmap = Bitmap.createScaledBitmap(bitmap, SAFE_GAZE_MAX_IMG_SIZE, (bitmap.height * ratio).toInt(), true)
-                    }
                 }
 
                 val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
@@ -179,10 +170,42 @@ class SafeGazeJsInterface(
     // method to convert base64 to bitmap (handle possible exception when decoding base64)
     private fun base64ToBitmap(base64Image: String): Bitmap? {
         return try {
-            val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
-            BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size)
+            val result: Bitmap?
+            val time = measureTimeMillis {
+                val byteArrayImage = Base64.decode(base64Image, Base64.DEFAULT)
+
+                // Check the original image dimensions
+                val options = BitmapFactory.Options().apply {
+                    inJustDecodeBounds = true
+                }
+                BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size, options)
+
+                val width = options.outWidth
+                val height = options.outHeight
+
+                // Downsample the image if it exceeds the maximum size
+                var inSampleSize = 1
+
+                if (width > SAFE_GAZE_MAX_IMG_SIZE || height > SAFE_GAZE_MAX_IMG_SIZE) {
+                    inSampleSize = Math.max(
+                        ceil(width / SAFE_GAZE_MAX_IMG_SIZE.toDouble()).toInt(),
+                        ceil(height / SAFE_GAZE_MAX_IMG_SIZE.toDouble()).toInt()
+                    )
+                }
+
+                options.apply {
+                    inJustDecodeBounds = false
+                    this.inSampleSize = inSampleSize
+                    inPreferredConfig = Bitmap.Config.RGB_565 // Memory-efficient pixel format
+                }
+
+                result = BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size, options)
+            }
+
+            Timber.d("kLog base64ToBitmap: $time ms")
+            result
         } catch (e: Exception) {
-            Timber.e(e, "kLog Error decoding base64 image")
+            Timber.e(e, "kLog base64ToBitmap: ${e.message}")
             null
         }
     }
@@ -195,7 +218,10 @@ class SafeGazeJsInterface(
             Glide.with(context)
                 .asBitmap()
                 .load(url)
-                .apply(RequestOptions().downsample(DownsampleStrategy.AT_MOST))
+                .apply(RequestOptions()
+                    .downsample(DownsampleStrategy.AT_MOST)
+                    .override(SAFE_GAZE_MAX_IMG_SIZE, SAFE_GAZE_MAX_IMG_SIZE)
+                )
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(object : CustomTarget<Bitmap>() {
                     override fun onResourceReady(
@@ -355,17 +381,17 @@ class SafeGazeJsInterface(
                             resultJson = "null"
                             callSafegazeOnDeviceModelHandler(it.uid, resultJson, "null", false)
 
-                            Timber.d("kLog invalid or failed image: -- ${it.url}")
+                            Timber.d("kLog invalid or failed image: -- ${if (it.url.isDataUri()) "data:url" else it.url}")
                         } else if (result.persons.isNotEmpty()) {
                             resultJson = VisualizationUtils.toJson(gson, result)
                             callSafegazeOnDeviceModelHandler(it.uid, resultJson, result.base64Image, result.persons.any { p -> p.isFemale })
 
-                            Timber.d("kLog Inference time: $inferenceTime ms -- ${it.url}")
+                            Timber.d("kLog Inference time: $inferenceTime ms -- ${if (it.url.isDataUri()) "data:url" else it.url}")
                         } else {
                             resultJson = nsfwJson(result.isNsfw)
                             callSafegazeOnDeviceModelHandler(it.uid, resultJson, result.base64Image, result.isNsfw)
 
-                            Timber.d("kLog Inference time: $inferenceTime ms  --  ${it.url}")
+                            Timber.d("kLog Inference time: $inferenceTime ms  --  ${if (it.url.isDataUri()) "data:url" else it.url}")
                         }
 
                         // Insert to local DB
