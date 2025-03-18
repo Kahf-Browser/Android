@@ -9,6 +9,7 @@ import android.util.Base64
 import android.webkit.JavascriptInterface
 import androidx.core.graphics.toRect
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.request.RequestOptions
@@ -187,7 +188,7 @@ class SafeGazeJsInterface(
                 var inSampleSize = 1
 
                 if (width > SAFE_GAZE_MAX_IMG_SIZE || height > SAFE_GAZE_MAX_IMG_SIZE) {
-                    inSampleSize = Math.max(
+                    inSampleSize = maxOf(
                         ceil(width / SAFE_GAZE_MAX_IMG_SIZE.toDouble()).toInt(),
                         ceil(height / SAFE_GAZE_MAX_IMG_SIZE.toDouble()).toInt()
                     )
@@ -196,7 +197,7 @@ class SafeGazeJsInterface(
                 options.apply {
                     inJustDecodeBounds = false
                     this.inSampleSize = inSampleSize
-                    inPreferredConfig = Bitmap.Config.RGB_565 // Memory-efficient pixel format
+                    inPreferredConfig = Bitmap.Config.ARGB_8888
                 }
 
                 result = BitmapFactory.decodeByteArray(byteArrayImage, 0, byteArrayImage.size, options)
@@ -221,6 +222,7 @@ class SafeGazeJsInterface(
                 .apply(RequestOptions()
                     .downsample(DownsampleStrategy.AT_MOST)
                     .override(SAFE_GAZE_MAX_IMG_SIZE, SAFE_GAZE_MAX_IMG_SIZE)
+                    .format(DecodeFormat.PREFER_ARGB_8888)
                 )
                 .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .into(object : CustomTarget<Bitmap>() {
