@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
@@ -75,6 +76,12 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManager
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -144,6 +151,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var layoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
+    private val UPDATE_REQUEST_CODE = 1001
+
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
 
@@ -185,6 +195,70 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         observeKeyboardVisibility()
+
+        checkForAppUpdate()
+    }
+
+    private fun checkForAppUpdate() {
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            when {
+                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                    appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) -> {
+                    startImmediateUpdate(appUpdateInfo)
+                }
+
+                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                    appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE) -> {
+                    startFlexibleUpdate(appUpdateInfo)
+                }
+            }
+        }
+    }
+
+    private fun startImmediateUpdate(appUpdateInfo: AppUpdateInfo) {
+        appUpdateManager.startUpdateFlowForResult(
+            appUpdateInfo,
+            this,
+            AppUpdateOptions.defaultOptions(AppUpdateType.IMMEDIATE),
+            UPDATE_REQUEST_CODE,
+        )
+    }
+
+    private fun startFlexibleUpdate(appUpdateInfo: AppUpdateInfo) {
+        appUpdateManager.startUpdateFlowForResult(
+            appUpdateInfo,
+            this,
+            AppUpdateOptions.defaultOptions(AppUpdateType.FLEXIBLE),
+            UPDATE_REQUEST_CODE,
+        )
+
+        // Listen for update completion
+        appUpdateManager.registerListener { state ->
+            if (state.installStatus() == com.google.android.play.core.install.model.InstallStatus.DOWNLOADED) {
+                Toast.makeText(this, "Update downloaded! Restarting app...", Toast.LENGTH_LONG).show()
+                appUpdateManager.completeUpdate()
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                startImmediateUpdate(appUpdateInfo)
+            }
+        }
+    }
+
+    // **Handle Update Failure**
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == UPDATE_REQUEST_CODE) {
+            if (resultCode != Activity.RESULT_OK) {
+                Toast.makeText(this, "Update is required to continue!", Toast.LENGTH_SHORT).show()
+                checkForAppUpdate() // Keep prompting until updated
+            }
+        }
     }
 
     override fun onStop() {
