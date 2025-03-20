@@ -42,6 +42,8 @@ class CustomDnsResolver(
     private var privateDns: PrivateDnsLevel
     private var socketHelper: SocketHelper
     private var responseTimeStat = Pair(0L, 0)
+    private var totalResolutionTimeStat = Pair(0L, 0)
+    private var cacheMissOccurred = false
 
     companion object {
         private const val MAX_RETRY = 2
@@ -78,6 +80,7 @@ class CustomDnsResolver(
             } else {
                 Timber.d("tpLog Cache expired for $host")
                 cache.remove(host)
+                cacheMissOccurred = true
 
                 try {
                     val queryMessage = Message.newQuery(Record.newRecord(Name.fromString(host), Type.A, DClass.IN))
@@ -87,19 +90,30 @@ class CustomDnsResolver(
                     null
                 }
             }
-        } ?: try {
-            val queryMessage = Message.newQuery(Record.newRecord(Name.fromString(host), Type.A, DClass.IN))
-            val responseMessage = sendDoTQuery(queryMessage)
-            responseMessage
-        } catch (e: Exception) {
-            null
+        } ?: run {
+            cacheMissOccurred = true
+            try {
+                val queryMessage = Message.newQuery(Record.newRecord(Name.fromString(host), Type.A, DClass.IN))
+                val responseMessage = sendDoTQuery(queryMessage)
+                responseMessage
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 
     suspend fun resolveDomain(domain: android.net.Uri, attempt: Int = 0): Pair<String, String>? {
         if (attempt > 2) return null
 
-        return withContext(dispatcher.io()) {
+        // Reset cache miss flag and start timing only on initial call
+        if (attempt == 0) {
+            cacheMissOccurred = false
+        }
+
+        // Measure total resolution time for initial calls only
+        val startTime = if (attempt == 0) System.currentTimeMillis() else 0
+
+        val result = withContext(dispatcher.io()) {
             val host = (domain.host ?: domain.toString()).removeSuffix(".") + "."
 
             try {
@@ -121,6 +135,7 @@ class CustomDnsResolver(
                         return@withContext Pair(KAHF_GUARD_BLOCKED_URL, KAHF_GUARD_BLOCKED_IP)
                     }
 
+                    // Make recursive call with incremented attempt counter
                     val cnameResponseMessage = resolveDomain(cnameRecord.rdataToString().toUri(), attempt + 1)
                     cnameResponseMessage?.let { pair ->
                         cache[host] = CachedDnsResponse(responseMessage, System.currentTimeMillis() + 5 * 60 * 1000)
@@ -135,6 +150,16 @@ class CustomDnsResolver(
                 null
             }
         }
+
+        // Calculate and log total time for initial calls only when all recursion completes
+        if (attempt == 0) {
+            val totalTime = System.currentTimeMillis() - startTime
+            if (cacheMissOccurred) {
+                logTotalResolutionTime(totalTime)
+            }
+        }
+
+        return result
     }
 
     private suspend fun sendDoTQuery(query: Message, retry: Int = 0): Message? {
@@ -216,6 +241,22 @@ class CustomDnsResolver(
                 )
             )
             responseTimeStat = Pair(0L, 0)
+        }
+    }
+
+    private fun logTotalResolutionTime(totalTimeMs: Long) {
+        totalResolutionTimeStat = Pair(totalResolutionTimeStat.first + totalTimeMs, totalResolutionTimeStat.second + 1)
+
+        if (totalResolutionTimeStat.second >= 10) {
+            val avgDuration = totalResolutionTimeStat.first / totalResolutionTimeStat.second
+            analytics.logEvent(
+                AnalyticsEvent.AvgDnsResolutionTime,
+                mapOf(
+                    AnalyticsParam.AvgResolutionTimeMs to avgDuration.toString(),
+                    AnalyticsParam.DnsResolver to privateDns.url,
+                )
+            )
+            totalResolutionTimeStat = Pair(0L, 0)
         }
     }
 }
