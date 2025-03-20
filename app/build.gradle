@@ -22,8 +22,8 @@ android {
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
-        versionCode 202503091
-        versionName "1.1.0"
+        versionCode 202503192
+        versionName "1.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "kahf_browser_${versionName}_${versionCode}"
         vectorDrawables.useSupportLibrary = true
@@ -389,6 +389,10 @@ dependencies {
     implementation JakeWharton.timber
     implementation 'nl.dionsegijn:konfetti:1.2.5'
     implementation 'com.github.Muslims-Day:kahfad:1.1.2'
+
+    // App update
+    implementation 'com.google.android.play:app-update:2.1.0'
+    implementation 'com.google.android.play:app-update-ktx:2.1.0'
 
     // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
