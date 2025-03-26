@@ -103,11 +103,17 @@ class SafeGazeJsInterface(
 
                 if (bitmap == null || bitmap.height < SAFE_GAZE_MIN_IMG_SIZE || bitmap.width < SAFE_GAZE_MIN_IMG_SIZE) {
                     continuation.resume(SafeGazeResult(false, emptyList(), bitmap?.width ?: 0, bitmap?.height ?: 0, VisualizationUtils.bitmapToBase64(bitmap)))
-                    recycleBitmap(bitmap)
+                    // recycleBitmap(bitmap)
                     return@launch
                 }
 
-                val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
+                val nsfwPrediction = try {
+                    nsfwDetector.isNsfw(bitmap)
+                } catch (e: Exception) {
+                    Timber.e(e, "kLog Error while classifying image: $e")
+                    continuation.resume(SafeGazeResult(false, emptyList(), bitmap.width, bitmap.height, VisualizationUtils.bitmapToBase64(bitmap)))
+                    return@launch
+                }
 
                 if (!nsfwPrediction.isSafe()) {
                     nsfwPrediction.getLabelWithConfidence().let {
@@ -138,7 +144,7 @@ class SafeGazeJsInterface(
                     }
                     val imageDataFinal = imageData ?: VisualizationUtils.bitmapToBase64(bitmap)
                     continuation.resume(SafeGazeResult(false, personList, bitmap.width, bitmap.height, imageDataFinal))
-                    recycleBitmap(bitmap)
+                    // recycleBitmap(bitmap)
                 }
             }
         }
