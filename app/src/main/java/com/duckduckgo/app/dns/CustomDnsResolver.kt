@@ -1,11 +1,11 @@
 package com.duckduckgo.app.dns
 
 import android.content.SharedPreferences
+import android.os.Build
 import androidx.core.net.toUri
 import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
-import com.duckduckgo.app.dns.socket_pool.SocketHelper
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_IP
@@ -22,17 +22,13 @@ import org.xbill.DNS.Record
 import org.xbill.DNS.Section
 import org.xbill.DNS.Type
 import timber.log.Timber
-import java.io.IOException
+import java.io.DataInputStream
+import java.io.DataOutputStream
 import java.net.InetAddress
 import java.util.concurrent.ConcurrentHashMap
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
 import kotlin.system.measureTimeMillis
-
-data class CachedDnsResponse(
-    val message: Message,
-    val expirationTimeMillis: Long
-) {
-    fun isExpired() = System.currentTimeMillis() > expirationTimeMillis
-}
 
 class CustomDnsResolver(
     private val dispatcher: DispatcherProvider,
@@ -40,7 +36,7 @@ class CustomDnsResolver(
     sharedPreferences: SharedPreferences
 ) : Dns {
     private var privateDns: PrivateDnsLevel
-    private var socketHelper: SocketHelper
+    private var dnsSocket: SSLSocket
     private var responseTimeStat = Pair(0L, 0)
     private var totalResolutionTimeStat = Pair(0L, 0)
     private var cacheMissOccurred = false
@@ -54,8 +50,36 @@ class CustomDnsResolver(
         privateDns = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
 
         runBlocking {
-            socketHelper = SocketHelper.getInstance(privateDns.dnsServerIps.random(), 853, privateDns.url)
+            dnsSocket = initSocket()
         }
+    }
+
+    private fun initSocket(): SSLSocket {
+        val socketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
+        val sslSocket = socketFactory.createSocket(privateDns.dnsServerIps.random(), 853) as SSLSocket
+        sslSocket.keepAlive = true
+        sslSocket.soTimeout = 2000
+        sslSocket.tcpNoDelay = true
+
+        // Set the TLS host header
+        sslSocket.sslParameters = sslSocket.sslParameters.apply {
+            serverNames = listOf(javax.net.ssl.SNIHostName(privateDns.url))
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                applicationProtocols = arrayOf("http/1.1")
+            } else {
+                try {
+                    val method = this::class.java.getMethod("setApplicationProtocols", Array<String>::class.java)
+                    method.invoke(this, arrayOf("http/1.1"))
+                } catch (e: Exception) {
+                    Timber.e("tpLog Error setting application protocols: ${e.message}")
+                }
+            }
+        }
+
+        sslSocket.startHandshake()
+
+        return sslSocket
     }
 
     override fun lookup(hostname: String): List<InetAddress> {
@@ -170,10 +194,9 @@ class CustomDnsResolver(
         val queryBytes = query.toWire()
 
         return withContext(dispatcher.io()) {
-            val socketClient = try {
-                withTimeout(1900) {
-                    Timber.e("tpLog Trying to get a socket")
-                    socketHelper.socket
+            try {
+                withTimeout(1500) {
+                    dnsSocket = initSocket()
                 }
             } catch (e: Exception) {
                 Timber.e("tpLog Error getting socket: ${e.message}")
@@ -183,21 +206,27 @@ class CustomDnsResolver(
             try {
                 var dotResponse: Message
                 val queryDurationMs = measureTimeMillis {
-                    val ans = socketClient.execute(queryBytes)
-                    dotResponse = Message(ans)
+                    // Write length-prefixed DNS query without closing the stream
+                    DataOutputStream(dnsSocket.outputStream).let {
+                        it.writeShort(queryBytes.size)
+                        it.write(queryBytes)
+                        it.flush()
+                    }
+
+                    DataInputStream(dnsSocket.inputStream).let {
+                        val responseBytes = ByteArray(it.readUnsignedShort())
+                        it.readFully(responseBytes)
+                        dotResponse = Message(responseBytes)
+                    }
                 }
+
                 Timber.d("tpLog DoT query time: $queryDurationMs ms")
                 logResponseTime(queryDurationMs)
+                dnsSocket.close()
 
-                socketHelper.returnSocket(socketClient)
                 dotResponse
-            } catch (e: IOException) {
-                Timber.e("tpLog DoT query error 1: ${e.message ?: e.toString()}")
-                // socketHelper.returnSocket(socketClient) // intentionally not invalidating the socket here
-                sendDoTQuery(query, retry + 1)
             } catch (e: Exception) {
-                Timber.e("tpLog DoT query error 2: ${e.message ?: e.toString()}")
-                socketHelper.invalidateSocket(socketClient)
+                Timber.e("tpLog DoT query error: ${e.message ?: e.toString()}")
                 sendDoTQuery(query, retry + 1)
             }
         }
@@ -206,7 +235,7 @@ class CustomDnsResolver(
     private suspend fun closeConnection() {
         try {
             withContext(dispatcher.io()) {
-                socketHelper.shutDown()
+                dnsSocket.close()
                 Timber.d("tpLog Socket connection closed successfully.")
             }
         } catch (e: Exception) {
@@ -223,7 +252,7 @@ class CustomDnsResolver(
         privateDns = privateDnsLevel
 
         runBlocking {
-            socketHelper = SocketHelper.getInstance(privateDns.dnsServerIps.random(), 853, privateDns.url)
+            dnsSocket = initSocket()
             Timber.d("tpLog DoH URL set to: ${privateDnsLevel.url}")
         }
     }
