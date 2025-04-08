@@ -190,25 +190,16 @@
 
         </LinearLayout>
 
-        <co.kahf.adsdk.adviews.KahfBannerAdView
-            android:id="@+id/kahfBannerAd"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/keyline_1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/textContainer" />
-
         <LinearLayout
             android:id="@+id/textContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="15dp"
-            android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
+            android:layout_marginBottom="@dimen/keyline_1"
             android:gravity="center"
             android:orientation="vertical"
             android:visibility="visible"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/kahfBannerAd"
             app:layout_constraintStart_toStartOf="parent"
             tools:visibility="visible">
 
@@ -253,6 +244,15 @@
                 android:textSize="11sp"
                 tools:text="Photo Credit" />
         </LinearLayout>
+
+        <co.kahf.adsdk.adviews.KahfBannerAdView
+            android:id="@+id/kahfBannerAd"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
         <include
             android:id="@+id/includeDaxDialogIntroBubbleCta"

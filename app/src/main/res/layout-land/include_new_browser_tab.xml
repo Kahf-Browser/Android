@@ -60,6 +60,13 @@
                 android:orientation="horizontal"
                 app:layout_constraintGuide_percent="0.02" />
 
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/guidelineMid"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5" />
+
             <LinearLayout
                 android:id="@+id/statContainer"
                 android:layout_width="0dp"
@@ -197,7 +204,9 @@
                 android:layout_marginTop="@dimen/keyline_1"
                 android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
                 app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintTop_toBottomOf="@id/historyRecyclerView"
                 app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/guidelineMid"
                 app:layout_constraintBottom_toBottomOf="parent" />
 
             <LinearLayout
@@ -212,7 +221,7 @@
                 app:layout_constraintWidth_percent="0.5"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/kahfBannerAd"
+                app:layout_constraintStart_toEndOf="@id/guidelineMid"
                 tools:visibility="visible">
 
                 <TextView
