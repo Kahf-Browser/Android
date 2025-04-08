@@ -892,11 +892,12 @@
     <string name="kahf_medium">MEDIUM</string>
     <string name="kahf_low">LOW</string>
     <string name="kahf_off">Off</string>
-    <string name="kahf_onboarding_get_what_you_want">Clean, Safe and Decent browsing -\nPowered by AI</string>
+    <string name="kahf_onboarding_disclaimer">Built on top of privacy aware DuckDuckGo browser</string>
+    <string name="kahf_onboarding_get_what_you_want">Private, Safe and Decent browsing -\nPowered by AI</string>
     <string name="kahf_onboarding_lets_go">Let\'s Go</string>
     <string name="kahf_onboarding_skip">Skip</string>
     <string name="kahf_onboarding_subtitle">Experience a safer internet with Kahf Browser. Powered by advanced AI, it filters out indecent images and harmful content in real time, allowing you to browse while staying true to your moral values.</string>
-    <string name="kahf_onboarding_title">Clean, Safe and Decent browsing -\nPowered by AI</string>
+    <string name="kahf_onboarding_title">Private, Safe and Decent browsing -\nPowered by AI</string>
     <string name="kahf_onboarding_sg_title">Hide Indecent Images</string>
     <string name="kahf_onboarding_sg_subtitle">Hiding inappropriate images.\nAvoid major sins\n\n<b>This feature is experimental.\nMay not be 100% accurate.</b></string>
     <string name="kahf_onboarding_sg_enable">Enable Image Blurring</string>
