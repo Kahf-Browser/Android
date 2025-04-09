@@ -38,3 +38,6 @@ const val KAHF_GUARD_DEFAULT = "High"
 // SafeGaze (image blur) Settings
 const val SAFE_GAZE_DEFAULT = "Pixelation"
 const val SAFE_GAZE_MODE = "safe_gaze_mode"
+
+// Firebase Remote Config
+const val MIN_VERSION = "minimum_version"

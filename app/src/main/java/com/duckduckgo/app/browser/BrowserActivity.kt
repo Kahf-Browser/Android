@@ -71,17 +71,19 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.MIN_VERSION
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
 import com.google.android.play.core.appupdate.AppUpdateInfo
-import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.get
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -200,16 +202,35 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun checkForAppUpdate() {
-        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-            when {
-                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                    appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE) -> {
-                    startImmediateUpdate(appUpdateInfo)
+        FirebaseRemoteConfig.getInstance().let { rc ->
+            rc.fetchAndActivate().addOnSuccessListener { fetchedFromRemote->
+                val minimumRequiredVersionCode: Long = try {
+                    rc[MIN_VERSION].asLong()
+                } catch (e: Exception) {
+                    0L
                 }
 
-                appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                    appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.FLEXIBLE) -> {
-                    startFlexibleUpdate(appUpdateInfo)
+                val updateType = if (minimumRequiredVersionCode > BuildConfig.VERSION_CODE) {
+                    AppUpdateType.IMMEDIATE
+                } else {
+                    AppUpdateType.FLEXIBLE
+                }
+
+                Timber.d(
+                    "rcLog Fetched from remote: $fetchedFromRemote. " +
+                        "MinRequiredVersion: $minimumRequiredVersionCode. " +
+                        "UpdateType: ${if (updateType == AppUpdateType.IMMEDIATE) "IMMEDIATE" else "FLEXIBLE"}",
+                )
+
+                appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+                    if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                        appUpdateInfo.isUpdateTypeAllowed(updateType)
+                    ) {
+                        when (updateType) {
+                            AppUpdateType.IMMEDIATE -> startImmediateUpdate(appUpdateInfo)
+                            AppUpdateType.FLEXIBLE -> startFlexibleUpdate(appUpdateInfo)
+                        }
+                    }
                 }
             }
         }
