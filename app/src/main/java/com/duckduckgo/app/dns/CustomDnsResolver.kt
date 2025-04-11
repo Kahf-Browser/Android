@@ -36,7 +36,7 @@ class CustomDnsResolver(
     sharedPreferences: SharedPreferences
 ) : Dns {
     private var privateDns: PrivateDnsLevel
-    private var dnsSocket: SSLSocket
+    private lateinit var dnsSocket: SSLSocket
     private var responseTimeStat = Pair(0L, 0)
     private var totalResolutionTimeStat = Pair(0L, 0)
     private var cacheMissOccurred = false
@@ -48,13 +48,9 @@ class CustomDnsResolver(
 
     init {
         privateDns = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
-
-        runBlocking {
-            dnsSocket = initSocket()
-        }
     }
 
-    private fun initSocket(): SSLSocket {
+    private fun setupDotSocket(): SSLSocket {
         val socketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
         val sslSocket = socketFactory.createSocket(privateDns.dnsServerIps.random(), 853) as SSLSocket
         sslSocket.keepAlive = true
@@ -196,7 +192,7 @@ class CustomDnsResolver(
         return withContext(dispatcher.io()) {
             try {
                 withTimeout(1500) {
-                    dnsSocket = initSocket()
+                    dnsSocket = setupDotSocket()
                 }
             } catch (e: Exception) {
                 Timber.e("tpLog Error getting socket: ${e.message}")
@@ -251,10 +247,7 @@ class CustomDnsResolver(
         cache.clear()
         privateDns = privateDnsLevel
 
-        runBlocking {
-            dnsSocket = initSocket()
-            Timber.d("tpLog DoH URL set to: ${privateDnsLevel.url}")
-        }
+        Timber.d("tpLog DoH URL set to: ${privateDnsLevel.url}")
     }
 
     private fun logResponseTime(queryDurationMs: Long) {
