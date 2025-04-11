@@ -74,7 +74,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingVertical="5dp"
-        app:layout_constraintBottom_toTopOf="@id/btnDefaultBrowser"
+        app:layout_constraintBottom_toTopOf="@id/btnEnableSafeGaze"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/subtitleText"
@@ -101,7 +101,7 @@
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/btnDefaultBrowser"
+        android:id="@+id/btnEnableSafeGaze"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
@@ -148,7 +148,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnDefaultBrowser"
+        app:layout_constraintTop_toBottomOf="@id/btnEnableSafeGaze"
         tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
