@@ -237,28 +237,42 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun startImmediateUpdate(appUpdateInfo: AppUpdateInfo) {
-        appUpdateManager.startUpdateFlowForResult(
-            appUpdateInfo,
-            this,
-            AppUpdateOptions.defaultOptions(AppUpdateType.IMMEDIATE),
-            UPDATE_REQUEST_CODE,
-        )
+        if (isFinishing || isDestroyed)
+            return
+
+        try {
+            appUpdateManager.startUpdateFlowForResult(
+                appUpdateInfo,
+                this@BrowserActivity,
+                AppUpdateOptions.defaultOptions(AppUpdateType.IMMEDIATE),
+                UPDATE_REQUEST_CODE,
+            )
+        } catch (e: Exception) {
+            playStoreUtils.launchPlayStore()
+        }
     }
 
     private fun startFlexibleUpdate(appUpdateInfo: AppUpdateInfo) {
-        appUpdateManager.startUpdateFlowForResult(
-            appUpdateInfo,
-            this,
-            AppUpdateOptions.defaultOptions(AppUpdateType.FLEXIBLE),
-            UPDATE_REQUEST_CODE,
-        )
+        if (isFinishing || isDestroyed)
+            return
 
-        // Listen for update completion
-        appUpdateManager.registerListener { state ->
-            if (state.installStatus() == com.google.android.play.core.install.model.InstallStatus.DOWNLOADED) {
-                Toast.makeText(this, "Update downloaded! Restarting app...", Toast.LENGTH_LONG).show()
-                appUpdateManager.completeUpdate()
+        try {
+            appUpdateManager.startUpdateFlowForResult(
+                appUpdateInfo,
+                this@BrowserActivity,
+                AppUpdateOptions.defaultOptions(AppUpdateType.FLEXIBLE),
+                UPDATE_REQUEST_CODE,
+            )
+
+            // Listen for update completion
+            appUpdateManager.registerListener { state ->
+                if (state.installStatus() == com.google.android.play.core.install.model.InstallStatus.DOWNLOADED) {
+                    Toast.makeText(this, "Update downloaded! Restarting app...", Toast.LENGTH_LONG).show()
+                    appUpdateManager.completeUpdate()
+                }
             }
+        } catch (e: Exception) {
+            playStoreUtils.launchPlayStore()
         }
     }
 
