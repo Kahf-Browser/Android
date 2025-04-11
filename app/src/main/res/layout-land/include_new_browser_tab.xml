@@ -217,6 +217,7 @@
                 android:gravity="center"
                 android:orientation="vertical"
                 android:visibility="visible"
+                android:foreground="@drawable/wallpaper_gradient_overlay"
                 android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
                 app:layout_constraintWidth_percent="0.5"
                 app:layout_constraintBottom_toBottomOf="parent"

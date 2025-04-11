@@ -53,6 +53,11 @@ sealed class AnalyticsEvent(val name: String) {
     data object SearchQueryEnter : AnalyticsEvent("search_query_enter")
     data object SearchResultLinkClick : AnalyticsEvent("search_result_link_click")
     data object ExtSearchRedirect : AnalyticsEvent("external_search_redirect")
+
+    // Kafh Ad
+    data object BannerAdClicked : AnalyticsEvent("kahf_banner_ad_clicked")
+    data object BannerAdImpression : AnalyticsEvent("kahf_banner_ad_impression")
+    data object BannerAdLoadFailed : AnalyticsEvent("kahf_banner_ad_failed_to_load")
 }
 
 sealed class AnalyticsParam(val name: String) {

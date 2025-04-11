@@ -124,6 +124,7 @@ import co.kahf.adsdk.KahfAdConfig
 import co.kahf.adsdk.KahfAdSdk
 import co.kahf.adsdk.KahfAdType
 import co.kahf.adsdk.KahfSdkConfig
+import co.kahf.adsdk.adviews.AdImpressionListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -4502,9 +4503,26 @@ class BrowserTabFragment :
             }
 
             // Kahf Ad
-            newBrowserTab.kahfBannerAd.loadAd(kahfAdConfig)
-            newBrowserTab.kahfBannerAd.setAdClickListener {
-                viewModel.onUserSubmittedQuery(it)
+            newBrowserTab.kahfBannerAd.apply {
+                loadAd(kahfAdConfig)
+                setAdClickListener {
+                    viewModel.onUserSubmittedQuery(it)
+                }
+                setAdImpressionListener(object : AdImpressionListener {
+                    override fun onAdClicked() {
+                        Timber.i("adLog onAdClicked")
+                        analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                    }
+
+                    override fun onAdFailedToLoad(message: String?) {
+                        analyticsService.logEvent(AnalyticsEvent.BannerAdLoadFailed)
+                    }
+
+                    override fun onAdLoaded() {
+                        Timber.i("adLog onAdLoaded")
+                        analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                    }
+                })
             }
 
             // App Statistics section
