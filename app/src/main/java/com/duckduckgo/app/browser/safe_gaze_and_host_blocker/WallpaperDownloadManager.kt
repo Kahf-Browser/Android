@@ -100,8 +100,26 @@ object WallpaperDownloadManager {
 
             Timber.d("fLog Wallpaper's list downloaded successfully.")
             downloadImages(context, jsonArray.map { it.asJsonObject.get("download_url").asString })
+            deleteMarkedWallpaper(context, jsonArray)
         } catch (e: IOException) {
             Timber.d("fLog Error downloading wallpaper's list: $e")
+        }
+    }
+
+    private fun deleteMarkedWallpaper(context: Context, jsonArray: JsonArray) {
+        for (element in jsonArray) {
+            val jsonObject = element.asJsonObject
+
+            if (jsonObject.has("remove") && jsonObject.get("remove").asBoolean) {
+                val url = jsonObject.get("download_url").asString
+                val fileName = url.md5()
+                val file = File("${context.filesDir}/wp/$fileName")
+
+                if (file.exists()) {
+                    val deleted = file.delete()
+                    Timber.d("fLog Deleted wallpaper: ${file.absolutePath}: $deleted")
+                }
+            }
         }
     }
 
