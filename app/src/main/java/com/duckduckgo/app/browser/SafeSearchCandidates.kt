@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser
 
 import com.duckduckgo.common.utils.AppUrl
 
-private val ssCandidateGoogle = SafeSearchCandidate("google.com", pathContains = listOf("search"), queryParam = "q", exclude = listOf("captcha", "accounts.google.com/", "${AppUrl.ParamKey.SAFE}=strict"))
+private val ssCandidateGoogle = SafeSearchCandidate("google.com", pathContains = listOf("search"), queryParam = "q", exclude = listOf("captcha", "accounts.google.com/", "${AppUrl.ParamKey.SAFE}="))
 
 val safeSearchCandidates = listOf(
     ssCandidateGoogle,

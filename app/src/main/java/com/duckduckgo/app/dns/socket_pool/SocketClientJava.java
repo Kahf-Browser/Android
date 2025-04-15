@@ -20,11 +20,9 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
-import timber.log.Timber;
+public class SocketClientJava {
 
-public class SocketClient {
-
-    private static final Logger LOGGER = Logger.getLogger(SocketClient.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(SocketClientJava.class.getName());
 
     private SSLSocket client;
     private DataInputStream input;
@@ -32,7 +30,7 @@ public class SocketClient {
 
     private static final int TIMEOUT_IN_MS = 2 * 1000;
 
-    public SocketClient(String host, int port, String dnsHostName) {
+    public SocketClientJava(String host, int port, String dnsHostName) {
         this.create(host, port, dnsHostName);
     }
 
@@ -60,7 +58,7 @@ public class SocketClient {
 
             configureSocket(dnsHostName);
         } catch (Exception ex) {
-            handleSocketCreationException(ex, host, port);
+            LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
         } finally {
             executor.shutdownNow(); // Ensure the thread is stopped
         }
@@ -75,11 +73,6 @@ public class SocketClient {
         this.input = new DataInputStream(this.client.getInputStream());
         this.output = new DataOutputStream(this.client.getOutputStream());
         this.output.flush();
-    }
-
-    private void handleSocketCreationException(Exception ex, String host, int port) {
-        LOGGER.log(Level.SEVERE, ex.getMessage(), ex);
-        throw new SocketClientException("Could not create a new connection to the Socket. Host:" + host + ", port:" + port, ex);
     }
 
     private SSLParameters getTLSHeader(String dnsHostName) {
@@ -110,7 +103,7 @@ public class SocketClient {
             return responseBytes;
         } catch (Exception ioex) {
             LOGGER.log(Level.SEVERE, "Error sending message to socket", ioex);
-            throw new SocketClientException("Error sending message to socket", ioex);
+            return null;
         }
     }
 
@@ -131,14 +124,6 @@ public class SocketClient {
             return this.client.isClosed();
         }
         return false;
-    }
-
-    public void activate() {
-        LOGGER.log(Level.FINE, "Activating socket");
-    }
-
-    public void deactivate() {
-        LOGGER.log(Level.FINE, "Deactivating socket");
     }
 
 }

@@ -66,13 +66,15 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
         binding = FragmentOnboardingSafegazeBinding.inflate(inflater, container, false)
 
         binding.btnSkip.setOnClickListener {
-            analytics.logEvent(AnalyticsEvent.OnboardSkipDecentInternet)
             if (hardwareCompatibilityChecked) {
+                analytics.logEvent(AnalyticsEvent.OnboardSkipDecentInternet)
+                // Turn off SafeGaze
+                SafeGazeLevel.updateLevel(spProvider.getKahfSharedPreferences(), SafeGazeLevel.Off)
                 (requireActivity() as KahfOnboardingActivity).onContinueClicked()
             }
         }
 
-        binding.btnDefaultBrowser.setOnClickListener {
+        binding.btnEnableSafeGaze.setOnClickListener {
             if (hardwareCompatibilityChecked) {
                 analytics.logEvent(AnalyticsEvent.OnboardEnabledDecentInternet)
                 onEnableSafeGazeClicked()

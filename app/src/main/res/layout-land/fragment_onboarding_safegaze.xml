@@ -91,7 +91,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:paddingVertical="5dp"
-        app:layout_constraintBottom_toTopOf="@id/btnDefaultBrowser"
+        app:layout_constraintBottom_toTopOf="@id/btnEnableSafeGaze"
         app:layout_constraintEnd_toEndOf="@id/guidelineMiddle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/titleText"
@@ -118,7 +118,7 @@
     </LinearLayout>
 
     <androidx.cardview.widget.CardView
-        android:id="@+id/btnDefaultBrowser"
+        android:id="@+id/btnEnableSafeGaze"
         android:layout_width="@dimen/kahf_onboard_button_width"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
@@ -160,10 +160,10 @@
         android:text="@string/kahf_onboarding_skip"
         android:textColor="@color/kahf_onboarding_skip"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/btnDefaultBrowser"
+        app:layout_constraintBottom_toBottomOf="@id/btnEnableSafeGaze"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btnDefaultBrowser"
-        app:layout_constraintTop_toTopOf="@id/btnDefaultBrowser"
+        app:layout_constraintStart_toEndOf="@id/btnEnableSafeGaze"
+        app:layout_constraintTop_toTopOf="@id/btnEnableSafeGaze"
         tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

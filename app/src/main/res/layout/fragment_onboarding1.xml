@@ -45,7 +45,7 @@
         android:id="@+id/titleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="25dp"
+        android:layout_marginBottom="5dp"
         android:fontFamily="@font/poppins_bold"
         android:paddingStart="30dp"
         android:paddingEnd="30dp"
@@ -54,10 +54,27 @@
         android:text="@string/kahf_onboarding_get_what_you_want"
         android:textColor="?attr/daxColorWhite"
         android:textSize="35sp"
-        app:layout_constraintBottom_toTopOf="@id/btnContinue"
+        app:layout_constraintBottom_toTopOf="@id/disclaimerText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         tools:ignore="DeprecatedWidgetInXml" />
+
+    <TextView
+        android:id="@+id/disclaimerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="4dp"
+        android:layout_marginBottom="20dp"
+        android:justificationMode="inter_word"
+        android:textColor="?attr/daxColorWhite"
+        android:textSize="15sp"
+        android:fontFamily="@font/inter"
+        android:gravity="center"
+        android:text="@string/kahf_onboarding_disclaimer"
+        app:layout_constraintBottom_toTopOf="@id/btnContinue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/btnContinue"

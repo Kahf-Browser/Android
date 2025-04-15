@@ -33,6 +33,8 @@ import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
@@ -95,7 +97,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         appCoroutineScope.launch(dispatchers.io()) {
             referralStateListener.initialiseReferralRetrieval()
         }
+
         scheduleTasks()
+        configRemoteConfig()
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
@@ -146,6 +150,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             enqueue(jsDownloadWorkReq)
             enqueue(wallpaperDownloadWorkReq)
         }
+    }
+
+    private fun configRemoteConfig() {
+        val remoteConfig: FirebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+        remoteConfig.setConfigSettingsAsync(
+            FirebaseRemoteConfigSettings.Builder()
+                .setMinimumFetchIntervalInSeconds(60 * 60) // 1 hour
+                .build(),
+        )
     }
 
     private fun configureLogging() {

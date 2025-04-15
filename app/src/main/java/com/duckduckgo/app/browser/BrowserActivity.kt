@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
@@ -70,11 +71,19 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.MIN_VERSION
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
+import com.google.android.play.core.appupdate.AppUpdateInfo
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
+import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.get
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -144,6 +153,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     private var layoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
+    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
+    private val UPDATE_REQUEST_CODE = 1001
+
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
 
@@ -185,6 +197,103 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
 
         observeKeyboardVisibility()
+
+        checkForAppUpdate()
+    }
+
+    private fun checkForAppUpdate() {
+        FirebaseRemoteConfig.getInstance().let { rc ->
+            rc.fetchAndActivate().addOnSuccessListener { fetchedFromRemote->
+                val minimumRequiredVersionCode: Long = try {
+                    rc[MIN_VERSION].asLong()
+                } catch (e: Exception) {
+                    0L
+                }
+
+                val updateType = if (minimumRequiredVersionCode > BuildConfig.VERSION_CODE) {
+                    AppUpdateType.IMMEDIATE
+                } else {
+                    AppUpdateType.FLEXIBLE
+                }
+
+                Timber.d(
+                    "rcLog Fetched from remote: $fetchedFromRemote. " +
+                        "MinRequiredVersion: $minimumRequiredVersionCode. " +
+                        "UpdateType: ${if (updateType == AppUpdateType.IMMEDIATE) "IMMEDIATE" else "FLEXIBLE"}",
+                )
+
+                appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+                    if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                        appUpdateInfo.isUpdateTypeAllowed(updateType)
+                    ) {
+                        when (updateType) {
+                            AppUpdateType.IMMEDIATE -> startImmediateUpdate(appUpdateInfo)
+                            AppUpdateType.FLEXIBLE -> startFlexibleUpdate(appUpdateInfo)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startImmediateUpdate(appUpdateInfo: AppUpdateInfo) {
+        if (isFinishing || isDestroyed)
+            return
+
+        try {
+            appUpdateManager.startUpdateFlowForResult(
+                appUpdateInfo,
+                this@BrowserActivity,
+                AppUpdateOptions.defaultOptions(AppUpdateType.IMMEDIATE),
+                UPDATE_REQUEST_CODE,
+            )
+        } catch (e: Exception) {
+            playStoreUtils.launchPlayStore()
+        }
+    }
+
+    private fun startFlexibleUpdate(appUpdateInfo: AppUpdateInfo) {
+        if (isFinishing || isDestroyed)
+            return
+
+        try {
+            appUpdateManager.startUpdateFlowForResult(
+                appUpdateInfo,
+                this@BrowserActivity,
+                AppUpdateOptions.defaultOptions(AppUpdateType.FLEXIBLE),
+                UPDATE_REQUEST_CODE,
+            )
+
+            // Listen for update completion
+            appUpdateManager.registerListener { state ->
+                if (state.installStatus() == com.google.android.play.core.install.model.InstallStatus.DOWNLOADED) {
+                    Toast.makeText(this, "Update downloaded! Restarting app...", Toast.LENGTH_LONG).show()
+                    appUpdateManager.completeUpdate()
+                }
+            }
+        } catch (e: Exception) {
+            playStoreUtils.launchPlayStore()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS) {
+                startImmediateUpdate(appUpdateInfo)
+            }
+        }
+    }
+
+    // **Handle Update Failure**
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == UPDATE_REQUEST_CODE) {
+            if (resultCode != Activity.RESULT_OK) {
+                Toast.makeText(this, "Update is required to continue!", Toast.LENGTH_SHORT).show()
+                checkForAppUpdate() // Keep prompting until updated
+            }
+        }
     }
 
     override fun onStop() {

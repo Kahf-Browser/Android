@@ -29,6 +29,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="?attr/actionBarSize"
+        android:visibility="gone"
+        tools:visibility="visible"
         android:foreground="@android:color/transparent">
 
         <androidx.appcompat.widget.AppCompatImageView
@@ -37,7 +39,6 @@
             android:layout_height="0dp"
             android:scaleType="centerCrop"
             android:src="@drawable/background_mosque"
-            android:foreground="@drawable/wallpaper_gradient_overlay"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -188,68 +189,76 @@
 
         </LinearLayout>
 
-        <co.kahf.adsdk.adviews.KahfBannerAdView
-            android:id="@+id/kahfBannerAd"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/keyline_1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/textContainer" />
-
         <LinearLayout
-            android:id="@+id/textContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="15dp"
             android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
-            android:gravity="center"
             android:orientation="vertical"
-            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="visible">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
-            <TextView
-                android:id="@+id/title"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/textContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:fontFamily="@font/lato"
+                android:background="@drawable/wallpaper_gradient_overlay"
                 android:gravity="center"
-                android:maxLines="2"
-                android:textAlignment="center"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="17sp"
-                tools:text="Title" />
-
-            <TextView
-                android:id="@+id/subtitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:fontFamily="@font/lato"
-                android:gravity="center"
-                android:maxLines="2"
-                android:textAlignment="center"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="13sp"
-                tools:text="Subtitle" />
-
-            <TextView
-                android:id="@+id/photoCredit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:ellipsize="end"
-                android:fontFamily="@font/lato"
-                android:gravity="center"
-                android:maxLines="1"
+                android:orientation="vertical"
+                android:paddingHorizontal="15dp"
                 android:paddingVertical="3dp"
-                android:textAlignment="center"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="11sp"
-                tools:text="Photo Credit" />
+                android:visibility="visible"
+                app:layout_constraintBottom_toTopOf="@id/kahfBannerAd"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:visibility="visible">
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/lato"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="17sp"
+                    tools:text="Title" />
+
+                <TextView
+                    android:id="@+id/subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/lato"
+                    android:gravity="center"
+                    android:maxLines="2"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="13sp"
+                    tools:text="Subtitle" />
+
+                <TextView
+                    android:id="@+id/photoCredit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/lato"
+                    android:gravity="center"
+                    android:maxLines="1"
+                    android:paddingVertical="3dp"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/darker_gray"
+                    android:textSize="11sp"
+                    tools:text="Photo Credit" />
+            </LinearLayout>
+
+            <co.kahf.adsdk.adviews.KahfBannerAdView
+                android:id="@+id/kahfBannerAd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
         </LinearLayout>
 
         <include

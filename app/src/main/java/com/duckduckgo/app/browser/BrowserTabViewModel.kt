@@ -3580,8 +3580,12 @@ class BrowserTabViewModel @Inject constructor(
         val jsonArrayStr = jsonFile.readText()
         val gson = Gson()
         val listType = object : TypeToken<List<WallpaperData>>() {}.type
-        val wallpaperDataList = gson.fromJson<List<WallpaperData>>(jsonArrayStr, listType)
-        val wallpaperData = wallpaperDataList.firstOrNull { it.downloadUrl.md5() == randomFile.name }
+        val wallpaperDataList = try {
+            gson.fromJson<List<WallpaperData>>(jsonArrayStr, listType)
+        } catch (e: Exception) {
+            null // Invalid or empty JSON
+        }
+        val wallpaperData = wallpaperDataList?.firstOrNull { it.downloadUrl.md5() == randomFile.name }
         val bitmap = BitmapFactory.decodeFile(randomFile.absolutePath)
 
         wpData = bitmap?.let {

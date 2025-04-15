@@ -499,17 +499,27 @@ class BrowserWebViewClient @Inject constructor(
         webView: WebView,
         request: WebResourceRequest,
     ): WebResourceResponse? {
-        val url = request.url.toString()
+        var url = request.url.toString()
         if (request.url.host == KAHF_GUARD_BLOCKED_URL || url.isDataUri()) return null
         val privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
         val privateDnsEnabled = privateDnsMode != PrivateDnsLevel.Off
+        val isAmpUrl = isAmpUrl(url)
 
         return runBlocking {
             withContext(dispatcherProvider.io()) {
                 try {
-                    if (privateDnsEnabled && request.isForMainFrame && resolveDns(Uri.parse(url)).second == KAHF_GUARD_BLOCKED_URL) {
-                        withContext(dispatcherProvider.main()) {
-                            webViewClientListener?.onUrlBlocked(url)
+                    if (isAmpUrl) {
+                        extractOriginalUrlFromAmp(url).also {
+                            Timber.d("amLog AMP URL: $it")
+                            url = it
+                        }
+                    }
+
+                    if (privateDnsEnabled && (request.isForMainFrame || isAmpUrl) && resolveDns(url.toUri()).second == KAHF_GUARD_BLOCKED_URL) {
+                        if (request.isForMainFrame) {
+                            withContext(dispatcherProvider.main()) {
+                                webViewClientListener?.onUrlBlocked(url)
+                            }
                         }
                         WebResourceResponse(null, null, null)
                     } else {
@@ -721,6 +731,43 @@ class BrowserWebViewClient @Inject constructor(
             SAFE_BROWSING_THREAT_UNKNOWN -> "SAFE_BROWSING_THREAT_UNKNOWN"
             SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE -> "SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE"
             else -> "ERROR_OTHER"
+        }
+    }
+
+    private fun isAmpUrl(url: String) =
+        url.contains("cdn.ampproject.org") && url.toUri().host != "cdn.ampproject.org"
+
+    private fun extractOriginalUrlFromAmp(ampUrl: String): String {
+        return try {
+            val uri = ampUrl.toUri()
+
+            // Handle cdn.ampproject.org format
+            if (uri.host?.contains("cdn.ampproject.org") == true) {
+                val pathSegments = uri.pathSegments
+                val index = pathSegments.indexOf("v")
+                if (index != -1 && pathSegments.size > index + 2) {
+                    val isSecure = pathSegments[index + 1] == "s"
+                    val originalUrlPath = pathSegments.subList(index + 2, pathSegments.size).joinToString("/")
+                    val scheme = if (isSecure) "https://" else "http://"
+                    return scheme + originalUrlPath
+                }
+            }
+
+            // Handle Google AMP format
+            if (uri.host?.contains("google.com") == true && uri.path?.contains("/amp/") == true) {
+                val path = uri.path ?: return ampUrl
+                val prefix = "/amp/s/"
+                return if (path.contains(prefix)) {
+                    "https://" + path.substringAfter(prefix)
+                } else {
+                    "http://" + path.substringAfter("/amp/")
+                }
+            }
+
+            // Fallback
+            ampUrl
+        } catch (e: Exception) {
+            ampUrl // fallback
         }
     }
 }
