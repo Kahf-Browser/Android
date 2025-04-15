@@ -2497,13 +2497,13 @@ class BrowserTabFragment :
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabLayout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+        /*newBrowserTab.newTabLayout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
             if (omnibar.omniBarContainer.isPressed) {
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
                 omnibar.omniBarContainer.isPressed = false
             }
-        }
+        }*/
     }
 
     private fun renderBottomNavMenus(viewState: BrowserViewState) {
@@ -3459,7 +3459,7 @@ class BrowserTabFragment :
         if (fragmentIsVisible() && lifecycle.currentState.isAtLeast(State.RESUMED)) {
 
             // Hide ad when keyboard is visible
-            binding.includeNewBrowserTab.kahfBannerAd.let { view->
+            binding.includeNewBrowserTab.bottomContentContainer.let { view->
                 if (isKbVisible) {
                     view.isVisible = false
                 } else {
