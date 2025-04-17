@@ -954,4 +954,7 @@
     <string name="kahf_resume_blurring">Resume blurring</string>
     <string name="inactivity_notification_title">We miss you!</string>
     <string name="inactivity_notification_body">It\'s been a while since you used Kahf. We’d love to hear your thoughts - tap to share your feedback.</string>
+    
+    <string name="kahf_restart_app">Update downloaded! Restarting app…</string>
+    <string name="kahf_update_required">Update is required to continue!</string>
 </resources>
