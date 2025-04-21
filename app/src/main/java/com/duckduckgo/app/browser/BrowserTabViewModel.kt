@@ -3599,27 +3599,31 @@ class BrowserTabViewModel @Inject constructor(
         clip: ClipData?,
         data: List<AutoCompleteSuggestion>
     ): List<AutoCompleteSuggestion> {
-        clip?.let {
-            if (it.itemCount == 0) {
-                return data
+        return try {
+            clip?.let {
+                if (it.itemCount == 0) {
+                    return data
+                }
+
+                val clipboardText = try {
+                    it.getItemAt(0)?.text?.toString() ?: ""
+                } catch (e: Exception) {
+                    ""
+                }
+
+                if (clipboardText.isEmpty()) {
+                    return data
+                }
+
+                return data.toMutableList().also { list ->
+                    list.add(0, AutoCompleteClipboardSuggestion(clipboardText, Patterns.WEB_URL.matcher(clipboardText).matches()))
+                }
             }
 
-            val clipboardText = try {
-                it.getItemAt(0)?.text?.toString() ?: ""
-            } catch (e: Exception) {
-                ""
-            }
-
-            if (clipboardText.isEmpty()) {
-                return data
-            }
-
-            return data.toMutableList().also { list ->
-                list.add(0, AutoCompleteClipboardSuggestion(clipboardText, Patterns.WEB_URL.matcher(clipboardText).matches()))
-            }
+            data
+        } catch (e: Exception) {
+            data
         }
-
-        return data
     }
 
     companion object {

@@ -4082,7 +4082,11 @@ class BrowserTabFragment :
                         binding.focusedViewContainerLayout.gone()
 
                         val suggestionsWithClipboardContent = viewModel.appendClipboardUrlToSuggestions(
-                            clipboardManager.primaryClip,
+                            try {
+                                clipboardManager.primaryClip
+                            } catch (e: Exception) {
+                                null
+                            },
                             viewState.searchResults.suggestions
                         )
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, suggestionsWithClipboardContent)
