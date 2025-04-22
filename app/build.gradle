@@ -437,7 +437,7 @@ dependencies {
 
     // MLKit
     // implementation "com.google.mlkit:object-detection:_"
-    implementation 'com.google.mlkit:face-detection:16.1.6'
+    // implementation 'com.google.mlkit:face-detection:16.1.6'
 
     // Tensorflow-lite
     implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'

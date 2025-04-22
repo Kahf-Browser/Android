@@ -11,11 +11,9 @@ import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboardingSafegazeBinding
 import com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface
-import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
-import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
+import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
-import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -37,12 +35,6 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
     @Inject
     lateinit var nsfwDetector: NsfwDetector
-
-    @Inject
-    lateinit var genderDetector: GenderDetector
-
-    @Inject
-    lateinit var poseDetector: MoveNetMultiPose
 
     @Inject
     lateinit var kahfImageBlockedDao: KahfImageBlockedDao
@@ -121,7 +113,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
         CoroutineScope(dispatcher.io() + exceptionHandler).launch {
             val jsInterface = SafeGazeJsInterface(
-                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatcher, analytics,
+                requireContext(), nsfwDetector, kahfImageBlockedDao, dispatcher, analytics,
                 { _ -> // No op - onUpdateBlur
                 },
                 { _, _, _, _ -> // No op - onImageClassified

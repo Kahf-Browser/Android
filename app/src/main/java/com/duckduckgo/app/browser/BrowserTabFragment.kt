@@ -244,9 +244,7 @@ import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
-import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
-import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -591,12 +589,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var nsfwDetector: NsfwDetector
-
-    @Inject
-    lateinit var genderDetector: GenderDetector
-
-    @Inject
-    lateinit var poseDetector: MoveNetMultiPose
 
     @Inject
     lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
@@ -2669,7 +2661,7 @@ class BrowserTabFragment :
 
         webView?.let {
             safeGazeInterface = SafeGazeJsInterface(
-                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatchers, analyticsService,
+                requireContext(), nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onUpdateBlur = { blur ->
                     val trimmedBlur = blur / 100
                     val jsFunction = "window.blurIntensity = $trimmedBlur; updateBluredImageOpacity();"
@@ -2687,8 +2679,8 @@ class BrowserTabFragment :
                         imageBlockCountDao.incrementCount()
                     }
 
-                    if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0 && genderDetector.modelInitializationTime > 0 && poseDetector.modelInitializationTime() > 0) {
-                        val initializationTime = nsfwDetector.modelInitializationTime + genderDetector.modelInitializationTime + poseDetector.modelInitializationTime()
+                    if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0) {
+                        val initializationTime = nsfwDetector.modelInitializationTime
                         analyticsService.logEvent(
                             AnalyticsEvent.ModelInitTime,
                             mapOf(AnalyticsParam.ModelInitTimeMS to initializationTime.toString())

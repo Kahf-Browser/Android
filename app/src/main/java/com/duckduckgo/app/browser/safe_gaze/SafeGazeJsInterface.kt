@@ -18,10 +18,7 @@ import com.bumptech.glide.request.transition.Transition
 import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
-import com.duckduckgo.app.safegaze.genderdetection.FaceDetector
-import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
-import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
 import com.duckduckgo.app.safegaze.poseDetection.Person
 import com.duckduckgo.app.safegaze.poseDetection.VisualizationUtils
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
@@ -59,8 +56,6 @@ internal data class UrlInfo(
 class SafeGazeJsInterface(
     private val context: Context,
     private val nsfwDetector: NsfwDetector,
-    private val genderDetector: GenderDetector,
-    private val movenet: MoveNetMultiPose,
     private val kahfImageBlockedDao: KahfImageBlockedDao,
     private val dispatcher: DispatcherProvider,
     private val analytics: AnalyticsService,
@@ -76,7 +71,6 @@ class SafeGazeJsInterface(
     private val scope = CoroutineScope(dispatcher.io() + Job())
     private var paused: AtomicBoolean = AtomicBoolean(false)
     private val gson = Gson()
-    private val faceDetector = FaceDetector(context)
 
     companion object {
         private const val MAX_INFERENCE_TIME_MS = 2000L
@@ -85,7 +79,6 @@ class SafeGazeJsInterface(
     init {
         scope.launch {
             loadCacheFromDisk()
-            movenet.warmup()
         }
     }
 
@@ -133,7 +126,6 @@ class SafeGazeJsInterface(
                             val faceBitmap = VisualizationUtils.cropToBBox(bitmap, faceBox.toRect())
 
                             if (faceBitmap != null) {
-                                val genderPrediction = genderDetector.predictGender(faceBitmap)
 
                                 person.isFemale = !genderPrediction.isMale
                                 person.genderScore = genderPrediction.genderScore
