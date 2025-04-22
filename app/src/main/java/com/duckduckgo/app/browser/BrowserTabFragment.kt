@@ -4515,16 +4515,16 @@ class BrowserTabFragment :
                 setAdImpressionListener(object : AdImpressionListener {
                     override fun onAdClicked() {
                         Timber.i("adLog onAdClicked")
-                        analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                        // analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
                     }
 
                     override fun onAdFailedToLoad(message: String?) {
-                        analyticsService.logEvent(AnalyticsEvent.BannerAdLoadFailed)
+                        // analyticsService.logEvent(AnalyticsEvent.BannerAdLoadFailed)
                     }
 
                     override fun onAdLoaded() {
-                        Timber.i("adLog onAdLoaded")
-                        analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                        Timber.i("adLog onAdLoaded $tabId")
+                        // analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
                     }
                 })
             }
