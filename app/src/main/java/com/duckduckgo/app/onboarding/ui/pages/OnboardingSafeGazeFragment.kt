@@ -118,6 +118,8 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
                 },
                 { _, _, _, _ -> // No op - onImageClassified
                 },
+                { _, _ -> }, // No op - onVideoClassified
+                grayBlur = true
             )
 
             // Wait for the View to be ready

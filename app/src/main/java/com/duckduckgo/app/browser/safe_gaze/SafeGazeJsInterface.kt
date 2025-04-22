@@ -15,29 +15,22 @@ import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import com.duckduckgo.app.analytics.AnalyticsEvent
-import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
-import com.duckduckgo.app.safegaze.poseDetection.Person
-import com.duckduckgo.app.safegaze.poseDetection.VisualizationUtils
-import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SAFE_GAZE_MAX_IMG_SIZE
 import com.duckduckgo.common.utils.SAFE_GAZE_MIN_IMG_SIZE
-import com.duckduckgo.common.utils.extensions.isDataUri
 import com.google.gson.Gson
+import io.kahf.porda_segmentation.BufferCacheSeg
+import io.kahf.video_filter.VideoFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -60,7 +53,9 @@ class SafeGazeJsInterface(
     private val dispatcher: DispatcherProvider,
     private val analytics: AnalyticsService,
     private val onUpdateBlur: (blur: Float) -> Unit,
-    private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?, updateBlurCount: Boolean) -> Unit
+    private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?, updateBlurCount: Boolean) -> Unit,
+    private val onVideoFrameClassified: (type: String, result: String?) -> Unit,
+    private var grayBlur: Boolean = false
 ) {
     private val onDeviceModelCachedResults = mutableMapOf<String, String>()
     private val inferenceTimes = mutableListOf<Long>()
@@ -71,6 +66,10 @@ class SafeGazeJsInterface(
     private val scope = CoroutineScope(dispatcher.io() + Job())
     private var paused: AtomicBoolean = AtomicBoolean(false)
     private val gson = Gson()
+    private val videoDetector = VideoFilter(context, dispatcher)
+    private val imageDetector = BufferCacheSeg(context, dispatcher, grayBlur) { result ->
+        onVideoFrameClassified("detectionResult", result)
+    }
 
     companion object {
         private const val MAX_INFERENCE_TIME_MS = 2000L
@@ -86,7 +85,14 @@ class SafeGazeJsInterface(
         url: String,
         imageData: String?
     ): SafeGazeResult {
-        return suspendCoroutine { continuation ->
+        return SafeGazeResult(
+            false,
+            emptyList(),
+            0,
+            0,
+            null
+        )
+        /*return suspendCoroutine { continuation ->
             scope.launch {
                 val bitmap = if (imageData != null) {
                     base64ToBitmap(imageData)
@@ -139,17 +145,18 @@ class SafeGazeJsInterface(
                     // recycleBitmap(bitmap)
                 }
             }
-        }
+        }*/
     }
 
-    private suspend fun runFaceAndPoseDetectionInParallel(bitmap: Bitmap): Pair<List<Rect>, List<Person>> = coroutineScope {
-        val faceDetectionDeferred = async { faceDetector.detectFaces(bitmap) }
+    private suspend fun runFaceAndPoseDetectionInParallel(bitmap: Bitmap): Pair<List<Rect>, List<Rect>> = coroutineScope {
+        /*val faceDetectionDeferred = async { faceDetector.detectFaces(bitmap) }
         val poseDetectionDeferred = async { movenet.estimatePoses(bitmap) }
 
         val faceList = faceDetectionDeferred.await()
         val poseList = poseDetectionDeferred.await()
 
-        faceList to poseList
+        faceList to poseList*/
+        Pair(emptyList(), emptyList())
     }
 
     private suspend fun getBitmapFromUrl(url: String): Bitmap? {
@@ -261,6 +268,11 @@ class SafeGazeJsInterface(
         onUpdateBlur(blur)
     }
 
+    fun updateBlurMode(boolean: Boolean) {
+        grayBlur = boolean
+        imageDetector.updateBlurMode(boolean)
+    }
+
     @JavascriptInterface
     fun sendMessage(message: String) {
         if (message.startsWith("coreML/-/")) {
@@ -288,8 +300,29 @@ class SafeGazeJsInterface(
         }
     }
 
-    private fun returnResultFromCache(uid: String, imageUrl: String) {
+    @JavascriptInterface
+    fun sendMessageFromWebView(messageType: String, data: String) {
+        when (messageType) {
+            "detectImg" -> handleImageDetectionSeg(data)
+            "detectVideoFrame" -> runVideoDetection(data)
+        }
+    }
+
+    private fun runVideoDetection(frameData: String) {
         CoroutineScope(dispatcher.io()).launch {
+            val result = videoDetector.detectVideoFrame(frameData)
+            onVideoFrameClassified("videoResult", result)
+        }
+    }
+
+    private fun handleImageDetectionSeg(imgInfo: String) {
+        CoroutineScope(dispatcher.io()).launch {
+            imageDetector.downloadAndStore(imgInfo)
+        }
+    }
+
+    private fun returnResultFromCache(uid: String, imageUrl: String) {
+        /*CoroutineScope(dispatcher.io()).launch {
             val bitmap = getBitmapFromUrl(imageUrl)
             val base64Image = VisualizationUtils.bitmapToBase64(bitmap) ?: "null"
 
@@ -299,7 +332,7 @@ class SafeGazeJsInterface(
                 base64Image = base64Image,
                 false,
             )
-        }
+        }*/
     }
 
     private fun addTaskToQueue(
@@ -317,7 +350,7 @@ class SafeGazeJsInterface(
     }
 
     private fun processQueue() {
-        if (!paused.get() && processingJob?.isActive != true) {
+        /*if (!paused.get() && processingJob?.isActive != true) {
             processingJob = scope.launch {
                 while (urlQueue.isNotEmpty()) {
                     val task = urlQueue.poll()
@@ -413,17 +446,17 @@ class SafeGazeJsInterface(
                     }
                 }
             }
-        }
+        }*/
     }
 
     private fun nsfwJson(isNsfw: Boolean) = "{\"isNSFW\":$isNsfw}"
 
-    private suspend fun debugDraw(url: String, personList: List<Person>) {
+    /*private suspend fun debugDraw(url: String, personList: List<Person>) {
         val bitmap = getBitmapFromUrl(url)
         val outputBitmap = VisualizationUtils.debugDraw(bitmap, personList, drawFace = false, drawPose = false, drawBodyMask = true)
 
         Timber.d("$outputBitmap")
-    }
+    }*/
 
     fun resetProcessingQueue() {
         urlQueue.clear()
@@ -476,19 +509,6 @@ class SafeGazeJsInterface(
 
         val (faceRectList, poseList) = runFaceAndPoseDetectionInParallel(bitmap)
         Timber.d("kLog ${faceRectList.size} faces and ${poseList.size} poses detected")
-
-        val personList = VisualizationUtils.matchFacesToPoses(poseList, faceRectList)
-        personList.forEach { person ->
-            person.faceBox?.let { faceRect ->
-                VisualizationUtils.cropToBBox(bitmap, faceRect.toRect())?.let { faceBmp ->
-                    val genderPrediction = genderDetector.predictGender(faceBmp)
-                    person.isFemale = !genderPrediction.isMale
-                    person.genderScore = genderPrediction.genderScore
-                }
-            }
-        }
-
-        Timber.d("kLog ${personList.count { it.isFemale }} females detected")
 
         val inferenceTime = System.currentTimeMillis() - t1
 

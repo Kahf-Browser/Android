@@ -2690,6 +2690,13 @@ class BrowserTabFragment :
                         Timber.d("Model initialization time: $initializationTime ms")
                     }
                 },
+                onVideoFrameClassified = { type, data ->
+                    webView?.post {
+                        val jsScript = "javascript:receiveMessageFromKotlin('$type', '$data')"
+                        webView?.evaluateJavascript(jsScript, null)
+                    }
+                },
+                grayBlur = false // FIXME - get this from the sharedPref
             )
 
             it.webViewClient = webViewClient
