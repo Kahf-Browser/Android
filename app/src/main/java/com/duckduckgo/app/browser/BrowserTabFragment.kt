@@ -362,6 +362,8 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
+import io.kahf.porda_segmentation.OutputImage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
@@ -711,6 +713,8 @@ class BrowserTabFragment :
         get() = omnibar.kahfSettingsButton
 
     private var webView: DuckDuckGoWebView? = null
+
+    private val gson = Gson()
 
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
@@ -2692,11 +2696,11 @@ class BrowserTabFragment :
                 },
                 onVideoFrameClassified = { type, data ->
                     webView?.post {
-                        val jsScript = "javascript:receiveMessageFromKotlin('$type', '$data')"
+                        val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
                         webView?.evaluateJavascript(jsScript, null)
                     }
                 },
-                grayBlur = false // FIXME - get this from the sharedPref
+                grayBlur = SafeGazeLevel.getCurrentLevel(sharedPreferences) == SafeGazeLevel.Blur,
             )
 
             it.webViewClient = webViewClient

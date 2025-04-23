@@ -357,6 +357,23 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    private fun loadVideoBlurJs(
+        webView: WebView,
+        url: String?
+    ) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
+            val isUrlWhiteListed = sgWhitelistDao.isHostWhitelisted(url?.toUri()?.host ?: "")
+
+            if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
+                val contentJs = readAssetFile(context.assets, "video_filter.js")
+                withContext(dispatcherProvider.main()) {
+                    webView.evaluateJavascript(contentJs, null)
+                }
+            }
+        }
+    }
+
     private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
@@ -391,9 +408,10 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         isMainJSLoaded = false
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
-        if (url?.contains("m.youtube.com") != true) {
-            handleSafeGaze(webView, url)
-        }
+        // if (url?.contains("m.youtube.com") != true) {
+        //     handleSafeGaze(webView, url)
+        // }
+        loadVideoBlurJs(webView, url)
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)

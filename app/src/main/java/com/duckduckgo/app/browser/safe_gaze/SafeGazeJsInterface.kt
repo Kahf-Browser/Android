@@ -7,7 +7,6 @@ import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.util.Base64
 import android.webkit.JavascriptInterface
-import androidx.core.graphics.toRect
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -20,9 +19,12 @@ import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SAFE_GAZE_MAX_IMG_SIZE
-import com.duckduckgo.common.utils.SAFE_GAZE_MIN_IMG_SIZE
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import io.kahf.porda_segmentation.BufferCacheSeg
+import io.kahf.porda_segmentation.DownloadImage
+import io.kahf.porda_segmentation.InputImage
+import io.kahf.porda_segmentation.OutputImage
 import io.kahf.video_filter.VideoFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -35,7 +37,6 @@ import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 import kotlin.math.ceil
 import kotlin.system.measureTimeMillis
 
@@ -54,7 +55,7 @@ class SafeGazeJsInterface(
     private val analytics: AnalyticsService,
     private val onUpdateBlur: (blur: Float) -> Unit,
     private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?, updateBlurCount: Boolean) -> Unit,
-    private val onVideoFrameClassified: (type: String, result: String?) -> Unit,
+    private val onVideoFrameClassified: (type: String, result: OutputImage?) -> Unit,
     private var grayBlur: Boolean = false
 ) {
     private val onDeviceModelCachedResults = mutableMapOf<String, String>()
@@ -70,6 +71,7 @@ class SafeGazeJsInterface(
     private val imageDetector = BufferCacheSeg(context, dispatcher, grayBlur) { result ->
         onVideoFrameClassified("detectionResult", result)
     }
+    private val imageDownloader = DownloadImage()
 
     companion object {
         private const val MAX_INFERENCE_TIME_MS = 2000L
@@ -303,21 +305,39 @@ class SafeGazeJsInterface(
     @JavascriptInterface
     fun sendMessageFromWebView(messageType: String, data: String) {
         when (messageType) {
-            "detectImg" -> handleImageDetectionSeg(data)
-            "detectVideoFrame" -> runVideoDetection(data)
+            "detectImg" -> runImageDetection(parseImageInfo(data))
+            "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
         }
     }
 
-    private fun runVideoDetection(frameData: String) {
-        CoroutineScope(dispatcher.io()).launch {
-            val result = videoDetector.detectVideoFrame(frameData)
-            onVideoFrameClassified("videoResult", result)
+    private fun runVideoDetection(imgInfo: InputImage?) {
+        imgInfo?.let {
+            scope.launch {
+                val result = videoDetector.detectVideoFrame(it)
+                onVideoFrameClassified("videoResult", result)
+            }
         }
     }
 
-    private fun handleImageDetectionSeg(imgInfo: String) {
-        CoroutineScope(dispatcher.io()).launch {
-            imageDetector.downloadAndStore(imgInfo)
+    private fun runImageDetection(imgInfo: InputImage?) {
+        imgInfo?.let {
+            scope.launch {
+                Timber.i("kLog image received for detection ${it.id}")
+                imageDetector.downloadAndStore(it)
+
+                /*getBitmapFromUrl(it.src ?: "")?.let { bmp->
+                    Timber.d("kLog image downloaded")
+                    val nsfwResponse = nsfwDetector.isNsfw(bmp)
+                    if (nsfwResponse.isSafe()) {
+                        Timber.d("kLog safe. now check for porda")
+                        imageDetector.downloadAndStore(it)
+                    } else {
+                        Timber.d("kLog Nsfw: ${nsfwResponse.getLabelWithConfidence()} ${it.src}")
+                    }
+                } ?: run {
+                    Timber.e("kLog Error downloading image: ${it.src}")
+                }*/
+            }
         }
     }
 
@@ -524,6 +544,14 @@ class SafeGazeJsInterface(
     private fun recycleBitmap(bitmap: Bitmap?) {
         if (bitmap != null && !bitmap.isRecycled) {
             bitmap.recycle()
+        }
+    }
+
+    private fun parseImageInfo(jsonString: String): InputImage? {
+        return try {
+            gson.fromJson(jsonString, InputImage::class.java)
+        } catch (e: JsonSyntaxException) {
+            null
         }
     }
 
