@@ -1094,6 +1094,7 @@ class BrowserTabFragment :
                     },
                     onBlurEffectChanged = {
                         val updated = updateSafeGazeSettings(it)
+                        safeGazeInterface.updateBlurMode(it.name == SafeGazeLevel.Blur.name)
                         if (updated) {
                             webView?.reload()
                         }
