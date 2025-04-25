@@ -17,9 +17,11 @@ import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwPrediction
+import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SAFE_GAZE_MAX_IMG_SIZE
+import com.duckduckgo.common.utils.extensions.md5
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import io.kahf.porda_segmentation.BufferCacheSeg
@@ -34,6 +36,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -48,8 +51,7 @@ class SafeGazeJsInterface(
     private val dispatcher: DispatcherProvider,
     private val analytics: AnalyticsService,
     private val onUpdateBlur: (blur: Float) -> Unit,
-    private val onImageClassified: (uid: String, detectionResultJson: String, base64Image: String?, updateBlurCount: Boolean) -> Unit,
-    private val onVideoFrameClassified: (type: String, result: OutputImage?) -> Unit,
+    private val onImageClassified: (type: String, result: OutputImage?) -> Unit,
     private var grayBlur: Boolean = false
 ) {
     private val onDeviceModelCachedResults = mutableMapOf<String, String>()
@@ -62,14 +64,8 @@ class SafeGazeJsInterface(
     private var paused: AtomicBoolean = AtomicBoolean(false)
     private val gson = Gson()
     private val videoDetector = VideoFilter(context, dispatcher)
-    private val imageDetector = BufferCacheSeg(context, dispatcher, grayBlur) { result ->
-        onVideoFrameClassified("detectionResult", result)
-    }
+    private val imageDetector = BufferCacheSeg(context, dispatcher, grayBlur)
     private val imageDownloader = DownloadImage()
-
-    companion object {
-        private const val MAX_INFERENCE_TIME_MS = 2000L
-    }
 
     init {
         scope.launch {
@@ -118,16 +114,6 @@ class SafeGazeJsInterface(
     }
 
     @JavascriptInterface
-    fun callSafegazeOnDeviceModelHandler(
-        uid: String,
-        detectionResultJson: String,
-        base64Image: String?,
-        updateBlurCount: Boolean
-    ) {
-        onImageClassified(uid, detectionResultJson, base64Image, updateBlurCount)
-    }
-
-    @JavascriptInterface
     fun updateBlur(blur: Float) {
         onUpdateBlur(blur)
     }
@@ -149,13 +135,19 @@ class SafeGazeJsInterface(
         imgInfo?.let {
             scope.launch {
                 val result = videoDetector.detectVideoFrame(it)
-                onVideoFrameClassified("videoResult", result)
+                onImageClassified("videoResult", result)
             }
         }
     }
 
     private fun addTaskToQueue(input: InputImage?) {
-        if (input == null) {
+        if (input == null || isInvalidImageUrl(input.src)) {
+            onImageClassified("detectionResult", OutputImage(
+                result = "null",
+                id = input?.id ?: "",
+                width = input?.width ?: 0,
+                height = input?.height ?: 0,
+            ))
             return
         }
 
@@ -174,6 +166,7 @@ class SafeGazeJsInterface(
                 while (urlQueue.isNotEmpty()) {
                     val task = urlQueue.poll()
 
+                    val result: OutputImage
                     task?.let {
                         // Log average waiting time for every 30 images to GA
                         val waitingTime = System.currentTimeMillis() - task.insertedAt
@@ -191,11 +184,13 @@ class SafeGazeJsInterface(
                             // Download bitmap
                             val bmp: Bitmap?
                             val imageDownloadTime = measureTimeMillis {
-                                bmp = imageDownloader.downloadImageWithAspectRatio(
-                                    context, task.src, task.width, task.height,
-                                )
+                                bmp = withTimeout(1500) {
+                                    imageDownloader.downloadImageWithAspectRatio(
+                                        context, task.src, task.width, task.height,
+                                    )
+                                }
                             }
-                            Timber.d("kLog image download time: $imageDownloadTime ms")
+                            Timber.d("kLog Download time: $imageDownloadTime ms")
 
                             if (bmp == null) {
                                 return@let
@@ -206,32 +201,31 @@ class SafeGazeJsInterface(
                             val nsfwInference = measureTimeMillis {
                                 nsfwResult = nsfwDetector.isNsfw(bmp)
                             }
-                            Timber.d("kLog nsfw classified. IsSafe: ${nsfwResult.isSafe()}. Inference time: $nsfwInference ms")
+                            Timber.d("kLog NSFW - ${nsfwResult.isSafe().not()}. Inference time: $nsfwInference ms")
 
-                            // Image is not safe, blur the whole image
                             if (!nsfwResult.isSafe()) {
-                                onVideoFrameClassified(
-                                    "detectionResult",
-                                    OutputImage(result = "nsfw", id = task.id, width = task.width, height = task.height),
-                                )
-                                return@let
-                            }
+                                // Image is not safe, blur the whole image
+                                result = OutputImage(result = "nsfw", id = task.id, width = task.width, height = task.height, isManipulated = true)
+                            } else {
+                                // Run Segmentation model
+                                val segmentationInf = measureTimeMillis {
+                                    result = imageDetector.downloadAndStore(task.copy(imgBitmap = bmp))
+                                }
+                                Timber.d("kLog Segmentation inference time: $segmentationInf ms")
 
-                            // Run Segmentation model
-                            val segmentationInf = measureTimeMillis {
-                                imageDetector.downloadAndStore(task.copy(imgBitmap = bmp))
+                                val inferenceTime = imageDownloadTime + nsfwInference + segmentationInf
+                                inferenceTimes.add(inferenceTime)
+                                Timber.d("kLog Total inference time: $inferenceTime ms")
                             }
-
-                            val inferenceTime = imageDownloadTime + nsfwInference + segmentationInf
-                            inferenceTimes.add(inferenceTime)
                         } catch (e: TimeoutCancellationException) {
                             Timber.e("kLog Timeout occurred while processing image: ")
-                            // analytics.logEvent(AnalyticsEvent.ImageProcessingTimeout, mapOf(AnalyticsParam.TimedOutImageUrl to it.url))
+                            analytics.logEvent(AnalyticsEvent.ImageProcessingTimeout)
                             return@let
                         }
+                        onImageClassified("detectionResult", result)
 
-                        // TODO Log P90 inference time for every 30 images to GA
-                        /*if (inferenceTimes.size >= 30) {
+                        // Log P90 inference time for every 30 images to GA
+                        if (inferenceTimes.size >= 30) {
                             val p90 = inferenceTimes.sorted()[inferenceTimes.size * 90 / 100]
                             analytics.logEvent(
                                 AnalyticsEvent.P90ImageProcessing,
@@ -240,22 +234,19 @@ class SafeGazeJsInterface(
                             inferenceTimes.clear()
                         }
 
-                        // TODO Increase nsfw count and save result cache to local DB
-                        onDeviceModelCachedResults[it.url] = resultJson
+                        // TODO Save result to local DB
+                        // onDeviceModelCachedResults[it.url] = resultJson
 
-                        // Don't save data uri images to save space
-                        if (it.url.isDataUri().not()) {
-                            kahfImageBlockedDao.insert(
-                                KahfImageBlocked(
-                                    imageUrl = it.url,
-                                    responseStr = resultJson,
-                                    isIndecent = result.isNsfw || result.persons.any { p -> p.isFemale },
-                                    imageWidth = result.imageWidth.toFloat(),
-                                    imageHeight = result.imageHeight.toFloat(),
-                                    modifiedAt = System.currentTimeMillis()
-                                ),
-                            )
-                        }*/
+                        kahfImageBlockedDao.insert(
+                            KahfImageBlocked(
+                                imageUrl = it.src.md5(),
+                                responseStr = "",
+                                isIndecent = result.isManipulated,
+                                imageWidth = result.width.toFloat(),
+                                imageHeight = result.height.toFloat(),
+                                modifiedAt = System.currentTimeMillis()
+                            ),
+                        )
                     }
                 }
             }
@@ -309,14 +300,21 @@ class SafeGazeJsInterface(
             )
         }
 
-        val t1 = System.currentTimeMillis()
+        val inferenceTime = measureTimeMillis {
+            val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
+            Timber.d("kLog nsfw classified. IsSafe: ${nsfwPrediction.isSafe()}")
 
-        val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
-        Timber.d("kLog nsfw classified. IsSafe: ${nsfwPrediction.isSafe()}")
+            val segmentationResult = imageDetector.downloadAndStore(InputImage(
+                src = "test_image.webp",
+                id = "test_image",
+                width = bitmap.width,
+                height = bitmap.height,
+                imgBitmap = bitmap,
+            ))
+            Timber.d("kLog segmentation completed. Image modified: ${segmentationResult.isManipulated}")
+        }
 
-        val inferenceTime = System.currentTimeMillis() - t1
-
-        return if (inferenceTime > 1000) {
+        return if (inferenceTime > 750) {
             Timber.e("kLog Will make it slower: $inferenceTime ms")
             false
         } else {
@@ -327,7 +325,9 @@ class SafeGazeJsInterface(
 
     private fun parseImageInfo(jsonString: String): InputImage? {
         return try {
-            gson.fromJson(jsonString, InputImage::class.java)
+            gson.fromJson(jsonString, InputImage::class.java).apply {
+                insertedAt = System.currentTimeMillis()
+            }
         } catch (e: JsonSyntaxException) {
             null
         }
@@ -346,7 +346,7 @@ class SafeGazeJsInterface(
     }
 
     private fun isInvalidImageUrl(url: String): Boolean {
-        return listOfEndsWith.any { url.endsWith(it) } || listOfContains.any { url.contains(it) }
+        return listOfEndsWith.any { url.endsWith(it, ignoreCase = true) } || listOfContains.any { url.contains(it) }
     }
 
     private val listOfContains = listOf("image/gif", "image/svg", "/assets/thesun/images/teaser", "grey-placeholder")

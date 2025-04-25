@@ -2674,13 +2674,13 @@ class BrowserTabFragment :
                         webView?.evaluateJavascript(jsFunction, null)
                     }
                 },
-                onImageClassified = { uid, detectionResultJson, base64Image, updateBlurCount ->
-                    val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson', `$base64Image`);"
+                onImageClassified = { type, data ->
                     webView?.post {
-                        webView?.evaluateJavascript(jsFunctionCall, null)
+                        val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
+                        webView?.evaluateJavascript(jsScript, null)
                     }
 
-                    if (updateBlurCount) {
+                    if (data?.isManipulated == true) {
                         imageBlockCountDao.incrementCount()
                     }
 
@@ -2693,12 +2693,6 @@ class BrowserTabFragment :
                         globalData.modelInitializationTimeLogged = true
 
                         Timber.d("Model initialization time: $initializationTime ms")
-                    }
-                },
-                onVideoFrameClassified = { type, data ->
-                    webView?.post {
-                        val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
-                        webView?.evaluateJavascript(jsScript, null)
                     }
                 },
                 grayBlur = SafeGazeLevel.getCurrentLevel(sharedPreferences) == SafeGazeLevel.Blur,
