@@ -73,46 +73,6 @@ class SafeGazeJsInterface(
         }
     }
 
-    private suspend fun downloadBitmap(
-        url: String,
-        context: Context
-    ): Bitmap? {
-        return suspendCancellableCoroutine { continuation ->
-            Glide.with(context)
-                .asBitmap()
-                .load(url)
-                .apply(
-                    RequestOptions()
-                        .downsample(DownsampleStrategy.AT_MOST)
-                        .override(SAFE_GAZE_MAX_IMG_SIZE, SAFE_GAZE_MAX_IMG_SIZE)
-                        .format(DecodeFormat.PREFER_ARGB_8888),
-                )
-                .diskCacheStrategy(DiskCacheStrategy.DATA)
-                .into(
-                    object : CustomTarget<Bitmap>() {
-                        override fun onResourceReady(
-                            resource: Bitmap,
-                            transition: Transition<in Bitmap>?
-                        ) {
-                            if (continuation.isActive) {
-                                continuation.resume(resource)
-                            }
-                        }
-
-                        override fun onLoadFailed(errorDrawable: Drawable?) {
-                            if (continuation.isActive) {
-                                continuation.resume(null)
-                            }
-                        }
-
-                        override fun onLoadCleared(placeholder: Drawable?) {
-                            // No-op
-                        }
-                    },
-                )
-        }
-    }
-
     @JavascriptInterface
     fun updateBlur(blur: Float) {
         onUpdateBlur(blur)
@@ -275,51 +235,6 @@ class SafeGazeJsInterface(
                 processQueue()
                 Timber.d("kLog processing job resumed for $tabId")
             }
-        }
-    }
-
-    /**
-     * Check if the hardware is compatible with running the on-device models
-     * We run the models on a test image and check if the inference time is within limits
-     * @return true if the hardware is compatible, false otherwise
-     */
-    suspend fun isHardwareCompatible(): Boolean {
-        Timber.d("kLog checking hardware compatibility")
-        
-        val bitmap = context.assets.open("test_image.webp").use {
-            // convert input stream to byte array
-            val buffer = ByteArray(it.available())
-            it.read(buffer)
-            it.close()
-
-            BitmapFactory.decodeByteArray(
-                buffer, 0, buffer.size,
-                BitmapFactory.Options().also { op ->
-                    op.inSampleSize = 3
-                },
-            )
-        }
-
-        val inferenceTime = measureTimeMillis {
-            val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
-            Timber.d("kLog nsfw classified. IsSafe: ${nsfwPrediction.isSafe()}")
-
-            val segmentationResult = imageDetector.downloadAndStore(InputImage(
-                src = "test_image.webp",
-                id = "test_image",
-                width = bitmap.width,
-                height = bitmap.height,
-                imgBitmap = bitmap,
-            ))
-            Timber.d("kLog segmentation completed. Image modified: ${segmentationResult.isManipulated}")
-        }
-
-        return if (inferenceTime > 750) {
-            Timber.e("kLog Will make it slower: $inferenceTime ms")
-            false
-        } else {
-            Timber.d("kLog Will run fine: $inferenceTime ms")
-            true
         }
     }
 

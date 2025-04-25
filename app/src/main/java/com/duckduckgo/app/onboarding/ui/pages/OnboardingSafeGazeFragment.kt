@@ -5,22 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboardingSafegazeBinding
-import com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface
+import com.duckduckgo.app.browser.safe_gaze.isHardwareCompatible
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
-import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.FragmentScope
+import io.kahf.porda_segmentation.BufferCacheSeg
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -35,9 +35,6 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
     @Inject
     lateinit var nsfwDetector: NsfwDetector
-
-    @Inject
-    lateinit var kahfImageBlockedDao: KahfImageBlockedDao
 
     @Inject
     lateinit var dispatcher: DispatcherProvider
@@ -101,7 +98,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
         val exceptionHandler = CoroutineExceptionHandler { _, _ ->
             Timber.e("kLog Error checking hardware compatibility")
 
-            CoroutineScope(dispatcher.main()).launch {
+            lifecycleScope.launch(dispatcher.main()) {
                 binding.tvCompatibility.text = getString(R.string.kahf_onboarding_incompatible).also { text = it }
                 binding.progressLoader.visibility = View.GONE
                 binding.tvCompatibility.setTextColor(
@@ -111,18 +108,11 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
             hardwareCompatibilityChecked = true
         }
 
-        CoroutineScope(dispatcher.io() + exceptionHandler).launch {
-            val jsInterface = SafeGazeJsInterface(
-                requireContext(), nsfwDetector, kahfImageBlockedDao, dispatcher, analytics,
-                { _ -> // No op - onUpdateBlur
-                },
-                { _, _ -> }, // No op - onVideoClassified
-                grayBlur = true
-            )
-
+        lifecycleScope.launch(dispatcher.io() + exceptionHandler) {
             // Wait for the View to be ready
             delay(500)
-            val result = jsInterface.isHardwareCompatible()
+            val imageDetector = BufferCacheSeg(requireContext(), dispatcher, false)
+            val result = isHardwareCompatible(requireContext(), nsfwDetector, imageDetector)
 
             withContext(dispatcher.main()) {
                 binding.tvCompatibility.text = getString(
