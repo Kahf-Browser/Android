@@ -19,7 +19,7 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import io.kahf.porda_segmentation.BufferCacheSeg
+import io.kahf.porda_segmentation.ImageProcessor
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -41,6 +41,9 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
     @Inject
     lateinit var spProvider: SharedPreferencesProvider
+
+    @Inject
+    lateinit var imageProcessor: ImageProcessor
 
     lateinit var binding: FragmentOnboardingSafegazeBinding
 
@@ -111,8 +114,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
         lifecycleScope.launch(dispatcher.io() + exceptionHandler) {
             // Wait for the View to be ready
             delay(500)
-            val imageDetector = BufferCacheSeg(requireContext(), dispatcher, false)
-            val result = isHardwareCompatible(requireContext(), nsfwDetector, imageDetector)
+            val result = isHardwareCompatible(requireContext(), nsfwDetector, imageProcessor)
 
             withContext(dispatcher.main()) {
                 binding.tvCompatibility.text = getString(

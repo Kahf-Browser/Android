@@ -2,16 +2,7 @@ package com.duckduckgo.app.browser.safe_gaze
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.webkit.JavascriptInterface
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DecodeFormat
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy
-import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
 import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
@@ -20,28 +11,25 @@ import com.duckduckgo.app.safegaze.nsfwdetection.NsfwPrediction
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.SAFE_GAZE_MAX_IMG_SIZE
 import com.duckduckgo.common.utils.extensions.md5
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import io.kahf.porda_segmentation.BufferCacheSeg
-import io.kahf.porda_segmentation.DownloadImage
+import io.kahf.porda_segmentation.ImageProcessor
+import io.kahf.porda_segmentation.ImageDownloader
 import io.kahf.porda_segmentation.InputImage
 import io.kahf.porda_segmentation.OutputImage
-import io.kahf.video_filter.VideoFilter
+import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.set
-import kotlin.coroutines.resume
 import kotlin.system.measureTimeMillis
 
 class SafeGazeJsInterface(
@@ -50,9 +38,10 @@ class SafeGazeJsInterface(
     private val kahfImageBlockedDao: KahfImageBlockedDao,
     private val dispatcher: DispatcherProvider,
     private val analytics: AnalyticsService,
-    private val onUpdateBlur: (blur: Float) -> Unit,
     private val onImageClassified: (type: String, result: OutputImage?) -> Unit,
-    private var grayBlur: Boolean = false
+    private var grayBlur: Boolean = false,
+    private val imageDetector: ImageProcessor,
+    private val videoDetector: VideoFrameProcessor,
 ) {
     private val onDeviceModelCachedResults = mutableMapOf<String, String>()
     private val inferenceTimes = mutableListOf<Long>()
@@ -63,19 +52,13 @@ class SafeGazeJsInterface(
     private val scope = CoroutineScope(dispatcher.io() + Job())
     private var paused: AtomicBoolean = AtomicBoolean(false)
     private val gson = Gson()
-    private val videoDetector = VideoFilter(context, dispatcher)
-    private val imageDetector = BufferCacheSeg(context, dispatcher, grayBlur)
-    private val imageDownloader = DownloadImage()
+    private val imageDownloader = ImageDownloader()
 
     init {
         scope.launch {
+            imageDetector.setBlur(grayBlur)
             loadCacheFromDisk()
         }
-    }
-
-    @JavascriptInterface
-    fun updateBlur(blur: Float) {
-        onUpdateBlur(blur)
     }
 
     fun updateBlurMode(boolean: Boolean) {

@@ -363,7 +363,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import io.kahf.porda_segmentation.OutputImage
+import io.kahf.porda_segmentation.ImageProcessor
+import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
@@ -618,6 +619,12 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var spProvider: SharedPreferencesProvider
+
+    @Inject
+    lateinit var imageProcessor: ImageProcessor
+
+    @Inject
+    lateinit var videoFrameProcessor: VideoFrameProcessor
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -2667,13 +2674,6 @@ class BrowserTabFragment :
         webView?.let {
             safeGazeInterface = SafeGazeJsInterface(
                 requireContext(), nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
-                onUpdateBlur = { blur ->
-                    val trimmedBlur = blur / 100
-                    val jsFunction = "window.blurIntensity = $trimmedBlur; updateBluredImageOpacity();"
-                    webView?.post {
-                        webView?.evaluateJavascript(jsFunction, null)
-                    }
-                },
                 onImageClassified = { type, data ->
                     webView?.post {
                         val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
@@ -2696,6 +2696,8 @@ class BrowserTabFragment :
                     }
                 },
                 grayBlur = SafeGazeLevel.getCurrentLevel(sharedPreferences) == SafeGazeLevel.Blur,
+                imageProcessor,
+                videoFrameProcessor
             )
 
             it.webViewClient = webViewClient

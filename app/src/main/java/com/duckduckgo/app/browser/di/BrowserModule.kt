@@ -117,6 +117,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import io.kahf.porda_segmentation.ImageProcessor
+import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 
@@ -394,5 +396,23 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun provideGlobalData(): GlobalData {
         return GlobalData(false)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideVideoFrameProcessor(
+        context: Context,
+        dispatcherProvider: DispatcherProvider,
+    ): VideoFrameProcessor {
+        return VideoFrameProcessor(context, dispatcherProvider)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideImageProcessor(
+        context: Context,
+        dispatcherProvider: DispatcherProvider,
+    ): ImageProcessor {
+        return ImageProcessor(context, dispatcherProvider)
     }
 }

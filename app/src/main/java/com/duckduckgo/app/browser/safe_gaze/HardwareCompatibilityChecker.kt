@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.safe_gaze
 import android.content.Context
 import android.graphics.BitmapFactory
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
-import io.kahf.porda_segmentation.BufferCacheSeg
+import io.kahf.porda_segmentation.ImageProcessor
 import io.kahf.porda_segmentation.InputImage
 import timber.log.Timber
 import kotlin.system.measureTimeMillis
@@ -32,7 +32,7 @@ import kotlin.system.measureTimeMillis
 suspend fun isHardwareCompatible(
     context: Context,
     nsfwDetector: NsfwDetector,
-    imageDetector: BufferCacheSeg
+    imageDetector: ImageProcessor
 ): Boolean {
     Timber.d("kLog checking hardware compatibility")
 
