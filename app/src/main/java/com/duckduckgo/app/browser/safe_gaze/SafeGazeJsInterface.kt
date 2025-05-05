@@ -23,6 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
@@ -108,6 +109,8 @@ class SafeGazeJsInterface(
             processingJob = scope.launch {
                 while (urlQueue.isNotEmpty()) {
                     val task = urlQueue.poll()
+                    // Add a small delay to avoid overwhelming the processor
+                    delay(10)
 
                     val result: OutputImage
                     task?.let {
@@ -133,7 +136,7 @@ class SafeGazeJsInterface(
                                     )
                                 }
                             }
-                            Timber.d("kLog Download time: $imageDownloadTime ms")
+                            Timber.d("kLog Download time: $imageDownloadTime ms (${bmp?.width}x${bmp?.height})")
 
                             if (bmp == null) {
                                 return@let
