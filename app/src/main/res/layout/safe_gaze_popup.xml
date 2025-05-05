@@ -312,13 +312,43 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/blueIndecentPhotosText" />
 
+                    <TextView
+                        android:id="@+id/tvCoverFace"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="@string/kahf_cover_face"
+                        android:textColor="?attr/kahfPrimaryText"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/btnToggleSiteBlur"
+                        app:layout_constraintEnd_toStartOf="@+id/switchCoverFace"
+                        tools:ignore="DeprecatedWidgetInXml" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchCoverFace"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:track="@drawable/switch_track"
+                        app:trackTint="@color/switch_track_color"
+                        app:thumbTint="?attr/kahfCardBackground"
+                        android:checked="false"
+                        tools:checked="true"
+                        android:scaleX="0.75"
+                        android:scaleY="0.75"
+                        android:layout_marginEnd="-5dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/btnToggleSiteBlur"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:id="@+id/divider3"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
                     android:background="?attr/kahfDivider"
                     app:layout_constraintTop_toBottomOf="@id/blurContainer" />
 

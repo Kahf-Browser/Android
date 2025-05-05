@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.safegaze.popup
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
@@ -27,8 +26,10 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
+import com.duckduckgo.app.isFaceCoverEnabled
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
+import com.duckduckgo.app.setFaceCoverMode
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
@@ -53,6 +54,8 @@ class SafeGazePopupHandler(
     onBlurEffectChanged: (sgLevel: SafeGazeLevel) -> Unit,
     onSgWhitelistUpdated: (host: String, isWhitelisted: Boolean) -> Unit,
 ) {
+    private var onFaceCoverChanged: ((shouldCoverFace: Boolean) -> Unit)? = null
+
     init {
         var btnHigh: PopupButton? = null
         var btnMed: PopupButton? = null
@@ -98,8 +101,6 @@ class SafeGazePopupHandler(
 
         // set initially selected item
         updateDescription(binding, preSelectedDns)
-
-        handleProgressBar()
 
         binding.btnShare.setOnClickListener { onShareClicked() }
         binding.btnSupport.setOnClickListener { onSupportClicked() }
@@ -175,6 +176,15 @@ class SafeGazePopupHandler(
             }
         }
 
+        // Toggle face cover
+        binding.switchCoverFace.isChecked = sharedPreferences.isFaceCoverEnabled()
+        binding.switchCoverFace.setOnCheckedChangeListener { _, isChecked ->
+            sharedPreferences.setFaceCoverMode(isChecked)
+            onFaceCoverChanged?.invoke(isChecked)
+        }
+        binding.switchCoverFace.isVisible = preSelectedSG != SafeGazeLevel.Off
+        binding.tvCoverFace.isVisible = preSelectedSG != SafeGazeLevel.Off
+
         setFontSize()
 
         // Set build number
@@ -207,6 +217,7 @@ class SafeGazePopupHandler(
             // SafeGaze
             tvOnOffImage.scaleIndependentTextSize(14f)
             tvDecent.scaleIndependentTextSize(18f)
+            tvCoverFace.scaleIndependentTextSize(18f)
             blueIndecentPhotosText.scaleIndependentTextSize(14f)
             btnToggleSiteBlur.scaleIndependentTextSize(12f)
 
@@ -256,11 +267,6 @@ class SafeGazePopupHandler(
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
-    private fun handleProgressBar() {
-        // No op
-    }
-
     @WorkerThread
     private suspend fun getJsVersion(context: Context): String {
         return withContext(dispatcher.io()) {
@@ -277,5 +283,9 @@ class SafeGazePopupHandler(
                 ""
             }
         }
+    }
+
+    fun setOnFaceCoverChangeListener(listener: (shouldCoverFace: Boolean) -> Unit) {
+        onFaceCoverChanged = listener
     }
 }

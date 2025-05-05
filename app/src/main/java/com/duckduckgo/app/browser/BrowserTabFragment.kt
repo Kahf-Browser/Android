@@ -237,14 +237,15 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.safegaze.popup.SafeGazePopupHandler
-import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
-import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
+import com.duckduckgo.app.isFaceCoverEnabled
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
+import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
+import com.duckduckgo.app.safegaze.popup.SafeGazePopupHandler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -1121,11 +1122,17 @@ class BrowserTabFragment :
                         popupWindow.dismiss()
                         (requireActivity() as DuckDuckGoActivity).toggleTheme()
                     },
-                    onSgWhitelistUpdated = { host, isWhitelisted ->
+                    onSgWhitelistUpdated = { _, _ ->
                         webView?.reload()
                         popupWindow.dismiss()
                     }
-                )
+                ).apply {
+                    setOnFaceCoverChangeListener { shouldCoverFace ->
+                        safeGazeInterface.updateFaceCoverMode(shouldCoverFace)
+                        webView?.reload()
+                        popupWindow.dismiss()
+                    }
+                }
 
                 lifecycleScope.launch {
                     val count = imageBlockCountDao.getCount().first()
@@ -2696,6 +2703,7 @@ class BrowserTabFragment :
                     }
                 },
                 grayBlur = SafeGazeLevel.getCurrentLevel(sharedPreferences) == SafeGazeLevel.Blur,
+                shouldCoverFace = sharedPreferences.isFaceCoverEnabled(),
                 imageProcessor,
                 videoFrameProcessor
             )

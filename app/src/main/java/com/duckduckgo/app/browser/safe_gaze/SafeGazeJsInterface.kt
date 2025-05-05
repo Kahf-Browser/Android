@@ -41,6 +41,7 @@ class SafeGazeJsInterface(
     private val analytics: AnalyticsService,
     private val onImageClassified: (type: String, result: OutputImage?) -> Unit,
     private var grayBlur: Boolean = false,
+    private var shouldCoverFace: Boolean = false,
     private val imageDetector: ImageProcessor,
     private val videoDetector: VideoFrameProcessor,
 ) {
@@ -57,7 +58,8 @@ class SafeGazeJsInterface(
 
     init {
         scope.launch {
-            imageDetector.setBlur(grayBlur)
+            imageDetector.updateFaceCoverMode(shouldCoverFace)
+            imageDetector.updateBlurMode(grayBlur)
             loadCacheFromDisk()
         }
     }
@@ -65,6 +67,11 @@ class SafeGazeJsInterface(
     fun updateBlurMode(boolean: Boolean) {
         grayBlur = boolean
         imageDetector.updateBlurMode(boolean)
+    }
+
+    fun updateFaceCoverMode(boolean: Boolean) {
+        shouldCoverFace = boolean
+        imageDetector.updateFaceCoverMode(boolean)
     }
 
     @JavascriptInterface
