@@ -150,13 +150,13 @@ class SafeGazeJsInterface(
                             }
 
                             // Run NSFW detection
-                            val nsfwResult: NsfwPrediction
+                            val nsfwResult: NsfwPrediction?
                             val nsfwInference = measureTimeMillis {
                                 nsfwResult = nsfwDetector.isNsfw(bmp)
                             }
-                            Timber.d("kLog NSFW - ${nsfwResult.isSafe().not()}. Inference time: $nsfwInference ms")
+                            Timber.d("kLog NSFW - ${nsfwResult?.isSafe()?.not()}. Inference time: $nsfwInference ms")
 
-                            if (!nsfwResult.isSafe()) {
+                            if (nsfwResult?.isSafe() == false) {
                                 // Image is not safe, blur the whole image
                                 result = OutputImage(result = "nsfw", id = task.id ?: "", width = task.width ?: 0, height = task.height ?: 0, isManipulated = true)
                             } else {

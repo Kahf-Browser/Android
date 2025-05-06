@@ -52,7 +52,7 @@ suspend fun isHardwareCompatible(
 
     val inferenceTime = measureTimeMillis {
         val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
-        Timber.d("kLog nsfw classified. IsSafe: ${nsfwPrediction.isSafe()}")
+        Timber.d("kLog nsfw classified. IsSafe: ${nsfwPrediction?.isSafe()}")
 
         val segmentationResult = imageDetector.downloadAndStore(
             InputImage(
