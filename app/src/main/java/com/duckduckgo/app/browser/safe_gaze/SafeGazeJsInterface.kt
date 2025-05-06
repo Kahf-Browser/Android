@@ -103,7 +103,7 @@ class SafeGazeJsInterface(
         }
 
         // If same url is already in queue, don't add it again
-        if (urlQueue.any { it.src == input.src }) {
+        if (urlQueue.any { it.id == input.id }) {
             return
         }
 
