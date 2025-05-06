@@ -2540,8 +2540,8 @@ class BrowserTabFragment :
             }
 
             timeMenuItem.setImageResource(
-                if (viewState.prayerTimeShowing) com.duckduckgo.mobile.android.R.drawable.ic_clock_filled
-                else com.duckduckgo.mobile.android.R.drawable.ic_clock_outlined,
+                if (viewState.prayerTimeShowing) com.duckduckgo.mobile.android.R.drawable.ic_prayer_filled
+                else com.duckduckgo.mobile.android.R.drawable.ic_prayer_outlined,
             )
 
             // Icon and onClick action of new tab button
