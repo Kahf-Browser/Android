@@ -139,7 +139,7 @@ class SafeGazeJsInterface(
                             val imageDownloadTime = measureTimeMillis {
                                 bmp = withTimeout(1500) {
                                     imageDownloader.downloadImageWithAspectRatio(
-                                        context, task.src, task.width, task.height,
+                                        context, task.src, task.baseImg, task.width, task.height,
                                     )
                                 }
                             }
@@ -158,7 +158,7 @@ class SafeGazeJsInterface(
 
                             if (!nsfwResult.isSafe()) {
                                 // Image is not safe, blur the whole image
-                                result = OutputImage(result = "nsfw", id = task.id, width = task.width, height = task.height, isManipulated = true)
+                                result = OutputImage(result = "nsfw", id = task.id ?: "", width = task.width ?: 0, height = task.height ?: 0, isManipulated = true)
                             } else {
                                 // Run Segmentation model
                                 val segmentationInf = measureTimeMillis {
@@ -192,7 +192,7 @@ class SafeGazeJsInterface(
 
                         kahfImageBlockedDao.insert(
                             KahfImageBlocked(
-                                imageUrl = it.src.md5(),
+                                imageUrl = it.src?.md5() ?: "",
                                 responseStr = "",
                                 isIndecent = result.isManipulated,
                                 imageWidth = result.width.toFloat(),
@@ -253,7 +253,10 @@ class SafeGazeJsInterface(
         }
     }
 
-    private fun isInvalidImageUrl(url: String): Boolean {
+    private fun isInvalidImageUrl(url: String?): Boolean {
+        if (url.isNullOrEmpty()) {
+            return true
+        }
         return listOfEndsWith.any { url.endsWith(it, ignoreCase = true) } || listOfContains.any { url.contains(it) }
     }
 

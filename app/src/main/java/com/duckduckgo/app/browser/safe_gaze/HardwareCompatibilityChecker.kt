@@ -61,6 +61,7 @@ suspend fun isHardwareCompatible(
                 width = bitmap.width,
                 height = bitmap.height,
                 imgBitmap = bitmap,
+                baseImg = "none", // Assuming toBase64() is a valid method
             ),
         )
         Timber.d("kLog segmentation completed. Image modified: ${segmentationResult.isManipulated}")
