@@ -34,11 +34,12 @@ import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
 class SafeGazePopupHandler(
     private val binding: SafeGazePopupBinding,
@@ -270,18 +271,16 @@ class SafeGazePopupHandler(
     @WorkerThread
     private suspend fun getJsVersion(context: Context): String {
         return withContext(dispatcher.io()) {
-            val safeGazeJs = File("${context.filesDir}/$SAFE_GAZE_JS_FILENAME")
-            if (safeGazeJs.exists()) {
-                val firstLine = safeGazeJs.bufferedReader().use { it.readLine() ?: "" }
-
-                if (firstLine.startsWith("// v")) {
-                    firstLine.substringAfter("// v")
-                } else {
-                    "1.0.0"
+            val firstLine = try {
+                val inputStream = context.assets.open("video_filter.js")
+                BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                    reader.readLine() ?: ""
                 }
-            } else {
+            } catch (e: IOException) {
                 ""
             }
+
+            firstLine.takeIf { it.startsWith("// v") }?.substringAfter("// v") ?: "1.0.0"
         }
     }
 
