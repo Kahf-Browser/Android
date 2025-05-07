@@ -199,7 +199,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <co.kahf.adsdk.adviews.KahfBannerAdView
+            <com.kahfads.sdk.adviews.KahfBannerAdView
                 android:id="@+id/kahfBannerAd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

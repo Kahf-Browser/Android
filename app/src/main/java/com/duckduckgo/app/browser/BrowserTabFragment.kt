@@ -120,11 +120,12 @@ import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
-import co.kahf.adsdk.KahfAdConfig
-import co.kahf.adsdk.KahfAdSdk
-import co.kahf.adsdk.KahfAdType
-import co.kahf.adsdk.KahfSdkConfig
-import co.kahf.adsdk.adviews.AdImpressionListener
+import com.kahfads.sdk.adviews.KahfBannerAdView
+import com.kahfads.sdk.KahfAdConfig
+import com.kahfads.sdk.KahfAdSdk
+import com.kahfads.sdk.KahfAdType
+import com.kahfads.sdk.KahfSdkConfig
+import com.kahfads.sdk.adviews.AdImpressionListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -679,6 +680,8 @@ class BrowserTabFragment :
 
     private lateinit var bottomNav: IncludeBrowserBottomNavBinding
 
+    private lateinit var adView: KahfBannerAdView
+
     private lateinit var webViewContainer: FrameLayout
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -928,6 +931,7 @@ class BrowserTabFragment :
         adType = KahfAdType.BANNER_AD,
         divId = "under-saalat-time",
         screenName = "home-page",
+        refreshRateInMillis = 20_000
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -4534,7 +4538,8 @@ class BrowserTabFragment :
             }
 
             // Kahf Ad
-            newBrowserTab.kahfBannerAd.apply {
+            adView = newBrowserTab.kahfBannerAd as KahfBannerAdView
+            adView.apply {
                 loadAd(kahfAdConfig)
                 setAdClickListener {
                     viewModel.onUserSubmittedQuery(it)
