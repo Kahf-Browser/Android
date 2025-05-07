@@ -893,6 +893,19 @@
     <string name="kahf_medium">MEDIUM</string>
     <string name="kahf_low">LOW</string>
     <string name="kahf_off">Off</string>
+
+    <string name="kahf_safegaze_lock">SafeGaze Lock</string>
+    <string name="kahf_safegaze_unlock">Unlock SafeGaze settings</string>
+    <string name="kahf_safegaze_lock_desc">If Touch ID, Face ID, or a system passcode is enabled, you\'ll be asked to unlock the app when opening SafeGaze settings.</string>
+    <string name="kahf_no_security_enabled">No secure lock enabled on the device</string>
+    <string name="kahf_no_device_credential">No device credentials are set up. Please set up a PIN, pattern, or password.</string>
+    <string name="kahf_no_biometrics">Please set up PIN, Password, Pattern, Fingerprint or Face recognition</string>
+    <string name="kahf_no_biometric_hardware">This device doesn\'t have biometric hardware.</string>
+    <string name="kahf_biometric_unavailable">Biometric hardware is currently unavailable.</string>
+    <string name="kahf_too_many_attempts">Too many failed attempts. Please try again later.</string>
+    <string name="kahf_authentication_error">Authentication failed</string>
+    <string name="kahf_not_recognized">Not recognized. Please try again.</string>
+
     <string name="kahf_onboarding_disclaimer">Built on top of privacy aware DuckDuckGo browser</string>
     <string name="kahf_onboarding_get_what_you_want">Private, Safe and Decent browsing -\nPowered by AI</string>
     <string name="kahf_onboarding_lets_go">Let\'s Go</string>

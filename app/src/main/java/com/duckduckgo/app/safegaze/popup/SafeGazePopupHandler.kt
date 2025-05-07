@@ -27,9 +27,11 @@ import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
 import com.duckduckgo.app.isFaceCoverEnabled
+import com.duckduckgo.app.isSgLockEnabled
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.setFaceCoverMode
+import com.duckduckgo.app.setSgLockMode
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
@@ -186,6 +188,12 @@ class SafeGazePopupHandler(
         binding.switchCoverFace.isVisible = preSelectedSG != SafeGazeLevel.Off
         binding.tvCoverFace.isVisible = preSelectedSG != SafeGazeLevel.Off
 
+        // Toggle biometric lock
+        binding.switchSgLock.isChecked = sharedPreferences.isSgLockEnabled()
+        binding.switchSgLock.setOnCheckedChangeListener { _, isChecked ->
+            sharedPreferences.setSgLockMode(isChecked)
+        }
+
         setFontSize()
 
         // Set build number
@@ -221,6 +229,10 @@ class SafeGazePopupHandler(
             tvCoverFace.scaleIndependentTextSize(18f)
             blueIndecentPhotosText.scaleIndependentTextSize(14f)
             btnToggleSiteBlur.scaleIndependentTextSize(12f)
+
+            // SafeGaze Lock
+            tvLock.scaleIndependentTextSize(18f)
+            tvLockDescription.scaleIndependentTextSize(14f)
 
             // Statistics
             statTitle.scaleIndependentTextSize(20f)

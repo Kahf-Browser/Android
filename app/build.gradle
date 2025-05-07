@@ -391,6 +391,7 @@ dependencies {
     implementation JakeWharton.timber
     implementation 'nl.dionsegijn:konfetti:1.2.5'
     implementation 'com.github.Muslims-Day:kahfad:2.0.2'
+    implementation 'androidx.biometric:biometric:1.1.0'
 
     // App update
     implementation 'com.google.android.play:app-update:2.1.0'

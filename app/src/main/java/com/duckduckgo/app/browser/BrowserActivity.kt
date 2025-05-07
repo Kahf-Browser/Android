@@ -33,6 +33,9 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.VisibleForTesting
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
@@ -89,6 +92,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.concurrent.Executor
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -156,6 +160,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
     private val immediateUpdateCode = 1000
     private val flexibleUpdateCode = 1001
+
+    private lateinit var biometricPrompt: BiometricPrompt
+    private val promptInfo: BiometricPrompt.PromptInfo by lazy {
+        BiometricPrompt.PromptInfo.Builder()
+            .setTitle(getString(R.string.kahf_safegaze_unlock))
+            .setAllowedAuthenticators(
+                BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                    BiometricManager.Authenticators.DEVICE_CREDENTIAL,
+            )
+            .build()
+    }
 
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
@@ -829,6 +844,51 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 },
             )
             .show()
+    }
+
+    fun isAnySecurityEnabled(): Boolean {
+        val biometricManager = BiometricManager.from(this@BrowserActivity)
+        return biometricManager.canAuthenticate(
+            BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                BiometricManager.Authenticators.DEVICE_CREDENTIAL,
+        ) == BiometricManager.BIOMETRIC_SUCCESS
+    }
+
+    fun showBiometricPrompt(function: (authenticated: Boolean, msgId: Int) -> Unit) {
+        biometricPrompt = BiometricPrompt(this, ContextCompat.getMainExecutor(this),
+            object : BiometricPrompt.AuthenticationCallback() {
+                override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    super.onAuthenticationSucceeded(result)
+                    function.invoke(true, 0)
+                }
+
+                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                    super.onAuthenticationError(errorCode, errString)
+
+                    val messageResId = when (errorCode) {
+                        BiometricPrompt.ERROR_NO_DEVICE_CREDENTIAL ->
+                            R.string.kahf_no_device_credential
+                        BiometricPrompt.ERROR_NO_BIOMETRICS ->
+                            R.string.kahf_no_biometrics
+                        BiometricPrompt.ERROR_HW_NOT_PRESENT ->
+                            R.string.kahf_no_biometric_hardware
+                        BiometricPrompt.ERROR_HW_UNAVAILABLE ->
+                            R.string.kahf_biometric_unavailable
+                        BiometricPrompt.ERROR_LOCKOUT ->
+                            R.string.kahf_too_many_attempts
+                        else -> R.string.kahf_authentication_error
+                    }
+
+                    function.invoke(false, messageResId)
+                }
+
+                override fun onAuthenticationFailed() {
+                    super.onAuthenticationFailed()
+                    function.invoke(false, R.string.kahf_not_recognized)
+                }
+            })
+
+        biometricPrompt.authenticate(promptInfo)
     }
 
     private fun hideWebContent() {

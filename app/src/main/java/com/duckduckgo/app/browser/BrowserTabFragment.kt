@@ -238,6 +238,7 @@ import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.isFaceCoverEnabled
+import com.duckduckgo.app.isSgLockEnabled
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
@@ -1036,133 +1037,151 @@ class BrowserTabFragment :
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
         }
-        handleSafeGazePopUp()
+
+        (requireActivity() as BrowserActivity).apply {
+            safeGazeIcon.setOnClickListener {
+                if (sharedPreferences.isSgLockEnabled()) {
+                    if (isAnySecurityEnabled()) {
+                        showBiometricPrompt { authenticated, msgId ->
+                            if (authenticated) {
+                                inflateSafeGazePopup()
+                            } else {
+                                showToast(msgId)
+                            }
+                        }
+                    } else {
+                        showToast(string.kahf_no_security_enabled)
+                        inflateSafeGazePopup()
+                    }
+                } else {
+                    inflateSafeGazePopup()
+                }
+            }
+        }
     }
 
     @SuppressLint("InflateParams")
-    private fun handleSafeGazePopUp() {
+    private fun inflateSafeGazePopup() {
         val popupBinding = SafeGazePopupBinding.inflate(LayoutInflater.from(context))
         val popupWindow = PopupWindow(popupBinding.root, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 
-        safeGazeIcon.setOnClickListener {
-            val iconRect = Rect()
-            safeGazeIcon.getGlobalVisibleRect(iconRect)
-            val x = iconRect.left
-            val y = iconRect.top
-            popupWindow.apply {
-                animationStyle = 2132017505
-                isFocusable = true
-            }
-
-            safeGazeIcon.post {
-                SafeGazePopupHandler(
-                    binding = popupBinding,
-                    currentUrl = webView?.url,
-                    sharedPreferences = sharedPreferences,
-                    sgWhitelistDao = safeGazeWhitelistDao,
-                    dispatcher = dispatchers,
-                    onDnsModeChanged = { dnsLevel ->
-                        val updated = updateDnsSettings(dnsLevel)
-                        if (updated) {
-                            dnsResolver.updateDohServerUrl(dnsLevel)
-                            popupWindow.dismiss()
-                            // Just reloading the WebView doesn't work. Relaunch the tab is required.
-                            webView?.url?.let { url ->
-                                val uri = Uri.parse(url).buildUpon().clearQuery().apply {
-                                    url.toUri().queryParameterNames.filter { it != ParamKey.SAFE }.forEach {
-                                        appendQueryParameter(it, url.toUri().getQueryParameter(it))
-                                    }
-                                }.build()
-
-                                (requireActivity() as BrowserActivity).relaunchCurrentTab(uri.toString())
-                            }
-                        }
-
-                        analyticsService.logEvent(
-                            when (dnsLevel) {
-                                PrivateDnsLevel.High -> PrivateDnsHigh
-                                PrivateDnsLevel.Medium -> PrivateDnsMedium
-                                PrivateDnsLevel.Low -> PrivateDnsLow
-                                PrivateDnsLevel.Off -> PrivateDnsDisable
-                            }
-                        )
-                    },
-                    onSafeGazeModeChanged = {
-                        val updated = updateSafeGazeSettings(it)
-                        if (updated) {
-                            analyticsService.logEvent(
-                                when (it) {
-                                    SafeGazeLevel.Off -> ImageFilerDisable
-                                    else -> ImageFilerEnable
-                                }
-                            )
-                            popupWindow.dismiss()
-                            webView?.reload()
-                        }
-                    },
-                    onBlurEffectChanged = {
-                        val updated = updateSafeGazeSettings(it)
-                        safeGazeInterface.updateBlurMode(it.name == SafeGazeLevel.Blur.name)
-                        if (updated) {
-                            webView?.reload()
-                        }
-                        popupWindow.dismiss()
-                    },
-                    onShareClicked = {
-                        val shareIntent = Intent(Intent.ACTION_SEND)
-                        shareIntent.type = "text/plain"
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${requireContext().packageName}")
-                        startActivity(Intent.createChooser(shareIntent, "Share via"))
-                    },
-                    onSupportClicked = {
-                        popupWindow.dismiss()
-                        viewModel.onUserSubmittedQuery("https://www.patreon.com/SafeGaze")
-                    },
-                    onThemeChanged = {
-                        popupWindow.dismiss()
-                        (requireActivity() as DuckDuckGoActivity).toggleTheme()
-                    },
-                    onSgWhitelistUpdated = { _, _ ->
-                        webView?.reload()
-                        popupWindow.dismiss()
-                    }
-                ).apply {
-                    setOnFaceCoverChangeListener { shouldCoverFace ->
-                        safeGazeInterface.updateFaceCoverMode(shouldCoverFace)
-                        webView?.reload()
-                        popupWindow.dismiss()
-                    }
-                }
-
-                lifecycleScope.launch {
-                    val count = imageBlockCountDao.getCount().first()
-                    popupBinding.imageBlurCount.setFormattedCount(count)
-
-                    val siteBlockCount = harmfulSiteBlockedDao.getTotalBlockCount().first()
-                    popupBinding.siteBlockedCount.setFormattedCount(siteBlockCount)
-
-                    webTrackersBlockedDao.getTotalTrackerCount().collect {
-                        popupBinding.trackerBlockedCount.setFormattedCount(it)
-                    }
-                }
-
-                val leftOverDevicePixel = getDeviceWidthInPixels(requireContext()) - x
-                val popUpLayingOut = 350.dpToPx(requireContext().resources.displayMetrics) - leftOverDevicePixel
-                val newPopUpPosition = (x - popUpLayingOut) - 50
-                popupWindow.showAtLocation(
-                    safeGazeIcon,
-                    Gravity.NO_GRAVITY,
-                    newPopUpPosition,
-                    (y + omnibar.toolbar.height) - 20,
-                )
-                val pointerArrow = popupBinding.pointerArrowImageView
-                val pointerArrowParams = pointerArrow.layoutParams as ConstraintLayout.LayoutParams
-                pointerArrowParams.rightMargin = leftOverDevicePixel - 113
-                pointerArrow.layoutParams = pointerArrowParams
-            }
-
-            analyticsService.logEvent(AnalyticsEvent.SettingsClicked)
+        val iconRect = Rect()
+        safeGazeIcon.getGlobalVisibleRect(iconRect)
+        val x = iconRect.left
+        val y = iconRect.top
+        popupWindow.apply {
+            animationStyle = 2132017505
+            isFocusable = true
         }
+
+        safeGazeIcon.post {
+            SafeGazePopupHandler(
+                binding = popupBinding,
+                currentUrl = webView?.url,
+                sharedPreferences = sharedPreferences,
+                sgWhitelistDao = safeGazeWhitelistDao,
+                dispatcher = dispatchers,
+                onDnsModeChanged = { dnsLevel ->
+                    val updated = updateDnsSettings(dnsLevel)
+                    if (updated) {
+                        dnsResolver.updateDohServerUrl(dnsLevel)
+                        popupWindow.dismiss()
+                        // Just reloading the WebView doesn't work. Relaunch the tab is required.
+                        webView?.url?.let { url ->
+                            val uri = url.toUri().buildUpon().clearQuery().apply {
+                                url.toUri().queryParameterNames.filter { it != ParamKey.SAFE }.forEach {
+                                    appendQueryParameter(it, url.toUri().getQueryParameter(it))
+                                }
+                            }.build()
+
+                            (requireActivity() as BrowserActivity).relaunchCurrentTab(uri.toString())
+                        }
+                    }
+
+                    analyticsService.logEvent(
+                        when (dnsLevel) {
+                            PrivateDnsLevel.High -> PrivateDnsHigh
+                            PrivateDnsLevel.Medium -> PrivateDnsMedium
+                            PrivateDnsLevel.Low -> PrivateDnsLow
+                            PrivateDnsLevel.Off -> PrivateDnsDisable
+                        },
+                    )
+                },
+                onSafeGazeModeChanged = {
+                    val updated = updateSafeGazeSettings(it)
+                    if (updated) {
+                        analyticsService.logEvent(
+                            when (it) {
+                                SafeGazeLevel.Off -> ImageFilerDisable
+                                else -> ImageFilerEnable
+                            },
+                        )
+                        popupWindow.dismiss()
+                        webView?.reload()
+                    }
+                },
+                onBlurEffectChanged = {
+                    val updated = updateSafeGazeSettings(it)
+                    safeGazeInterface.updateBlurMode(it.name == SafeGazeLevel.Blur.name)
+                    if (updated) {
+                        webView?.reload()
+                    }
+                    popupWindow.dismiss()
+                },
+                onShareClicked = {
+                    val shareIntent = Intent(Intent.ACTION_SEND)
+                    shareIntent.type = "text/plain"
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${requireContext().packageName}")
+                    startActivity(Intent.createChooser(shareIntent, "Share via"))
+                },
+                onSupportClicked = {
+                    popupWindow.dismiss()
+                    viewModel.onUserSubmittedQuery("https://www.patreon.com/SafeGaze")
+                },
+                onThemeChanged = {
+                    popupWindow.dismiss()
+                    (requireActivity() as DuckDuckGoActivity).toggleTheme()
+                },
+                onSgWhitelistUpdated = { _, _ ->
+                    webView?.reload()
+                    popupWindow.dismiss()
+                },
+            ).apply {
+                setOnFaceCoverChangeListener { shouldCoverFace ->
+                    safeGazeInterface.updateFaceCoverMode(shouldCoverFace)
+                    webView?.reload()
+                    popupWindow.dismiss()
+                }
+            }
+
+            lifecycleScope.launch {
+                val count = imageBlockCountDao.getCount().first()
+                popupBinding.imageBlurCount.setFormattedCount(count)
+
+                val siteBlockCount = harmfulSiteBlockedDao.getTotalBlockCount().first()
+                popupBinding.siteBlockedCount.setFormattedCount(siteBlockCount)
+
+                webTrackersBlockedDao.getTotalTrackerCount().collect {
+                    popupBinding.trackerBlockedCount.setFormattedCount(it)
+                }
+            }
+
+            val leftOverDevicePixel = getDeviceWidthInPixels(requireContext()) - x
+            val popUpLayingOut = 350.dpToPx(requireContext().resources.displayMetrics) - leftOverDevicePixel
+            val newPopUpPosition = (x - popUpLayingOut) - 50
+            popupWindow.showAtLocation(
+                safeGazeIcon,
+                Gravity.NO_GRAVITY,
+                newPopUpPosition,
+                (y + omnibar.toolbar.height) - 20,
+            )
+            val pointerArrow = popupBinding.pointerArrowImageView
+            val pointerArrowParams = pointerArrow.layoutParams as ConstraintLayout.LayoutParams
+            pointerArrowParams.rightMargin = leftOverDevicePixel - 113
+            pointerArrow.layoutParams = pointerArrowParams
+        }
+
+        analyticsService.logEvent(AnalyticsEvent.SettingsClicked)
     }
 
     private fun updateDnsSettings(selection: PrivateDnsLevel): Boolean {

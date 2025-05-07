@@ -500,12 +500,65 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:id="@+id/divider6"
+                    android:id="@+id/divider7"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="10dp"
                     android:background="?attr/kahfDivider"
                     app:layout_constraintTop_toBottomOf="@id/appStat" />
+
+                <TextView
+                    android:id="@+id/tvLock"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="@string/kahf_safegaze_lock"
+                    android:textColor="?attr/kahfPrimaryText"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/switchSgLock"
+                    app:layout_constraintTop_toBottomOf="@id/divider7"
+                    tools:ignore="DeprecatedWidgetInXml" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchSgLock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:track="@drawable/switch_track"
+                    app:trackTint="@color/switch_track_color"
+                    app:thumbTint="?attr/kahfCardBackground"
+                    android:checked="false"
+                    tools:checked="true"
+                    android:scaleX="0.75"
+                    android:scaleY="0.75"
+                    android:layout_marginEnd="-5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider7"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                <TextView
+                    android:id="@+id/tvLockDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/lato"
+                    android:text="@string/kahf_safegaze_lock_desc"
+                    android:textColor="?attr/kahfPrimaryText"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvLock"
+                    tools:ignore="DeprecatedWidgetInXml" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:id="@+id/divider6"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="?attr/kahfDivider"
+                    app:layout_constraintTop_toBottomOf="@id/tvLockDescription" />
 
                 <Button
                     android:id="@+id/btnShare"
