@@ -27,10 +27,10 @@ interface SafeGazeWhitelistDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(entity: SafeGazeWhitelistEntity)
 
-    @Query("DELETE FROM safegaze_whitelist WHERE host = :host")
+    @Query("DELETE FROM safegaze_whitelist WHERE host = :host OR host = 'www.' || :host")
     fun delete(host: String)
 
-    @Query("SELECT EXISTS(SELECT 1 FROM safegaze_whitelist WHERE host = :host)")
+    @Query("SELECT EXISTS(SELECT 1 FROM safegaze_whitelist WHERE host = :host OR host = 'www.' || :host)")
     fun isHostWhitelisted(host: String): Boolean
 
     @Query("SELECT * FROM safegaze_whitelist")
