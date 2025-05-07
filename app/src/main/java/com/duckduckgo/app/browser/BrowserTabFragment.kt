@@ -982,7 +982,9 @@ class BrowserTabFragment :
 
     override fun onDetach() {
         super.onDetach()
-        safeGazeInterface.cancelOngoingImageProcessing()
+        if (::safeGazeInterface.isInitialized) {
+            safeGazeInterface.cancelOngoingImageProcessing()
+        }
     }
 
     private fun resumeWebView() {
