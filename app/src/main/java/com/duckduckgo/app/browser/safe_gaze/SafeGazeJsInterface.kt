@@ -78,7 +78,8 @@ class SafeGazeJsInterface(
     fun sendMessageFromWebView(messageType: String, data: String) {
         when (messageType) {
             "detectImg" -> addTaskToQueue(parseImageInfo(data))
-            "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
+            // Temporarily disabled video detection
+            // "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
         }
     }
 

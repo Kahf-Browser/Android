@@ -408,9 +408,7 @@ class BrowserWebViewClient @Inject constructor(
     ) {
         isMainJSLoaded = false
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
-        if (url?.contains("m.youtube.com") != true) {
-            loadPordaJs(webView, url)
-        }
+        loadPordaJs(webView, url)
 
         url?.let {
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
