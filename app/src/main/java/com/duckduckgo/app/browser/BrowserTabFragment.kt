@@ -120,12 +120,6 @@ import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
-import com.kahfads.sdk.adviews.KahfBannerAdView
-import com.kahfads.sdk.KahfAdConfig
-import com.kahfads.sdk.KahfAdSdk
-import com.kahfads.sdk.KahfAdType
-import com.kahfads.sdk.KahfSdkConfig
-import com.kahfads.sdk.adviews.AdImpressionListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -366,6 +360,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.kahfads.sdk.KahfAdConfig
+import com.kahfads.sdk.KahfAdSdk
+import com.kahfads.sdk.KahfAdType
+import com.kahfads.sdk.KahfSdkConfig
+import com.kahfads.sdk.adviews.AdImpressionListener
+import com.kahfads.sdk.model.AdResult.Error
+import com.kahfads.sdk.model.ErrorType
 import io.kahf.porda_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
@@ -680,8 +681,6 @@ class BrowserTabFragment :
 
     private lateinit var bottomNav: IncludeBrowserBottomNavBinding
 
-    private lateinit var adView: KahfBannerAdView
-
     private lateinit var webViewContainer: FrameLayout
 
     private lateinit var sharedPreferences: SharedPreferences
@@ -922,16 +921,16 @@ class BrowserTabFragment :
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
     private val kahfSdkConfig = KahfSdkConfig(
-        publisherId = "muslims-day-web",
+        publisherId = "kahf-browser",
         campaignTypes = "paid|publisher-house|community|house",
         format = "json"
     )
 
     private val kahfAdConfig = KahfAdConfig(
         adType = KahfAdType.BANNER_AD,
-        divId = "under-saalat-time",
-        screenName = "home-page",
-        refreshRateInMillis = 20_000
+        divId = "home_banner",
+        screenName = "HomeView",
+        refreshRateInMillis = 20_000,
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -976,7 +975,7 @@ class BrowserTabFragment :
 
         KahfAdSdk.initialize(
             requireContext(),
-            kahfSdkConfig
+            kahfSdkConfig,
         )
     }
 
@@ -1524,6 +1523,7 @@ class BrowserTabFragment :
 
     private fun showHome() {
         Timber.d("New Tab: showHome")
+        viewModel.resumeAdRefresh()
         viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
@@ -1542,6 +1542,7 @@ class BrowserTabFragment :
 
     private fun showBrowser() {
         Timber.d("New Tab: showBrowser")
+        viewModel.pauseAdRefresh()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         binding.browserLayout.show()
@@ -1922,6 +1923,25 @@ class BrowserTabFragment :
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
+
+            is Command.PauseAdAutoRefresh -> {
+                lifecycleScope.launch(dispatchers.io()) {
+                    delay(100)
+                    withContext(dispatchers.main()) {
+                        binding.includeNewBrowserTab.kahfBannerAd.pauseAutoRefresh()
+                        Timber.d("adLog pause refresh. $tabId | ${webView?.url}")
+                    }
+                }
+            }
+            is Command.ResumeAdAutoRefresh -> {
+                if (lifecycle.currentState.isAtLeast(State.RESUMED)
+                    && (requireActivity() as BrowserActivity).isActiveTab(tabId)
+                    && webView?.isInvisible == true) {
+                    binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
+                    Timber.d("adLog resume refresh. $tabId | ${webView?.url}")
+                }
+            }
+
             else -> {
                 // NO OP
             }
@@ -2500,7 +2520,7 @@ class BrowserTabFragment :
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
                 analyticsService.logEvent(
-                    AnalyticsEvent.AddressBarSuggestionSelection, mapOf(AnalyticsParam.SuggestionSearchEngine to "duckduckgo")
+                    AnalyticsEvent.AddressBarSuggestionSelection, mapOf(AnalyticsParam.SuggestionSearchEngine to "google"),
                 )
                 viewModel.userSelectedAutocomplete(it)
             },
@@ -2720,7 +2740,7 @@ class BrowserTabFragment :
                         val initializationTime = nsfwDetector.modelInitializationTime
                         analyticsService.logEvent(
                             AnalyticsEvent.ModelInitTime,
-                            mapOf(AnalyticsParam.ModelInitTimeMS to initializationTime.toString())
+                            mapOf(AnalyticsParam.ModelInitTimeMS to initializationTime.toString()),
                         )
                         globalData.modelInitializationTimeLogged = true
 
@@ -2730,7 +2750,7 @@ class BrowserTabFragment :
                 grayBlur = SafeGazeLevel.getCurrentLevel(sharedPreferences) == SafeGazeLevel.Blur,
                 shouldCoverFace = sharedPreferences.isFaceCoverEnabled(),
                 imageProcessor,
-                videoFrameProcessor
+                videoFrameProcessor,
             )
 
             it.webViewClient = webViewClient
@@ -3467,6 +3487,7 @@ class BrowserTabFragment :
     private fun onTabHidden() {
         if (!isAdded) return
         viewModel.onViewHidden()
+        viewModel.pauseAdRefresh()
         downloadMessagesJob.cancel()
         webView?.onPause()
         safeGazeInterface.onTabPaused(tabId)
@@ -3477,6 +3498,7 @@ class BrowserTabFragment :
         webView?.onResume()
         launchDownloadMessagesJob()
         viewModel.onViewVisible()
+        viewModel.resumeAdRefresh()
         safeGazeInterface.onTabResumed(tabId)
     }
 
@@ -4120,7 +4142,7 @@ class BrowserTabFragment :
                             } catch (e: Exception) {
                                 null
                             },
-                            viewState.searchResults.suggestions
+                            viewState.searchResults.suggestions,
                         )
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, suggestionsWithClipboardContent)
 
@@ -4540,27 +4562,47 @@ class BrowserTabFragment :
             }
 
             // Kahf Ad
-            adView = newBrowserTab.kahfBannerAd as KahfBannerAdView
-            adView.apply {
+            newBrowserTab.kahfBannerAd.apply {
                 loadAd(kahfAdConfig)
                 setAdClickListener {
                     viewModel.onUserSubmittedQuery(it)
                 }
-                setAdImpressionListener(object : AdImpressionListener {
-                    override fun onAdClicked() {
-                        Timber.i("adLog onAdClicked")
-                        // analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
-                    }
+                setAdImpressionListener(
+                    object : AdImpressionListener {
+                        override fun onAdClicked() {
+                            Timber.i("adLog onAdClicked")
+                            analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                        }
 
-                    override fun onAdFailedToLoad(message: String?) {
-                        // analyticsService.logEvent(AnalyticsEvent.BannerAdLoadFailed)
-                    }
+                        override fun onAdFailedToLoad(error: Error) {
+                            Timber.i("adLog onAdFailedToLoad ${error.message}")
+                            when (error.type) {
+                                ErrorType.TIMEOUT -> {
+                                    analyticsService.logEvent(AnalyticsEvent.AdTimeout)
+                                }
+                                ErrorType.NO_AD_FOUND -> {
+                                    analyticsService.logEvent(AnalyticsEvent.AdNotFound)
+                                }
+                                ErrorType.SERVER_ERROR -> {
+                                    analyticsService.logEvent(AnalyticsEvent.AdServerError)
+                                }
+                                else -> {
+                                    // No op
+                                }
+                            }
+                        }
 
-                    override fun onAdLoaded() {
-                        Timber.i("adLog onAdLoaded $tabId")
-                        // analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
-                    }
-                })
+                        override fun onAdLoaded() {
+                            if (webView?.isVisible != false) {
+                                Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
+                                viewModel.pauseAdRefresh()
+                            } else {
+                                Timber.i("adLog onAdLoaded $tabId")
+                                analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                            }
+                        }
+                    },
+                )
             }
 
             // App Statistics section
@@ -4622,10 +4664,12 @@ class BrowserTabFragment :
             newBrowserTab.newTabLayout.show()
 
             viewModel.newTabShown = true
+            viewModel.resumeAdRefresh()
         }
 
         private fun hideNewTab() {
             Timber.d("New Tab: hideNewTab")
+            viewModel.pauseAdRefresh()
             newBrowserTab.browserBackground.gone()
         }
 

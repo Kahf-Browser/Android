@@ -570,6 +570,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    fun isActiveTab(tabID: String) = currentTab?.tabId == tabID
+
     fun launchFire() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING)
         val dialog = FireDialog(
