@@ -2256,7 +2256,7 @@ class BrowserTabFragment :
                     }
 
                     else -> {
-                        showToast(R.string.unableToOpenLink)
+                        // showToast(R.string.unableToOpenLink)
                     }
                 }
             } else {
@@ -2291,7 +2291,7 @@ class BrowserTabFragment :
             }
         }.onFailure { exception ->
             Timber.e(exception, "Failed to launch external app")
-            showToast(R.string.unableToOpenLink)
+            // showToast(string.unableToOpenLink) No need to show toast here
         }
     }
 
