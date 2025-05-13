@@ -368,6 +368,7 @@ class BrowserWebViewClient @Inject constructor(
             if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
                 val contentJs = readAssetFile(context.assets, "video_filter.js")
                 withContext(dispatcherProvider.main()) {
+                    webView.evaluateJavascript("Android = true;", null)
                     webView.evaluateJavascript(contentJs, null)
                 }
             }
