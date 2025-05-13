@@ -61,6 +61,7 @@ suspend fun isHardwareCompatible(
                 width = bitmap.width,
                 height = bitmap.height,
                 imgBitmap = bitmap,
+                order = 1F,
                 baseImg = "none", // Assuming toBase64() is a valid method
             ),
         )
