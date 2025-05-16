@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.analytics.AnalyticsEvent
@@ -12,6 +13,7 @@ import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboardingSafegazeBinding
 import com.duckduckgo.app.browser.safe_gaze.isHardwareCompatible
+import com.duckduckgo.app.isZikrTab
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
@@ -57,6 +59,9 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
     ): View {
         binding = FragmentOnboardingSafegazeBinding.inflate(inflater, container, false)
 
+        val isZikrTab = isZikrTab()
+
+        binding.btnSkip.isVisible = isZikrTab.not()
         binding.btnSkip.setOnClickListener {
             if (hardwareCompatibilityChecked) {
                 analytics.logEvent(AnalyticsEvent.OnboardSkipDecentInternet)
@@ -66,9 +71,17 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
             }
         }
 
+        binding.btnEnableSafeGaze.isVisible = isZikrTab.not()
         binding.btnEnableSafeGaze.setOnClickListener {
             if (hardwareCompatibilityChecked) {
                 analytics.logEvent(AnalyticsEvent.OnboardEnabledDecentInternet)
+                onEnableSafeGazeClicked()
+            }
+        }
+
+        binding.btnNext.isVisible = isZikrTab
+        binding.btnNext.setOnClickListener {
+            if (hardwareCompatibilityChecked) {
                 onEnableSafeGazeClicked()
             }
         }

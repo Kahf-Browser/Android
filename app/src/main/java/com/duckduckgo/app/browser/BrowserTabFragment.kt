@@ -234,6 +234,7 @@ import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
 import com.duckduckgo.app.isFaceCoverEnabled
 import com.duckduckgo.app.isSgLockEnabled
+import com.duckduckgo.app.isZikrTab
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
@@ -1061,6 +1062,11 @@ class BrowserTabFragment :
                 } else {
                     inflateSafeGazePopup()
                 }
+            }
+
+            safeGazeIcon.setOnLongClickListener {
+                Toast.makeText(requireContext(),"Model: ${Build.MODEL}\nManufacturer: ${Build.MANUFACTURER}", Toast.LENGTH_LONG).show()
+                true
             }
         }
     }
@@ -4374,13 +4380,13 @@ class BrowserTabFragment :
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = viewState.showSearchIcon
                 omnibar.buttonsVisibleWithBrowser.isVisible = !omnibar.omnibarTextInput.hasFocus()
-                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus()
+                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus() && isZikrTab().not()
             } else {
                 omnibar.daxIcon.isVisible = false
                 omnibar.shieldIcon?.isVisible = false
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = true
-                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus()
+                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus() && isZikrTab().not()
                 omnibar.buttonsVisibleWithBrowser.isVisible = false
             }
 
