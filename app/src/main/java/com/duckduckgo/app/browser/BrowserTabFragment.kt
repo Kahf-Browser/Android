@@ -927,7 +927,7 @@ class BrowserTabFragment :
     )
 
     private val kahfAdConfig = KahfAdConfig(
-        adType = KahfAdType.BANNER_AD,
+        adType = KahfAdType.BANNER_AD_640_200,
         divId = "home_banner",
         screenName = "HomeView",
         refreshRateInMillis = 20_000,
