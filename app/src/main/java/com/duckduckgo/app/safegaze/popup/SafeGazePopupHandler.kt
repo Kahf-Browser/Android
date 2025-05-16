@@ -216,7 +216,6 @@ class SafeGazePopupHandler(
     private fun setFontSize() {
         with(binding) {
             // KahfGuard
-            tvOnOff.scaleIndependentTextSize(14f)
             title.scaleIndependentTextSize(20f)
             tvDescription.scaleIndependentTextSize(14f)
             btnHigh.btnLabel.scaleIndependentTextSize(13f)
@@ -224,7 +223,6 @@ class SafeGazePopupHandler(
             btnLow.btnLabel.scaleIndependentTextSize(13f)
 
             // SafeGaze
-            tvOnOffImage.scaleIndependentTextSize(14f)
             tvDecent.scaleIndependentTextSize(18f)
             tvCoverFace.scaleIndependentTextSize(18f)
             blueIndecentPhotosText.scaleIndependentTextSize(14f)
