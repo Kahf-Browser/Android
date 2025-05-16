@@ -1043,7 +1043,7 @@ class BrowserTabFragment :
             dialog.deleteBookmarkListener = viewModel
         }
 
-        (requireActivity() as BrowserActivity).apply {
+        (requireActivity() as DuckDuckGoActivity).apply {
             safeGazeIcon.setOnClickListener {
                 if (sharedPreferences.isSgLockEnabled()) {
                     if (isAnySecurityEnabled()) {

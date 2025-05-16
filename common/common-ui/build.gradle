@@ -39,6 +39,7 @@ dependencies {
 
     implementation project(path: ':common-utils')
     implementation project(path: ':di')
+    implementation 'androidx.biometric:biometric:1.1.0'
     anvil project(path: ':anvil-compiler')
     implementation project(path: ':anvil-annotations')
     implementation project(path: ':app-build-config-api')
