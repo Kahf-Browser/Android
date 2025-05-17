@@ -120,7 +120,13 @@ class SafeGazeJsInterface(
                     // Add a small delay to avoid overwhelming the processor
                     delay(10)
 
-                    val result: OutputImage
+                    var result = OutputImage(
+                        result = "null",
+                        id = task?.id ?: "",
+                        width = task?.width ?: 0,
+                        height = task?.height ?: 0,
+                    )
+
                     task?.let {
                         // Log average waiting time for every 30 images to GA
                         val waitingTime = System.currentTimeMillis() - task.insertedAt
@@ -138,7 +144,7 @@ class SafeGazeJsInterface(
                             // Download bitmap
                             val bmp: Bitmap?
                             val imageDownloadTime = measureTimeMillis {
-                                bmp = withTimeout(1500) {
+                                bmp = withTimeout(1800) {
                                     imageDownloader.downloadImageWithAspectRatio(
                                         context, task.src, task.baseImg, task.width, task.height,
                                     )
@@ -176,7 +182,6 @@ class SafeGazeJsInterface(
                             analytics.logEvent(AnalyticsEvent.ImageProcessingTimeout)
                             return@let
                         }
-                        onImageClassified("detectionResult", result)
 
                         // Log P90 inference time for every 30 images to GA
                         if (inferenceTimes.size >= 30) {
@@ -202,6 +207,7 @@ class SafeGazeJsInterface(
                             ),
                         )
                     }
+                    onImageClassified("detectionResult", result)
                 }
             }
         }
