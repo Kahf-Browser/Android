@@ -24,7 +24,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
@@ -45,7 +44,6 @@ class SafeGazeJsInterface(
     private val imageDetector: ImageProcessor,
     private val videoDetector: VideoFrameProcessor,
 ) {
-    private val onDeviceModelCachedResults = mutableMapOf<String, String>()
     private val inferenceTimes = mutableListOf<Long>()
     private val waitingTimes = mutableListOf<Long>()
 
@@ -60,7 +58,6 @@ class SafeGazeJsInterface(
         scope.launch {
             imageDetector.updateFaceCoverMode(shouldCoverFace)
             imageDetector.updateBlurMode(grayBlur)
-            loadCacheFromDisk()
         }
     }
 
@@ -120,7 +117,7 @@ class SafeGazeJsInterface(
                     // Add a small delay to avoid overwhelming the processor
                     delay(10)
 
-                    var result = OutputImage(
+                    var output = OutputImage(
                         result = "null",
                         id = task?.id ?: "",
                         width = task?.width ?: 0,
@@ -128,6 +125,17 @@ class SafeGazeJsInterface(
                     )
 
                     task?.let {
+                        val maskType = getMaskType()
+                        val cachedResult = kahfImageBlockedDao.findByUrl(
+                            "${it.src?.md5()}_$maskType"
+                        )
+
+                        if (cachedResult != null) {
+                            output = OutputImage(result = cachedResult.responseStr, id = it.id ?: "", width = it.width ?: 0, height = it.height ?: 0)
+                            Timber.d("kLog cache hit")
+                            return@let
+                        }
+
                         // Log average waiting time for every 30 images to GA
                         val waitingTime = System.currentTimeMillis() - task.insertedAt
                         waitingTimes.add(waitingTime)
@@ -165,11 +173,11 @@ class SafeGazeJsInterface(
 
                             if (nsfwResult?.isSafe() == false) {
                                 // Image is not safe, blur the whole image
-                                result = OutputImage(result = "nsfw", id = task.id ?: "", width = task.width ?: 0, height = task.height ?: 0, isManipulated = true)
+                                output = OutputImage(result = "nsfw", id = task.id ?: "", width = task.width ?: 0, height = task.height ?: 0, isManipulated = true)
                             } else {
                                 // Run Segmentation model
                                 val segmentationInf = measureTimeMillis {
-                                    result = imageDetector.downloadAndStore(task.copy(imgBitmap = bmp))
+                                    output = imageDetector.downloadAndStore(task.copy(imgBitmap = bmp))
                                 }
                                 Timber.d("kLog Segmentation inference time: $segmentationInf ms")
 
@@ -193,23 +201,29 @@ class SafeGazeJsInterface(
                             inferenceTimes.clear()
                         }
 
-                        // TODO Save result to local DB
-                        // onDeviceModelCachedResults[it.url] = resultJson
-
                         kahfImageBlockedDao.insert(
                             KahfImageBlocked(
-                                imageUrl = it.src?.md5() ?: "",
-                                responseStr = "",
-                                isIndecent = result.isManipulated,
-                                imageWidth = result.width.toFloat(),
-                                imageHeight = result.height.toFloat(),
-                                modifiedAt = System.currentTimeMillis()
+                                imageUrl = "${it.src?.md5()}_$maskType",
+                                responseStr = output.result,
+                                isIndecent = output.isManipulated,
+                                imageWidth = output.width.toFloat(),
+                                imageHeight = output.height.toFloat(),
+                                modifiedAt = System.currentTimeMillis(),
+                                maskType = maskType,
                             ),
                         )
                     }
-                    onImageClassified("detectionResult", result)
+                    onImageClassified("detectionResult", output)
                 }
             }
+        }
+    }
+
+    private fun getMaskType(): Int {
+        return if (grayBlur) {
+            if (shouldCoverFace) 1 else 0
+        } else {
+            if (shouldCoverFace) 3 else 2
         }
     }
 
@@ -245,18 +259,6 @@ class SafeGazeJsInterface(
             }
         } catch (e: JsonSyntaxException) {
             null
-        }
-    }
-
-    private suspend fun loadCacheFromDisk() {
-        kahfImageBlockedDao.getAllBlockedImageDetails().first().forEach { kahfImageBlocked->
-            onDeviceModelCachedResults[kahfImageBlocked.imageUrl] = kahfImageBlocked.responseStr
-        }
-
-        Timber.d("kLog loading cache to disk from memory(${onDeviceModelCachedResults.size})")
-
-        if (onDeviceModelCachedResults.isEmpty()) {
-            onDeviceModelCachedResults["--"] = ""
         }
     }
 

@@ -42,6 +42,9 @@ interface KahfImageBlockedDao {
     @Query("DELETE FROM kahf_image_blocked WHERE modifiedAt < :milliseconds")
     fun deleteImagesOlderThan(milliseconds: Long): Int
 
+    @Query("SELECT * FROM kahf_image_blocked WHERE imageUrl = :urlMd5")
+    fun findByUrl(urlMd5: String): KahfImageBlocked?
+
     fun deleteOlderImages(days: Long): Int {
         return deleteImagesOlderThan(Instant.now().minus(Duration.ofDays(days)).toEpochMilli())
     }

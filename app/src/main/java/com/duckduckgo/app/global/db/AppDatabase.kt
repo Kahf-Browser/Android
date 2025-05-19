@@ -70,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 59,
+    version = 60,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -757,6 +757,14 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
         }
     }
 
+    val MIGRATION_59_TO_60 = object : Migration(59, 60) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Add the maskType column with a default value of 2 (pixelation with no face cover)
+            db.execSQL("ALTER TABLE kahf_image_blocked ADD COLUMN maskType INTEGER NOT NULL DEFAULT 2")
+            // Delete all existing entries from the table
+            db.execSQL("DELETE FROM kahf_image_blocked") }
+    }
+
 
     /**
      * WARNING ⚠️
@@ -842,6 +850,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_56_TO_57,
             MIGRATION_57_TO_58,
             MIGRATION_58_TO_59,
+            MIGRATION_59_TO_60,
         )
 
     @Deprecated(
