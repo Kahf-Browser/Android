@@ -33,7 +33,7 @@ const val KAHF_GUARD_BLOCKED_IP = "blocked.kahfguard.com"
 
 // Private DNS Settings
 const val KAHF_GUARD_INTENSITY = "kahf_guard_intensity"
-const val KAHF_GUARD_DEFAULT = "High"
+const val KAHF_GUARD_DEFAULT = "Medium"
 
 // SafeGaze (image blur) Settings
 const val SAFE_GAZE_DEFAULT = "Pixelation"
