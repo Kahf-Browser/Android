@@ -26,6 +26,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.withContext
+import androidx.core.net.toUri
 
 interface FaviconDownloader {
     suspend fun getFaviconFromDisk(file: File): Bitmap?
@@ -95,18 +96,31 @@ class GlideFaviconDownloader @Inject constructor(
     }
 
     override suspend fun getFaviconFromGoogleApi(url: String): Bitmap? {
-        val uri = Uri.parse("https://www.google.com/s2/favicons?domain=$url&sz=64")
-
         return withContext(dispatcherProvider.io()) {
-            return@withContext runCatching {
-                Glide.with(context)
-                    .asBitmap()
-                    .load(uri)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(true)
-                    .submit()
-                    .get()
-            }.getOrNull()
+            // Try Google's favicon service first
+            val googleUri = "https://www.google.com/s2/favicons?domain=$url&sz=64".toUri()
+            var icon = loadBitmapFromUrl(googleUri)
+
+            // Fall back to Clearbit if Google's service doesn't return a favicon
+            if (icon == null) {
+                // FIXME ClearBit API will shut down on December 1, 2025. Use BrandFetch
+                val clearBitUri = "https://logo.clearbit.com/$url".toUri()
+                icon = loadBitmapFromUrl(clearBitUri)
+            }
+
+            icon
         }
+    }
+
+    private fun loadBitmapFromUrl(uri: Uri): Bitmap? {
+        return runCatching {
+            Glide.with(context)
+                .asBitmap()
+                .load(uri)
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .skipMemoryCache(true)
+                .submit()
+                .get()
+        }.getOrNull()
     }
 }
