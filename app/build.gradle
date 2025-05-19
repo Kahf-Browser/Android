@@ -100,6 +100,17 @@ android {
                     appIcon     : "@mipmap/ic_launcher_debug",
                     appIconRound: "@mipmap/ic_launcher_debug"
             ]
+
+            def posthogPropertiesFile = project.rootProject.file('posthog.properties')
+            if (posthogPropertiesFile.exists()) {
+                def posthogProps = new Properties()
+                posthogPropertiesFile.withInputStream { posthogProps.load(it) }
+                buildConfigField "String", "POSTHOG_API_KEY", "\"${posthogProps.getProperty('posthog.api.key')}\""
+                buildConfigField "String", "POSTHOG_HOST", "\"${posthogProps.getProperty('posthog.host')}\""
+            } else {
+                buildConfigField "String", "POSTHOG_API_KEY", "--"
+                buildConfigField "String", "POSTHOG_HOST", "--"
+            }
         }
         release {
             minifyEnabled false
@@ -110,6 +121,17 @@ android {
                     appIcon     : "@mipmap/ic_launcher",
                     appIconRound: "@mipmap/ic_launcher_round"
             ]
+
+            def posthogPropertiesFile = project.rootProject.file('posthog.properties')
+            if (posthogPropertiesFile.exists()) {
+                def posthogProps = new Properties()
+                posthogPropertiesFile.withInputStream { posthogProps.load(it) }
+                buildConfigField "String", "POSTHOG_API_KEY", "\"${posthogProps.getProperty('posthog.api.key')}\""
+                buildConfigField "String", "POSTHOG_HOST", "\"${posthogProps.getProperty('posthog.host')}\""
+            } else {
+                buildConfigField "String", "POSTHOG_API_KEY", "--"
+                buildConfigField "String", "POSTHOG_HOST", "--"
+            }
         }
     }
     flavorDimensions "store"
@@ -474,6 +496,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
     implementation("com.google.firebase:firebase-config")
+
+    // posthog
+    implementation("com.posthog:posthog-android:3.15.0")
 
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"

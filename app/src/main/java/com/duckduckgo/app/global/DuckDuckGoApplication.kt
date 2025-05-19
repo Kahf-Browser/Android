@@ -35,6 +35,8 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.posthog.android.PostHogAndroid
+import com.posthog.android.PostHogAndroidConfig
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
 import io.reactivex.exceptions.UndeliverableException
@@ -100,6 +102,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
         scheduleTasks()
         configRemoteConfig()
+
+        with(
+            PostHogAndroidConfig(
+                apiKey = BuildConfig.POSTHOG_API_KEY,
+                host = BuildConfig.POSTHOG_HOST,
+            ),
+        ) {
+            PostHogAndroid.setup(this@DuckDuckGoApplication, this)
+        }
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {

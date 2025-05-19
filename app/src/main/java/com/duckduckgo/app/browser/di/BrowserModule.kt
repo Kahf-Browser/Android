@@ -23,7 +23,7 @@ import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.analytics.AnalyticsService
-import com.duckduckgo.app.analytics.FirebaseAnalyticsService
+import com.duckduckgo.app.analytics.PostHogAnalyticsService
 import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
@@ -388,8 +388,9 @@ class BrowserModule {
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideAnalyticsService(context: Context): AnalyticsService {
-        val f = FirebaseAnalytics.getInstance(context.applicationContext)
-        return FirebaseAnalyticsService(f)
+        // val f = FirebaseAnalytics.getInstance(context.applicationContext)
+        // return FirebaseAnalyticsService(f)
+        return PostHogAnalyticsService()
     }
 
     @Provides
