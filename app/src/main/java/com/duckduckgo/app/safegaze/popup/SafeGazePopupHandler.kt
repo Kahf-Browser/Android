@@ -135,7 +135,7 @@ class SafeGazePopupHandler(
                 onDnsModeChanged(PrivateDnsLevel.Off)
             } else {
                 binding.privateDnsGroup.isVisible = true
-                btnHigh.performClick()
+                btnMed.performClick()
             }
         }
 
