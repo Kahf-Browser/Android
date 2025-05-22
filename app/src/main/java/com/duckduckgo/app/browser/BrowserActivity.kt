@@ -194,7 +194,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         configureOnBackPressedListener()
 
         lifecycleScope.launch(dispatcherProvider.io()) {
-            kahfImageBlockedDao.deleteOlderImages(15)
+            kahfImageBlockedDao.deleteOlderImages(3)
         }
 
         observeKeyboardVisibility()
