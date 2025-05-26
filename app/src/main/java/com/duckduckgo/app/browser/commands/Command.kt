@@ -62,6 +62,8 @@ sealed class Command {
     class SendEmail(val emailAddress: String) : Command()
     object ShowKeyboard : Command()
     object HideKeyboard : Command()
+    data object ResumeAdAutoRefresh : Command()
+    data object PauseAdAutoRefresh : Command()
     class ShowFullScreen(val view: View) : Command()
     class DownloadImage(
         val url: String,

@@ -60,7 +60,7 @@
                 app:tint="?attr/kahfBottomNavIcon"
                 android:layout_weight="1"
                 android:background="@drawable/ripple_bottom_oval"
-                android:src="@drawable/ic_clock_outlined"
+                android:src="@drawable/ic_prayer_outlined"
                 android:padding="16dp"
                 tools:ignore="ContentDescription"/>
 

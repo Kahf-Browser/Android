@@ -147,6 +147,37 @@
             tools:ignore="DeprecatedWidgetInXml" />
     </androidx.cardview.widget.CardView>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/btnNext"
+        android:layout_width="@dimen/kahf_onboard_button_width"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        app:cardBackgroundColor="@color/kahf_onboarding_button_2"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toTopOf="@id/guidelineBottom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone"
+        tools:ignore="InvalidColorAttribute">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/inter"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:text="@string/kahf_onboarding_next"
+            android:textColor="?attr/daxColorWhite"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            tools:ignore="DeprecatedWidgetInXml" />
+    </androidx.cardview.widget.CardView>
+
     <TextView
         android:id="@+id/btnSkip"
         android:layout_width="wrap_content"

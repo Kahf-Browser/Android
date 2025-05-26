@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.safegaze.popup
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
@@ -27,17 +26,22 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
+import com.duckduckgo.app.isFaceCoverEnabled
+import com.duckduckgo.app.isSgLockEnabled
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
+import com.duckduckgo.app.setFaceCoverMode
+import com.duckduckgo.app.setSgLockMode
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
 import com.duckduckgo.common.utils.DispatcherProvider
-import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 
 class SafeGazePopupHandler(
     private val binding: SafeGazePopupBinding,
@@ -53,6 +57,8 @@ class SafeGazePopupHandler(
     onBlurEffectChanged: (sgLevel: SafeGazeLevel) -> Unit,
     onSgWhitelistUpdated: (host: String, isWhitelisted: Boolean) -> Unit,
 ) {
+    private var onFaceCoverChanged: ((shouldCoverFace: Boolean) -> Unit)? = null
+
     init {
         var btnHigh: PopupButton? = null
         var btnMed: PopupButton? = null
@@ -99,8 +105,6 @@ class SafeGazePopupHandler(
         // set initially selected item
         updateDescription(binding, preSelectedDns)
 
-        handleProgressBar()
-
         binding.btnShare.setOnClickListener { onShareClicked() }
         binding.btnSupport.setOnClickListener { onSupportClicked() }
         binding.btnTheme.setOnClickListener { onThemeChanged() }
@@ -131,7 +135,7 @@ class SafeGazePopupHandler(
                 onDnsModeChanged(PrivateDnsLevel.Off)
             } else {
                 binding.privateDnsGroup.isVisible = true
-                btnHigh.performClick()
+                btnMed.performClick()
             }
         }
 
@@ -175,6 +179,21 @@ class SafeGazePopupHandler(
             }
         }
 
+        // Toggle face cover
+        binding.switchCoverFace.isChecked = sharedPreferences.isFaceCoverEnabled()
+        binding.switchCoverFace.setOnCheckedChangeListener { _, isChecked ->
+            sharedPreferences.setFaceCoverMode(isChecked)
+            onFaceCoverChanged?.invoke(isChecked)
+        }
+        binding.switchCoverFace.isVisible = preSelectedSG != SafeGazeLevel.Off
+        binding.tvCoverFace.isVisible = preSelectedSG != SafeGazeLevel.Off
+
+        // Toggle biometric lock
+        binding.switchSgLock.isChecked = sharedPreferences.isSgLockEnabled()
+        binding.switchSgLock.setOnCheckedChangeListener { _, isChecked ->
+            sharedPreferences.setSgLockMode(isChecked)
+        }
+
         setFontSize()
 
         // Set build number
@@ -197,7 +216,6 @@ class SafeGazePopupHandler(
     private fun setFontSize() {
         with(binding) {
             // KahfGuard
-            tvOnOff.scaleIndependentTextSize(14f)
             title.scaleIndependentTextSize(20f)
             tvDescription.scaleIndependentTextSize(14f)
             btnHigh.btnLabel.scaleIndependentTextSize(13f)
@@ -205,10 +223,14 @@ class SafeGazePopupHandler(
             btnLow.btnLabel.scaleIndependentTextSize(13f)
 
             // SafeGaze
-            tvOnOffImage.scaleIndependentTextSize(14f)
             tvDecent.scaleIndependentTextSize(18f)
+            tvCoverFace.scaleIndependentTextSize(18f)
             blueIndecentPhotosText.scaleIndependentTextSize(14f)
             btnToggleSiteBlur.scaleIndependentTextSize(12f)
+
+            // SafeGaze Lock
+            tvLock.scaleIndependentTextSize(18f)
+            tvLockDescription.scaleIndependentTextSize(14f)
 
             // Statistics
             statTitle.scaleIndependentTextSize(20f)
@@ -256,26 +278,23 @@ class SafeGazePopupHandler(
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility", "SetTextI18n")
-    private fun handleProgressBar() {
-        // No op
-    }
-
     @WorkerThread
     private suspend fun getJsVersion(context: Context): String {
         return withContext(dispatcher.io()) {
-            val safeGazeJs = File("${context.filesDir}/$SAFE_GAZE_JS_FILENAME")
-            if (safeGazeJs.exists()) {
-                val firstLine = safeGazeJs.bufferedReader().use { it.readLine() ?: "" }
-
-                if (firstLine.startsWith("// v")) {
-                    firstLine.substringAfter("// v")
-                } else {
-                    "1.0.0"
+            val firstLine = try {
+                val inputStream = context.assets.open("video_filter.js")
+                BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                    reader.readLine() ?: ""
                 }
-            } else {
+            } catch (e: IOException) {
                 ""
             }
+
+            firstLine.takeIf { it.startsWith("// v") }?.substringAfter("// v") ?: "1.0.0"
         }
+    }
+
+    fun setOnFaceCoverChangeListener(listener: (shouldCoverFace: Boolean) -> Unit) {
+        onFaceCoverChanged = listener
     }
 }

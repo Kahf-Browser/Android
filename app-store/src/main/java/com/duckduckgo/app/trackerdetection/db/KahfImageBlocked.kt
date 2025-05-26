@@ -31,5 +31,6 @@ data class KahfImageBlocked(
     val isIndecent: Boolean, // nsfw or female content
     val imageWidth: Float,
     val imageHeight: Float,
-    val modifiedAt: Long = 0
+    val modifiedAt: Long = 0,
+    val maskType: Int, // 0: gray face open, 1: gray face covered, 2: pixelation face open, 3: pixelation face covered
 )

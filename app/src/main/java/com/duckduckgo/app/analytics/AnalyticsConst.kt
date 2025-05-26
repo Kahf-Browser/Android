@@ -58,6 +58,9 @@ sealed class AnalyticsEvent(val name: String) {
     data object BannerAdClicked : AnalyticsEvent("kahf_banner_ad_clicked")
     data object BannerAdImpression : AnalyticsEvent("kahf_banner_ad_impression")
     data object BannerAdLoadFailed : AnalyticsEvent("kahf_banner_ad_failed_to_load")
+    data object AdNotFound : AnalyticsEvent("kahf_ad_not_found")
+    data object AdServerError : AnalyticsEvent("kahf_ad_server_error")
+    data object AdTimeout : AnalyticsEvent("kahf_ad_timeout")
 }
 
 sealed class AnalyticsParam(val name: String) {

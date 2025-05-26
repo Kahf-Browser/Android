@@ -23,7 +23,7 @@ class NsfwDetector(val context: Context) {
         .add(NormalizeOp(0f, 255f))
         .build()
 
-    fun isNsfw(bitmap: Bitmap): NsfwPrediction {
+    fun isNsfw(bitmap: Bitmap): NsfwPrediction? {
         // initializing mode in IO thread
         if (!::model.isInitialized) {
             val t1 = System.currentTimeMillis()
@@ -31,18 +31,22 @@ class NsfwDetector(val context: Context) {
             modelInitializationTime = System.currentTimeMillis() - t1
         }
 
-        val inputFeature = TensorBuffer.createFixedSize(intArrayOf(1, inputImageSize, inputImageSize, 3), DataType.FLOAT32)
+        val inputFeature = TensorBuffer.createFixedSize(intArrayOf(1, inputImageSize, inputImageSize, 3), FLOAT32)
 
-        val buffer = TensorImage(FLOAT32).let {
-            it.load(bitmap)
-            imageProcessor.process(it)
-        }.tensorBuffer.buffer
+        return try {
+            val buffer = TensorImage(FLOAT32).let {
+                it.load(bitmap)
+                imageProcessor.process(it)
+            }.tensorBuffer.buffer
 
-        inputFeature.loadBuffer(buffer)
-        val outputs = model.process(inputFeature)
-        val outputFeature = outputs.outputFeature0AsTensorBuffer
-        val prediction = NsfwPrediction(outputFeature.floatArray)
-        return prediction
+            inputFeature.loadBuffer(buffer)
+            val outputs = model.process(inputFeature)
+            val outputFeature = outputs.outputFeature0AsTensorBuffer
+            val prediction = NsfwPrediction(outputFeature.floatArray)
+            prediction
+        } catch (e: Exception) {
+            null
+        }
     }
 
     fun dispose() {

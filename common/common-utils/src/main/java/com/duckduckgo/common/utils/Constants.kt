@@ -24,8 +24,8 @@ const val KAHF_FEEDBACK_FORM = "https://tally.so/r/mKkz2K"
 const val SAFE_GAZE_JS_FILENAME = "safe_gaze.js"
 const val SAFE_GAZE_INTERFACE = "SafeGazeInterface"
 const val SAFE_GAZE_PREFERENCES = "safe_gaze_preferences"
-const val SAFE_GAZE_MIN_FACE_SIZE = 15
-const val SAFE_GAZE_MIN_IMG_SIZE = 45
+const val SAFE_GAZE_FACE_COVER = "safe_gaze_face_cover"
+const val SAFE_GAZE_LOCK = "safe_gaze_lock"
 const val SAFE_GAZE_MAX_IMG_SIZE = 300
 const val KAHF_GUARD_BLOCKED_WITH_DOT = "blocked.kahfguard.com."
 const val KAHF_GUARD_BLOCKED_URL = "blocked.kahfguard.com"
@@ -33,7 +33,7 @@ const val KAHF_GUARD_BLOCKED_IP = "blocked.kahfguard.com"
 
 // Private DNS Settings
 const val KAHF_GUARD_INTENSITY = "kahf_guard_intensity"
-const val KAHF_GUARD_DEFAULT = "High"
+const val KAHF_GUARD_DEFAULT = "Medium"
 
 // SafeGaze (image blur) Settings
 const val SAFE_GAZE_DEFAULT = "Pixelation"

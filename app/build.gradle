@@ -22,8 +22,8 @@ android {
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
-        versionCode 202504151
-        versionName "1.3.1"
+        versionCode 202505221
+        versionName "1.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "kahf_browser_${versionName}_${versionCode}"
         vectorDrawables.useSupportLibrary = true
@@ -100,6 +100,17 @@ android {
                     appIcon     : "@mipmap/ic_launcher_debug",
                     appIconRound: "@mipmap/ic_launcher_debug"
             ]
+
+            def posthogPropertiesFile = project.rootProject.file('posthog.properties')
+            if (posthogPropertiesFile.exists()) {
+                def posthogProps = new Properties()
+                posthogPropertiesFile.withInputStream { posthogProps.load(it) }
+                buildConfigField "String", "POSTHOG_API_KEY", "\"${posthogProps.getProperty('posthog.api.key')}\""
+                buildConfigField "String", "POSTHOG_HOST", "\"${posthogProps.getProperty('posthog.host')}\""
+            } else {
+                buildConfigField "String", "POSTHOG_API_KEY", "--"
+                buildConfigField "String", "POSTHOG_HOST", "--"
+            }
         }
         release {
             minifyEnabled false
@@ -110,6 +121,17 @@ android {
                     appIcon     : "@mipmap/ic_launcher",
                     appIconRound: "@mipmap/ic_launcher_round"
             ]
+
+            def posthogPropertiesFile = project.rootProject.file('posthog.properties')
+            if (posthogPropertiesFile.exists()) {
+                def posthogProps = new Properties()
+                posthogPropertiesFile.withInputStream { posthogProps.load(it) }
+                buildConfigField "String", "POSTHOG_API_KEY", "\"${posthogProps.getProperty('posthog.api.key')}\""
+                buildConfigField "String", "POSTHOG_HOST", "\"${posthogProps.getProperty('posthog.host')}\""
+            } else {
+                buildConfigField "String", "POSTHOG_API_KEY", "--"
+                buildConfigField "String", "POSTHOG_HOST", "--"
+            }
         }
     }
     flavorDimensions "store"
@@ -355,6 +377,8 @@ dependencies {
     implementation project(':survey-api')
     implementation project(':survey-impl')
 
+    implementation project(":video_filters")
+
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
     debugImplementation Square.leakCanary.android
@@ -388,7 +412,7 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation JakeWharton.timber
     implementation 'nl.dionsegijn:konfetti:1.2.5'
-    implementation 'com.github.Muslims-Day:kahfad:2.0.2'
+    implementation 'com.github.KahfAds:adsdk:2.2.9'
 
     // App update
     implementation 'com.google.android.play:app-update:2.1.0'
@@ -437,7 +461,7 @@ dependencies {
 
     // MLKit
     // implementation "com.google.mlkit:object-detection:_"
-    implementation 'com.google.mlkit:face-detection:16.1.6'
+    // implementation 'com.google.mlkit:face-detection:16.1.6'
 
     // Tensorflow-lite
     implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
@@ -472,6 +496,10 @@ dependencies {
     implementation 'com.google.firebase:firebase-crashlytics'
     implementation 'com.google.firebase:firebase-analytics'
     implementation("com.google.firebase:firebase-config")
+
+    // posthog
+    implementation("com.posthog:posthog-android:3.15.0")
+    implementation("com.facebook.android:facebook-android-sdk:latest.release")
 
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"

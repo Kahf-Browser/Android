@@ -41,6 +41,10 @@
         android:theme="@style/Theme.DuckDuckGo.Light"
         android:requestLegacyExternalStorage="true"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
+
+        <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
+        <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
+
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />

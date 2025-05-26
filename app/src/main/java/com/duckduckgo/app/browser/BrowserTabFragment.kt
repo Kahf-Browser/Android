@@ -120,11 +120,6 @@ import androidx.webkit.WebMessageCompat
 import androidx.webkit.WebSettingsCompat
 import androidx.webkit.WebViewCompat
 import androidx.webkit.WebViewFeature
-import co.kahf.adsdk.KahfAdConfig
-import co.kahf.adsdk.KahfAdSdk
-import co.kahf.adsdk.KahfAdType
-import co.kahf.adsdk.KahfSdkConfig
-import co.kahf.adsdk.adviews.AdImpressionListener
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.anvil.annotations.InjectWith
@@ -237,16 +232,17 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.safegaze.popup.SafeGazePopupHandler
-import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
-import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
+import com.duckduckgo.app.isFaceCoverEnabled
+import com.duckduckgo.app.isSgLockEnabled
+import com.duckduckgo.app.isZikrTab
 import com.duckduckgo.app.location.data.LocationPermissionType
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
-import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
+import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
-import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
+import com.duckduckgo.app.safegaze.popup.SafeGazePopupHandler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -364,6 +360,16 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
+import com.kahfads.sdk.KahfAdConfig
+import com.kahfads.sdk.KahfAdSdk
+import com.kahfads.sdk.KahfAdType
+import com.kahfads.sdk.KahfSdkConfig
+import com.kahfads.sdk.adviews.AdImpressionListener
+import com.kahfads.sdk.model.AdResult.Error
+import com.kahfads.sdk.model.ErrorType
+import io.kahf.porda_segmentation.ImageProcessor
+import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.Runnable
@@ -593,12 +599,6 @@ class BrowserTabFragment :
     lateinit var nsfwDetector: NsfwDetector
 
     @Inject
-    lateinit var genderDetector: GenderDetector
-
-    @Inject
-    lateinit var poseDetector: MoveNetMultiPose
-
-    @Inject
     lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
 
     @Inject
@@ -624,6 +624,12 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var spProvider: SharedPreferencesProvider
+
+    @Inject
+    lateinit var imageProcessor: ImageProcessor
+
+    @Inject
+    lateinit var videoFrameProcessor: VideoFrameProcessor
 
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
@@ -719,6 +725,8 @@ class BrowserTabFragment :
         get() = omnibar.kahfSettingsButton
 
     private var webView: DuckDuckGoWebView? = null
+
+    private val gson = Gson()
 
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
@@ -914,15 +922,16 @@ class BrowserTabFragment :
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
     private val kahfSdkConfig = KahfSdkConfig(
-        publisherId = "muslims-day-web",
+        publisherId = "kahf-browser",
         campaignTypes = "paid|publisher-house|community|house",
         format = "json"
     )
 
     private val kahfAdConfig = KahfAdConfig(
-        adType = KahfAdType.BANNER_AD,
-        divId = "under-saalat-time",
-        screenName = "home-page",
+        adType = KahfAdType.BANNER_AD_640_200,
+        divId = "home_banner",
+        screenName = "HomeView",
+        refreshRateInMillis = 20_000,
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -967,13 +976,15 @@ class BrowserTabFragment :
 
         KahfAdSdk.initialize(
             requireContext(),
-            kahfSdkConfig
+            kahfSdkConfig,
         )
     }
 
     override fun onDetach() {
         super.onDetach()
-        safeGazeInterface.cancelOngoingImageProcessing()
+        if (::safeGazeInterface.isInitialized) {
+            safeGazeInterface.cancelOngoingImageProcessing()
+        }
     }
 
     private fun resumeWebView() {
@@ -1032,126 +1043,156 @@ class BrowserTabFragment :
             (dialog as EditSavedSiteDialogFragment).listener = viewModel
             dialog.deleteBookmarkListener = viewModel
         }
-        handleSafeGazePopUp()
+
+        (requireActivity() as DuckDuckGoActivity).apply {
+            safeGazeIcon.setOnClickListener {
+                if (sharedPreferences.isSgLockEnabled()) {
+                    if (isAnySecurityEnabled()) {
+                        showBiometricPrompt { authenticated, msgId ->
+                            if (authenticated) {
+                                inflateSafeGazePopup()
+                            } else {
+                                showToast(msgId)
+                            }
+                        }
+                    } else {
+                        showToast(string.kahf_no_security_enabled)
+                        inflateSafeGazePopup()
+                    }
+                } else {
+                    inflateSafeGazePopup()
+                }
+            }
+
+            safeGazeIcon.setOnLongClickListener {
+                Toast.makeText(requireContext(),"Model: ${Build.MODEL}\nManufacturer: ${Build.MANUFACTURER}", Toast.LENGTH_LONG).show()
+                true
+            }
+        }
     }
 
     @SuppressLint("InflateParams")
-    private fun handleSafeGazePopUp() {
+    private fun inflateSafeGazePopup() {
         val popupBinding = SafeGazePopupBinding.inflate(LayoutInflater.from(context))
         val popupWindow = PopupWindow(popupBinding.root, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
 
-        safeGazeIcon.setOnClickListener {
-            val iconRect = Rect()
-            safeGazeIcon.getGlobalVisibleRect(iconRect)
-            val x = iconRect.left
-            val y = iconRect.top
-            popupWindow.apply {
-                animationStyle = 2132017505
-                isFocusable = true
-            }
-
-            safeGazeIcon.post {
-                SafeGazePopupHandler(
-                    binding = popupBinding,
-                    currentUrl = webView?.url,
-                    sharedPreferences = sharedPreferences,
-                    sgWhitelistDao = safeGazeWhitelistDao,
-                    dispatcher = dispatchers,
-                    onDnsModeChanged = { dnsLevel ->
-                        val updated = updateDnsSettings(dnsLevel)
-                        if (updated) {
-                            dnsResolver.updateDohServerUrl(dnsLevel)
-                            popupWindow.dismiss()
-                            // Just reloading the WebView doesn't work. Relaunch the tab is required.
-                            webView?.url?.let { url ->
-                                val uri = Uri.parse(url).buildUpon().clearQuery().apply {
-                                    url.toUri().queryParameterNames.filter { it != ParamKey.SAFE }.forEach {
-                                        appendQueryParameter(it, url.toUri().getQueryParameter(it))
-                                    }
-                                }.build()
-
-                                (requireActivity() as BrowserActivity).relaunchCurrentTab(uri.toString())
-                            }
-                        }
-
-                        analyticsService.logEvent(
-                            when (dnsLevel) {
-                                PrivateDnsLevel.High -> PrivateDnsHigh
-                                PrivateDnsLevel.Medium -> PrivateDnsMedium
-                                PrivateDnsLevel.Low -> PrivateDnsLow
-                                PrivateDnsLevel.Off -> PrivateDnsDisable
-                            }
-                        )
-                    },
-                    onSafeGazeModeChanged = {
-                        val updated = updateSafeGazeSettings(it)
-                        if (updated) {
-                            analyticsService.logEvent(
-                                when (it) {
-                                    SafeGazeLevel.Off -> ImageFilerDisable
-                                    else -> ImageFilerEnable
-                                }
-                            )
-                            popupWindow.dismiss()
-                            webView?.reload()
-                        }
-                    },
-                    onBlurEffectChanged = {
-                        val updated = updateSafeGazeSettings(it)
-                        if (updated) {
-                            webView?.reload()
-                        }
-                        popupWindow.dismiss()
-                    },
-                    onShareClicked = {
-                        val shareIntent = Intent(Intent.ACTION_SEND)
-                        shareIntent.type = "text/plain"
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${requireContext().packageName}")
-                        startActivity(Intent.createChooser(shareIntent, "Share via"))
-                    },
-                    onSupportClicked = {
-                        popupWindow.dismiss()
-                        viewModel.onUserSubmittedQuery("https://www.patreon.com/SafeGaze")
-                    },
-                    onThemeChanged = {
-                        popupWindow.dismiss()
-                        (requireActivity() as DuckDuckGoActivity).toggleTheme()
-                    },
-                    onSgWhitelistUpdated = { host, isWhitelisted ->
-                        webView?.reload()
-                        popupWindow.dismiss()
-                    }
-                )
-
-                lifecycleScope.launch {
-                    val count = imageBlockCountDao.getCount().first()
-                    popupBinding.imageBlurCount.setFormattedCount(count)
-
-                    val siteBlockCount = harmfulSiteBlockedDao.getTotalBlockCount().first()
-                    popupBinding.siteBlockedCount.setFormattedCount(siteBlockCount)
-
-                    webTrackersBlockedDao.getTotalTrackerCount().collect {
-                        popupBinding.trackerBlockedCount.setFormattedCount(it)
-                    }
-                }
-
-                val leftOverDevicePixel = getDeviceWidthInPixels(requireContext()) - x
-                val popUpLayingOut = 350.dpToPx(requireContext().resources.displayMetrics) - leftOverDevicePixel
-                val newPopUpPosition = (x - popUpLayingOut) - 50
-                popupWindow.showAtLocation(
-                    safeGazeIcon,
-                    Gravity.NO_GRAVITY,
-                    newPopUpPosition,
-                    (y + omnibar.toolbar.height) - 20,
-                )
-                val pointerArrow = popupBinding.pointerArrowImageView
-                val pointerArrowParams = pointerArrow.layoutParams as ConstraintLayout.LayoutParams
-                pointerArrowParams.rightMargin = leftOverDevicePixel - 113
-                pointerArrow.layoutParams = pointerArrowParams
-            }
-
-            analyticsService.logEvent(AnalyticsEvent.SettingsClicked)
+        val iconRect = Rect()
+        safeGazeIcon.getGlobalVisibleRect(iconRect)
+        val x = iconRect.left
+        val y = iconRect.top
+        popupWindow.apply {
+            animationStyle = 2132017505
+            isFocusable = true
         }
+
+        safeGazeIcon.post {
+            SafeGazePopupHandler(
+                binding = popupBinding,
+                currentUrl = webView?.url,
+                sharedPreferences = sharedPreferences,
+                sgWhitelistDao = safeGazeWhitelistDao,
+                dispatcher = dispatchers,
+                onDnsModeChanged = { dnsLevel ->
+                    val updated = updateDnsSettings(dnsLevel)
+                    if (updated) {
+                        dnsResolver.updateDohServerUrl(dnsLevel)
+                        popupWindow.dismiss()
+                        // Just reloading the WebView doesn't work. Relaunch the tab is required.
+                        webView?.url?.let { url ->
+                            val uri = url.toUri().buildUpon().clearQuery().apply {
+                                url.toUri().queryParameterNames.filter { it != ParamKey.SAFE }.forEach {
+                                    appendQueryParameter(it, url.toUri().getQueryParameter(it))
+                                }
+                            }.build()
+
+                            (requireActivity() as BrowserActivity).relaunchCurrentTab(uri.toString())
+                        }
+                    }
+
+                    analyticsService.logEvent(
+                        when (dnsLevel) {
+                            PrivateDnsLevel.High -> PrivateDnsHigh
+                            PrivateDnsLevel.Medium -> PrivateDnsMedium
+                            PrivateDnsLevel.Low -> PrivateDnsLow
+                            PrivateDnsLevel.Off -> PrivateDnsDisable
+                        },
+                    )
+                },
+                onSafeGazeModeChanged = {
+                    val updated = updateSafeGazeSettings(it)
+                    if (updated) {
+                        analyticsService.logEvent(
+                            when (it) {
+                                SafeGazeLevel.Off -> ImageFilerDisable
+                                else -> ImageFilerEnable
+                            },
+                        )
+                        popupWindow.dismiss()
+                        webView?.reload()
+                    }
+                },
+                onBlurEffectChanged = {
+                    val updated = updateSafeGazeSettings(it)
+                    safeGazeInterface.updateBlurMode(it.name == SafeGazeLevel.Blur.name)
+                    if (updated) {
+                        webView?.reload()
+                    }
+                    popupWindow.dismiss()
+                },
+                onShareClicked = {
+                    val shareIntent = Intent(Intent.ACTION_SEND)
+                    shareIntent.type = "text/plain"
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, "https://play.google.com/store/apps/details?id=${requireContext().packageName}")
+                    startActivity(Intent.createChooser(shareIntent, "Share via"))
+                },
+                onSupportClicked = {
+                    popupWindow.dismiss()
+                    viewModel.onUserSubmittedQuery("https://www.patreon.com/SafeGaze")
+                },
+                onThemeChanged = {
+                    popupWindow.dismiss()
+                    (requireActivity() as DuckDuckGoActivity).toggleTheme()
+                },
+                onSgWhitelistUpdated = { _, _ ->
+                    webView?.reload()
+                    popupWindow.dismiss()
+                },
+            ).apply {
+                setOnFaceCoverChangeListener { shouldCoverFace ->
+                    safeGazeInterface.updateFaceCoverMode(shouldCoverFace)
+                    webView?.reload()
+                    popupWindow.dismiss()
+                }
+            }
+
+            lifecycleScope.launch {
+                val count = imageBlockCountDao.getCount().first()
+                popupBinding.imageBlurCount.setFormattedCount(count)
+
+                val siteBlockCount = harmfulSiteBlockedDao.getTotalBlockCount().first()
+                popupBinding.siteBlockedCount.setFormattedCount(siteBlockCount)
+
+                webTrackersBlockedDao.getTotalTrackerCount().collect {
+                    popupBinding.trackerBlockedCount.setFormattedCount(it)
+                }
+            }
+
+            val leftOverDevicePixel = getDeviceWidthInPixels(requireContext()) - x
+            val popUpLayingOut = 350.dpToPx(requireContext().resources.displayMetrics) - leftOverDevicePixel
+            val newPopUpPosition = (x - popUpLayingOut) - 50
+            popupWindow.showAtLocation(
+                safeGazeIcon,
+                Gravity.NO_GRAVITY,
+                newPopUpPosition,
+                (y + omnibar.toolbar.height) - 20,
+            )
+            val pointerArrow = popupBinding.pointerArrowImageView
+            val pointerArrowParams = pointerArrow.layoutParams as ConstraintLayout.LayoutParams
+            pointerArrowParams.rightMargin = leftOverDevicePixel - 113
+            pointerArrow.layoutParams = pointerArrowParams
+        }
+
+        analyticsService.logEvent(AnalyticsEvent.SettingsClicked)
     }
 
     private fun updateDnsSettings(selection: PrivateDnsLevel): Boolean {
@@ -1488,6 +1529,7 @@ class BrowserTabFragment :
 
     private fun showHome() {
         Timber.d("New Tab: showHome")
+        viewModel.resumeAdRefresh()
         viewModel.onHomeShown()
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
@@ -1506,6 +1548,7 @@ class BrowserTabFragment :
 
     private fun showBrowser() {
         Timber.d("New Tab: showBrowser")
+        viewModel.pauseAdRefresh()
         newBrowserTab.newTabLayout.gone()
         newBrowserTab.newTabContainerLayout.gone()
         binding.browserLayout.show()
@@ -1886,6 +1929,25 @@ class BrowserTabFragment :
             is Command.HideSSLError -> hideSSLWarning()
             is Command.LaunchScreen -> launchScreen(it.screen, it.payload)
             is Command.HideOnboardingDaxDialog -> hideOnboardingDaxDialog(it.onboardingCta)
+
+            is Command.PauseAdAutoRefresh -> {
+                lifecycleScope.launch(dispatchers.io()) {
+                    delay(100)
+                    withContext(dispatchers.main()) {
+                        binding.includeNewBrowserTab.kahfBannerAd.pauseAutoRefresh()
+                        Timber.d("adLog pause refresh. $tabId | ${webView?.url}")
+                    }
+                }
+            }
+            is Command.ResumeAdAutoRefresh -> {
+                if (lifecycle.currentState.isAtLeast(State.RESUMED)
+                    && (requireActivity() as BrowserActivity).isActiveTab(tabId)
+                    && webView?.isInvisible == true) {
+                    binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
+                    Timber.d("adLog resume refresh. $tabId | ${webView?.url}")
+                }
+            }
+
             else -> {
                 // NO OP
             }
@@ -2200,7 +2262,7 @@ class BrowserTabFragment :
                     }
 
                     else -> {
-                        showToast(R.string.unableToOpenLink)
+                        // showToast(R.string.unableToOpenLink)
                     }
                 }
             } else {
@@ -2235,7 +2297,7 @@ class BrowserTabFragment :
             }
         }.onFailure { exception ->
             Timber.e(exception, "Failed to launch external app")
-            showToast(R.string.unableToOpenLink)
+            // showToast(string.unableToOpenLink) No need to show toast here
         }
     }
 
@@ -2464,7 +2526,7 @@ class BrowserTabFragment :
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
             immediateSearchClickListener = {
                 analyticsService.logEvent(
-                    AnalyticsEvent.AddressBarSuggestionSelection, mapOf(AnalyticsParam.SuggestionSearchEngine to "duckduckgo")
+                    AnalyticsEvent.AddressBarSuggestionSelection, mapOf(AnalyticsParam.SuggestionSearchEngine to "google"),
                 )
                 viewModel.userSelectedAutocomplete(it)
             },
@@ -2497,13 +2559,13 @@ class BrowserTabFragment :
     }
 
     private fun configureNewTab() {
-        newBrowserTab.newTabLayout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+        /*newBrowserTab.newTabLayout.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
             if (omnibar.omniBarContainer.isPressed) {
                 omnibar.omnibarTextInput.hideKeyboard()
                 binding.focusDummy.requestFocus()
                 omnibar.omniBarContainer.isPressed = false
             }
-        }
+        }*/
     }
 
     private fun renderBottomNavMenus(viewState: BrowserViewState) {
@@ -2529,8 +2591,8 @@ class BrowserTabFragment :
             }
 
             timeMenuItem.setImageResource(
-                if (viewState.prayerTimeShowing) com.duckduckgo.mobile.android.R.drawable.ic_clock_filled
-                else com.duckduckgo.mobile.android.R.drawable.ic_clock_outlined,
+                if (viewState.prayerTimeShowing) com.duckduckgo.mobile.android.R.drawable.ic_prayer_filled
+                else com.duckduckgo.mobile.android.R.drawable.ic_prayer_outlined,
             )
 
             // Icon and onClick action of new tab button
@@ -2669,35 +2731,32 @@ class BrowserTabFragment :
 
         webView?.let {
             safeGazeInterface = SafeGazeJsInterface(
-                requireContext(), nsfwDetector, genderDetector, poseDetector, kahfImageBlockedDao, dispatchers, analyticsService,
-                onUpdateBlur = { blur ->
-                    val trimmedBlur = blur / 100
-                    val jsFunction = "window.blurIntensity = $trimmedBlur; updateBluredImageOpacity();"
+                requireContext(), nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
+                onImageClassified = { type, data ->
                     webView?.post {
-                        webView?.evaluateJavascript(jsFunction, null)
-                    }
-                },
-                onImageClassified = { uid, detectionResultJson, base64Image, updateBlurCount ->
-                    val jsFunctionCall = "safegazeOnDeviceModelHandler('$uid', '$detectionResultJson', `$base64Image`);"
-                    webView?.post {
-                        webView?.evaluateJavascript(jsFunctionCall, null)
+                        val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
+                        webView?.evaluateJavascript(jsScript, null)
                     }
 
-                    if (updateBlurCount) {
+                    if (data?.isManipulated == true) {
                         imageBlockCountDao.incrementCount()
                     }
 
-                    if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0 && genderDetector.modelInitializationTime > 0 && poseDetector.modelInitializationTime() > 0) {
-                        val initializationTime = nsfwDetector.modelInitializationTime + genderDetector.modelInitializationTime + poseDetector.modelInitializationTime()
+                    if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0) {
+                        val initializationTime = nsfwDetector.modelInitializationTime
                         analyticsService.logEvent(
                             AnalyticsEvent.ModelInitTime,
-                            mapOf(AnalyticsParam.ModelInitTimeMS to initializationTime.toString())
+                            mapOf(AnalyticsParam.ModelInitTimeMS to initializationTime.toString()),
                         )
                         globalData.modelInitializationTimeLogged = true
 
                         Timber.d("Model initialization time: $initializationTime ms")
                     }
                 },
+                grayBlur = SafeGazeLevel.getCurrentLevel(sharedPreferences) == SafeGazeLevel.Blur,
+                shouldCoverFace = sharedPreferences.isFaceCoverEnabled(),
+                imageProcessor,
+                videoFrameProcessor,
             )
 
             it.webViewClient = webViewClient
@@ -3434,6 +3493,7 @@ class BrowserTabFragment :
     private fun onTabHidden() {
         if (!isAdded) return
         viewModel.onViewHidden()
+        viewModel.pauseAdRefresh()
         downloadMessagesJob.cancel()
         webView?.onPause()
         safeGazeInterface.onTabPaused(tabId)
@@ -3444,6 +3504,7 @@ class BrowserTabFragment :
         webView?.onResume()
         launchDownloadMessagesJob()
         viewModel.onViewVisible()
+        viewModel.resumeAdRefresh()
         safeGazeInterface.onTabResumed(tabId)
     }
 
@@ -3459,7 +3520,7 @@ class BrowserTabFragment :
         if (fragmentIsVisible() && lifecycle.currentState.isAtLeast(State.RESUMED)) {
 
             // Hide ad when keyboard is visible
-            binding.includeNewBrowserTab.kahfBannerAd.let { view->
+            binding.includeNewBrowserTab.bottomContentContainer.let { view->
                 if (isKbVisible) {
                     view.isVisible = false
                 } else {
@@ -4082,8 +4143,12 @@ class BrowserTabFragment :
                         binding.focusedViewContainerLayout.gone()
 
                         val suggestionsWithClipboardContent = viewModel.appendClipboardUrlToSuggestions(
-                            clipboardManager.primaryClip,
-                            viewState.searchResults.suggestions
+                            try {
+                                clipboardManager.primaryClip
+                            } catch (e: Exception) {
+                                null
+                            },
+                            viewState.searchResults.suggestions,
                         )
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, suggestionsWithClipboardContent)
 
@@ -4315,13 +4380,13 @@ class BrowserTabFragment :
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = viewState.showSearchIcon
                 omnibar.buttonsVisibleWithBrowser.isVisible = !omnibar.omnibarTextInput.hasFocus()
-                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus()
+                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus() && isZikrTab().not()
             } else {
                 omnibar.daxIcon.isVisible = false
                 omnibar.shieldIcon?.isVisible = false
                 omnibar.clearTextButton?.isVisible = viewState.showClearButton
                 omnibar.searchIcon?.isVisible = true
-                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus()
+                omnibar.kahfSettingsButton.isVisible = !omnibar.omnibarTextInput.hasFocus() && isZikrTab().not()
                 omnibar.buttonsVisibleWithBrowser.isVisible = false
             }
 
@@ -4508,21 +4573,42 @@ class BrowserTabFragment :
                 setAdClickListener {
                     viewModel.onUserSubmittedQuery(it)
                 }
-                setAdImpressionListener(object : AdImpressionListener {
-                    override fun onAdClicked() {
-                        Timber.i("adLog onAdClicked")
-                        analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
-                    }
+                setAdImpressionListener(
+                    object : AdImpressionListener {
+                        override fun onAdClicked() {
+                            Timber.i("adLog onAdClicked")
+                            analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                        }
 
-                    override fun onAdFailedToLoad(message: String?) {
-                        analyticsService.logEvent(AnalyticsEvent.BannerAdLoadFailed)
-                    }
+                        override fun onAdFailedToLoad(error: Error) {
+                            Timber.i("adLog onAdFailedToLoad ${error.message}")
+                            when (error.type) {
+                                ErrorType.TIMEOUT -> {
+                                    analyticsService.logEvent(AnalyticsEvent.AdTimeout)
+                                }
+                                ErrorType.NO_AD_FOUND -> {
+                                    analyticsService.logEvent(AnalyticsEvent.AdNotFound)
+                                }
+                                ErrorType.SERVER_ERROR -> {
+                                    analyticsService.logEvent(AnalyticsEvent.AdServerError)
+                                }
+                                else -> {
+                                    // No op
+                                }
+                            }
+                        }
 
-                    override fun onAdLoaded() {
-                        Timber.i("adLog onAdLoaded")
-                        analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
-                    }
-                })
+                        override fun onAdLoaded() {
+                            if (webView?.isVisible != false) {
+                                Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
+                                viewModel.pauseAdRefresh()
+                            } else {
+                                Timber.i("adLog onAdLoaded $tabId")
+                                analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                            }
+                        }
+                    },
+                )
             }
 
             // App Statistics section
@@ -4584,10 +4670,12 @@ class BrowserTabFragment :
             newBrowserTab.newTabLayout.show()
 
             viewModel.newTabShown = true
+            viewModel.resumeAdRefresh()
         }
 
         private fun hideNewTab() {
             Timber.d("New Tab: hideNewTab")
+            viewModel.pauseAdRefresh()
             newBrowserTab.browserBackground.gone()
         }
 

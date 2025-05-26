@@ -87,6 +87,7 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
         itemList.add(PredefinedBookmark(R.drawable.ic_facebook,"Facebook", "https://facebook.com"))
         itemList.add(PredefinedBookmark(R.drawable.ic_twitter,"X", "https://x.com"))
         itemList.add(PredefinedBookmark(R.drawable.ic_gmail,"Gmail", "https://gmail.com"))
+        itemList.add(PredefinedBookmark(R.drawable.ic_quran_gtaf,"Al Quran", "https://quran.gtaf.org"))
 
         rvAdapter = PredefinedBookmarkAdapter(itemList) { position->
             itemList[position].selected = !itemList[position].selected
@@ -132,7 +133,6 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
 
         selectedBookmarks.toMutableList().let {
             it.add(PredefinedBookmark(R.drawable.ic_youtube,"Islam QA", "https://islamqa.info/en"))
-            it.add(PredefinedBookmark(R.drawable.ic_youtube,"Quran.com", "https://quran.com/"))
 
             it.forEach { bookmark ->
                 savedSitesRepository.insertFavorite(url = bookmark.url, title = bookmark.title)

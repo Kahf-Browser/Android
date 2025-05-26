@@ -19,4 +19,12 @@
 <resources>
     <!-- Notify Me View -->
     <string name="notifyme_button_label">Notify me</string>
+    <string name="kahf_safegaze_unlock">Unlock SafeGaze settings</string>
+    <string name="kahf_no_device_credential">No device credentials are set up. Please set up a PIN, pattern, or password.</string>
+    <string name="kahf_no_biometrics">Please set up PIN, Password, Pattern, Fingerprint or Face recognition</string>
+    <string name="kahf_no_biometric_hardware">This device doesn\'t have biometric hardware.</string>
+    <string name="kahf_biometric_unavailable">Biometric hardware is currently unavailable.</string>
+    <string name="kahf_too_many_attempts">Too many failed attempts. Please try again later.</string>
+    <string name="kahf_authentication_error">Authentication failed</string>
+    <string name="kahf_not_recognized">Not recognized. Please try again.</string>
 </resources>

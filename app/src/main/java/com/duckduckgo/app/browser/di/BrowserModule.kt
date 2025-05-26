@@ -23,7 +23,7 @@ import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.analytics.AnalyticsService
-import com.duckduckgo.app.analytics.FirebaseAnalyticsService
+import com.duckduckgo.app.analytics.PostHogAnalyticsService
 import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.LongPressHandler
@@ -85,11 +85,7 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.referral.AppReferrerDataStore
-import com.duckduckgo.app.safegaze.genderdetection.GenderDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
-import com.duckduckgo.app.safegaze.poseDetection.MoveNetMultiPose
-import com.duckduckgo.app.safegaze.poseDetection.TrackerType.BOUNDING_BOX
-import com.duckduckgo.app.safegaze.poseDetection.Type
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -121,6 +117,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
+import io.kahf.porda_segmentation.ImageProcessor
+import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 
@@ -389,28 +387,33 @@ class BrowserModule {
 
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun providesGenderDetector(context: Context): GenderDetector {
-        return GenderDetector(context)
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun providePoseDetector(context: Context): MoveNetMultiPose {
-        return MoveNetMultiPose.create(context, Type.Dynamic).apply {
-            setTracker(BOUNDING_BOX)
-        }
-    }
-
-    @Provides
-    @SingleInstanceIn(AppScope::class)
     fun provideAnalyticsService(context: Context): AnalyticsService {
-        val f = FirebaseAnalytics.getInstance(context.applicationContext)
-        return FirebaseAnalyticsService(f)
+        // val f = FirebaseAnalytics.getInstance(context.applicationContext)
+        // return FirebaseAnalyticsService(f)
+        return PostHogAnalyticsService()
     }
 
     @Provides
     @SingleInstanceIn(AppScope::class)
     fun provideGlobalData(): GlobalData {
         return GlobalData(false)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideVideoFrameProcessor(
+        context: Context,
+        dispatcherProvider: DispatcherProvider,
+    ): VideoFrameProcessor {
+        return VideoFrameProcessor(context, dispatcherProvider)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun provideImageProcessor(
+        context: Context,
+        dispatcherProvider: DispatcherProvider,
+    ): ImageProcessor {
+        return ImageProcessor(context, dispatcherProvider)
     }
 }

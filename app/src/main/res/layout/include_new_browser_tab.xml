@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/newTabLayout"
@@ -61,7 +61,7 @@
                 android:id="@+id/appStat"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="15dp">
+                android:layout_margin="@dimen/kahf_new_tab_content_margin">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -178,7 +178,7 @@
                 android:clipToPadding="false"
                 android:overScrollMode="never"
                 android:layout_marginVertical="5dp"
-                android:layout_marginHorizontal="15dp"
+                android:layout_marginHorizontal="@dimen/kahf_new_tab_content_margin"
                 android:paddingHorizontal="@dimen/keyline_1"
                 android:paddingTop="@dimen/keyline_2"
                 android:background="@drawable/app_statistics_bg"
@@ -190,13 +190,20 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/bottomContentContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
+            android:layout_marginBottom="@dimen/bottomNavHeight"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
+
+            <com.kahfads.sdk.adviews.KahfBannerAdView
+                android:id="@+id/kahfBannerAd"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/kahf_new_tab_content_margin"/>
 
             <LinearLayout
                 android:id="@+id/textContainer"
@@ -253,12 +260,6 @@
                     android:textSize="11sp"
                     tools:text="Photo Credit" />
             </LinearLayout>
-
-            <co.kahf.adsdk.adviews.KahfBannerAdView
-                android:id="@+id/kahfBannerAd"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
-
         </LinearLayout>
 
         <include
@@ -274,4 +275,4 @@
             app:layout_constraintWidth_max="600dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+</LinearLayout>

@@ -54,28 +54,26 @@
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="10dp">
 
-                <ImageView
-                    android:id="@+id/kahf_guard_logo"
-                    android:layout_width="0dp"
-                    android:layout_height="40dp"
-                    android:contentDescription="@string/asilLogoDescription"
-                    android:scaleType="fitStart"
-                    android:src="@drawable/kahf_guard_logo_with_text"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/tvOnOff"/>
-
-                <TextView
-                    android:id="@+id/tvOnOff"
-                    android:text="@string/kahf_on_off"
-                    android:fontFamily="@font/lato"
-                    android:textColor="#828282"
-                    android:textSize="14sp"
+                <androidx.constraintlayout.widget.Group
+                    android:id="@+id/private_dns_group"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    app:layout_constraintEnd_toStartOf="@+id/switch_kahd_guard"
-                    app:layout_constraintTop_toTopOf="@id/kahf_guard_logo"
-                    app:layout_constraintBottom_toBottomOf="@id/kahf_guard_logo"/>
+                    app:constraint_referenced_ids="button_container,tvDescription"/>
+
+                <TextView
+                    android:id="@+id/title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="@string/kahf_safer_internet"
+                    android:textColor="?attr/kahfPrimaryText"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/switch_kahd_guard"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="DeprecatedWidgetInXml" />
 
                 <androidx.appcompat.widget.SwitchCompat
                     android:id="@+id/switch_kahd_guard"
@@ -90,37 +88,8 @@
                     android:scaleY="0.75"
                     android:layout_marginEnd="-5dp"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/kahf_guard_logo"
-                    app:layout_constraintBottom_toBottomOf="@id/kahf_guard_logo"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/private_dns_group"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="divider,title,button_container,tvDescription"/>
-
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:id="@+id/divider"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
-                    android:background="?attr/kahfDivider"
-                    app:layout_constraintTop_toBottomOf="@id/kahf_guard_logo" />
-
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/kahf_safer_internet"
-                    android:textColor="?attr/kahfPrimaryText"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/divider"
-                    tools:ignore="DeprecatedWidgetInXml" />
 
 
                 <LinearLayout
@@ -129,6 +98,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="horizontal"
+                    android:layout_marginTop="-10dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/title">
 
@@ -158,7 +128,7 @@
                     android:maxLines="3"
                     android:minLines="3"
                     android:paddingHorizontal="10dp"
-                    android:paddingVertical="10dp"
+                    android:paddingVertical="5dp"
                     android:textColor="?attr/kahfPrimaryText"
                     android:textSize="14sp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -193,20 +163,8 @@
                         android:textStyle="bold"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/tvOnOffImage"
+                        app:layout_constraintEnd_toStartOf="@id/switch_safe_gaze"
                         tools:ignore="DeprecatedWidgetInXml" />
-
-                    <TextView
-                        android:id="@+id/tvOnOffImage"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato"
-                        android:text="@string/kahf_on_off"
-                        android:textColor="#828282"
-                        android:textSize="14sp"
-                        app:layout_constraintBottom_toBottomOf="@+id/tvDecent"
-                        app:layout_constraintEnd_toStartOf="@+id/switch_safe_gaze"
-                        app:layout_constraintTop_toTopOf="@+id/tvDecent" />
 
                     <androidx.appcompat.widget.SwitchCompat
                         android:id="@+id/switch_safe_gaze"
@@ -312,13 +270,43 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/blueIndecentPhotosText" />
 
+                    <TextView
+                        android:id="@+id/tvCoverFace"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="@string/kahf_cover_face"
+                        android:textColor="?attr/kahfPrimaryText"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/btnToggleSiteBlur"
+                        app:layout_constraintEnd_toStartOf="@+id/switchCoverFace"
+                        tools:ignore="DeprecatedWidgetInXml" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchCoverFace"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:track="@drawable/switch_track"
+                        app:trackTint="@color/switch_track_color"
+                        app:thumbTint="?attr/kahfCardBackground"
+                        android:checked="false"
+                        tools:checked="true"
+                        android:scaleX="0.75"
+                        android:scaleY="0.75"
+                        android:layout_marginEnd="-5dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/btnToggleSiteBlur"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider
                     android:id="@+id/divider3"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
                     android:background="?attr/kahfDivider"
                     app:layout_constraintTop_toBottomOf="@id/blurContainer" />
 
@@ -470,12 +458,65 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:id="@+id/divider6"
+                    android:id="@+id/divider7"
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="10dp"
                     android:background="?attr/kahfDivider"
                     app:layout_constraintTop_toBottomOf="@id/appStat" />
+
+                <TextView
+                    android:id="@+id/tvLock"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:text="@string/kahf_safegaze_lock"
+                    android:textColor="?attr/kahfPrimaryText"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/switchSgLock"
+                    app:layout_constraintTop_toBottomOf="@id/divider7"
+                    tools:ignore="DeprecatedWidgetInXml" />
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchSgLock"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:track="@drawable/switch_track"
+                    app:trackTint="@color/switch_track_color"
+                    app:thumbTint="?attr/kahfCardBackground"
+                    android:checked="false"
+                    tools:checked="true"
+                    android:scaleX="0.75"
+                    android:scaleY="0.75"
+                    android:layout_marginEnd="-5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider7"
+                    tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+                <TextView
+                    android:id="@+id/tvLockDescription"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/lato"
+                    android:text="@string/kahf_safegaze_lock_desc"
+                    android:textColor="?attr/kahfPrimaryText"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="10dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tvLock"
+                    tools:ignore="DeprecatedWidgetInXml" />
+
+                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                    android:id="@+id/divider6"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="?attr/kahfDivider"
+                    app:layout_constraintTop_toBottomOf="@id/tvLockDescription" />
 
                 <Button
                     android:id="@+id/btnShare"

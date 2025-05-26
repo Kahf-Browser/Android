@@ -84,11 +84,11 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.get
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
 // open class so that we can test BrowserApplicationStateInfo
 @InjectWith(ActivityScope::class)
@@ -154,7 +154,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private var layoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(this) }
-    private val UPDATE_REQUEST_CODE = 1001
+    private val immediateUpdateCode = 1000
+    private val flexibleUpdateCode = 1001
 
     @VisibleForTesting
     var destroyedByBackPress: Boolean = false
@@ -193,7 +194,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         configureOnBackPressedListener()
 
         lifecycleScope.launch(dispatcherProvider.io()) {
-            kahfImageBlockedDao.deleteOlderImages(30)
+            kahfImageBlockedDao.deleteOlderImages(3)
         }
 
         observeKeyboardVisibility()
@@ -245,7 +246,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 appUpdateInfo,
                 this@BrowserActivity,
                 AppUpdateOptions.defaultOptions(AppUpdateType.IMMEDIATE),
-                UPDATE_REQUEST_CODE,
+                immediateUpdateCode,
             )
         } catch (e: Exception) {
             playStoreUtils.launchPlayStore()
@@ -261,13 +262,13 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 appUpdateInfo,
                 this@BrowserActivity,
                 AppUpdateOptions.defaultOptions(AppUpdateType.FLEXIBLE),
-                UPDATE_REQUEST_CODE,
+                flexibleUpdateCode,
             )
 
             // Listen for update completion
             appUpdateManager.registerListener { state ->
                 if (state.installStatus() == com.google.android.play.core.install.model.InstallStatus.DOWNLOADED) {
-                    Toast.makeText(this, "Update downloaded! Restarting app...", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.kahf_restart_app), Toast.LENGTH_LONG).show()
                     appUpdateManager.completeUpdate()
                 }
             }
@@ -288,9 +289,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     // **Handle Update Failure**
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == UPDATE_REQUEST_CODE) {
+        if (requestCode == immediateUpdateCode) {
             if (resultCode != Activity.RESULT_OK) {
-                Toast.makeText(this, "Update is required to continue!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.kahf_update_required), Toast.LENGTH_SHORT).show()
                 checkForAppUpdate() // Keep prompting until updated
             }
         }
@@ -553,6 +554,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent?.let { startActivity(it) }
         }
     }
+
+    fun isActiveTab(tabID: String) = currentTab?.tabId == tabID
 
     fun launchFire() {
         pixel.fire(AppPixelName.FORGET_ALL_PRESSED_BROWSING)

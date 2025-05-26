@@ -120,12 +120,14 @@ import com.duckduckgo.app.browser.commands.Command.OpenAppLink
 import com.duckduckgo.app.browser.commands.Command.OpenInNewBackgroundTab
 import com.duckduckgo.app.browser.commands.Command.OpenInNewTab
 import com.duckduckgo.app.browser.commands.Command.OpenMessageInNewTab
+import com.duckduckgo.app.browser.commands.Command.PauseAdAutoRefresh
 import com.duckduckgo.app.browser.commands.Command.PrintLink
 import com.duckduckgo.app.browser.commands.Command.RefreshUserAgent
 import com.duckduckgo.app.browser.commands.Command.RequestFileDownload
 import com.duckduckgo.app.browser.commands.Command.RequestSystemLocationPermission
 import com.duckduckgo.app.browser.commands.Command.RequiresAuthentication
 import com.duckduckgo.app.browser.commands.Command.ResetHistory
+import com.duckduckgo.app.browser.commands.Command.ResumeAdAutoRefresh
 import com.duckduckgo.app.browser.commands.Command.SaveCredentials
 import com.duckduckgo.app.browser.commands.Command.ScreenLock
 import com.duckduckgo.app.browser.commands.Command.ScreenUnlock
@@ -445,7 +447,8 @@ class BrowserTabViewModel @Inject constructor(
     private var refreshOnViewVisible = MutableStateFlow(true)
     private var ctaChangedTicker = MutableStateFlow("")
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
-    var lastBlockedUrl: String = ""
+    private var lastBlockedUrl: String = ""
+    private var isAdAutoRefreshing = false
 
     data class HiddenBookmarksIds(
         val favorites: List<String> = emptyList(),
@@ -3299,6 +3302,22 @@ class BrowserTabViewModel @Inject constructor(
         }
     }
 
+    fun resumeAdRefresh() {
+        if (!isAdAutoRefreshing) {
+            isAdAutoRefreshing = true
+            viewModelScope.launch(dispatchers.main()) {
+                command.value = ResumeAdAutoRefresh
+            }
+        }
+    }
+
+    fun pauseAdRefresh() {
+        viewModelScope.launch(dispatchers.main()) {
+            command.value = PauseAdAutoRefresh
+            isAdAutoRefreshing = false
+        }
+    }
+
     fun onFaviconsFetchingEnabled(
         fetchingEnabled: Boolean,
     ) {
@@ -3599,27 +3618,31 @@ class BrowserTabViewModel @Inject constructor(
         clip: ClipData?,
         data: List<AutoCompleteSuggestion>
     ): List<AutoCompleteSuggestion> {
-        clip?.let {
-            if (it.itemCount == 0) {
-                return data
+        return try {
+            clip?.let {
+                if (it.itemCount == 0) {
+                    return data
+                }
+
+                val clipboardText = try {
+                    it.getItemAt(0)?.text?.toString() ?: ""
+                } catch (e: Exception) {
+                    ""
+                }
+
+                if (clipboardText.isEmpty()) {
+                    return data
+                }
+
+                return data.toMutableList().also { list ->
+                    list.add(0, AutoCompleteClipboardSuggestion(clipboardText, Patterns.WEB_URL.matcher(clipboardText).matches()))
+                }
             }
 
-            val clipboardText = try {
-                it.getItemAt(0)?.text?.toString() ?: ""
-            } catch (e: Exception) {
-                ""
-            }
-
-            if (clipboardText.isEmpty()) {
-                return data
-            }
-
-            return data.toMutableList().also { list ->
-                list.add(0, AutoCompleteClipboardSuggestion(clipboardText, Patterns.WEB_URL.matcher(clipboardText).matches()))
-            }
+            data
+        } catch (e: Exception) {
+            data
         }
-
-        return data
     }
 
     companion object {

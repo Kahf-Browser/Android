@@ -14,14 +14,12 @@
   ~ limitations under the License.
   -->
 
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/newTabLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:clipChildren="false"
-    android:fillViewport="true"
     tools:context="com.duckduckgo.app.browser.BrowserActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -67,6 +65,14 @@
                 android:orientation="vertical"
                 app:layout_constraintGuide_percent="0.5" />
 
+            <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/barrier"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:barrierMargin="3dp"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="statContainer,historyRecyclerView" />
+
             <LinearLayout
                 android:id="@+id/statContainer"
                 android:layout_width="0dp"
@@ -75,13 +81,13 @@
                 android:baselineAligned="false"
                 android:orientation="horizontal"
                 android:padding="10dp"
+                android:layout_marginHorizontal="3dp"
                 android:layout_marginTop="@dimen/keyline_1"
                 android:weightSum="3"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/historyRecyclerView"
-                app:layout_constraintTop_toTopOf="@id/historyRecyclerView"
-                app:layout_constraintBottom_toBottomOf="@id/historyRecyclerView"
-                app:layout_constraintWidth_percent="0.49">
+                app:layout_constraintEnd_toStartOf="@id/guidelineMid"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/barrier">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -179,93 +185,110 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/historyRecyclerView"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="110dp"
                 android:layout_marginEnd="5dp"
                 android:background="@drawable/app_statistics_bg"
                 android:clipToPadding="false"
-                android:orientation="horizontal"
-                android:overScrollMode="never"
                 android:paddingHorizontal="@dimen/keyline_1"
                 android:paddingTop="@dimen/keyline_2"
                 android:visibility="visible"
+                tools:visibility="visible"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/guidelineTop"
-                app:layout_constraintWidth_percent="0.5"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/barrier"
+                app:layout_constraintStart_toEndOf="@id/guidelineMid"
                 tools:itemCount="7"
                 tools:listitem="@layout/item_history_entry" />
 
-            <co.kahf.adsdk.adviews.KahfBannerAdView
-                android:id="@+id/kahfBannerAd"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/bottomContentContainer"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/keyline_1"
-                android:layout_marginTop="@dimen/keyline_1"
-                android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
-                app:layout_constraintWidth_percent="0.5"
-                app:layout_constraintTop_toBottomOf="@id/historyRecyclerView"
+                android:layout_marginBottom="@dimen/bottomNavHeight"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="@id/guidelineMid"
-                app:layout_constraintBottom_toBottomOf="parent" />
-
-            <LinearLayout
-                android:id="@+id/textContainer"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="15dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:visibility="visible"
-                android:foreground="@drawable/wallpaper_gradient_overlay"
-                android:layout_marginBottom="@dimen/kahf_bottom_nav_height"
-                app:layout_constraintWidth_percent="0.5"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/guidelineMid"
-                tools:visibility="visible">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/barrier"
+                app:layout_constraintVertical_bias="1.0">
 
-                <TextView
-                    android:id="@+id/title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:fontFamily="@font/lato"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="17sp"
-                    tools:text="Title" />
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guidelineMidChild"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.5" />
 
-                <TextView
-                    android:id="@+id/subtitle"
-                    android:layout_width="wrap_content"
+                <com.kahfads.sdk.adviews.KahfBannerAdView
+                    android:id="@+id/kahfBannerAd"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:fontFamily="@font/lato"
-                    android:gravity="center"
-                    android:maxLines="2"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="13sp"
-                    tools:text="Subtitle" />
+                    android:layout_marginHorizontal="@dimen/keyline_1"
+                    android:layout_marginTop="@dimen/keyline_1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/guidelineMidChild"
+                    app:layout_constraintBottom_toBottomOf="parent" />
 
-                <TextView
-                    android:id="@+id/photoCredit"
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:id="@+id/textContainer"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:ellipsize="end"
-                    android:fontFamily="@font/lato"
+                    android:layout_marginHorizontal="5dp"
                     android:gravity="center"
-                    android:maxLines="1"
-                    android:paddingVertical="3dp"
-                    android:textAlignment="center"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="11sp"
-                    tools:text="Photo Credit" />
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:visibility="visible"
+                    android:foreground="@drawable/wallpaper_gradient_overlay"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/guidelineMidChild"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/lato"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:textAlignment="center"
+                        android:textColor="#777"
+                        android:textSize="17sp"
+                        tools:text="Title" />
+
+                    <TextView
+                        android:id="@+id/subtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/lato"
+                        android:gravity="center"
+                        android:maxLines="2"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="13sp"
+                        tools:text="Subtitle" />
+
+                    <TextView
+                        android:id="@+id/photoCredit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:ellipsize="end"
+                        android:fontFamily="@font/lato"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:paddingVertical="3dp"
+                        android:textAlignment="center"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="11sp"
+                        tools:text="Photo Credit" />
+                </LinearLayout>
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -282,4 +305,4 @@
             app:layout_constraintWidth_max="600dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+</LinearLayout>
