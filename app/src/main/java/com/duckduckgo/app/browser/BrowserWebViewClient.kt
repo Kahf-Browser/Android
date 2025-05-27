@@ -521,6 +521,7 @@ class BrowserWebViewClient @Inject constructor(
         val privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
         val privateDnsEnabled = privateDnsMode != PrivateDnsLevel.Off
         val isAmpUrl = ampDetector.isAmpUrl(url)
+        val isIpUrl = specialUrlDetector.isIpUrl(url) // Url falls in this pattern: https://1.1.1.1
 
         return runBlocking {
             withContext(dispatcherProvider.io()) {
@@ -532,8 +533,8 @@ class BrowserWebViewClient @Inject constructor(
                         }
                     }
 
-                    if (privateDnsEnabled && (request.isForMainFrame || isAmpUrl) && resolveDns(url.toUri()).second == KAHF_GUARD_BLOCKED_URL) {
-                        if (request.isForMainFrame) {
+                    if (privateDnsEnabled && (request.isForMainFrame || isAmpUrl) && (resolveDns(url.toUri()).second == KAHF_GUARD_BLOCKED_URL || isIpUrl)) {
+                        if (request.isForMainFrame && !isIpUrl) {
                             withContext(dispatcherProvider.main()) {
                                 webViewClientListener?.onUrlBlocked(url)
                             }

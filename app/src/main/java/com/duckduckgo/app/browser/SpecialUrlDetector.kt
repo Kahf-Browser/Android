@@ -40,6 +40,8 @@ class SpecialUrlDetectorImpl(
     private val externalAppIntentFlagsFeature: ExternalAppIntentFlagsFeature,
 ) : SpecialUrlDetector {
 
+    val ipUrlPattern = Regex("""https?://(\d{1,3}(?:\.\d{1,3}){3})""") // https://123.32.43.56
+
     override fun determineType(initiatingUrl: String?, uri: Uri): UrlType {
         val uriString = uri.toString()
 
@@ -185,6 +187,8 @@ class SpecialUrlDetectorImpl(
     }
 
     private fun String.truncate(maxLength: Int): String = if (this.length > maxLength) this.substring(0, maxLength) else this
+
+    override fun isIpUrl(url: String) = ipUrlPattern.find(url) != null
 
     companion object {
         private const val TEL_SCHEME = "tel"

@@ -23,6 +23,7 @@ interface SpecialUrlDetector {
     fun determineType(initiatingUrl: String?, uri: Uri): UrlType
     fun determineType(uriString: String?): UrlType
     fun processUrl(initiatingUrl: String?, uriString: String): UrlType
+    fun isIpUrl(url: String): Boolean
 
     sealed class UrlType {
         class Web(val webAddress: String) : UrlType()
