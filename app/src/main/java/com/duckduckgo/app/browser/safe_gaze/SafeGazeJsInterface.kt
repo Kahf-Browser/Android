@@ -14,8 +14,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.md5
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import io.kahf.porda_segmentation.ImageProcessor
 import io.kahf.porda_segmentation.ImageDownloader
+import io.kahf.porda_segmentation.ImageProcessor
 import io.kahf.porda_segmentation.InputImage
 import io.kahf.porda_segmentation.OutputImage
 import io.kahf.video_filter.VideoFrameProcessor
@@ -25,11 +25,11 @@ import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.collections.set
 import kotlin.system.measureTimeMillis
 
 class SafeGazeJsInterface(
@@ -49,6 +49,7 @@ class SafeGazeJsInterface(
 
     private val urlQueue: ConcurrentLinkedQueue<InputImage> = ConcurrentLinkedQueue()
     private var processingJob: Job? = null
+    private var imgDownloadJob: Job? = null
     private val scope = CoroutineScope(dispatcher.io() + Job())
     private var paused: AtomicBoolean = AtomicBoolean(false)
     private val gson = Gson()
@@ -152,10 +153,20 @@ class SafeGazeJsInterface(
                             // Download bitmap
                             val bmp: Bitmap?
                             val imageDownloadTime = measureTimeMillis {
-                                bmp = withTimeout(1800) {
-                                    imageDownloader.downloadImageWithAspectRatio(
-                                        context, task.src, task.baseImg, task.width, task.height,
-                                    )
+                                imgDownloadJob?.cancel()
+                                imgDownloadJob = Job()
+
+                                bmp = try {
+                                    withContext(dispatcher.io() + imgDownloadJob!!) {
+                                        withTimeout(2000) {
+                                            imageDownloader.downloadImageWithAspectRatio(
+                                                context, task.src, task.baseImg, task.width, task.height,
+                                            )
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    Timber.e("kLog Image download failed: ${e.message}")
+                                    null
                                 }
                             }
                             Timber.d("kLog Download time: $imageDownloadTime ms (${bmp?.width}x${bmp?.height})")
@@ -239,6 +250,7 @@ class SafeGazeJsInterface(
     fun onTabPaused(tabId: String) {
         paused.set(true)
         processingJob?.cancel()
+        imgDownloadJob?.cancel()
     }
 
     fun onTabResumed(tabId: String) {
