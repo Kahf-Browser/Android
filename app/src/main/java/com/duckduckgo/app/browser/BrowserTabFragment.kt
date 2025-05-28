@@ -1105,7 +1105,9 @@ class BrowserTabFragment :
                                 }
                             }.build()
 
-                            (requireActivity() as BrowserActivity).relaunchCurrentTab(uri.toString())
+                            if (requireActivity() is BrowserActivity) {
+                                (requireActivity() as BrowserActivity).relaunchCurrentTab(uri.toString())
+                            }
                         }
                     }
 
@@ -1941,6 +1943,7 @@ class BrowserTabFragment :
             }
             is Command.ResumeAdAutoRefresh -> {
                 if (lifecycle.currentState.isAtLeast(State.RESUMED)
+                    && requireActivity() is BrowserActivity
                     && (requireActivity() as BrowserActivity).isActiveTab(tabId)
                     && webView?.isInvisible == true) {
                     binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
