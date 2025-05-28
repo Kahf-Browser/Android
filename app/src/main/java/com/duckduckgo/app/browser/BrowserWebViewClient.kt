@@ -65,10 +65,13 @@ import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
+import com.duckduckgo.app.isZikrTab
+import com.duckduckgo.app.primaryDomain
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
+import com.duckduckgo.app.trackerdetection.db.ZikrWhiteListDao
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -131,6 +134,7 @@ class BrowserWebViewClient @Inject constructor(
     private val subscriptions: Subscriptions,
     private val dnsResolver: CustomDnsResolver,
     private val sgWhitelistDao: SafeGazeWhitelistDao,
+    private val zikrWhitelistDao: ZikrWhiteListDao,
     private val ampDetector: AmpDetector,
     spProvider: SharedPreferencesProvider
 ) : WebViewClient() {
@@ -166,7 +170,8 @@ class BrowserWebViewClient @Inject constructor(
         try {
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
-            if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
+            // Zikr tab specific changes
+            if (isForMainFrame && (dosDetector.isUrlGeneratingDos(url) && !url.host.equals("iom.edu.bd"))) {
                 webView.loadUrl("about:blank")
                 webViewClientListener?.dosAttackDetected()
                 return false
@@ -518,6 +523,18 @@ class BrowserWebViewClient @Inject constructor(
     ): WebResourceResponse? {
         var url = request.url.toString()
         if (request.url.host == KAHF_GUARD_BLOCKED_URL || url.isDataUri()) return null
+
+        // Zikr Tab specific logic
+        if (isZikrTab() && request.isForMainFrame) {
+            val primaryDomain = request.url.primaryDomain()
+
+            return if (zikrWhitelistDao.findByUrl(primaryDomain) != null) {
+                null
+            } else {
+                WebResourceResponse(null, null, null)
+            }
+        }
+
         val privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
         val privateDnsEnabled = privateDnsMode != PrivateDnsLevel.Off
         val isAmpUrl = ampDetector.isAmpUrl(url)
