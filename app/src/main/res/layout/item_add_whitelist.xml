@@ -52,7 +52,7 @@
         android:layout_gravity="center_horizontal"
         app:typography="caption"
         app:textType="secondary"
-        app:text="@string/zikr_add_white_list"
+        android:text="@string/zikr_add_white_list"
         android:textColor="@android:color/white"
         android:gravity="center"
         android:maxLines="2"

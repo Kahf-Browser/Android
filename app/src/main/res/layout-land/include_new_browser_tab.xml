@@ -71,7 +71,7 @@
                 android:layout_height="0dp"
                 app:barrierMargin="3dp"
                 app:barrierDirection="bottom"
-                app:constraint_referenced_ids="statContainer,historyRecyclerView" />
+                app:constraint_referenced_ids="statContainer" />
 
             <LinearLayout
                 android:id="@+id/statContainer"
