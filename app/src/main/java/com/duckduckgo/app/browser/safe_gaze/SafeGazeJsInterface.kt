@@ -29,6 +29,7 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.PriorityBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.system.measureTimeMillis
 
@@ -47,7 +48,7 @@ class SafeGazeJsInterface(
     private val inferenceTimes = mutableListOf<Long>()
     private val waitingTimes = mutableListOf<Long>()
 
-    private val urlQueue: ConcurrentLinkedQueue<InputImage> = ConcurrentLinkedQueue()
+    private val urlQueue: PriorityBlockingQueue<InputImage> = PriorityBlockingQueue()
     private var processingJob: Job? = null
     private var imgDownloadJob: Job? = null
     private val scope = CoroutineScope(dispatcher.io() + Job())
