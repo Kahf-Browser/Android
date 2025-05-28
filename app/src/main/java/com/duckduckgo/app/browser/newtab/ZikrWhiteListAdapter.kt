@@ -1,5 +1,6 @@
 package com.duckduckgo.app.browser.newtab
 
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.saved.sites.impl.R
 import com.duckduckgo.saved.sites.impl.databinding.DialogAddWhitelistItemBinding
 import kotlinx.coroutines.launch
+import androidx.core.content.edit
 
 class ZikrWhiteListAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -24,12 +26,15 @@ class ZikrWhiteListAdapter(
     private val onItemClick: (WhiteListItem) -> Unit,
     private val onDeleteItem: (WhiteListItem) -> Unit,
     private val onAddClick: (title: String, url: String) -> Unit,
+    private val storage: SharedPreferences, // Optional password for admin actions
 ) : ListAdapter<WhiteListItem, RecyclerView.ViewHolder>(WhiteListDiffCallback()) {
 
     companion object {
         const val VIEW_TYPE_ITEM = 1
         const val VIEW_TYPE_ADD = 2
+        const val ZIKR_ADMIN_PASSWORD_KEY = "zikr_admin_password"
     }
+
 
     override fun getItemViewType(position: Int): Int {
         return if (getItem(position).isPlus) VIEW_TYPE_ADD else VIEW_TYPE_ITEM
@@ -39,24 +44,24 @@ class ZikrWhiteListAdapter(
         return when (viewType) {
             VIEW_TYPE_ADD -> {
                 val binding = ItemAddWhitelistBinding.inflate(
-                    LayoutInflater.from(parent.context), parent, false
+                    LayoutInflater.from(parent.context), parent, false,
                 )
-                AddWhiteListViewHolder(binding, faviconManager, lifecycleOwner, onAddClick)
+                AddWhiteListViewHolder(binding, faviconManager, lifecycleOwner, onAddClick, storage)
             }
             else -> {
                 val binding = ItemHistoryEntryBinding.inflate(
-                    LayoutInflater.from(parent.context), parent, false
+                    LayoutInflater.from(parent.context), parent, false,
                 )
                 ZikrWhiteListViewHolder(binding, faviconManager, lifecycleOwner, onDeleteItem)
             }
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int): Unit {
         val item = getItem(position)
         when (holder) {
             is AddWhiteListViewHolder -> {
-                holder.bind(item)
+                holder.bind()
                 holder.binding.historyItemLabel.text = holder.binding.root.context.getString(R.string.zikr_add_white_list)
             }
             is ZikrWhiteListViewHolder -> {
@@ -67,33 +72,86 @@ class ZikrWhiteListAdapter(
     }
 }
 
-private class WhiteListDiffCallback : DiffUtil.ItemCallback<WhiteListItem>() {
-    override fun areItemsTheSame(
-        oldItem: WhiteListItem,
-        newItem: WhiteListItem,
-    ): Boolean {
-        return oldItem == newItem
-    }
-
-    override fun areContentsTheSame(
-        oldItem: WhiteListItem,
-        newItem: WhiteListItem,
-    ): Boolean {
-        return oldItem == newItem
-    }
-}
-
 class AddWhiteListViewHolder(
     val binding: ItemAddWhitelistBinding,
     val faviconManager: FaviconManager,
     val lifecycleOwner: LifecycleOwner,
     val onAddClick: (title: String, url: String) -> Unit,
+    val storage: SharedPreferences, // Pass the SharedPreferences to this class
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    fun bind(item: WhiteListItem) {
+    fun bind() {
         binding.quickAccessFaviconCard.setOnClickListener {
-            showPopup()
+            checkPasswordAndShowPopup()
         }
+    }
+
+    private fun checkPasswordAndShowPopup() {
+        // Check if password exists in SharedPreferences
+        val password = storage.getString(ZikrWhiteListAdapter.ZIKR_ADMIN_PASSWORD_KEY, null)
+
+        if (password.isNullOrEmpty()) {
+            // No password set, ask user to create one
+            showSetPasswordDialog()
+        } else {
+            // Password is set, verify it
+            showPasswordVerificationDialog(password)
+        }
+    }
+
+    private fun showSetPasswordDialog() {
+        val context = binding.root.context
+        val dialogBuilder = android.app.AlertDialog.Builder(context)
+        dialogBuilder.setTitle("Set Admin Password")
+        dialogBuilder.setMessage("Please set an admin password to protect whitelist additions")
+
+        // Create input field
+        val input = android.widget.EditText(context)
+        input.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        dialogBuilder.setView(input)
+
+        dialogBuilder.setPositiveButton("Save") { _, _ ->
+            val newPassword = input.text.toString()
+            if (newPassword.isNotEmpty()) {
+                // Save password to SharedPreferences
+                storage.edit { putString(ZikrWhiteListAdapter.ZIKR_ADMIN_PASSWORD_KEY, newPassword) }
+                showPopup()
+            }
+        }
+
+        dialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        dialogBuilder.show()
+    }
+
+    private fun showPasswordVerificationDialog(correctPassword: String) {
+        val context = binding.root.context
+        val dialogBuilder = android.app.AlertDialog.Builder(context)
+        dialogBuilder.setTitle("Verify Admin Password")
+        dialogBuilder.setMessage("Please enter the admin password")
+
+        // Create input field
+        val input = android.widget.EditText(context)
+        input.inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        dialogBuilder.setView(input)
+
+        dialogBuilder.setPositiveButton("Verify") { _, _ ->
+            val enteredPassword = input.text.toString()
+            if (enteredPassword == correctPassword) {
+                showPopup()
+            } else {
+                // Show error message if password is incorrect
+                android.widget.Toast.makeText(context, "Incorrect password", android.widget.Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        dialogBuilder.setNegativeButton("Cancel") { dialog, _ ->
+            dialog.cancel()
+        }
+
+        dialogBuilder.show()
     }
 
     private fun showPopup() {
@@ -154,3 +212,18 @@ class ZikrWhiteListViewHolder(
     }
 }
 
+private class WhiteListDiffCallback : DiffUtil.ItemCallback<WhiteListItem>() {
+    override fun areItemsTheSame(
+        oldItem: WhiteListItem,
+        newItem: WhiteListItem,
+    ): Boolean {
+        return oldItem == newItem
+    }
+
+    override fun areContentsTheSame(
+        oldItem: WhiteListItem,
+        newItem: WhiteListItem,
+    ): Boolean {
+        return oldItem == newItem
+    }
+}

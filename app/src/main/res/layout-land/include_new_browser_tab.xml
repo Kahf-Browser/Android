@@ -183,7 +183,7 @@
             </LinearLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/historyRecyclerView"
+                android:id="@+id/whiteListRecyclerView"
                 android:layout_width="0dp"
                 android:layout_height="110dp"
                 android:layout_marginEnd="5dp"
@@ -193,12 +193,13 @@
                 android:paddingTop="@dimen/keyline_2"
                 android:visibility="visible"
                 tools:visibility="visible"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="11"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="4"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/barrier"
                 app:layout_constraintStart_toEndOf="@id/guidelineMid"
-                tools:itemCount="7"
                 tools:listitem="@layout/item_history_entry" />
 
             <androidx.constraintlayout.widget.ConstraintLayout

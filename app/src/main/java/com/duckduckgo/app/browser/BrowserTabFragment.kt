@@ -4664,6 +4664,7 @@ class BrowserTabFragment :
                         )
                     }
                 },
+                storage = sharedPreferences,
             )
 
             newBrowserTab.whiteListRecyclerView.let { rv->
