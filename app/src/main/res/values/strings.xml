@@ -967,4 +967,6 @@
     
     <string name="kahf_restart_app">Update downloaded! Restarting app…</string>
     <string name="kahf_update_required">Update is required to continue!</string>
+    <string name="zirk_add_website">Add Website</string>
+    <string name="zirk_remove_website">Remove from White List</string>
 </resources>

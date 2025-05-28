@@ -109,4 +109,7 @@ object DaoModule {
 
     @Provides
     fun provideSafeGazeWhitelistDao(database: AppDatabase) = database.safeGazeWhitelistDao()
+
+    @Provides
+    fun provideZikrWhiteListDao(database: AppDatabase) = database.zikrWhiteListDao()
 }

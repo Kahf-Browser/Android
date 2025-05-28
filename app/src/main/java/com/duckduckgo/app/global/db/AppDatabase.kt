@@ -70,7 +70,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
 
 @Database(
     exportSchema = true,
-    version = 60,
+    version = 61,
     entities = [
         TdsTracker::class,
         TdsEntity::class,
@@ -107,6 +107,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         HarmfulSiteBlocked::class,
         ImageBlockCount::class,
         SafeGazeWhitelistEntity::class,
+        ZikrWhiteListItem::class,
     ],
 )
 
@@ -158,6 +159,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun harmfulSiteBlockedDao(): HarmfulSiteBlockedDao
     abstract fun imageBlockCountDao(): ImageBlockCountDao
     abstract fun safeGazeWhitelistDao(): SafeGazeWhitelistDao
+    abstract fun zikrWhiteListDao(): ZikrWhiteListDao
 
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
 
@@ -765,6 +767,21 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             db.execSQL("DELETE FROM kahf_image_blocked") }
     }
 
+    val MIGRATION_60_TO_61 = object : Migration(60, 61) {
+        override fun migrate(db: SupportSQLiteDatabase) {
+            // Create zikr_whitelist table
+            db.execSQL(
+                "CREATE TABLE IF NOT EXISTS `zikr_whitelist` (" +
+                    "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "`name` TEXT NOT NULL, " +
+                    "`url` TEXT NOT NULL, " +
+                    "`isVisible` INTEGER NOT NULL DEFAULT 1)"
+            )
+
+            // Create unique index for the url column
+            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_zikr_whitelist_url` ON `zikr_whitelist` (`url`)")
+        }
+    }
 
     /**
      * WARNING ⚠️
@@ -851,6 +868,7 @@ class MigrationsProvider(val context: Context, val settingsDataStore: SettingsDa
             MIGRATION_57_TO_58,
             MIGRATION_58_TO_59,
             MIGRATION_59_TO_60,
+            MIGRATION_60_TO_61,
         )
 
     @Deprecated(

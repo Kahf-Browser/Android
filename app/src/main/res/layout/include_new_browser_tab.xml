@@ -171,19 +171,20 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/historyRecyclerView"
+                android:id="@+id/whiteListRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:clipToPadding="false"
                 android:overScrollMode="never"
                 android:layout_marginVertical="5dp"
                 android:layout_marginHorizontal="@dimen/kahf_new_tab_content_margin"
                 android:paddingHorizontal="@dimen/keyline_1"
                 android:paddingTop="@dimen/keyline_2"
+                android:paddingBottom="@dimen/keyline_2"
                 android:background="@drawable/app_statistics_bg"
-                tools:itemCount="7"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:itemCount="11"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="4"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 tools:listitem="@layout/item_history_entry" />
 

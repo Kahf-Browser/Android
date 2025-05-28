@@ -114,6 +114,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.webkit.JavaScriptReplyProxy
 import androidx.webkit.WebMessageCompat
@@ -177,9 +178,10 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.newtab.FocusedViewProvider
-import com.duckduckgo.app.browser.newtab.HistoryQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
 import com.duckduckgo.app.browser.newtab.SpaceItemDecoration
+import com.duckduckgo.app.browser.newtab.WhiteListItem
+import com.duckduckgo.app.browser.newtab.ZikrWhiteListAdapter
 import com.duckduckgo.app.browser.omnibar.OmnibarScrolling
 import com.duckduckgo.app.browser.omnibar.animations.BrowserTrackersAnimatorHelper
 import com.duckduckgo.app.browser.omnibar.animations.PrivacyShieldAnimationHelper
@@ -253,6 +255,8 @@ import com.duckduckgo.app.trackerdetection.db.ImageBlockCountDao
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlockedDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
+import com.duckduckgo.app.trackerdetection.db.ZikrWhiteListDao
+import com.duckduckgo.app.trackerdetection.db.ZikrWhiteListItem
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autoconsent.api.Autoconsent
@@ -621,6 +625,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var historyRepository: RealNavigationHistory
+
+    @Inject
+    lateinit var zikrWhiteListDao: ZikrWhiteListDao
 
     @Inject
     lateinit var spProvider: SharedPreferencesProvider
@@ -4634,31 +4641,61 @@ class BrowserTabFragment :
                 .launchIn(lifecycleScope)
 
             // Recent history section
-            val historyAdapter = HistoryQuickAccessAdapter(
+            val historyAdapter = ZikrWhiteListAdapter(
                 lifecycleOwner = viewLifecycleOwner,
                 faviconManager = faviconManager,
                 onItemClick = {
-                    viewModel.onUserSubmittedQuery(it.url.toString())
+                    viewModel.onUserSubmittedQuery(it.url)
                 },
                 onDeleteItem = {
                     lifecycleScope.launch(dispatchers.io()) {
-                        historyRepository.clearEntry(it)
+                        zikrWhiteListDao.deleteByUrl(it.url)
                     }
                 },
-                onClearAll = {
+                onAddClick = { title, url ->
+                    Timber.d("wlLog $title $url")
                     lifecycleScope.launch(dispatchers.io()) {
-                        historyRepository.clearHistory()
+                        zikrWhiteListDao.insert(
+                            ZikrWhiteListItem(
+                                name = title,
+                                url = url,
+                                isVisible = true,
+                            ),
+                        )
                     }
                 },
             )
 
-            newBrowserTab.historyRecyclerView.let { rv->
+            newBrowserTab.whiteListRecyclerView.let { rv->
                 rv.addItemDecoration(SpaceItemDecoration(resources.getDimensionPixelSize(R.dimen._08dp)))
-                rv.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+                rv.layoutManager = GridLayoutManager(requireContext(), 4)
                 rv.adapter = historyAdapter
             }
 
-            historyRepository.getHistoryFlow().flowWithLifecycle(lifecycle)
+            zikrWhiteListDao.getAllVisible().flowWithLifecycle(lifecycle)
+                .distinctUntilChanged()
+                .onEach { whiteList ->
+                    whiteList.map {
+                        WhiteListItem(
+                            title = it.name,
+                            url = it.url,
+                            isPlus = false,
+                        )
+                    }.toMutableList().let { whiteListItems ->
+                        whiteListItems.add(
+                            WhiteListItem(
+                                title = "Add\n",
+                                url = "",
+                                isPlus = true,
+                            ),
+                        )
+
+                        historyAdapter.submitList(whiteListItems)
+                    }
+                }
+                .launchIn(lifecycleScope)
+
+            /*historyRepository.getHistoryFlow().flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
                 .onEach {
                     val uniqueItems = it.distinctBy { history -> history.url.host }
@@ -4666,7 +4703,7 @@ class BrowserTabFragment :
                     newBrowserTab.historyRecyclerView.isVisible = uniqueItems.isNotEmpty()
                     Timber.d("History updated. Should update UI now. ${uniqueItems.size}")
                 }
-                .launchIn(lifecycleScope)
+                .launchIn(lifecycleScope)*/
 
             newBrowserTab.browserBackground.show()
             newBrowserTab.newTabContainerLayout.show()
