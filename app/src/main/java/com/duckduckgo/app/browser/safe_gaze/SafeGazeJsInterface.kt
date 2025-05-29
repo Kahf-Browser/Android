@@ -195,7 +195,7 @@ class SafeGazeJsInterface(
 
                                 val inferenceTime = imageDownloadTime + nsfwInference + segmentationInf
                                 inferenceTimes.add(inferenceTime)
-                                Timber.d("kLog Total inference time: $inferenceTime ms")
+                                Timber.d("kLog Total inference time: $inferenceTime ms, download: $imageDownloadTime, NSFW: $nsfwInference, seg: $segmentationInf")
                             }
                         } catch (e: TimeoutCancellationException) {
                             Timber.e("kLog Timeout occurred while processing image: ")
