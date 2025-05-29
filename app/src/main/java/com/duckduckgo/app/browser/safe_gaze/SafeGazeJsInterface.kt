@@ -48,7 +48,7 @@ class SafeGazeJsInterface(
     private val inferenceTimes = mutableListOf<Long>()
     private val waitingTimes = mutableListOf<Long>()
 
-    private val urlQueue: PriorityBlockingQueue<InputImage> = PriorityBlockingQueue()
+    private val urlQueue: PriorityBlockingQueue<InputImage> = PriorityBlockingQueue(20, compareBy { it.order })
     private var processingJob: Job? = null
     private var imgDownloadJob: Job? = null
     private val scope = CoroutineScope(dispatcher.io() + Job())
