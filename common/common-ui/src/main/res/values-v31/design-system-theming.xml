@@ -21,8 +21,8 @@
         <item name="android:windowLightNavigationBar">true</item>
         <item name="android:navigationBarDividerColor">?attr/colorControlHighlight</item>
 
-        <item name="android:windowSplashScreenBackground">@color/whiteFive</item>
-        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_dax_splash_screen_icon</item>
-        <item name="android:windowSplashScreenAnimationDuration">800</item>
+        <item name="android:windowBackground">@drawable/img_kahf_splash</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 </resources>
