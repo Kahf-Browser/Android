@@ -65,6 +65,7 @@ import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
+import com.duckduckgo.app.isZikrTab
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -142,6 +143,7 @@ class BrowserWebViewClient @Inject constructor(
     lateinit var activity: FragmentActivity
     private var start: Long? = null
     private var sharedPreferences = spProvider.getKahfSharedPreferences()
+    private val isZikrTablet = isZikrTab()
 
     /**
      * This is the method of url overriding available from API 24 onwards
@@ -167,9 +169,11 @@ class BrowserWebViewClient @Inject constructor(
             Timber.v("shouldOverride webViewUrl: ${webView.url} URL: $url")
             webViewClientListener?.onShouldOverride()
             if (isForMainFrame && dosDetector.isUrlGeneratingDos(url)) {
-                webView.loadUrl("about:blank")
-                webViewClientListener?.dosAttackDetected()
-                return false
+                if (!(isZikrTablet && url.host == "iom.edu.bd")) {
+                    webView.loadUrl("about:blank")
+                    webViewClientListener?.dosAttackDetected()
+                    return false
+                }
             }
 
             return when (val urlType = specialUrlDetector.determineType(initiatingUrl = webView.originalUrl, uri = url)) {
