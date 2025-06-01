@@ -33,6 +33,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     private val viewModel: LaunchViewModel by bindViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_SplashScreen)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
