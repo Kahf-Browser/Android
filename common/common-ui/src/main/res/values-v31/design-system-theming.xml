@@ -21,7 +21,7 @@
         <item name="android:windowLightNavigationBar">true</item>
         <item name="android:navigationBarDividerColor">?attr/colorControlHighlight</item>
 
-        <item name="android:windowBackground">@drawable/img_kahf_splash</item>
+        <item name="android:windowBackground">@drawable/kahf_browser_splash</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
     </style>
