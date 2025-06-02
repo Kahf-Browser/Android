@@ -23,7 +23,6 @@ import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
-import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
