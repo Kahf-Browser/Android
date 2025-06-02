@@ -500,6 +500,7 @@ dependencies {
     // posthog
     implementation("com.posthog:posthog-android:3.15.0")
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
+    implementation 'androidx.core:core-splashscreen:1.0.1'
 
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"

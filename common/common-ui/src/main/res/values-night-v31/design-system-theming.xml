@@ -20,5 +20,10 @@
         <item name="android:windowBackground">@drawable/kahf_browser_splash</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
+
+        <item name="android:windowSplashScreenBackground">#5048ed</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/kahf_browser_logo_only_288</item>
+        <item name="android:windowSplashScreenAnimationDuration">800</item>
+        <item name="android:windowSplashScreenBrandingImage">@drawable/kahf_browser_logo_wordmark_center_align</item>
     </style>
 </resources>

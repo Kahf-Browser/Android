@@ -17,6 +17,7 @@
 package com.duckduckgo.app.launch
 
 import android.os.Bundle
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
@@ -34,6 +35,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_SplashScreen)
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
