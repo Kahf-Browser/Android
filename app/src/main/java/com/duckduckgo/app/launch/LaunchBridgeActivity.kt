@@ -17,12 +17,12 @@
 package com.duckduckgo.app.launch
 
 import android.os.Bundle
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
-import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.launch
@@ -34,6 +34,7 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(com.duckduckgo.mobile.android.R.style.Theme_DuckDuckGo_SplashScreen)
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_launch)
 
