@@ -14,10 +14,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.md5
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import io.kahf.porda_segmentation.ImageDownloader
-import io.kahf.porda_segmentation.ImageProcessor
-import io.kahf.porda_segmentation.InputImage
-import io.kahf.porda_segmentation.OutputImage
+import io.kahf.kahf_segmentation.ImageDownloader
+import io.kahf.kahf_segmentation.ImageProcessor
+import io.kahf.kahf_segmentation.InputImage
+import io.kahf.kahf_segmentation.OutputImage
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -28,7 +28,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import timber.log.Timber
-import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.PriorityBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.system.measureTimeMillis

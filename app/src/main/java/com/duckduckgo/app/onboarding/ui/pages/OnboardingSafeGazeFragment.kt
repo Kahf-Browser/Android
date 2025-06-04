@@ -21,7 +21,7 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import io.kahf.porda_segmentation.ImageProcessor
+import io.kahf.kahf_segmentation.ImageProcessor
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

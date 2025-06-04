@@ -112,12 +112,11 @@ import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.UserAgentProvider
-import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
 import dagger.multibindings.IntoSet
-import io.kahf.porda_segmentation.ImageProcessor
+import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
