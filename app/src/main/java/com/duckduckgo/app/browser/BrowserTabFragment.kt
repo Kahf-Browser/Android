@@ -17,7 +17,10 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.LayoutTransition
+import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -55,6 +58,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.ContextMenu
 import android.view.Gravity
 import android.view.KeyEvent
@@ -136,6 +140,7 @@ import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
+import com.duckduckgo.app.browser.DuckDuckGoWebView.ScrollDirection
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
@@ -366,6 +371,7 @@ import com.kahfads.sdk.KahfAdSdk
 import com.kahfads.sdk.KahfAdType
 import com.kahfads.sdk.KahfSdkConfig
 import com.kahfads.sdk.adviews.AdImpressionListener
+import com.kahfads.sdk.adviews.KahfBannerAdView
 import com.kahfads.sdk.model.AdResult.Error
 import com.kahfads.sdk.model.ErrorType
 import io.kahf.porda_segmentation.ImageProcessor
@@ -725,6 +731,23 @@ class BrowserTabFragment :
         get() = omnibar.kahfSettingsButton
 
     private var webView: DuckDuckGoWebView? = null
+
+    // bottom sliding ads view
+    // private lateinit var overlayView: View
+    // private lateinit var closeButton: ImageView
+    private lateinit var kahfAdSliderView: KahfBannerAdView
+    private lateinit var rootContainer: ConstraintLayout
+
+    // Animation and timing control
+    private val handler = Handler(Looper.getMainLooper())
+    private var hideRunnable: Runnable? = null
+    private var cooldownRunnable: Runnable? = null
+
+    // Bottom Ads view State management
+    private var isAdsVisible = false
+    private var isInCooldown = false
+    private var isAnimating = false
+    private var isFirstTimeScrolling = false
 
     private val gson = Gson()
 
@@ -2725,12 +2748,38 @@ class BrowserTabFragment :
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     private fun configureWebView() {
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        rootContainer = binding.clWebViewContainer
+        kahfAdSliderView = binding.kahfSliderAdView
+        // closeButton = binding.closeButton
+
+        // Set scroll listener for our custom WebView
 
         webView = layoutInflater.inflate(
             R.layout.include_duckduckgo_browser_webview,
             binding.webViewContainer,
             true,
         ).findViewById(R.id.browserWebView)
+
+        setupBottomKahfAdsView()
+        setupCloseButton()
+
+        webView?.setScrollListener(object : DuckDuckGoWebView.ScrollListener {
+            override fun onScrollDetected(direction: ScrollDirection) {
+                Log.e("WEBVIEW", "onScrollDetected")
+                if (!isFirstTimeScrolling) {
+                    isFirstTimeScrolling = true
+                }
+                handleScrollDetected()
+            }
+
+            override fun startedScroll() {
+
+            }
+
+            override fun stoppedScroll() {
+                //do something if needed
+            }
+        })
 
         webView?.let {
             safeGazeInterface = SafeGazeJsInterface(
@@ -2837,6 +2886,164 @@ class BrowserTabFragment :
         }
 
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
+    }
+
+    private fun setupBottomKahfAdsView() {
+        // Initially position overlay below screen
+        kahfAdSliderView.post {
+            val screenHeight = rootContainer.height
+            kahfAdSliderView.translationY = screenHeight.toFloat()
+            kahfAdSliderView.visibility = View.VISIBLE
+        }
+    }
+
+    private fun setupCloseButton() {
+        // closeButton.setOnClickListener {
+        //     manualHideOverlay()
+        // }
+    }
+
+    private fun handleScrollDetected() {
+        // Only show if conditions are met
+        if (!isInCooldown && !isAdsVisible && !isAnimating) {
+            showKahfAdsViewWithAnim()
+        }
+    }
+
+    private fun showKahfAdsViewWithAnim() {
+        if (isAdsVisible || isAnimating) return
+
+        viewModel.resumeAdRefresh()
+        isAnimating = true
+        isAdsVisible = true
+
+        // Cancel any pending hide operation
+        hideRunnable?.let { handler.removeCallbacks(it) }
+
+        Handler(Looper.myLooper() ?: Looper.getMainLooper()).postDelayed(Runnable {
+            // Smooth slide up animation with bounce effect
+            val animator = ObjectAnimator.ofFloat(kahfAdSliderView, "translationY",
+                kahfAdSliderView.translationY, 0f)
+            animator.apply {
+                duration = SHOW_DURATION
+                interpolator = android.view.animation.DecelerateInterpolator()
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        isAnimating = false
+                        showKahfAds(kahfAdSliderView)
+                        scheduleHideOverlay()
+                    }
+                })
+                start()
+            }
+
+            // Add subtle fade in for better UX
+            kahfAdSliderView.alpha = 0.8f
+            kahfAdSliderView.animate()
+                .alpha(1.0f)
+                .setDuration(SHOW_DURATION)
+                .start()
+        }, if (isFirstTimeScrolling) INITIAL_DELAY else 0L)
+    }
+
+    private fun automaticallyHideKahfAdsView() {
+        if (!isAdsVisible || isAnimating) return
+
+        isAnimating = true
+
+        // Smooth slide down animation
+        val animator = ObjectAnimator.ofFloat(kahfAdSliderView, "translationY",
+            0f, kahfAdSliderView.height.toFloat() + 50f) // Extra 50px for complete hide
+        animator.apply {
+            duration = HIDE_DURATION
+            interpolator = android.view.animation.AccelerateInterpolator()
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    isAnimating = false
+                    isAdsVisible = false
+                    viewModel.pauseAdRefresh()
+                    startCooldownPeriod()
+                }
+            })
+            start()
+        }
+
+        // Add fade out effect
+        kahfAdSliderView.animate()
+            .alpha(0.6f)
+            .setDuration(HIDE_DURATION)
+            .start()
+    }
+
+    private fun closeKahfAdsSlidingView() {
+        // Cancel scheduled hide and hide immediately
+        hideRunnable?.let { handler.removeCallbacks(it) }
+        automaticallyHideKahfAdsView()
+    }
+
+    private fun scheduleHideOverlay() {
+        hideRunnable = Runnable { automaticallyHideKahfAdsView() }
+        handler.postDelayed(hideRunnable!!, DISPLAY_DURATION)
+    }
+
+    private fun startCooldownPeriod() {
+        isInCooldown = true
+        cooldownRunnable = Runnable {
+            isInCooldown = false
+            isFirstTimeScrolling = false
+            // Reset overlay position for next show
+            kahfAdSliderView.post {
+                kahfAdSliderView.translationY = kahfAdSliderView.height.toFloat() + 50f
+                kahfAdSliderView.alpha = 1.0f
+            }
+        }
+        handler.postDelayed(cooldownRunnable!!, COOLDOWN_DURATION)
+    }
+
+    private fun showKahfAds(kahfAdsView: KahfBannerAdView) {
+        kahfAdsView.apply {
+            loadAd(kahfAdConfig)
+            setAdClickListener {
+                closeKahfAdsSlidingView()
+                viewModel.onUserSubmittedQuery(it)
+            }
+            setAdImpressionListener(
+                object : AdImpressionListener {
+                    override fun onAdClicked() {
+                        Timber.i("adLog onAdClicked")
+                        analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                    }
+
+                    override fun onAdFailedToLoad(error: Error) {
+                        Timber.i("adLog onAdFailedToLoad ${error.message}")
+                        when (error.type) {
+                            ErrorType.TIMEOUT -> {
+                                analyticsService.logEvent(AnalyticsEvent.AdTimeout)
+                            }
+                            ErrorType.NO_AD_FOUND -> {
+                                analyticsService.logEvent(AnalyticsEvent.AdNotFound)
+                            }
+                            ErrorType.SERVER_ERROR -> {
+                                analyticsService.logEvent(AnalyticsEvent.AdServerError)
+                            }
+                            else -> {
+                                // No op
+                            }
+                        }
+                    }
+
+                    override fun onAdLoaded() {
+                        if (webView?.isVisible != false) {
+                            Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
+                            viewModel.pauseAdRefresh()
+                        } else {
+                            Timber.i("adLog onAdLoaded $tabId")
+                            analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                        }
+                    }
+                },
+            )
+        }
     }
 
     private fun screenLock(data: JsCallbackData) {
@@ -3576,6 +3783,8 @@ class BrowserTabFragment :
         automaticFireproofDialog?.dismiss()
         browserAutofill.removeJsInterface()
         destroyWebView()
+        hideRunnable?.let { handler.removeCallbacks(it) }
+        cooldownRunnable?.let { handler.removeCallbacks(it) }
         super.onDestroy()
     }
 
@@ -3881,6 +4090,13 @@ class BrowserTabFragment :
         private const val BOOKMARKS_BOTTOM_SHEET_DURATION = 3500L
 
         private const val WEB_MESSAGE_LISTENER_WEBVIEW_VERSION = "126.0.6478.40"
+
+        const val SHOW_DURATION = 400L
+        const val HIDE_DURATION = 300L
+        const val DISPLAY_DURATION = 10_000L // 10 seconds
+        const val COOLDOWN_DURATION = 28_000L // 28 seconds
+        const val INITIAL_DELAY = 2_000L // 2 seconds
+        //cooldown + initial delay = 30 sec (overall delay)
 
         fun newInstance(
             tabId: String,
@@ -4571,48 +4787,7 @@ class BrowserTabFragment :
             }
 
             // Kahf Ad
-            newBrowserTab.kahfBannerAd.apply {
-                loadAd(kahfAdConfig)
-                setAdClickListener {
-                    viewModel.onUserSubmittedQuery(it)
-                }
-                setAdImpressionListener(
-                    object : AdImpressionListener {
-                        override fun onAdClicked() {
-                            Timber.i("adLog onAdClicked")
-                            analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
-                        }
-
-                        override fun onAdFailedToLoad(error: Error) {
-                            Timber.i("adLog onAdFailedToLoad ${error.message}")
-                            when (error.type) {
-                                ErrorType.TIMEOUT -> {
-                                    analyticsService.logEvent(AnalyticsEvent.AdTimeout)
-                                }
-                                ErrorType.NO_AD_FOUND -> {
-                                    analyticsService.logEvent(AnalyticsEvent.AdNotFound)
-                                }
-                                ErrorType.SERVER_ERROR -> {
-                                    analyticsService.logEvent(AnalyticsEvent.AdServerError)
-                                }
-                                else -> {
-                                    // No op
-                                }
-                            }
-                        }
-
-                        override fun onAdLoaded() {
-                            if (webView?.isVisible != false) {
-                                Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
-                                viewModel.pauseAdRefresh()
-                            } else {
-                                Timber.i("adLog onAdLoaded $tabId")
-                                analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
-                            }
-                        }
-                    },
-                )
-            }
+            showKahfAds(newBrowserTab.kahfBannerAd)
 
             // App Statistics section
             imageBlockCountDao.getCount()

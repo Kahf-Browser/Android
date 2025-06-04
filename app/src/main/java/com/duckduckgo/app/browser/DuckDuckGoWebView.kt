@@ -34,6 +34,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.compareSemanticVersion
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.math.abs
 
 /**
  * WebView subclass which allows the WebView to
@@ -56,6 +57,15 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     private var nestedOffsetY: Int = 0
     private var nestedScrollHelper: NestedScrollingChildHelper = NestedScrollingChildHelper(this)
     private val helper = CoordinatorLayoutHelper()
+
+    //for ad slider view
+    private var scrollListener: ScrollListener? = null
+    private var lY = 0f
+    private var lastScrollY = 0
+    private var isScrolling = false
+    private val scrollThreshold = 20f
+    private val scrollDetectionDelay = 100L
+    private var lastScrollTime = 0L
 
     var isDestroyed: Boolean = false
 
@@ -106,11 +116,18 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         event.offsetLocation(0f, nestedOffsetY.toFloat())
 
         when (action) {
-            MotionEvent.ACTION_UP -> {
-                hasGestureFinished = true
+            MotionEvent.ACTION_DOWN -> {
+                hasGestureFinished = false
+                // disable swipeRefresh until we can be sure it should be enabled
+                enableSwipeRefresh(false)
+
                 returnValue = super.onTouchEvent(event)
-                stopNestedScroll()
+                lastY = eventY
+                lY = event.y
+                isScrolling = false
+                startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL)
             }
+
             MotionEvent.ACTION_MOVE -> {
                 var deltaY = lastY - eventY
 
@@ -132,16 +149,33 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
                 }
 
                 lastDeltaY = deltaY
+
+                val currentY = event.y
+                val dY = abs(currentY - lY)
+                val currentTime = System.currentTimeMillis()
+
+                if (dY > scrollThreshold &&
+                    !isScrolling &&
+                    currentTime - lastScrollTime > scrollDetectionDelay) {
+                    isScrolling = true
+                    lastScrollTime = currentTime
+                    val direction = when {
+                        deltaY > 0 -> ScrollDirection.UP    // Finger moving down = content scrolling up
+                        deltaY < 0 -> ScrollDirection.DOWN  // Finger moving up = content scrolling down
+                        else -> ScrollDirection.UNKNOWN
+                    }
+                    if (canScrollVertically(1)) {
+                        scrollListener?.onScrollDetected(direction)
+                    }
+                }
             }
 
-            MotionEvent.ACTION_DOWN -> {
-                hasGestureFinished = false
-                // disable swipeRefresh until we can be sure it should be enabled
-                enableSwipeRefresh(false)
-
+            MotionEvent.ACTION_UP,  MotionEvent.ACTION_CANCEL-> {
+                isScrolling = false
+                scrollListener?.stoppedScroll()
+                hasGestureFinished = true
                 returnValue = super.onTouchEvent(event)
-                lastY = eventY
-                startNestedScroll(ViewCompat.SCROLL_AXIS_VERTICAL)
+                stopNestedScroll()
             }
 
             else -> {
@@ -151,6 +185,26 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
         }
 
         return returnValue
+    }
+
+    override fun onScrollChanged(l: Int, t: Int, oldl: Int, oldt: Int) {
+        super.onScrollChanged(l, t, oldl, oldt)
+
+        val currentTime = System.currentTimeMillis()
+        val dY = t - oldt
+        if (abs(dY) > scrollThreshold &&
+            currentTime - lastScrollTime > scrollDetectionDelay) {
+
+            lastScrollTime = currentTime
+            val direction = when {
+                dY > 0 -> ScrollDirection.DOWN  // Scrolled down (positive delta)
+                dY < 0 -> ScrollDirection.UP    // Scrolled up (negative delta)
+                else -> ScrollDirection.UNKNOWN
+            }
+            scrollListener?.onScrollDetected(direction)
+        }
+
+        lastScrollY = t
     }
 
     override fun setNestedScrollingEnabled(enabled: Boolean) {
@@ -327,6 +381,20 @@ class DuckDuckGoWebView : WebView, NestedScrollingChild3 {
     }.getOrElse { exception ->
         Timber.e(exception, "Error removing WebMessageListener: $jsObjectName")
         false
+    }
+
+    interface ScrollListener {
+        fun onScrollDetected(direction: ScrollDirection)
+        fun startedScroll()
+        fun stoppedScroll()
+    }
+
+    fun setScrollListener(listener: ScrollListener) {
+        this.scrollListener = listener
+    }
+
+    enum class ScrollDirection {
+        UP, DOWN, UNKNOWN
     }
 
     companion object {
