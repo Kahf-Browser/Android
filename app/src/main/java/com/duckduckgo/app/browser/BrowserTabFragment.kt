@@ -374,7 +374,7 @@ import com.kahfads.sdk.adviews.AdImpressionListener
 import com.kahfads.sdk.adviews.KahfBannerAdView
 import com.kahfads.sdk.model.AdResult.Error
 import com.kahfads.sdk.model.ErrorType
-import io.kahf.porda_segmentation.ImageProcessor
+import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
