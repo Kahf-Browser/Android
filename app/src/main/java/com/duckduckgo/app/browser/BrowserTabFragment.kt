@@ -87,6 +87,7 @@ import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
@@ -140,7 +141,7 @@ import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
-import com.duckduckgo.app.browser.DuckDuckGoWebView.ScrollDirection
+import com.duckduckgo.app.browser.KahfWebView.ScrollDirection
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
@@ -370,10 +371,7 @@ import com.kahfads.sdk.KahfAdConfig
 import com.kahfads.sdk.KahfAdSdk
 import com.kahfads.sdk.KahfAdType
 import com.kahfads.sdk.KahfSdkConfig
-import com.kahfads.sdk.adviews.AdImpressionListener
 import com.kahfads.sdk.adviews.KahfBannerAdView
-import com.kahfads.sdk.model.AdResult.Error
-import com.kahfads.sdk.model.ErrorType
 import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
@@ -730,12 +728,12 @@ class BrowserTabFragment :
     private val safeGazeIcon: ImageButton
         get() = omnibar.kahfSettingsButton
 
-    private var webView: DuckDuckGoWebView? = null
+    private var webView: KahfWebView? = null
 
     // bottom sliding ads view
     // private lateinit var overlayView: View
     // private lateinit var closeButton: ImageView
-    private lateinit var kahfAdSliderView: KahfBannerAdView
+    private lateinit var kahfAdSliderView: ImageView
     private lateinit var rootContainer: ConstraintLayout
 
     // Animation and timing control
@@ -747,7 +745,7 @@ class BrowserTabFragment :
     private var isAdsVisible = false
     private var isInCooldown = false
     private var isAnimating = false
-    private var isFirstTimeScrolling = false
+    // private var isFirstTimeScrolling = false
 
     private val gson = Gson()
 
@@ -1489,6 +1487,7 @@ class BrowserTabFragment :
             is DownloadCommand.ShowDownloadStartedMessage -> downloadStarted(command)
             is DownloadCommand.ShowDownloadFailedMessage -> downloadFailed(command)
             is DownloadCommand.ShowDownloadSuccessMessage -> downloadSucceeded(command)
+            else -> {}
         }
     }
 
@@ -2763,13 +2762,14 @@ class BrowserTabFragment :
         setupBottomKahfAdsView()
         setupCloseButton()
 
-        webView?.setScrollListener(object : DuckDuckGoWebView.ScrollListener {
+        webView?.setScrollListener(object : KahfWebView.ScrollListener {
             override fun onScrollDetected(direction: ScrollDirection) {
-                Log.e("WEBVIEW", "onScrollDetected")
-                if (!isFirstTimeScrolling) {
+                Log.e("WEBVIEW", "onScrollDetected: direction: $direction")
+                /*if (!isFirstTimeScrolling) {
                     isFirstTimeScrolling = true
-                }
+                }*/
                 handleScrollDetected()
+                handleBottomNavAndWebViewTransition(direction)
             }
 
             override fun startedScroll() {
@@ -2910,6 +2910,10 @@ class BrowserTabFragment :
         }
     }
 
+    private fun handleBottomNavAndWebViewTransition(direction: ScrollDirection) {
+
+    }
+
     private fun showKahfAdsViewWithAnim() {
         if (isAdsVisible || isAnimating) return
 
@@ -2930,7 +2934,7 @@ class BrowserTabFragment :
                 addListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         isAnimating = false
-                        showKahfAds(kahfAdSliderView)
+                        // showKahfAds(kahfAdSliderView)
                         scheduleHideOverlay()
                     }
                 })
@@ -2943,7 +2947,7 @@ class BrowserTabFragment :
                 .alpha(1.0f)
                 .setDuration(SHOW_DURATION)
                 .start()
-        }, if (isFirstTimeScrolling) INITIAL_DELAY else 0L)
+        }, INITIAL_DELAY/*if (isFirstTimeScrolling) INITIAL_DELAY else 0L*/)
     }
 
     private fun automaticallyHideKahfAdsView() {
@@ -2990,7 +2994,7 @@ class BrowserTabFragment :
         isInCooldown = true
         cooldownRunnable = Runnable {
             isInCooldown = false
-            isFirstTimeScrolling = false
+            // isFirstTimeScrolling = false
             // Reset overlay position for next show
             kahfAdSliderView.post {
                 kahfAdSliderView.translationY = kahfAdSliderView.height.toFloat() + 50f
@@ -3001,7 +3005,7 @@ class BrowserTabFragment :
     }
 
     private fun showKahfAds(kahfAdsView: KahfBannerAdView) {
-        kahfAdsView.apply {
+        /*kahfAdsView.apply {
             loadAd(kahfAdConfig)
             setAdClickListener {
                 closeKahfAdsSlidingView()
@@ -3043,7 +3047,7 @@ class BrowserTabFragment :
                     }
                 },
             )
-        }
+        }*/
     }
 
     private fun screenLock(data: JsCallbackData) {
@@ -3071,7 +3075,7 @@ class BrowserTabFragment :
         experimentCta.hideOnboardingCta(binding)
     }
 
-    private fun configureWebViewForBlobDownload(webView: DuckDuckGoWebView) {
+    private fun configureWebViewForBlobDownload(webView: KahfWebView) {
         lifecycleScope.launch(dispatchers.main()) {
             if (isBlobDownloadWebViewFeatureEnabled(webView)) {
                 val script = blobDownloadScript()
@@ -3157,7 +3161,7 @@ class BrowserTabFragment :
         return script
     }
 
-    private suspend fun isBlobDownloadWebViewFeatureEnabled(webView: DuckDuckGoWebView): Boolean {
+    private suspend fun isBlobDownloadWebViewFeatureEnabled(webView: KahfWebView): Boolean {
         return withContext(dispatchers.io()) { webViewBlobDownloadFeature.self().isEnabled() } &&
             webView.isWebMessageListenerSupported(dispatchers, webViewVersionProvider) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
@@ -3185,7 +3189,7 @@ class BrowserTabFragment :
         webShareRequest.launch(JsCallbackData(data, featureName, method, id))
     }
 
-    private fun configureWebViewForAutofill(it: DuckDuckGoWebView) {
+    private fun configureWebViewForAutofill(it: KahfWebView) {
         browserAutofill.addJsInterface(it, autofillCallback, this, null, tabId)
 
         autofillFragmentResultListeners.getPlugins().forEach { plugin ->
