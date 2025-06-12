@@ -25,6 +25,10 @@
         <item name="android:navigationBarColor">?attr/kahfNavBarColor</item>
         <item name="preferDarkNavigationBarIcons">false</item>
         <item name="preferredNavigationBarColor">?attr/daxColorBlack</item>
+
+        <item name="android:windowBackground">@drawable/kahf_browser_splash</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 
 </resources>

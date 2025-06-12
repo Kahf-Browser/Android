@@ -15,5 +15,9 @@
   -->
 
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Dark" />
+    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Dark">
+        <item name="android:windowBackground">@drawable/kahf_browser_splash</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
 </resources>
