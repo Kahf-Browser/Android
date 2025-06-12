@@ -94,6 +94,10 @@
 
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
 
+        <item name="android:windowBackground">@drawable/kahf_browser_splash</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+
         <item name="colorPrimary">?attr/daxColorBackground</item>
         <item name="colorPrimaryDark">?attr/daxColorSurface</item>
         <item name="colorPrimaryVariant">?attr/daxColorBackground</item>
@@ -115,7 +119,6 @@
 
         <!--colorBackground appears behind scrollable content and is used for the default window background -->
         <item name="android:colorBackground">?attr/daxColorBackground</item>
-        <item name="android:windowBackground">?attr/daxColorBackground</item>
 
         <!--controls the ripple coloring-->
         <item name="colorControlHighlight">?attr/daxColorRipple</item>
