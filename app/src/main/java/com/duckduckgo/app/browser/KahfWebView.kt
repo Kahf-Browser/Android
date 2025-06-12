@@ -152,13 +152,13 @@ class KahfWebView: WebView, NestedScrollingChild3 {
                     currentTime - lastScrollTime > scrollDetectionDelay) {
                     isScrolling = true
                     lastScrollTime = currentTime
-                    val direction = when {
+                    /*val direction = when {
                         deltaY > 0 -> ScrollDirection.UP    // Finger moving down = content scrolling up
                         deltaY < 0 -> ScrollDirection.DOWN  // Finger moving up = content scrolling down
                         else -> ScrollDirection.UNKNOWN
-                    }
+                    }*/
                     if (canScrollVertically(1)) {
-                        scrollListener?.onScrollDetected(direction)
+                        scrollListener?.onScrollDetected(deltaY)
                     }
                 }
             }
@@ -189,12 +189,12 @@ class KahfWebView: WebView, NestedScrollingChild3 {
             currentTime - lastScrollTime > scrollDetectionDelay) {
 
             lastScrollTime = currentTime
-            val direction = when {
+            /*val direction = when {
                 dY > 0 -> ScrollDirection.DOWN  // Scrolled down (positive delta)
                 dY < 0 -> ScrollDirection.UP    // Scrolled up (negative delta)
                 else -> ScrollDirection.UNKNOWN
-            }
-            scrollListener?.onScrollDetected(direction)
+            }*/
+            scrollListener?.onScrollDetected(dY)
         }
 
         lastScrollY = t
@@ -377,7 +377,7 @@ class KahfWebView: WebView, NestedScrollingChild3 {
     }
 
     interface ScrollListener {
-        fun onScrollDetected(direction: ScrollDirection)
+        fun onScrollDetected(deltaY: Int)
         fun startedScroll()
         fun stoppedScroll()
     }

@@ -2763,13 +2763,15 @@ class BrowserTabFragment :
         setupCloseButton()
 
         webView?.setScrollListener(object : KahfWebView.ScrollListener {
-            override fun onScrollDetected(direction: ScrollDirection) {
-                Log.e("WEBVIEW", "onScrollDetected: direction: $direction")
+            override fun onScrollDetected(deltaY: Int) {
+                Log.e("WEBVIEW", "onScrollDetected: direction: $deltaY")
+                /*deltaY > 0 -> ScrollDirection.UP    // Finger moving down = content scrolling up
+                deltaY < 0 -> ScrollDirection.DOWN  // Finger moving up = content scrolling down*/
                 /*if (!isFirstTimeScrolling) {
                     isFirstTimeScrolling = true
                 }*/
                 handleScrollDetected()
-                handleBottomNavAndWebViewTransition(direction)
+                handleBottomNavAndWebViewTransition(deltaY)
             }
 
             override fun startedScroll() {
@@ -2910,7 +2912,7 @@ class BrowserTabFragment :
         }
     }
 
-    private fun handleBottomNavAndWebViewTransition(direction: ScrollDirection) {
+    private fun handleBottomNavAndWebViewTransition(deltaY: Int) {
 
     }
 
