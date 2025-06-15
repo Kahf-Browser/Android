@@ -22,6 +22,8 @@ import android.content.pm.PackageManager
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.app.ads.AdsCommunicator
+import com.duckduckgo.app.ads.AdsManager
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.analytics.PostHogAnalyticsService
 import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
@@ -382,6 +384,12 @@ class BrowserModule {
     @SingleInstanceIn(AppScope::class)
     fun providesNsfwDetector(context: Context): NsfwDetector {
         return NsfwDetector(context)
+    }
+
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun providesAdsManager(context: Context): AdsManager {
+        return AdsManager(context)
     }
 
     @Provides

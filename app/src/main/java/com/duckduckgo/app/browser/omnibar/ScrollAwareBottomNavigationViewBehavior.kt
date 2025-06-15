@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.view.ViewCompat
@@ -32,7 +33,7 @@ import kotlin.math.abs
 class ScrollAwareBottomNavigationViewBehavior(
     context: Context,
     attrs: AttributeSet
-) : CoordinatorLayout.Behavior<BottomNavigationView>(context, attrs) {
+) : CoordinatorLayout.Behavior<ConstraintLayout>(context, attrs) {
 
     companion object {
         const val DURATION = 100L
@@ -40,22 +41,24 @@ class ScrollAwareBottomNavigationViewBehavior(
     }
 
     private var webViewContainer: View? = null
+    private var bottomNav: BottomNavigationView? = null
 
     override fun onStartNestedScroll(
         coordinatorLayout: CoordinatorLayout,
-        child: BottomNavigationView,
+        child: ConstraintLayout,
         directTargetChild: View,
         target: View,
         axes: Int,
         type: Int
     ): Boolean {
         webViewContainer = webViewContainer ?: coordinatorLayout.findViewById(R.id.webViewContainer)
+        bottomNav = bottomNav ?: coordinatorLayout.findViewById(R.id.botNav)
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL
     }
 
     override fun onNestedScroll(
         coordinatorLayout: CoordinatorLayout,
-        child: BottomNavigationView,
+        child: ConstraintLayout,
         target: View,
         dxConsumed: Int,
         dyConsumed: Int,
@@ -67,9 +70,9 @@ class ScrollAwareBottomNavigationViewBehavior(
         if (abs(dyConsumed) < SCROLL_THRESHOLD) return
 
         if (dyConsumed > 0) {
-            showBottomNav(child)
+            showBottomNav(bottomNav!!)
         } else if (dyConsumed < 0) {
-            hideBottomNav(child)
+            hideBottomNav(bottomNav!!)
         }
     }
 
@@ -89,28 +92,34 @@ class ScrollAwareBottomNavigationViewBehavior(
                 }
                 start()
             }.doOnEnd {
-                navBar.animate().translationY(navBar.height.toFloat()).setDuration(DURATION)
+                navBar.apply {
+                    animate().translationY(navBar.height.toFloat()).setDuration(DURATION)
+                    visibility = View.GONE
+                }
             }
         }
     }
 
     fun showBottomNav(navBar: BottomNavigationView) {
-        navBar.animate().translationY(0f).setDuration(DURATION).withEndAction {
-            webViewContainer?.let {
-                val layoutParams = it.layoutParams as? FrameLayout.LayoutParams ?: return@let
-                val currentMargin = layoutParams.bottomMargin
-                val targetMargin = navBar.height
+        navBar.apply {
+            visibility = View.VISIBLE
+            animate().translationY(0f).setDuration(DURATION).withEndAction {
+                webViewContainer?.let {
+                    val layoutParams = it.layoutParams as? FrameLayout.LayoutParams ?: return@let
+                    val currentMargin = layoutParams.bottomMargin
+                    val targetMargin = navBar.height
 
-                // Don't animate if margin is already at target value
-                if (currentMargin >= targetMargin) return@let
+                    // Don't animate if margin is already at target value
+                    if (currentMargin >= targetMargin) return@let
 
-                ValueAnimator.ofInt(currentMargin, targetMargin).apply {
-                    duration = DURATION
-                    addUpdateListener { animator ->
-                        layoutParams.bottomMargin = navBar.height
-                        it.layoutParams = layoutParams
+                    ValueAnimator.ofInt(currentMargin, targetMargin).apply {
+                        duration = DURATION
+                        addUpdateListener { animator ->
+                            layoutParams.bottomMargin = navBar.height
+                            it.layoutParams = layoutParams
+                        }
+                        start()
                     }
-                    start()
                 }
             }
         }

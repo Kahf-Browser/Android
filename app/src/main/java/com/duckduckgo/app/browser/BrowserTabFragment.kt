@@ -17,10 +17,7 @@
 package com.duckduckgo.app.browser
 
 import android.Manifest
-import android.animation.Animator
-import android.animation.AnimatorListenerAdapter
 import android.animation.LayoutTransition
-import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.app.ActivityOptions
@@ -87,7 +84,6 @@ import android.webkit.WebView.HitTestResult.UNKNOWN_TYPE
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
@@ -129,6 +125,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
+import com.duckduckgo.app.ads.AdsCommunicator
+import com.duckduckgo.app.ads.AdsManager
+import com.duckduckgo.app.ads.AdsManager.AdsSlidingDirection.DOWN
+import com.duckduckgo.app.ads.AdsManager.AdsSlidingDirection.END
 import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsEvent.ImageFilerDisable
 import com.duckduckgo.app.analytics.AnalyticsEvent.ImageFilerEnable
@@ -141,7 +141,6 @@ import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.brokensite.BrokenSiteActivity
 import com.duckduckgo.app.browser.BrowserTabViewModel.FileChooserRequestedParams
 import com.duckduckgo.app.browser.BrowserTabViewModel.LocationPermission
-import com.duckduckgo.app.browser.KahfWebView.ScrollDirection
 import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.LOADING
@@ -367,11 +366,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.kahfads.sdk.KahfAdConfig
 import com.kahfads.sdk.KahfAdSdk
-import com.kahfads.sdk.KahfAdType
 import com.kahfads.sdk.KahfSdkConfig
-import com.kahfads.sdk.adviews.KahfBannerAdView
 import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
@@ -406,7 +402,8 @@ class BrowserTabFragment :
     DownloadConfirmationDialogListener,
     SitePermissionsGrantedListener,
     AutofillEventListener,
-    EmailProtectionUserPromptListener {
+    EmailProtectionUserPromptListener,
+    AdsCommunicator {
 
     private val supervisorJob = SupervisorJob()
 
@@ -635,6 +632,9 @@ class BrowserTabFragment :
     @Inject
     lateinit var videoFrameProcessor: VideoFrameProcessor
 
+    @Inject
+    lateinit var adsManager: AdsManager
+
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -714,7 +714,12 @@ class BrowserTabFragment :
 
     private val activeMenuColor by lazy { ContextCompat.getColor(requireContext(), com.duckduckgo.mobile.android.R.color.kahf_bottom_nav_icon) }
 
-    private val inactiveMenuColor by lazy { ContextCompat.getColor(requireContext(), com.duckduckgo.mobile.android.R.color.kahf_bottom_nav_icon_inactive) }
+    private val inactiveMenuColor by lazy {
+        ContextCompat.getColor(
+            requireContext(),
+            com.duckduckgo.mobile.android.R.color.kahf_bottom_nav_icon_inactive,
+        )
+    }
 
     // Optimization to prevent against excessive work generating WebView previews; an existing job will be cancelled if a new one is launched
     private var bitmapGeneratorJob: Job? = null
@@ -733,19 +738,6 @@ class BrowserTabFragment :
     // bottom sliding ads view
     // private lateinit var overlayView: View
     // private lateinit var closeButton: ImageView
-    private lateinit var kahfAdSliderView: ImageView
-    private lateinit var rootContainer: ConstraintLayout
-
-    // Animation and timing control
-    private val handler = Handler(Looper.getMainLooper())
-    private var hideRunnable: Runnable? = null
-    private var cooldownRunnable: Runnable? = null
-
-    // Bottom Ads view State management
-    private var isAdsVisible = false
-    private var isInCooldown = false
-    private var isAnimating = false
-    // private var isFirstTimeScrolling = false
 
     private val gson = Gson()
 
@@ -945,14 +937,7 @@ class BrowserTabFragment :
     private val kahfSdkConfig = KahfSdkConfig(
         publisherId = "kahf-browser",
         campaignTypes = "paid|publisher-house|community|house",
-        format = "json"
-    )
-
-    private val kahfAdConfig = KahfAdConfig(
-        adType = KahfAdType.BANNER_AD_640_200,
-        divId = "home_banner",
-        screenName = "HomeView",
-        refreshRateInMillis = 20_000,
+        format = "json",
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1086,7 +1071,7 @@ class BrowserTabFragment :
             }
 
             safeGazeIcon.setOnLongClickListener {
-                Toast.makeText(requireContext(),"Model: ${Build.MODEL}\nManufacturer: ${Build.MANUFACTURER}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Model: ${Build.MODEL}\nManufacturer: ${Build.MANUFACTURER}", Toast.LENGTH_LONG).show()
                 true
             }
         }
@@ -1493,7 +1478,8 @@ class BrowserTabFragment :
 
     @SuppressLint("WrongConstant")
     private fun downloadStarted(command: DownloadCommand.ShowDownloadStartedMessage) {
-        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH, showOverBottomNav = true)?.show()
+        view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), DOWNLOAD_SNACKBAR_LENGTH, showOverBottomNav = true)
+            ?.show()
     }
 
     private fun downloadFailed(command: DownloadCommand.ShowDownloadFailedMessage) {
@@ -1502,15 +1488,20 @@ class BrowserTabFragment :
     }
 
     private fun downloadSucceeded(command: DownloadCommand.ShowDownloadSuccessMessage) {
-        val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG, showOverBottomNav = true)
-            ?.apply {
-                this.setAction(R.string.downloadsDownloadFinishedActionName) {
-                    val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
-                    if (!result) {
-                        view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG, showOverBottomNav = true).show()
+        val downloadSucceededSnackbar =
+            view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG, showOverBottomNav = true)
+                ?.apply {
+                    this.setAction(R.string.downloadsDownloadFinishedActionName) {
+                        val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
+                        if (!result) {
+                            view.makeSnackbarWithNoBottomInset(
+                                getString(R.string.downloadsCannotOpenFileErrorMessage),
+                                Snackbar.LENGTH_LONG,
+                                showOverBottomNav = true,
+                            ).show()
+                        }
                     }
                 }
-            }
         view?.postDelayed({ downloadSucceededSnackbar?.show() }, DOWNLOAD_SNACKBAR_DELAY)
     }
 
@@ -1963,11 +1954,13 @@ class BrowserTabFragment :
                     }
                 }
             }
+
             is Command.ResumeAdAutoRefresh -> {
                 if (lifecycle.currentState.isAtLeast(State.RESUMED)
                     && requireActivity() is BrowserActivity
                     && (requireActivity() as BrowserActivity).isActiveTab(tabId)
-                    && webView?.isInvisible == true) {
+                    && webView?.isInvisible == true
+                ) {
                     binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
                     Timber.d("adLog resume refresh. $tabId | ${webView?.url}")
                 }
@@ -2739,7 +2732,6 @@ class BrowserTabFragment :
         }
     }
 
-
     private fun userEnteredQuery(query: String) {
         viewModel.onUserSubmittedQuery(query)
     }
@@ -2747,8 +2739,6 @@ class BrowserTabFragment :
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     private fun configureWebView() {
         binding.daxDialogOnboardingCtaContent.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
-        rootContainer = binding.clWebViewContainer
-        kahfAdSliderView = binding.kahfSliderAdView
         // closeButton = binding.closeButton
 
         // Set scroll listener for our custom WebView
@@ -2759,29 +2749,38 @@ class BrowserTabFragment :
             true,
         ).findViewById(R.id.browserWebView)
 
-        setupBottomKahfAdsView()
-        setupCloseButton()
+        adsManager.apply {
+            viewLifecycleOwner.lifecycle.addObserver(this)
+            setupEndSlidableKahfAdsView(adsView = binding.kahfEndSlidableAdView, rootContainer = binding.clWebViewContainer)
+            // setupBottomSlidableKahfAdsView(adsView = bottomNav.kahfBottomSlidableAdView, rootContainer = binding.clWebViewContainer)
+            setAdsManagerCommunicator(adsCommunicator = this@BrowserTabFragment)
+            setupCloseButton()
+        }
 
-        webView?.setScrollListener(object : KahfWebView.ScrollListener {
-            override fun onScrollDetected(deltaY: Int) {
-                Log.e("WEBVIEW", "onScrollDetected: direction: $deltaY")
-                /*deltaY > 0 -> ScrollDirection.UP    // Finger moving down = content scrolling up
-                deltaY < 0 -> ScrollDirection.DOWN  // Finger moving up = content scrolling down*/
-                /*if (!isFirstTimeScrolling) {
-                    isFirstTimeScrolling = true
-                }*/
-                handleScrollDetected()
-                handleBottomNavAndWebViewTransition(deltaY)
-            }
+        webView?.setScrollListener(
+            object : KahfWebView.ScrollListener {
+                override fun onScrollDetected(deltaY: Int) {
+                    Log.e("WEBVIEW", "onScrollDetected: direction: $deltaY")
+                    /*deltaY > 0 -> ScrollDirection.UP    // Finger moving down = content scrolling up
+                    deltaY < 0 -> ScrollDirection.DOWN  // Finger moving up = content scrolling down*/
+                    /*if (!isFirstTimeScrolling) {
+                        isFirstTimeScrolling = true
+                    }*/
+                    adsManager.apply {
+                        handleScrollDetected(adsView = binding.kahfEndSlidableAdView, adsSlidingDirection = END)
+                        // handleScrollDetected(adsView = bottomNav.kahfBottomSlidableAdView, adsSlidingDirection = DOWN)
+                        handleBottomNavAndWebViewTransition(deltaY)
+                    }
+                }
 
-            override fun startedScroll() {
+                override fun startedScroll() {
+                }
 
-            }
-
-            override fun stoppedScroll() {
-                //do something if needed
-            }
-        })
+                override fun stoppedScroll() {
+                    //do something if needed
+                }
+            },
+        )
 
         webView?.let {
             safeGazeInterface = SafeGazeJsInterface(
@@ -2888,168 +2887,6 @@ class BrowserTabFragment :
         }
 
         WebView.setWebContentsDebuggingEnabled(webContentDebugging.isEnabled())
-    }
-
-    private fun setupBottomKahfAdsView() {
-        // Initially position overlay below screen
-        kahfAdSliderView.post {
-            val screenHeight = rootContainer.height
-            kahfAdSliderView.translationY = screenHeight.toFloat()
-            kahfAdSliderView.visibility = View.VISIBLE
-        }
-    }
-
-    private fun setupCloseButton() {
-        // closeButton.setOnClickListener {
-        //     manualHideOverlay()
-        // }
-    }
-
-    private fun handleScrollDetected() {
-        // Only show if conditions are met
-        if (!isInCooldown && !isAdsVisible && !isAnimating) {
-            showKahfAdsViewWithAnim()
-        }
-    }
-
-    private fun handleBottomNavAndWebViewTransition(deltaY: Int) {
-
-    }
-
-    private fun showKahfAdsViewWithAnim() {
-        if (isAdsVisible || isAnimating) return
-
-        viewModel.resumeAdRefresh()
-        isAnimating = true
-        isAdsVisible = true
-
-        // Cancel any pending hide operation
-        hideRunnable?.let { handler.removeCallbacks(it) }
-
-        Handler(Looper.myLooper() ?: Looper.getMainLooper()).postDelayed(Runnable {
-            // Smooth slide up animation with bounce effect
-            val animator = ObjectAnimator.ofFloat(kahfAdSliderView, "translationY",
-                kahfAdSliderView.translationY, 0f)
-            animator.apply {
-                duration = SHOW_DURATION
-                interpolator = android.view.animation.DecelerateInterpolator()
-                addListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        isAnimating = false
-                        // showKahfAds(kahfAdSliderView)
-                        scheduleHideOverlay()
-                    }
-                })
-                start()
-            }
-
-            // Add subtle fade in for better UX
-            kahfAdSliderView.alpha = 0.8f
-            kahfAdSliderView.animate()
-                .alpha(1.0f)
-                .setDuration(SHOW_DURATION)
-                .start()
-        }, INITIAL_DELAY/*if (isFirstTimeScrolling) INITIAL_DELAY else 0L*/)
-    }
-
-    private fun automaticallyHideKahfAdsView() {
-        if (!isAdsVisible || isAnimating) return
-
-        isAnimating = true
-
-        // Smooth slide down animation
-        val animator = ObjectAnimator.ofFloat(kahfAdSliderView, "translationY",
-            0f, kahfAdSliderView.height.toFloat() + 50f) // Extra 50px for complete hide
-        animator.apply {
-            duration = HIDE_DURATION
-            interpolator = android.view.animation.AccelerateInterpolator()
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    isAnimating = false
-                    isAdsVisible = false
-                    viewModel.pauseAdRefresh()
-                    startCooldownPeriod()
-                }
-            })
-            start()
-        }
-
-        // Add fade out effect
-        kahfAdSliderView.animate()
-            .alpha(0.6f)
-            .setDuration(HIDE_DURATION)
-            .start()
-    }
-
-    private fun closeKahfAdsSlidingView() {
-        // Cancel scheduled hide and hide immediately
-        hideRunnable?.let { handler.removeCallbacks(it) }
-        automaticallyHideKahfAdsView()
-    }
-
-    private fun scheduleHideOverlay() {
-        hideRunnable = Runnable { automaticallyHideKahfAdsView() }
-        handler.postDelayed(hideRunnable!!, DISPLAY_DURATION)
-    }
-
-    private fun startCooldownPeriod() {
-        isInCooldown = true
-        cooldownRunnable = Runnable {
-            isInCooldown = false
-            // isFirstTimeScrolling = false
-            // Reset overlay position for next show
-            kahfAdSliderView.post {
-                kahfAdSliderView.translationY = kahfAdSliderView.height.toFloat() + 50f
-                kahfAdSliderView.alpha = 1.0f
-            }
-        }
-        handler.postDelayed(cooldownRunnable!!, COOLDOWN_DURATION)
-    }
-
-    private fun showKahfAds(kahfAdsView: KahfBannerAdView) {
-        /*kahfAdsView.apply {
-            loadAd(kahfAdConfig)
-            setAdClickListener {
-                closeKahfAdsSlidingView()
-                viewModel.onUserSubmittedQuery(it)
-            }
-            setAdImpressionListener(
-                object : AdImpressionListener {
-                    override fun onAdClicked() {
-                        Timber.i("adLog onAdClicked")
-                        analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
-                    }
-
-                    override fun onAdFailedToLoad(error: Error) {
-                        Timber.i("adLog onAdFailedToLoad ${error.message}")
-                        when (error.type) {
-                            ErrorType.TIMEOUT -> {
-                                analyticsService.logEvent(AnalyticsEvent.AdTimeout)
-                            }
-                            ErrorType.NO_AD_FOUND -> {
-                                analyticsService.logEvent(AnalyticsEvent.AdNotFound)
-                            }
-                            ErrorType.SERVER_ERROR -> {
-                                analyticsService.logEvent(AnalyticsEvent.AdServerError)
-                            }
-                            else -> {
-                                // No op
-                            }
-                        }
-                    }
-
-                    override fun onAdLoaded() {
-                        if (webView?.isVisible != false) {
-                            Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
-                            viewModel.pauseAdRefresh()
-                        } else {
-                            Timber.i("adLog onAdLoaded $tabId")
-                            analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
-                        }
-                    }
-                },
-            )
-        }*/
     }
 
     private fun screenLock(data: JsCallbackData) {
@@ -3169,7 +3006,10 @@ class BrowserTabFragment :
             WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
     }
 
-    private fun readAssetFile(assetManager: AssetManager, fileName: String): String {
+    private fun readAssetFile(
+        assetManager: AssetManager,
+        fileName: String
+    ): String {
         val stringBuilder = StringBuilder()
         try {
             val inputStream = assetManager.open(fileName)
@@ -3186,8 +3026,12 @@ class BrowserTabFragment :
         return stringBuilder.toString()
     }
 
-
-    private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
+    private fun webShare(
+        featureName: String,
+        method: String,
+        id: String,
+        data: JSONObject
+    ) {
         webShareRequest.launch(JsCallbackData(data, featureName, method, id))
     }
 
@@ -3736,14 +3580,17 @@ class BrowserTabFragment :
         if (fragmentIsVisible() && lifecycle.currentState.isAtLeast(State.RESUMED)) {
 
             // Hide ad when keyboard is visible
-            binding.includeNewBrowserTab.bottomContentContainer.let { view->
+            binding.includeNewBrowserTab.bottomContentContainer.let { view ->
                 if (isKbVisible) {
                     view.isVisible = false
                 } else {
                     // Delay the visibility change to avoid flickering
-                    view.postDelayed({
-                        view.isVisible = true
-                    }, 200)
+                    view.postDelayed(
+                        {
+                            view.isVisible = true
+                        },
+                        200,
+                    )
                 }
             }
         }
@@ -3789,8 +3636,7 @@ class BrowserTabFragment :
         automaticFireproofDialog?.dismiss()
         browserAutofill.removeJsInterface()
         destroyWebView()
-        hideRunnable?.let { handler.removeCallbacks(it) }
-        cooldownRunnable?.let { handler.removeCallbacks(it) }
+        adsManager.removeHandlers()
         super.onDestroy()
     }
 
@@ -4793,7 +4639,15 @@ class BrowserTabFragment :
             }
 
             // Kahf Ad
-            showKahfAds(newBrowserTab.kahfBannerAd)
+            /*showKahfAds(
+                kahfAdsView = newBrowserTab.kahfBannerAd,
+                config = KahfAdConfig(
+                    adType = KahfAdType.BANNER_AD_640_200,
+                    divId = "home_banner",
+                    screenName = "HomeView",
+                    refreshRateInMillis = 20_000,
+                ),
+            )*/
 
             // App Statistics section
             imageBlockCountDao.getCount()
@@ -4833,7 +4687,7 @@ class BrowserTabFragment :
                 },
             )
 
-            newBrowserTab.historyRecyclerView.let { rv->
+            newBrowserTab.historyRecyclerView.let { rv ->
                 rv.addItemDecoration(SpaceItemDecoration(resources.getDimensionPixelSize(R.dimen._08dp)))
                 rv.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
                 rv.adapter = historyAdapter
@@ -4987,7 +4841,17 @@ class BrowserTabFragment :
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
     }
+
+    override fun resumeAd() {
+        viewModel.resumeAdRefresh()
+    }
+
+    override fun pauseAd() {
+        viewModel.pauseAdRefresh()
+    }
 }
+
+
 
 private class JsOrientationHandler {
 

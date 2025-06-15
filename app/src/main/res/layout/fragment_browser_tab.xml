@@ -122,16 +122,19 @@
                         android:visibility="gone" />
                 </FrameLayout>
 
-                <ImageView
-                    android:id="@+id/kahfSliderAdView"
-                    android:layout_width="match_parent"
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/kahfEndSlidableAdView"
+                    android:layout_width="50dp"
                     android:layout_height="50dp"
+                    android:visibility="invisible"
                     android:contentDescription="@string/aboutActivityTitle"
                     app:srcCompat="@drawable/kahf_ads_ad"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.App.CircleImageView"
                     android:background="@drawable/bg_ads_overlay"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
+                    app:layout_constraintVertical_bias="0.4"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

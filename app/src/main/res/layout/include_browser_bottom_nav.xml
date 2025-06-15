@@ -21,113 +21,142 @@
     android:layout_height="match_parent"
     tools:parentTag="androidx.coordinatorlayout.widget.CoordinatorLayout">
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/botNav"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/bottomNavHeight"
-        android:layout_gravity="bottom"
-        android:background="@color/black"
         app:layout_behavior="com.duckduckgo.app.browser.omnibar.ScrollAwareBottomNavigationViewBehavior"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp">
+        android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/buttonLayout"
+        <ImageView
+            android:id="@+id/kahfBottomSlidableAdView"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:visibility="invisible"
+            android:background="@drawable/bg_ads_overlay"
+            android:contentDescription="@string/aboutActivityTitle"
+            app:layout_constraintBottom_toTopOf="@id/botNav"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/kahf_ads_ad" />
+
+        <!--<com.kahfads.sdk.adviews.KahfBannerAdView
+            android:id="@+id/kahfBottomAdSlidingView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/botNav"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>-->
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/botNav"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/bottomNavHeight"
+            android:layout_gravity="bottom"
+            android:layout_marginStart="0dp"
+            android:layout_marginEnd="0dp"
+            android:background="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-
-            <ImageButton
-                android:id="@+id/homeMenuItem"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:tint="?attr/kahfBottomNavIcon"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_bottom_oval"
-                android:src="@drawable/ic_bookmark_20"
-                android:padding="16dp"
-                tools:ignore="ContentDescription"/>
-
-            <ImageButton
-                android:id="@+id/timeMenuItem"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:tint="?attr/kahfBottomNavIcon"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_bottom_oval"
-                android:src="@drawable/ic_prayer_outlined"
-                android:padding="16dp"
-                tools:ignore="ContentDescription"/>
-
-            <ImageButton
-                android:id="@+id/backMenuItem"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_bottom_oval"
-                android:padding="16dp"
-                android:src="@drawable/ic_arrow_left_24"
-                android:visibility="gone"
-                app:tint="?attr/kahfBottomNavIcon"
-                tools:ignore="ContentDescription" />
-
-            <ImageButton
-                android:id="@+id/forwardMenuItem"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_bottom_oval"
-                android:padding="16dp"
-                android:src="@drawable/ic_arrow_right_24"
-                android:visibility="gone"
-                app:tint="?attr/kahfBottomNavIcon"
-                tools:ignore="ContentDescription" />
-
-            <ImageButton
-                android:id="@+id/newTabMenuItem"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_bottom_oval"
-                app:tint="?attr/kahfBottomNavIcon"
-                android:src="@drawable/ic_new_tab"
-                android:padding="16dp"
-                tools:ignore="ContentDescription"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
-                android:id="@+id/tabsMenuContainer"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center">
+                android:id="@+id/buttonLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-                <com.duckduckgo.app.browser.TabSwitcherButton
-                    android:id="@+id/tabSwitcher"
-                    android:layout_width="wrap_content"
+                <ImageButton
+                    android:id="@+id/homeMenuItem"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:background="?selectableItemBackgroundBorderless" />
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple_bottom_oval"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_bookmark_20"
+                    app:tint="?attr/kahfBottomNavIcon"
+                    tools:ignore="ContentDescription" />
+
+                <ImageButton
+                    android:id="@+id/timeMenuItem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple_bottom_oval"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_prayer_outlined"
+                    app:tint="?attr/kahfBottomNavIcon"
+                    tools:ignore="ContentDescription" />
+
+                <ImageButton
+                    android:id="@+id/backMenuItem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple_bottom_oval"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_arrow_left_24"
+                    android:visibility="gone"
+                    app:tint="?attr/kahfBottomNavIcon"
+                    tools:ignore="ContentDescription" />
+
+                <ImageButton
+                    android:id="@+id/forwardMenuItem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple_bottom_oval"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_arrow_right_24"
+                    android:visibility="gone"
+                    app:tint="?attr/kahfBottomNavIcon"
+                    tools:ignore="ContentDescription" />
+
+                <ImageButton
+                    android:id="@+id/newTabMenuItem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple_bottom_oval"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_new_tab"
+                    app:tint="?attr/kahfBottomNavIcon"
+                    tools:ignore="ContentDescription" />
+
+                <LinearLayout
+                    android:id="@+id/tabsMenuContainer"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center">
+
+                    <com.duckduckgo.app.browser.TabSwitcherButton
+                        android:id="@+id/tabSwitcher"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="?selectableItemBackgroundBorderless" />
+                </LinearLayout>
+
+                <ImageButton
+                    android:id="@+id/optionsMenuItem"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/ripple_bottom_oval"
+                    android:padding="16dp"
+                    android:src="@drawable/ic_menu_vertical_24"
+                    app:tint="?attr/kahfBottomNavIcon"
+                    tools:ignore="ContentDescription" />
+
             </LinearLayout>
 
-            <ImageButton
-                android:id="@+id/optionsMenuItem"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@drawable/ripple_bottom_oval"
-                android:src="@drawable/ic_menu_vertical_24"
-                android:padding="16dp"
-                app:tint="?attr/kahfBottomNavIcon"
-                tools:ignore="ContentDescription" />
 
-        </LinearLayout>
+        </com.google.android.material.bottomnavigation.BottomNavigationView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-    </com.google.android.material.bottomnavigation.BottomNavigationView>
 
 </merge>
 
