@@ -380,6 +380,23 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    private fun loadAutoplayBlockerJs(webView: WebView) {
+        val currentUrl = webView.url
+        val isYoutube = currentUrl?.contains("youtube.com", ignoreCase = true) == true
+        val isFacebook = currentUrl?.contains("facebook.com", ignoreCase = true) == true
+
+        if (isYoutube || isFacebook) {
+            Timber.v("apLog Loading Autoplay Blocker JS")
+
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                val script = readAssetFile(context.assets, "autoplay_blocker.js")
+                withContext(dispatcherProvider.main()) {
+                    webView.evaluateJavascript(script, null)
+                }
+            }
+        }
+    }
+
     private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
@@ -460,6 +477,8 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
+            loadAutoplayBlockerJs(webView)
+
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
             }
