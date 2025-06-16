@@ -124,8 +124,8 @@
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/kahfEndSlidableAdView"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
                     android:visibility="invisible"
                     android:contentDescription="@string/aboutActivityTitle"
                     app:srcCompat="@drawable/kahf_ads_ad"

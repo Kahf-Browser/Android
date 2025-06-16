@@ -59,7 +59,7 @@ class AdsManager(val context: Context) : DefaultLifecycleObserver {
         adsView.post {
             val screenHeight = rootContainer.height
             adsView.translationY = screenHeight.toFloat()
-            adsView.visibility = VISIBLE
+            adsView.visibility = INVISIBLE
         }
     }
 
@@ -71,7 +71,7 @@ class AdsManager(val context: Context) : DefaultLifecycleObserver {
         adsView.post {
             val screenWidth = rootContainer.width
             adsView.translationX = screenWidth.toFloat()
-            adsView.visibility = VISIBLE
+            adsView.visibility = INVISIBLE
         }
     }
 
