@@ -40,6 +40,7 @@ class CustomDnsResolver(
     private var responseTimeStat = Pair(0L, 0)
     private var totalResolutionTimeStat = Pair(0L, 0)
     private var cacheMissOccurred = false
+    private val resolutionTimes = mutableListOf<Long>()
 
     companion object {
         private const val MAX_RETRY = 2
@@ -267,17 +268,33 @@ class CustomDnsResolver(
     }
 
     private fun logTotalResolutionTime(totalTimeMs: Long) {
+        resolutionTimes.add(totalTimeMs)
         totalResolutionTimeStat = Pair(totalResolutionTimeStat.first + totalTimeMs, totalResolutionTimeStat.second + 1)
-
         if (totalResolutionTimeStat.second >= 10) {
             val avgDuration = totalResolutionTimeStat.first / totalResolutionTimeStat.second
-            analytics.logEvent(
-                AnalyticsEvent.AvgDnsResolutionTime,
-                mapOf(
-                    AnalyticsParam.AvgResolutionTimeMs to avgDuration.toString(),
-                    AnalyticsParam.DnsResolver to privateDns.url,
+            val p90ResolutionTime = resolutionTimes.sorted()[(resolutionTimes.size * .9).toInt()]
+            analytics.apply {
+
+                //log p90 dns resolution time
+
+                logEvent(
+                    AnalyticsEvent.P90DnsResolution,
+                    mapOf(
+                        AnalyticsParam.DnsResolutionTime to p90ResolutionTime.toString(),
+                        AnalyticsParam.DnsResolver to privateDns.url,
+                    )
                 )
-            )
+
+                //log avg dns resolution time
+                logEvent(
+                    AnalyticsEvent.AvgDnsResolutionTime,
+                    mapOf(
+                        AnalyticsParam.AvgResolutionTimeMs to avgDuration.toString(),
+                        AnalyticsParam.DnsResolver to privateDns.url,
+                    )
+                )
+            }
+            resolutionTimes.clear()
             totalResolutionTimeStat = Pair(0L, 0)
         }
     }
