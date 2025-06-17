@@ -80,13 +80,19 @@ class InactivityCheckScheduler @Inject constructor(
 
     private fun scheduleInactivityCheck() {
         Timber.d("iuLog Scheduling inactivity check worker")
+
+        workManager.cancelUniqueWork(WORK_NAME)
+
         val workRequest = PeriodicWorkRequestBuilder<InactivityCheckWorker>(
-            1, TimeUnit.DAYS
-        ).build()
+            1, TimeUnit.DAYS,
+        )
+            .addTag("inactivityChecker")
+            .setInitialDelay(1, TimeUnit.HOURS) // Add some initial delay to spread out job execution
+            .build()
 
         workManager.enqueueUniquePeriodicWork(
             WORK_NAME,
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.REPLACE, // Use REPLACE instead of KEEP
             workRequest
         )
     }
