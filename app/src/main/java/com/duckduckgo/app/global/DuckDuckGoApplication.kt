@@ -43,6 +43,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
@@ -164,6 +165,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
         val wallpaperDownloadWorkReq = OneTimeWorkRequest.Builder(WallpaperDownloadWorker::class.java)
             .addTag("com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker")
+            .setInitialDelay(15, TimeUnit.SECONDS)
             .build()
 
         workManager.enqueueUniqueWork(
