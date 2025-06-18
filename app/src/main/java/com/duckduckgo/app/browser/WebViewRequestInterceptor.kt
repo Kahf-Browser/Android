@@ -311,7 +311,8 @@ class WebViewRequestInterceptor(
     }
 
     private fun shouldEnforceSafeSearch(url: Uri): Boolean {
-        return try {
+        return false
+        /*return try {
             val urlString = url.toString()
 
             val host = url.host ?: ""
@@ -326,7 +327,7 @@ class WebViewRequestInterceptor(
             }
         } catch (e: Exception) {
             false
-        }
+        }*/
     }
 
     // Load the content from the resolved IP but with the original host as Host header

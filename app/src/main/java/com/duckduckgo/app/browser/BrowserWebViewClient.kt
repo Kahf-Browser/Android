@@ -142,6 +142,7 @@ class BrowserWebViewClient @Inject constructor(
     private var start: Long? = null
     private var sharedPreferences = spProvider.getKahfSharedPreferences()
     private val isZikrTablet = isZikrTab()
+    private var privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
 
     /**
      * This is the method of url overriding available from API 24 onwards
@@ -431,9 +432,16 @@ class BrowserWebViewClient @Inject constructor(
         favicon: Bitmap?,
     ) {
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
-        loadPordaJs(webView, url)
 
         url?.let {
+            requestRewriter.enforceSafeSearch(it.toUri(), privateDnsMode)?.let { safeSearchEnforcedUrl ->
+                webView.stopLoading()
+                webView.loadUrl(safeSearchEnforcedUrl.toString())
+                return
+            }
+
+            loadPordaJs(webView, it)
+
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != "about:blank" && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
@@ -540,7 +548,7 @@ class BrowserWebViewClient @Inject constructor(
     ): WebResourceResponse? {
         var url = request.url.toString()
         if (request.url.host == KAHF_GUARD_BLOCKED_URL || url.isDataUri()) return null
-        val privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
+        privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
         val privateDnsEnabled = privateDnsMode != PrivateDnsLevel.Off
         val isAmpUrl = ampDetector.isAmpUrl(url)
 

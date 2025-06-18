@@ -17,7 +17,9 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
+import androidx.core.net.toUri
 import com.duckduckgo.app.referral.AppReferrerDataStore
+import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.AppUrl.ParamValue
@@ -28,6 +30,7 @@ interface RequestRewriter {
     fun shouldRewriteRequest(uri: Uri): Boolean
     fun rewriteRequestWithCustomQueryParams(request: Uri): Uri
     fun addCustomQueryParams(builder: Uri.Builder)
+    fun enforceSafeSearch(uri: Uri, level: PrivateDnsLevel): Uri?
 }
 
 class DuckDuckGoRequestRewriter(
@@ -75,5 +78,21 @@ class DuckDuckGoRequestRewriter(
 
         builder.appendQueryParameter(ParamKey.HIDE_SERP, ParamValue.HIDE_SERP)
         builder.appendQueryParameter(ParamKey.SOURCE, sourceValue)
+    }
+
+    override fun enforceSafeSearch(uri: Uri, level: PrivateDnsLevel): Uri? {
+        val mode = when(level) {
+            PrivateDnsLevel.High -> "strict"
+            PrivateDnsLevel.Medium -> "active"
+            else -> "off" // No change needed
+        }
+
+        if (uri.host?.matches(Regex(""".*\.google\..*""")) == true && uri.path?.startsWith("/search") == true) {
+            if (uri.getQueryParameter("safe").equals(mode, true)) {
+                return null
+            }
+            return  "https://${uri.host}/search?q=${uri.getQueryParameter("q")}&safe=$mode".toUri()
+        }
+        return null // No change needed
     }
 }
