@@ -310,6 +310,7 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DEFAULT_FACE_COVER
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
@@ -1122,6 +1123,10 @@ class BrowserTabFragment :
                 },
                 onSafeGazeModeChanged = {
                     val updated = updateSafeGazeSettings(it)
+                    if (it == SafeGazeLevel.Off) {
+                        safeGazeInterface.updateBlurMode(false)
+                        safeGazeInterface.updateFaceCoverMode(DEFAULT_FACE_COVER)
+                    }
                     if (updated) {
                         analyticsService.logEvent(
                             when (it) {
