@@ -55,7 +55,6 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         BiometricPrompt.PromptInfo.Builder()
             .setTitle(getString(R.string.kahf_safegaze_unlock))
             .setAllowedAuthenticators(
-                BiometricManager.Authenticators.BIOMETRIC_WEAK or
                     BiometricManager.Authenticators.DEVICE_CREDENTIAL,
             )
             .build()
@@ -162,7 +161,6 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     fun isAnySecurityEnabled(): Boolean {
         val biometricManager = BiometricManager.from(this@DuckDuckGoActivity)
         return biometricManager.canAuthenticate(
-            BiometricManager.Authenticators.BIOMETRIC_WEAK or
                 BiometricManager.Authenticators.DEVICE_CREDENTIAL,
         ) == BiometricManager.BIOMETRIC_SUCCESS
     }
