@@ -899,7 +899,8 @@
     <string name="kahf_off">Off</string>
 
     <string name="kahf_safegaze_lock">SafeGaze Lock</string>
-    <string name="kahf_safegaze_lock_desc">If Touch ID, Face ID, or a system passcode is enabled, you\'ll be asked to unlock the app when opening SafeGaze settings.</string>
+    <string name="kahf_prevent_turning_off_safety_feature">Prevent turning off safety features</string>
+    <string name="kahf_safegaze_lock_desc">If a PIN, Pattern or Password is enabled in device, you\'ll be asked to verify when opening SafeGaze settings.</string>
     <string name="kahf_no_security_enabled">No secure lock enabled on the device</string>
 
     <string name="kahf_onboarding_disclaimer">Built on top of privacy aware DuckDuckGo browser</string>
