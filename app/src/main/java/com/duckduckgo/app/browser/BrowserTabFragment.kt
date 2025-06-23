@@ -189,6 +189,7 @@ import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
+import com.duckduckgo.app.browser.safe_gaze.DeviceLockAuthenticator
 import com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -935,6 +936,8 @@ class BrowserTabFragment :
         refreshRateInMillis = 20_000,
     )
 
+    private lateinit var deviceLockAuthenticator: DeviceLockAuthenticator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called for tabId=$tabId")
@@ -979,6 +982,18 @@ class BrowserTabFragment :
             requireContext(),
             kahfSdkConfig,
         )
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            if (!this@BrowserTabFragment::deviceLockAuthenticator.isInitialized) {
+                deviceLockAuthenticator = DeviceLockAuthenticator(fragment = this@BrowserTabFragment,
+                    onAuthenticated = {
+                        inflateSafeGazePopup()
+                    },
+                    onFailed = {
+                        showToast(com.duckduckgo.mobile.android.R.string.kahf_authentication_error)
+                    })
+            }
+        }
     }
 
     override fun onDetach() {
@@ -1048,17 +1063,23 @@ class BrowserTabFragment :
         (requireActivity() as DuckDuckGoActivity).apply {
             safeGazeIcon.setOnClickListener {
                 if (sharedPreferences.isSgLockEnabled()) {
-                    if (isAnySecurityEnabled()) {
-                        showBiometricPrompt { authenticated, msgId ->
-                            if (authenticated) {
-                                inflateSafeGazePopup()
-                            } else {
-                                showToast(msgId)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        if (isAnySecurityEnabled()) {
+                            showBiometricPrompt { authenticated, msgId ->
+                                if (authenticated) {
+                                    inflateSafeGazePopup()
+                                } else {
+                                    showToast(msgId)
+                                }
                             }
+                        } else {
+                            showToast(string.kahf_no_security_enabled)
+                            inflateSafeGazePopup()
                         }
                     } else {
-                        showToast(string.kahf_no_security_enabled)
-                        inflateSafeGazePopup()
+                        if (deviceLockAuthenticator.isDeviceSecure()) {
+                            deviceLockAuthenticator.promptForAuthentication()
+                        }
                     }
                 } else {
                     inflateSafeGazePopup()
