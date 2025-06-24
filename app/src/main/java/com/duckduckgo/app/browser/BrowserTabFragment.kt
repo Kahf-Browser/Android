@@ -194,6 +194,7 @@ import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
+import com.duckduckgo.app.browser.safe_gaze.DeviceLockAuthenticator
 import com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
@@ -315,6 +316,7 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DEFAULT_FACE_COVER
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
@@ -940,6 +942,8 @@ class BrowserTabFragment :
         format = "json",
     )
 
+    private lateinit var deviceLockAuthenticator: DeviceLockAuthenticator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called for tabId=$tabId")
@@ -984,6 +988,18 @@ class BrowserTabFragment :
             requireContext(),
             kahfSdkConfig,
         )
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            if (!this@BrowserTabFragment::deviceLockAuthenticator.isInitialized) {
+                deviceLockAuthenticator = DeviceLockAuthenticator(fragment = this@BrowserTabFragment,
+                    onAuthenticated = {
+                        inflateSafeGazePopup()
+                    },
+                    onFailed = {
+                        showToast(com.duckduckgo.mobile.android.R.string.kahf_authentication_error)
+                    })
+            }
+        }
     }
 
     override fun onDetach() {
@@ -1053,17 +1069,23 @@ class BrowserTabFragment :
         (requireActivity() as DuckDuckGoActivity).apply {
             safeGazeIcon.setOnClickListener {
                 if (sharedPreferences.isSgLockEnabled()) {
-                    if (isAnySecurityEnabled()) {
-                        showBiometricPrompt { authenticated, msgId ->
-                            if (authenticated) {
-                                inflateSafeGazePopup()
-                            } else {
-                                showToast(msgId)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        if (isAnySecurityEnabled()) {
+                            showBiometricPrompt { authenticated, msgId ->
+                                if (authenticated) {
+                                    inflateSafeGazePopup()
+                                } else {
+                                    showToast(msgId)
+                                }
                             }
+                        } else {
+                            showToast(string.kahf_no_security_enabled)
+                            inflateSafeGazePopup()
                         }
                     } else {
-                        showToast(string.kahf_no_security_enabled)
-                        inflateSafeGazePopup()
+                        if (deviceLockAuthenticator.isDeviceSecure()) {
+                            deviceLockAuthenticator.promptForAuthentication()
+                        }
                     }
                 } else {
                     inflateSafeGazePopup()
@@ -1128,6 +1150,10 @@ class BrowserTabFragment :
                 },
                 onSafeGazeModeChanged = {
                     val updated = updateSafeGazeSettings(it)
+                    if (it == SafeGazeLevel.Off) {
+                        safeGazeInterface.updateBlurMode(false)
+                        safeGazeInterface.updateFaceCoverMode(DEFAULT_FACE_COVER)
+                    }
                     if (updated) {
                         analyticsService.logEvent(
                             when (it) {

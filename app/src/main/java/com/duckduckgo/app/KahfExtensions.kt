@@ -5,8 +5,9 @@ import android.os.Build
 import com.duckduckgo.common.utils.SAFE_GAZE_FACE_COVER
 import com.duckduckgo.common.utils.SAFE_GAZE_LOCK
 import androidx.core.content.edit
+import com.duckduckgo.common.utils.DEFAULT_FACE_COVER
 
-fun SharedPreferences.isFaceCoverEnabled() = this.getBoolean(SAFE_GAZE_FACE_COVER, false)
+fun SharedPreferences.isFaceCoverEnabled() = this.getBoolean(SAFE_GAZE_FACE_COVER, DEFAULT_FACE_COVER)
 
 fun SharedPreferences.setFaceCoverMode(enabled: Boolean) {
     this.edit { putBoolean(SAFE_GAZE_FACE_COVER, enabled) }

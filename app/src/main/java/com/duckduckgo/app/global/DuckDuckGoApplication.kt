@@ -22,7 +22,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.safe_gaze.JsDownloadWorker
 import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.WallpaperDownloadWorker
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -44,6 +43,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
@@ -148,19 +148,31 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun scheduleTasks() {
-        val jsDownloadWorkReq = OneTimeWorkRequest.from(JsDownloadWorker::class.java)
-        val wallpaperDownloadWorkReq = OneTimeWorkRequest.from(WallpaperDownloadWorker::class.java)
-
         val workManager = WorkManager.getInstance(this)
-
-        // Cancel all existing work with the same tags
         workManager.cancelAllWorkByTag("jsDownloader")
         workManager.cancelAllWorkByTag("com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker")
 
-        workManager.apply {
-            enqueue(jsDownloadWorkReq)
-            enqueue(wallpaperDownloadWorkReq)
-        }
+        /*val jsDownloadWorkReq = OneTimeWorkRequest.Builder(JsDownloadWorker::class.java)
+            .addTag("jsDownloader")
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "jsDownloadWork",
+            androidx.work.ExistingWorkPolicy.REPLACE,
+            jsDownloadWorkReq,
+        )*/
+
+
+        val wallpaperDownloadWorkReq = OneTimeWorkRequest.Builder(WallpaperDownloadWorker::class.java)
+            .addTag("com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker")
+            .setInitialDelay(15, TimeUnit.SECONDS)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker",
+            androidx.work.ExistingWorkPolicy.REPLACE,
+            wallpaperDownloadWorkReq
+        )
     }
 
     private fun configRemoteConfig() {

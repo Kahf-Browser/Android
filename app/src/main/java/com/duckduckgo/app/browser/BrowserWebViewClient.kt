@@ -97,8 +97,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URI
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import kotlin.system.measureTimeMillis
 
 private const val ABOUT_BLANK = "about:blank"
 
@@ -139,11 +138,11 @@ class BrowserWebViewClient @Inject constructor(
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
-    private var isMainJSLoaded = false
     lateinit var activity: FragmentActivity
     private var start: Long? = null
     private var sharedPreferences = spProvider.getKahfSharedPreferences()
     private val isZikrTablet = isZikrTab()
+    private var privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
 
     /**
      * This is the method of url overriding available from API 24 onwards
@@ -380,6 +379,23 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    private fun loadAutoplayBlockerJs(webView: WebView) {
+        val currentUrl = webView.url
+        val isYoutube = currentUrl?.contains("youtube.com", ignoreCase = true) == true
+        val isFacebook = currentUrl?.contains("facebook.com", ignoreCase = true) == true
+
+        if (isYoutube || isFacebook) {
+            Timber.v("apLog Loading Autoplay Blocker JS")
+
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                val script = readAssetFile(context.assets, "autoplay_blocker.js")
+                withContext(dispatcherProvider.main()) {
+                    webView.evaluateJavascript(script, null)
+                }
+            }
+        }
+    }
+
     private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
@@ -394,14 +410,17 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private suspend fun resolveDns(uri: Uri): Pair<String, String> {
-        return suspendCoroutine { continuation ->
-            CoroutineScope(dispatcherProvider.io()).launch {
-                val initialTime = System.currentTimeMillis()
-                val ip = dnsResolver.resolveDomain(uri)
-                Timber.d("ipLog $ip || lookup time ${System.currentTimeMillis() - initialTime}ms || ${uri.host}")
-                continuation.resume(ip ?: Pair("", uri.toString()))
-                "${uri.scheme}://${ip}${uri.path}${uri.query?.let { "?$it" } ?: ""}"
+    private suspend fun resolveDnsAndBlock(uri: Uri) = withContext(dispatcherProvider.io()) {
+        var result: Pair<String, String>?
+        val exeTime = measureTimeMillis {
+            result = dnsResolver.resolveDomain(uri)
+        }
+        Timber.d("asLog ipLog $result || lookup time ${System.currentTimeMillis() - exeTime}ms || ${uri.host}")
+
+        if (result?.second == KAHF_GUARD_BLOCKED_URL) {
+            Timber.d("asLog Blocking URL: $uri")
+            withContext(dispatcherProvider.main()) {
+                webViewClientListener?.onUrlBlocked(uri.toString())
             }
         }
     }
@@ -412,11 +431,17 @@ class BrowserWebViewClient @Inject constructor(
         url: String?,
         favicon: Bitmap?,
     ) {
-        isMainJSLoaded = false
         Timber.v("onPageStarted webViewUrl: ${webView.url} URL: $url progress: ${webView.progress}")
-        loadPordaJs(webView, url)
 
         url?.let {
+            requestRewriter.enforceSafeSearch(it.toUri(), privateDnsMode)?.let { safeSearchEnforcedUrl ->
+                webView.stopLoading()
+                webView.loadUrl(safeSearchEnforcedUrl.toString())
+                return
+            }
+
+            loadPordaJs(webView, it)
+
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != "about:blank" && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
@@ -432,7 +457,6 @@ class BrowserWebViewClient @Inject constructor(
         val navigationList = webView.safeCopyBackForwardList() ?: return
         webViewClientListener?.navigationStateChanged(WebViewNavigationState(navigationList))
         if (url != null && url == lastPageStarted) {
-            isMainJSLoaded = false
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
@@ -460,6 +484,8 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
+            loadAutoplayBlockerJs(webView)
+
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
             }
@@ -522,45 +548,32 @@ class BrowserWebViewClient @Inject constructor(
     ): WebResourceResponse? {
         var url = request.url.toString()
         if (request.url.host == KAHF_GUARD_BLOCKED_URL || url.isDataUri()) return null
-        val privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
+        privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
         val privateDnsEnabled = privateDnsMode != PrivateDnsLevel.Off
         val isAmpUrl = ampDetector.isAmpUrl(url)
-        val isIpUrl = specialUrlDetector.isIpUrl(url) // Url falls in this pattern: https://1.1.1.1
+
+        if (privateDnsEnabled && (request.isForMainFrame || isAmpUrl)) {
+            // Don't allow IP URLs to be loaded
+            val isIpUrl = specialUrlDetector.isIpUrl(url) // Url falls in this pattern: https://1.1.1.1
+            if (isIpUrl) {
+                return null
+            }
+
+            if (isAmpUrl) {
+                ampDetector.extractOriginalUrlFromAmp(url).also {
+                    Timber.d("amLog AMP URL: $it")
+                    url = it
+                }
+                return WebResourceResponse(null, null, null)
+            } else {
+                appCoroutineScope.launch { resolveDnsAndBlock(url.toUri()) }
+            }
+        }
 
         return runBlocking {
             withContext(dispatcherProvider.io()) {
                 try {
-                    if (isAmpUrl) {
-                        ampDetector.extractOriginalUrlFromAmp(url).also {
-                            Timber.d("amLog AMP URL: $it")
-                            url = it
-                        }
-                    }
 
-                    if (privateDnsEnabled && (request.isForMainFrame || isAmpUrl) && (resolveDns(url.toUri()).second == KAHF_GUARD_BLOCKED_URL || isIpUrl)) {
-                        if (request.isForMainFrame && !isIpUrl) {
-                            withContext(dispatcherProvider.main()) {
-                                webViewClientListener?.onUrlBlocked(url)
-                            }
-                        }
-                        WebResourceResponse(null, null, null)
-                    } else {
-                        val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
-                        withContext(dispatcherProvider.main()) {
-                            loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
-                        }
-                        Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-                        requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener, privateDnsEnabled)
-                    }
-                } catch (e: Exception) {
-                    null
-                }
-            }
-        }
-
-        /*return runBlocking {
-            withContext(dispatcherProvider.io()) {
-                try {
                     val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
                     withContext(dispatcherProvider.main()) {
                         loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
@@ -571,7 +584,7 @@ class BrowserWebViewClient @Inject constructor(
                     null
                 }
             }
-        }*/
+        }
     }
 
     override fun onRenderProcessGone(
