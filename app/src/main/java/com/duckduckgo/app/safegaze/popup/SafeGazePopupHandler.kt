@@ -20,11 +20,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.os.Build
+import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
+import com.duckduckgo.app.browser.R.string
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
 import com.duckduckgo.app.isFaceCoverEnabled
 import com.duckduckgo.app.isSgLockEnabled
@@ -34,6 +36,7 @@ import com.duckduckgo.app.setFaceCoverMode
 import com.duckduckgo.app.setSgLockMode
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
+import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
@@ -44,6 +47,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 
 class SafeGazePopupHandler(
+    private val activity: DuckDuckGoActivity?,
     private val binding: SafeGazePopupBinding,
     private val currentUrl: String?,
     sharedPreferences: SharedPreferences,
@@ -191,7 +195,12 @@ class SafeGazePopupHandler(
         // Toggle biometric lock
         binding.switchSgLock.isChecked = sharedPreferences.isSgLockEnabled()
         binding.switchSgLock.setOnCheckedChangeListener { _, isChecked ->
-            sharedPreferences.setSgLockMode(isChecked)
+            if (activity?.isAnySecurityEnabled() == true) {
+                sharedPreferences.setSgLockMode(isChecked)
+            } else {
+                binding.switchSgLock.isChecked = false
+                Toast.makeText(activity, string.kahf_no_security_enabled_long_desc, Toast.LENGTH_SHORT).show()
+            }
         }
 
         setFontSize()
