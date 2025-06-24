@@ -1092,10 +1092,10 @@ class BrowserTabFragment :
                 }
             }
 
-            safeGazeIcon.setOnLongClickListener {
+            /*safeGazeIcon.setOnLongClickListener {
                 Toast.makeText(requireContext(), "Model: ${Build.MODEL}\nManufacturer: ${Build.MANUFACTURER}", Toast.LENGTH_LONG).show()
                 true
-            }
+            }*/
         }
     }
 
