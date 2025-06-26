@@ -29,6 +29,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.A
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteInAppMessageSuggestion
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.autocomplete.AutoCompleteViewHolder.EmptySuggestionViewHolder
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.ADS_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.BOOKMARK_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.CLIPBOARD_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.DEFAULT_TYPE
@@ -59,6 +60,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
         HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
         IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
         CLIPBOARD_TYPE to ClipboardSuggestionViewHolderFactory(),
+        ADS_TYPE to AdsSuggestionViewHolderFactory(),
         DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(),
     )
 
@@ -80,6 +82,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
             suggestions[position] is AutoCompleteInAppMessageSuggestion -> IN_APP_MESSAGE_TYPE
             suggestions[position] is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
             suggestions[position] is AutoCompleteClipboardSuggestion -> CLIPBOARD_TYPE
+            suggestions[position] is AutoCompleteSuggestion.AutoCompleteAdsSuggestion -> ADS_TYPE
             else -> SUGGESTION_TYPE
         }
     }
@@ -140,5 +143,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val IN_APP_MESSAGE_TYPE = 6
         const val DEFAULT_TYPE = 7
         const val CLIPBOARD_TYPE = 8
+        const val ADS_TYPE = 9
     }
 }

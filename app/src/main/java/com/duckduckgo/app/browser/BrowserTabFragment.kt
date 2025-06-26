@@ -2317,7 +2317,7 @@ class BrowserTabFragment :
 
     private fun launchDialogForIntent(
         context: Context,
-        pm: PackageManager?,
+        pm: PackageManager,
         intent: Intent,
         activities: List<ResolveInfo>,
         useFirstActivityFound: Boolean,

@@ -78,6 +78,12 @@ interface AutoComplete {
             val isUrl: Boolean,
         ) : AutoCompleteSuggestion(phrase)
 
+        data class AutoCompleteAdsSuggestion(
+            override val phrase: String,
+            val isUrl: Boolean,
+            val adProviderDomain: String,
+        ) : AutoCompleteSuggestion(phrase)
+
         data class AutoCompleteDefaultSuggestion(
             override val phrase: String,
         ) : AutoCompleteSuggestion(phrase)

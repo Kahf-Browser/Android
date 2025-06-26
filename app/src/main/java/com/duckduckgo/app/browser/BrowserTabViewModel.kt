@@ -59,6 +59,7 @@ import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteClipboardSuggestion
+import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteAdsSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteDefaultSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySearchSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteHistoryRelatedSuggestion.AutoCompleteHistorySuggestion
@@ -861,6 +862,7 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteHistorySuggestion -> onUserSubmittedQuery(suggestion.url, FromAutocomplete(isNav = true))
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
                     is AutoCompleteClipboardSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = suggestion.isUrl))
+                    is AutoCompleteAdsSuggestion -> onUserSubmittedQuery(suggestion.adProviderDomain, FromAutocomplete(isNav = suggestion.isUrl))
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
                 }
             }
@@ -3614,6 +3616,8 @@ class BrowserTabViewModel @Inject constructor(
 
                 return data.toMutableList().also { list ->
                     list.add(0, AutoCompleteClipboardSuggestion(clipboardText, Patterns.WEB_URL.matcher(clipboardText).matches()))
+                    list.add(1, AutoCompleteAdsSuggestion("Kahf Guard", Patterns.WEB_URL.matcher(clipboardText).matches(), adProviderDomain = "https://kahfguard.com"))
+                    list.add(2, AutoCompleteAdsSuggestion("Muslims Day", Patterns.WEB_URL.matcher(clipboardText).matches(), adProviderDomain = "https://muslimsday.com/"))
                 }
             }
 
