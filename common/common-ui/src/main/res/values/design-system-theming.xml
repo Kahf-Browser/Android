@@ -29,8 +29,8 @@
         <item name="android:windowLightStatusBar">?attr/preferDarkStatusBarIcons</item>
         <item name="preferDarkNavigationBarIcons">false</item>
         <item name="preferredNavigationBarColor">?attr/daxColorBlack</item>
-        <item name="kahfStatusBarColor">@color/white</item>
-        <item name="kahfNavBarColor">@color/black</item>
+        <item name="kahfStatusBarColor">?attr/daxColorWhite</item>
+        <item name="kahfNavBarColor">?attr/daxColorBlack</item>
     </style>
 
     <!--  Our base theme, Base.Theme.DuckDuckGo,
@@ -94,9 +94,7 @@
 
     <style name="Theme.DuckDuckGo" parent="Base.Theme.DuckDuckGo">
 
-        <item name="android:windowBackground">@drawable/kahf_browser_splash</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">?attr/daxColorBackground</item>
 
         <item name="colorPrimary">?attr/daxColorBackground</item>
         <item name="colorPrimaryDark">?attr/daxColorSurface</item>
@@ -330,7 +328,11 @@
         <item name="daxColorPrimaryIcon">@color/white</item>
     </style>
 
-    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Light"/>
+    <style name="Theme.DuckDuckGo.SplashScreen" parent="Theme.DuckDuckGo.Light">
+        <item name="android:windowBackground">@drawable/kahf_browser_splash</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
 
     <style name="Theme.AppCompat.Transparent.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowIsTranslucent">true</item>
