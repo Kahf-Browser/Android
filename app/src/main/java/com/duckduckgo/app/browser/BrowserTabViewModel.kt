@@ -3615,9 +3615,9 @@ class BrowserTabViewModel @Inject constructor(
                 }
 
                 return data.toMutableList().also { list ->
-                    list.add(0, AutoCompleteClipboardSuggestion(clipboardText, Patterns.WEB_URL.matcher(clipboardText).matches()))
-                    list.add(1, AutoCompleteAdsSuggestion("Kahf Guard", Patterns.WEB_URL.matcher("https://kahfguard.com").matches(), adProviderDomain = "https://kahfguard.com"))
-                    list.add(2, AutoCompleteAdsSuggestion("Muslims Day", Patterns.WEB_URL.matcher("https://muslimsday.com/").matches(), adProviderDomain = "https://muslimsday.com/"))
+                    // list.add(0, AutoCompleteClipboardSuggestion(clipboardText, Patterns.WEB_URL.matcher(clipboardText).matches()))
+                    list.add(0, AutoCompleteAdsSuggestion("Protect yourself from harm.", Patterns.WEB_URL.matcher("https://kahfguard.com").matches(), adProviderDomain = "https://kahfguard.com"))
+                    // list.add(1, AutoCompleteAdsSuggestion("Be a productive muslim throughout the day. Visit Muslims Day", Patterns.WEB_URL.matcher("https://muslimsday.com/").matches(), adProviderDomain = "https://muslimsday.com/"))
                 }
             }
 

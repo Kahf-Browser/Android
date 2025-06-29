@@ -19,6 +19,8 @@ package com.duckduckgo.app.browser.autocomplete
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
@@ -36,7 +38,9 @@ import com.duckduckgo.app.browser.databinding.ItemAutocompleteDefaultBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteSearchSuggestionBinding
+import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.view.MessageCta.Message
+import kotlinx.coroutines.launch
 
 interface SuggestionViewHolderFactory {
 
@@ -115,7 +119,10 @@ class ClipboardSuggestionViewHolderFactory : SuggestionViewHolderFactory {
     }
 }
 
-class AdsSuggestionViewHolderFactory : SuggestionViewHolderFactory {
+class AdsSuggestionViewHolderFactory(
+    private val lifecycleOwner: LifecycleOwner?,
+    private val favIconManager: FaviconManager?,
+) : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -131,8 +138,13 @@ class AdsSuggestionViewHolderFactory : SuggestionViewHolderFactory {
         deleteClickListener: (AutoCompleteSuggestion) -> Unit,
         openSettingsClickListener: () -> Unit,
     ) {
-        val searchSuggestionViewHolder = holder as AutoCompleteViewHolder.AdsSuggestionViewHolder
-        searchSuggestionViewHolder.bind(suggestion as AutoCompleteSuggestion.AutoCompleteAdsSuggestion, immediateSearchClickListener, editableSearchClickListener)
+        val adsSuggestionViewHolder = holder as AutoCompleteViewHolder.AdsSuggestionViewHolder
+        adsSuggestionViewHolder.bind(
+            lifecycleOwner = lifecycleOwner,
+            favIconManager = favIconManager, suggestion as AutoCompleteSuggestion.AutoCompleteAdsSuggestion,
+            immediateSearchClickListener,
+            editableSearchClickListener
+        )
     }
 }
 
@@ -307,12 +319,19 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 
     class AdsSuggestionViewHolder(val binding: ItemAutocompleteAdsSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
         fun bind(
+            lifecycleOwner: LifecycleOwner?,
+            favIconManager: FaviconManager?,
             item: AutoCompleteSuggestion.AutoCompleteAdsSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
-            title.text = item.phrase
-
+            /*title.text = item.phrase
+            domainName.text = item.adProviderDomain
+            title2.text = item.phrase
+            domainName2.text = item.adProviderDomain*/
+            /*lifecycleOwner?.lifecycleScope?.launch {
+                favIconManager?.loadToViewMaybeFromRemoteWithPlaceholder(url = item.adProviderDomain, view = phraseOrUrlIndicator, fetchFromRemote = true)
+            }*/
             // goToBookmarkImage.setOnClickListener { editableSearchClickListener(item) }
             root.setOnClickListener { immediateSearchListener(item) }
         }

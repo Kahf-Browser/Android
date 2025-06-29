@@ -213,6 +213,8 @@ class SystemSearchActivity : DuckDuckGoActivity() {
     private fun configureAutoComplete() {
         binding.autocompleteSuggestions.layoutManager = LinearLayoutManager(this)
         autocompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
+            favIconManager = null,
+            lifecycleOwner = null,
             immediateSearchClickListener = {
                 viewModel.userSubmittedAutocompleteResult(it.phrase)
             },

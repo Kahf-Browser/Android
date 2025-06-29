@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.autocomplete
 import android.view.ViewGroup
 import androidx.annotation.UiThread
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
@@ -38,8 +39,11 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.IN_APP_MESSAGE_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
+import com.duckduckgo.app.browser.favicon.FaviconManager
 
 class BrowserAutoCompleteSuggestionsAdapter(
+    private val lifecycleOwner: LifecycleOwner?,
+    private val favIconManager: FaviconManager?,
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val autoCompleteInAppMessageDismissedListener: () -> Unit,
@@ -60,7 +64,10 @@ class BrowserAutoCompleteSuggestionsAdapter(
         HISTORY_SEARCH_TYPE to HistorySearchSuggestionViewHolderFactory(),
         IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
         CLIPBOARD_TYPE to ClipboardSuggestionViewHolderFactory(),
-        ADS_TYPE to AdsSuggestionViewHolderFactory(),
+        ADS_TYPE to AdsSuggestionViewHolderFactory(
+            lifecycleOwner = lifecycleOwner,
+            favIconManager = favIconManager
+        ),
         DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(),
     )
 
@@ -91,29 +98,46 @@ class BrowserAutoCompleteSuggestionsAdapter(
         holder: AutoCompleteViewHolder,
         position: Int,
     ) {
-        if (holder is EmptySuggestionViewHolder) {
-            // nothing required
-        } else {
-            viewHolderFactoryMap.getValue(getItemViewType(position)).onBindViewHolder(
-                holder,
-                suggestions[position],
-                immediateSearchClickListener,
-                editableSearchClickListener,
-                deleteClickListener,
-                autoCompleteOpenSettingsClickListener,
-            )
-
-            val drawableRes: Int = if (suggestions.size == 1) {
-                R.drawable.suggestion_bg_rounded
-            } else if (position == 0) {
-                R.drawable.suggestion_bg_rounded_top
-            } else if (position == suggestions.size - 1) {
-                R.drawable.suggestion_bg_rounded_bottom
-            } else {
-                R.drawable.suggestion_bg_rectangle
+        var drawableRes = 0
+        when (holder) {
+            is EmptySuggestionViewHolder -> {
+                // nothing required
             }
-            holder.itemView.background = ContextCompat.getDrawable(holder.itemView.context, drawableRes)
+
+            // different background to highlight ads
+            is AutoCompleteViewHolder.AdsSuggestionViewHolder -> {
+                drawableRes = if (suggestions.size == 1) {
+                    R.drawable.ads_suggestion_bg_rounded
+                } else if (position == 0) {
+                    R.drawable.ads_suggestion_bg_rounded_top
+                } else if (position == suggestions.size - 1) {
+                    R.drawable.ads_suggestion_bg_rounded_bottom
+                } else {
+                    R.drawable.ads_suggestion_bg_rectangle
+                }
+            }
+
+            else -> {
+                drawableRes = if (suggestions.size == 1) {
+                    R.drawable.suggestion_bg_rounded
+                } else if (position == 0) {
+                    R.drawable.suggestion_bg_rounded_top
+                } else if (position == suggestions.size - 1) {
+                    R.drawable.suggestion_bg_rounded_bottom
+                } else {
+                    R.drawable.suggestion_bg_rectangle
+                }
+            }
         }
+        viewHolderFactoryMap.getValue(getItemViewType(position)).onBindViewHolder(
+            holder,
+            suggestions[position],
+            immediateSearchClickListener,
+            editableSearchClickListener,
+            deleteClickListener,
+            autoCompleteOpenSettingsClickListener,
+        )
+        holder.itemView.background = ContextCompat.getDrawable(holder.itemView.context, drawableRes)
     }
 
     override fun getItemCount(): Int {

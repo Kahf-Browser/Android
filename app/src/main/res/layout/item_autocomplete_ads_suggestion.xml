@@ -21,22 +21,36 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="1dp"
-    android:layout_marginTop="0dp"
-    android:background="@drawable/suggestion_bg_rounded"
-    android:paddingTop="@dimen/kahf_suggestion_padding"
-    android:paddingEnd="@dimen/keyline_4"
-    android:paddingStart="20dp"
-    android:paddingBottom="@dimen/kahf_suggestion_padding">
+    android:layout_marginTop="0dp">
+
+    <com.kahfads.sdk.adviews.KahfBannerAdView
+        android:layout_width="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="100dp"/>
+
+    <!--<com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/tvSponsored"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:textStyle="bold"
+        android:includeFontPadding="false"
+        android:text="@string/kahf_sponsored"
+        android:textColor="@color/kahf_suggestion_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <ImageView
         android:id="@+id/phraseOrUrlIndicator"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:importantForAccessibility="no"
         android:src="@drawable/kahf_browser_logo_only"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/domainName"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="@id/title"/>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
         android:id="@+id/title"
@@ -44,45 +58,73 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:ellipsize="end"
+        android:layout_marginTop="8dp"
         android:includeFontPadding="false"
         android:gravity="center_vertical|start"
-        android:maxLines="1"
         android:textColor="@color/kahf_suggestion_text"
         app:layout_constraintStart_toEndOf="@id/phraseOrUrlIndicator"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="phrase or URL suggestion"/>
+        app:layout_constraintTop_toBottomOf="@id/tvSponsored"
+        tools:text="Be a productive muslim throughout the day. Visit Muslims Day"/>
 
     <TextView
-        android:id="@+id/description"
+        android:id="@+id/domainName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:typography="body2"
         app:textType="secondary"
         android:layout_marginStart="10dp"
         android:ellipsize="end"
+        android:layout_marginTop="2dp"
         android:gravity="center_vertical|start"
         android:maxLines="1"
-        android:textColor="@color/white"
+        android:textColor="@color/gray50"
         android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/phraseOrUrlIndicator"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/title"
         android:text="@string/kahf_sponsored"/>
 
-    <!--<ImageView
-        android:id="@+id/goToBookmarkImage"
-        android:layout_width="wrap_content"
+    <ImageView
+        android:id="@+id/image2"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/kahf_browser_logo_only"
+        app:layout_constraintBottom_toBottomOf="@id/domainName2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/title2"/>
+
+    <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/title2"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="6dp"
-        android:background="?selectableItemBackgroundBorderless"
-        android:contentDescription="@string/editQueryBeforeSubmitting"
-        android:padding="3dp"
-        android:src="@drawable/ic_arrow_right_24"
-        app:tint="@color/kahf_suggestion_text"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginStart="10dp"
+        android:ellipsize="end"
+        android:layout_marginTop="12dp"
+        android:includeFontPadding="false"
+        android:gravity="center_vertical|start"
+        android:textColor="@color/kahf_suggestion_text"
+        app:layout_constraintStart_toEndOf="@id/image2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>-->
+        app:layout_constraintTop_toBottomOf="@id/domainName"
+        tools:text="Be a productive muslim throughout the day. Visit Muslims Day"/>
+
+    <TextView
+        android:id="@+id/domainName2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:typography="body2"
+        app:textType="secondary"
+        android:layout_marginStart="10dp"
+        android:ellipsize="end"
+        android:layout_marginTop="2dp"
+        android:gravity="center_vertical|start"
+        android:maxLines="1"
+        android:textColor="@color/gray50"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/image2"
+        app:layout_constraintTop_toBottomOf="@id/title2"
+        android:text="@string/kahf_sponsored"/>-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

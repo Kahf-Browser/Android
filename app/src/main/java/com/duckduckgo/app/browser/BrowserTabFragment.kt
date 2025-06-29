@@ -2568,6 +2568,8 @@ class BrowserTabFragment :
         val context = context ?: return
         binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
+            lifecycleOwner = viewLifecycleOwner,
+            favIconManager = faviconManager,
             immediateSearchClickListener = {
                 analyticsService.logEvent(
                     AnalyticsEvent.AddressBarSuggestionSelection, mapOf(AnalyticsParam.SuggestionSearchEngine to "google"),
