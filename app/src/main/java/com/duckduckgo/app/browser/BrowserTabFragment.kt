@@ -1079,7 +1079,6 @@ class BrowserTabFragment :
                                 }
                             }
                         } else {
-                            showToast(string.kahf_no_security_enabled)
                             inflateSafeGazePopup()
                         }
                     } else {
@@ -1115,6 +1114,7 @@ class BrowserTabFragment :
 
         safeGazeIcon.post {
             SafeGazePopupHandler(
+                activity = requireActivity() as? DuckDuckGoActivity,
                 binding = popupBinding,
                 currentUrl = webView?.url,
                 sharedPreferences = sharedPreferences,
