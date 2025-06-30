@@ -16,9 +16,11 @@
 
 package com.duckduckgo.app.browser.autocomplete
 
+import android.graphics.Outline
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -38,8 +40,13 @@ import com.duckduckgo.app.browser.databinding.ItemAutocompleteDefaultBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteHistorySuggestionBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteInAppMessageBinding
 import com.duckduckgo.app.browser.databinding.ItemAutocompleteSearchSuggestionBinding
+import com.duckduckgo.app.browser.databinding.ItemSuggestedHeadingSearchSuggestionBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.common.ui.view.MessageCta.Message
+import com.kahfads.sdk.KahfAdConfig
+import com.kahfads.sdk.adviews.AdImpressionListener
+import com.kahfads.sdk.model.AdResult
+import com.kahfads.sdk.model.ErrorType
 import kotlinx.coroutines.launch
 
 interface SuggestionViewHolderFactory {
@@ -54,6 +61,26 @@ interface SuggestionViewHolderFactory {
         deleteClickListener: (AutoCompleteSuggestion) -> Unit = {},
         openSettingsClickListener: () -> Unit = {},
     )
+}
+
+class SuggestedSuggestionTextViewHolderFactory : SuggestionViewHolderFactory {
+
+    override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemSuggestedHeadingSearchSuggestionBinding.inflate(inflater, parent, false)
+        return AutoCompleteViewHolder.SuggestedTextSuggestionViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(
+        holder: AutoCompleteViewHolder,
+        suggestion: AutoCompleteSuggestion,
+        immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
+        deleteClickListener: (AutoCompleteSuggestion) -> Unit,
+        openSettingsClickListener: () -> Unit,
+    ) {
+
+    }
 }
 
 class SearchSuggestionViewHolderFactory : SuggestionViewHolderFactory {
@@ -120,8 +147,7 @@ class ClipboardSuggestionViewHolderFactory : SuggestionViewHolderFactory {
 }
 
 class AdsSuggestionViewHolderFactory(
-    private val lifecycleOwner: LifecycleOwner?,
-    private val favIconManager: FaviconManager?,
+    private val kahfAdConfig: KahfAdConfig?,
 ) : SuggestionViewHolderFactory {
 
     override fun onCreateViewHolder(parent: ViewGroup): AutoCompleteViewHolder {
@@ -140,8 +166,7 @@ class AdsSuggestionViewHolderFactory(
     ) {
         val adsSuggestionViewHolder = holder as AutoCompleteViewHolder.AdsSuggestionViewHolder
         adsSuggestionViewHolder.bind(
-            lifecycleOwner = lifecycleOwner,
-            favIconManager = favIconManager, suggestion as AutoCompleteSuggestion.AutoCompleteAdsSuggestion,
+            config = kahfAdConfig, suggestion as AutoCompleteSuggestion.AutoCompleteAdsSuggestion,
             immediateSearchClickListener,
             editableSearchClickListener
         )
@@ -274,6 +299,8 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
         }
     }
 
+    class SuggestedTextSuggestionViewHolder(val binding: ItemSuggestedHeadingSearchSuggestionBinding) : AutoCompleteViewHolder(binding.root)
+
     class HistorySearchSuggestionViewHolder(val binding: ItemAutocompleteSearchSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
         fun bind(
             item: AutoCompleteHistorySearchSuggestion,
@@ -319,17 +346,73 @@ sealed class AutoCompleteViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 
     class AdsSuggestionViewHolder(val binding: ItemAutocompleteAdsSuggestionBinding) : AutoCompleteViewHolder(binding.root) {
         fun bind(
-            lifecycleOwner: LifecycleOwner?,
-            favIconManager: FaviconManager?,
+            config: KahfAdConfig?,
             item: AutoCompleteSuggestion.AutoCompleteAdsSuggestion,
             immediateSearchListener: (AutoCompleteSuggestion) -> Unit,
             editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
         ) = with(binding) {
+            val radius = 8F * adView.resources.displayMetrics.density
+            adView.post {
+                adView.apply {
+                    clipToOutline = true
+                    outlineProvider = object : ViewOutlineProvider() {
+                        override fun getOutline(view: View, outline: Outline) {
+                            outline.setRoundRect(0, 0, view.width, view.height, radius)
+                        }
+                    }
+                    /*loasdAd(config!!)
+                    setAdClickListener {
+                        // closeKahfAdsSlidingView()
+                        immediateSearchListener.invoke(AutoCompleteSuggestion.AutoCompleteAdsSuggestion(phrase = it, isUrl = true, adProviderDomain = it))
+                    }*/
+                    /*setAdImpressionListener(
+                        object : AdImpressionListener {
+
+                            override fun onAdClicked() {
+                                Timber.i("adLog onAdClicked")
+                                analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                            }
+
+                            override fun onAdFailedToLoad(error: AdResult.Error) {
+                                Timber.i("adLog onAdFailedToLoad ${error.message}")
+                                when (error.type) {
+                                    ErrorType.TIMEOUT -> {
+                                        analyticsService.logEvent(AnalyticsEvent.AdTimeout)
+                                    }
+
+                                    ErrorType.NO_AD_FOUND -> {
+                                        analyticsService.logEvent(AnalyticsEvent.AdNotFound)
+                                    }
+
+                                    ErrorType.SERVER_ERROR -> {
+                                        analyticsService.logEvent(AnalyticsEvent.AdServerError)
+                                    }
+
+                                    else -> {
+                                        // No op
+                                    }
+                                }
+                            }
+
+                            override fun onAdLoaded() {
+                                if (webView?.isVisible != false) {
+                                    Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
+                                    viewModel.pauseAdRefresh()
+                                } else {
+                                    Timber.i("adLog onAdLoaded $tabId")
+                                    analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                                }
+                            }
+                        },
+                    )*/
+                }
+            }
+
             /*title.text = item.phrase
             domainName.text = item.adProviderDomain
             title2.text = item.phrase
-            domainName2.text = item.adProviderDomain*/
-            /*lifecycleOwner?.lifecycleScope?.launch {
+            domainName2.text = item.adProviderDomain
+            lifecycleOwner?.lifecycleScope?.launch {
                 favIconManager?.loadToViewMaybeFromRemoteWithPlaceholder(url = item.adProviderDomain, view = phraseOrUrlIndicator, fetchFromRemote = true)
             }*/
             // goToBookmarkImage.setOnClickListener { editableSearchClickListener(item) }

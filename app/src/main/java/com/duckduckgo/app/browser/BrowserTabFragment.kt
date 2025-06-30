@@ -368,7 +368,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
+import com.kahfads.sdk.KahfAdConfig
 import com.kahfads.sdk.KahfAdSdk
+import com.kahfads.sdk.KahfAdType
 import com.kahfads.sdk.KahfSdkConfig
 import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
@@ -2568,8 +2570,12 @@ class BrowserTabFragment :
         val context = context ?: return
         binding.autoCompleteSuggestionsList.layoutManager = LinearLayoutManager(context)
         autoCompleteSuggestionsAdapter = BrowserAutoCompleteSuggestionsAdapter(
-            lifecycleOwner = viewLifecycleOwner,
-            favIconManager = faviconManager,
+            kahfAdConfig = KahfAdConfig(
+                adType = KahfAdType.BANNER_AD_600_94,
+                divId = "suggestion_banner",
+                screenName = "SuggestionView",
+                refreshRateInMillis = 20_000,
+            ),
             immediateSearchClickListener = {
                 analyticsService.logEvent(
                     AnalyticsEvent.AddressBarSuggestionSelection, mapOf(AnalyticsParam.SuggestionSearchEngine to "google"),
@@ -2779,8 +2785,8 @@ class BrowserTabFragment :
 
         adsManager.apply {
             viewLifecycleOwner.lifecycle.addObserver(this)
-            setupEndSlidableKahfAdsView(adsView = binding.kahfEndSlidableAdView, rootContainer = binding.clWebViewContainer)
-            // setupBottomSlidableKahfAdsView(adsView = bottomNav.kahfBottomSlidableAdView, rootContainer = binding.clWebViewContainer)
+            // setupEndSlidableKahfAdsView(adsView = binding.kahfEndSlidableAdView, rootContainer = binding.clWebViewContainer)
+            setupBottomSlidableKahfAdsView(adsView = bottomNav.kahfBottomSlidableAdView, rootContainer = binding.clWebViewContainer)
             setAdsManagerCommunicator(adsCommunicator = this@BrowserTabFragment)
             setupCloseButton()
         }
@@ -2795,8 +2801,8 @@ class BrowserTabFragment :
                         isFirstTimeScrolling = true
                     }*/
                     adsManager.apply {
-                        handleScrollDetected(adsView = binding.kahfEndSlidableAdView, adsSlidingDirection = END)
-                        // handleScrollDetected(adsView = bottomNav.kahfBottomSlidableAdView, adsSlidingDirection = DOWN)
+                        // handleScrollDetected(adsView = binding.kahfEndSlidableAdView, adsSlidingDirection = END)
+                        handleScrollDetected(adsView = bottomNav.kahfBottomSlidableAdView, adsSlidingDirection = DOWN)
                         handleBottomNavAndWebViewTransition(deltaY)
                     }
                 }

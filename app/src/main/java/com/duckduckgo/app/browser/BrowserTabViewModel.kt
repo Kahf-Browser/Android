@@ -738,7 +738,11 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         val currentViewState = currentAutoCompleteViewState()
-        currentViewState.copy(searchResults = AutoCompleteResult(result.query, result.suggestions)).also {
+        val mutableResultList = result.suggestions.toMutableList()
+        if (mutableResultList.isNotEmpty()) {
+            mutableResultList.add(0, AutoCompleteSuggestion.AutoCompleteSuggestedTextSuggestion("", false))
+        }
+        currentViewState.copy(searchResults = AutoCompleteResult(result.query, mutableResultList.toList())).also {
             lastAutoCompleteState = it
             autoCompleteViewState.value = it
         }
@@ -863,6 +867,7 @@ class BrowserTabViewModel @Inject constructor(
                     is AutoCompleteHistorySearchSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = false))
                     is AutoCompleteClipboardSuggestion -> onUserSubmittedQuery(suggestion.phrase, FromAutocomplete(isNav = suggestion.isUrl))
                     is AutoCompleteAdsSuggestion -> onUserSubmittedQuery(suggestion.adProviderDomain, FromAutocomplete(isNav = suggestion.isUrl))
+                    is AutoCompleteSuggestion.AutoCompleteSuggestedTextSuggestion -> {}
                     is AutoCompleteInAppMessageSuggestion -> return@withContext
                 }
             }

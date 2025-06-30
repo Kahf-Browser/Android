@@ -38,12 +38,13 @@ import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAda
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_SEARCH_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.HISTORY_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.IN_APP_MESSAGE_TYPE
+import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTED_TEXT_TYPE
 import com.duckduckgo.app.browser.autocomplete.BrowserAutoCompleteSuggestionsAdapter.Type.SUGGESTION_TYPE
 import com.duckduckgo.app.browser.favicon.FaviconManager
+import com.kahfads.sdk.KahfAdConfig
 
 class BrowserAutoCompleteSuggestionsAdapter(
-    private val lifecycleOwner: LifecycleOwner?,
-    private val favIconManager: FaviconManager?,
+    private val kahfAdConfig: KahfAdConfig?,
     private val immediateSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val editableSearchClickListener: (AutoCompleteSuggestion) -> Unit,
     private val autoCompleteInAppMessageDismissedListener: () -> Unit,
@@ -65,9 +66,9 @@ class BrowserAutoCompleteSuggestionsAdapter(
         IN_APP_MESSAGE_TYPE to InAppMessageViewHolderFactory(),
         CLIPBOARD_TYPE to ClipboardSuggestionViewHolderFactory(),
         ADS_TYPE to AdsSuggestionViewHolderFactory(
-            lifecycleOwner = lifecycleOwner,
-            favIconManager = favIconManager
+            kahfAdConfig = kahfAdConfig
         ),
+        SUGGESTED_TEXT_TYPE to SuggestedSuggestionTextViewHolderFactory(),
         DEFAULT_TYPE to DefaultSuggestionViewHolderFactory(),
     )
 
@@ -90,6 +91,7 @@ class BrowserAutoCompleteSuggestionsAdapter(
             suggestions[position] is AutoCompleteDefaultSuggestion -> DEFAULT_TYPE
             suggestions[position] is AutoCompleteClipboardSuggestion -> CLIPBOARD_TYPE
             suggestions[position] is AutoCompleteSuggestion.AutoCompleteAdsSuggestion -> ADS_TYPE
+            suggestions[position] is AutoCompleteSuggestion.AutoCompleteSuggestedTextSuggestion -> SUGGESTED_TEXT_TYPE
             else -> SUGGESTION_TYPE
         }
     }
@@ -168,5 +170,6 @@ class BrowserAutoCompleteSuggestionsAdapter(
         const val DEFAULT_TYPE = 7
         const val CLIPBOARD_TYPE = 8
         const val ADS_TYPE = 9
+        const val SUGGESTED_TEXT_TYPE = 10
     }
 }
