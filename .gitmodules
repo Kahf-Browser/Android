@@ -4,3 +4,6 @@
 [submodule "submodules/privacy-grade"]
 	path = submodules/privacy-grade
 	url = https://github.com/duckduckgo/privacy-grade
+[submodule "libs/image_processor"]
+	path = libs/image_processor
+	url = https://github.com/Kahf-Browser/private.git
