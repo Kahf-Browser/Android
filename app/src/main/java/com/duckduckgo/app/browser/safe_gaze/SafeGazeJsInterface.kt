@@ -160,41 +160,46 @@ class SafeGazeJsInterface(
         if (!paused.get() && processingJob?.isActive != true) {
             processingJob = scope.launch {
                 while (urlQueue.isNotEmpty()) {
-                    val peekedTask = urlQueue.peek() ?: continue
+                    // Find the first task that's ready to process (not pending)
+                    val readyTask = urlQueue.find { task ->
+                        val status = downloadTracker[task.id]
+                        status is DownloadStatus.Success || status is DownloadStatus.Failed
+                    }
 
-                    when (val downloadStatus = downloadTracker[peekedTask.id]) {
+                    if (readyTask == null) {
+                        delay(50)
+                        continue
+                    }
+
+                    urlQueue.remove(readyTask)
+
+                    when (val downloadStatus = downloadTracker[readyTask.id]) {
                         null, is DownloadStatus.Pending -> {
-                            // Image download not started or still in progress. Wait a bit.
-                            delay(50)
                             continue
                         }
                         is DownloadStatus.Failed -> {
-                            // Download failed, remove from queue and tracker
-                            urlQueue.poll()
-                            downloadTracker.remove(peekedTask.id)
+                            // Download failed, remove from tracker
+                            downloadTracker.remove(readyTask.id)
                             onImageClassified("detectionResult", OutputImage(
                                 result = "null",
-                                id = peekedTask.id ?: "",
-                                width = peekedTask.width ?: 0,
-                                height = peekedTask.height ?: 0,
+                                id = readyTask.id ?: "",
+                                width = readyTask.width ?: 0,
+                                height = readyTask.height ?: 0,
                             ))
                             continue
                         }
                         is DownloadStatus.Success -> {
-                            // Download completed successfully, remove from queue and process
-                            val task = urlQueue.poll()
-
                             // Small delay to avoid overwhelming the processor
                             delay(10)
 
                             var output = OutputImage(
                                 result = "null",
-                                id = task?.id ?: "",
-                                width = task?.width ?: 0,
-                                height = task?.height ?: 0,
+                                id = readyTask.id ?: "",
+                                width = readyTask.width ?: 0,
+                                height = readyTask.height ?: 0,
                             )
 
-                            task?.let {
+                            readyTask.let {
                                 val maskType = getMaskType()
                                 val cachedResult = kahfImageBlockedDao.findByUrl(
                                     "${it.src?.md5()}_$maskType"
@@ -212,7 +217,7 @@ class SafeGazeJsInterface(
                                     return@let
                                 }
 
-                                val waitingTime = System.currentTimeMillis() - task.insertedAt
+                                val waitingTime = System.currentTimeMillis() - readyTask.insertedAt
                                 waitingTimes.add(waitingTime)
                                 if (waitingTimes.size >= 30) {
                                     val avg = waitingTimes.average().toLong()
@@ -237,14 +242,14 @@ class SafeGazeJsInterface(
                                     if (nsfwResult?.isSafe() == false) {
                                         output = OutputImage(
                                             result = "nsfw",
-                                            id = task.id ?: "",
-                                            width = task.width ?: 0,
-                                            height = task.height ?: 0,
+                                            id = readyTask.id ?: "",
+                                            width = readyTask.width ?: 0,
+                                            height = readyTask.height ?: 0,
                                             isManipulated = true
                                         )
                                     } else {
                                         val segmentationInf = measureTimeMillis {
-                                            output = imageDetector.downloadAndStore(task.copy(imgBitmap = bmp))
+                                            output = imageDetector.downloadAndStore(readyTask.copy(imgBitmap = bmp))
                                         }
                                         Timber.d("kLog Segmentation inference time: $segmentationInf ms")
 
@@ -256,7 +261,7 @@ class SafeGazeJsInterface(
                                     Timber.e("kLog Error processing image: ${e.message}")
                                     return@let
                                 } finally {
-                                    downloadTracker.remove(task.id)
+                                    downloadTracker.remove(readyTask.id)
                                 }
 
                                 if (inferenceTimes.size >= 30) {
