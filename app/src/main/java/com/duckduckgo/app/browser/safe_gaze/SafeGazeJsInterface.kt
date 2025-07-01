@@ -116,22 +116,21 @@ class SafeGazeJsInterface(
 
         scope.launch {
             try {
-                // Semaphore to limit 5 concurrent downloads
                 downloadSemaphore.acquire()
 
                 val downloadTime = measureTimeMillis {
+                    val startTime = System.currentTimeMillis()
                     val bitmap = withTimeout(2000) {
                         imageDownloader.downloadImageWithAspectRatio(
                             context, input.src, input.baseImg, input.width, input.height
                         )
                     }
+                    val downloadTime = System.currentTimeMillis() - startTime
 
                     if (bitmap != null) {
-                        // Store successful download in tracker
                         downloadTracker[input.id] = DownloadStatus.Success(bitmap)
-                        Timber.d("kLog Download successful for ${input.id}: ${bitmap.width}x${bitmap.height}")
+                        Timber.d("kLog Downloaded in ${downloadTime}ms for ${input.id}: ${bitmap.width}x${bitmap.height}")
                     } else {
-                        // Mark as failed
                         downloadTracker[input.id] = DownloadStatus.Failed
                         Timber.d("kLog Download failed for ${input.id} - bitmap is null")
                     }
@@ -143,10 +142,9 @@ class SafeGazeJsInterface(
                 Timber.e("kLog Image download failed for ${input.id}: ${e.message}")
                 downloadTracker[input.id] = DownloadStatus.Failed
             } finally {
-                // Always release semaphore
                 downloadSemaphore.release()
 
-                // If the task is at the head of queue and processing is idle, kick-start processing
+                // If processing is idle, kick-start processing
                 if (!paused.get() && processingJob?.isActive != true) {
                     urlQueue.peek()?.let {
                         if (it.id == input.id) {
@@ -166,8 +164,7 @@ class SafeGazeJsInterface(
 
                     when (val downloadStatus = downloadTracker[peekedTask.id]) {
                         null, is DownloadStatus.Pending -> {
-                            // Image download not started or still in progress
-                            // Wait a bit and check again (requirement 2)
+                            // Image download not started or still in progress. Wait a bit.
                             delay(50)
                             continue
                         }
@@ -215,7 +212,7 @@ class SafeGazeJsInterface(
                                     return@let
                                 }
 
-                                val waitingTime = System.currentTimeMillis() - (task.insertedAt ?: System.currentTimeMillis())
+                                val waitingTime = System.currentTimeMillis() - task.insertedAt
                                 waitingTimes.add(waitingTime)
                                 if (waitingTimes.size >= 30) {
                                     val avg = waitingTimes.average().toLong()
@@ -227,8 +224,7 @@ class SafeGazeJsInterface(
                                 }
 
                                 try {
-                                    val bmp = (downloadStatus as DownloadStatus.Success).bitmap
-                                    val imageDownloadTime = 0L // Already measured during download
+                                    val bmp = downloadStatus.bitmap
 
                                     Timber.d("kLog Using pre-downloaded bitmap: ${bmp.width}x${bmp.height}")
 
@@ -252,9 +248,9 @@ class SafeGazeJsInterface(
                                         }
                                         Timber.d("kLog Segmentation inference time: $segmentationInf ms")
 
-                                        val inferenceTime = imageDownloadTime + nsfwInference + segmentationInf
+                                        val inferenceTime = nsfwInference + segmentationInf
                                         inferenceTimes.add(inferenceTime)
-                                        Timber.d("kLog Total inference time: $inferenceTime ms, download: $imageDownloadTime, NSFW: $nsfwInference, seg: $segmentationInf")
+                                        Timber.d("kLog Total inference time: $inferenceTime ms, NSFW: $nsfwInference, seg: $segmentationInf")
                                     }
                                 } catch (e: Exception) {
                                     Timber.e("kLog Error processing image: ${e.message}")
