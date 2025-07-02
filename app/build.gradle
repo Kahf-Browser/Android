@@ -505,6 +505,7 @@ dependencies {
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"
     internalImplementation "com.facebook.soloader:soloader:_"
+    implementation "com.github.KahfAds:android:0.0.47"
 
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator

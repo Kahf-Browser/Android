@@ -34,6 +34,9 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.kahfads.sdk.KahfAdSdk
+import com.kahfads.sdk.KahfAdsSdk
+import com.kahfads.sdk.KahfAdsSdkConfig
 import com.posthog.android.PostHogAndroid
 import com.posthog.android.PostHogAndroidConfig
 import dagger.android.AndroidInjector
@@ -111,6 +114,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         ) {
             PostHogAndroid.setup(this@DuckDuckGoApplication, this)
         }
+        setupKahfAdsSDK()
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
@@ -208,6 +212,16 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                     .build(),
             )
         }
+    }
+
+    private fun setupKahfAdsSDK() {
+        KahfAdsSdk.initialize(
+            config = KahfAdsSdkConfig(
+                publisherId = "kahf-browser",
+                fallbackPublisherId = "kahf-browser"
+            ),
+            context = this
+        )
     }
 
     // vtodo - Work around for https://crbug.com/558377
