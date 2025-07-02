@@ -40,6 +40,11 @@ sealed class AnalyticsEvent(val name: String) {
     data object ImageProcessingTimeout : AnalyticsEvent("image_processing_timeout")
     data object ModelInitTime : AnalyticsEvent("model_initialization_time")
 
+    data object P90NSFWProcessing: AnalyticsEvent("p90_nsfw_processing")
+    data object P90CoreInference: AnalyticsEvent("p90_core_inference")
+    data object P90ApplySolidMask: AnalyticsEvent("p90_apply_solid_mask")
+    data object P90ApplyPixelationMask: AnalyticsEvent("p90_apply_pixelation_mask")
+
     // Onboarding
     data object OnboardSetAsDefaultBrowser : AnalyticsEvent("onboard_set_as_default_browser")
     data object OnboardSkipDefaultBrowser : AnalyticsEvent("onboard_skip_default_browser")
@@ -73,6 +78,11 @@ sealed class AnalyticsParam(val name: String) {
     data object ModelInitTimeMS : AnalyticsParam("model_initialization_time_ms")
     data object AvgResolutionTimeMs : AnalyticsParam("avg_resolution_time_ms")
     data object AvgKahfGuardTimeMs : AnalyticsParam("avg_kahf_guard_time_ms")
+
+    data object NSFWProcessingTime : AnalyticsParam("nsfw_processing_time_ms")
+    data object CoreInferenceTime : AnalyticsParam("core_inference_time_ms")
+    data object ApplySolidMaskTime : AnalyticsParam("apply_solid_mask_time_ms")
+    data object ApplyPixelationMaskTime : AnalyticsParam("apply_pixelation_mask_time_ms")
 
     // Search
     data object SuggestionSearchEngine : AnalyticsParam("autosuggestion_search_engine")
