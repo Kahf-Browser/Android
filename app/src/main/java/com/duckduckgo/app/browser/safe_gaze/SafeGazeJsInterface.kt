@@ -100,9 +100,7 @@ class SafeGazeJsInterface(
                 result = "null",
                 id = input?.id ?: "",
                 width = input?.width ?: 0,
-                height = input?.height ?: 0,
-                coreInferenceTime = 0L,
-                maskOrPixelationTime = 0L
+                height = input?.height ?: 0
             ))
             return
         }
@@ -190,9 +188,7 @@ class SafeGazeJsInterface(
                                 result = "null",
                                 id = readyTask.id ?: "",
                                 width = readyTask.width ?: 0,
-                                height = readyTask.height ?: 0,
-                                coreInferenceTime = 0L,
-                                maskOrPixelationTime = 0L
+                                height = readyTask.height ?: 0
                             ))
                             continue
                         }
@@ -204,9 +200,7 @@ class SafeGazeJsInterface(
                                 result = "null",
                                 id = readyTask.id ?: "",
                                 width = readyTask.width ?: 0,
-                                height = readyTask.height ?: 0,
-                                coreInferenceTime = 0L,
-                                maskOrPixelationTime = 0L
+                                height = readyTask.height ?: 0
                             )
 
                             readyTask.let {
@@ -220,9 +214,7 @@ class SafeGazeJsInterface(
                                         result = cachedResult.responseStr,
                                         id = it.id ?: "",
                                         width = it.width ?: 0,
-                                        height = it.height ?: 0,
-                                        coreInferenceTime = 0L,
-                                        maskOrPixelationTime = 0L
+                                        height = it.height ?: 0
                                     )
                                     Timber.d("kLog cache hit")
                                     downloadTracker.remove(it.id)
@@ -258,9 +250,7 @@ class SafeGazeJsInterface(
                                             id = readyTask.id ?: "",
                                             width = readyTask.width ?: 0,
                                             height = readyTask.height ?: 0,
-                                            isManipulated = true,
-                                            nsfwInference,
-                                            nsfwInference
+                                            isManipulated = true
                                         )
                                     } else {
                                         val segmentationInf = measureTimeMillis {
@@ -270,11 +260,11 @@ class SafeGazeJsInterface(
 
                                         val inferenceTime = nsfwInference + segmentationInf
                                         inferenceTimes.add(inferenceTime)
-                                        coreInferenceTimes.add(output.coreInferenceTime)
+                                        coreInferenceTimes.add(output.coreInferenceTime ?: 0L)
                                         if (grayBlur) {
-                                            maskingTimes.add(output.maskOrPixelationTime)
+                                            maskingTimes.add(output.maskOrPixelationTime ?: 0L)
                                         } else {
-                                            pixelationTimes.add(output.maskOrPixelationTime)
+                                            pixelationTimes.add(output.maskOrPixelationTime ?: 0L)
                                         }
                                         inferenceTimes.add(inferenceTime)
                                         Timber.d("kLog Total inference time: $inferenceTime ms, NSFW: $nsfwInference, seg: $segmentationInf")
@@ -288,15 +278,17 @@ class SafeGazeJsInterface(
 
                                 if (nsfwProcessingTimes.size >= 30) {
                                     val p90NSFW = nsfwProcessingTimes.sorted()[nsfwProcessingTimes.size * 90 / 100]
+                                    Timber.d("kLog p90NSFW: $p90NSFW")
                                     analytics.logEvent(
                                         AnalyticsEvent.P90NSFWProcessing,
                                         mapOf(AnalyticsParam.NSFWProcessingTime to p90NSFW.toString()),
                                     )
-                                    inferenceTimes.clear()
+                                    nsfwProcessingTimes.clear()
                                 }
 
                                 if (coreInferenceTimes.size >= 30) {
                                     val p90CoreInference = coreInferenceTimes.sorted()[coreInferenceTimes.size * 90 / 100]
+                                    Timber.d("kLog p90CoreInference: $p90CoreInference")
                                     analytics.logEvent(
                                         AnalyticsEvent.P90CoreInference,
                                         mapOf(AnalyticsParam.CoreInferenceTime to p90CoreInference.toString()),
@@ -306,6 +298,7 @@ class SafeGazeJsInterface(
 
                                 if (maskingTimes.size >= 30) {
                                     val p90Masking = maskingTimes.sorted()[maskingTimes.size * 90 / 100]
+                                    Timber.d("kLog p90Masking: $p90Masking")
                                     analytics.logEvent(
                                         AnalyticsEvent.P90ApplySolidMask,
                                         mapOf(AnalyticsParam.ApplySolidMaskTime to p90Masking.toString()),
@@ -315,15 +308,17 @@ class SafeGazeJsInterface(
 
                                 if (pixelationTimes.size >= 30) {
                                     val p90Pixelation = pixelationTimes.sorted()[pixelationTimes.size * 90 / 100]
+                                    Timber.d("kLog p90Pixelation: $p90Pixelation")
                                     analytics.logEvent(
                                         AnalyticsEvent.P90ApplyPixelationMask,
                                         mapOf(AnalyticsParam.ApplyPixelationMaskTime to p90Pixelation.toString()),
                                     )
-                                    inferenceTimes.clear()
+                                    pixelationTimes.clear()
                                 }
 
                                 if (inferenceTimes.size >= 30) {
                                     val p90 = inferenceTimes.sorted()[inferenceTimes.size * 90 / 100]
+                                    // Timber.d("kLog p90Inference: $p90")
                                     analytics.logEvent(
                                         AnalyticsEvent.P90ImageProcessing,
                                         mapOf(AnalyticsParam.ImageProcessingTime to p90.toString()),
