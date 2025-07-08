@@ -117,10 +117,11 @@ class SafeGazeJsInterface(
 
     private fun startImageDownload(input: InputImage) {
         downloadTracker[input.id] = DownloadStatus.Pending
-
+        var acquired = false
         scope.launch {
             try {
                 downloadSemaphore.acquire()
+                acquired = true
 
                 val downloadTime = measureTimeMillis {
                     val startTime = System.currentTimeMillis()
@@ -146,7 +147,9 @@ class SafeGazeJsInterface(
                 Timber.e("kLog Image download failed for ${input.id}: ${e.message}")
                 downloadTracker[input.id] = DownloadStatus.Failed
             } finally {
-                downloadSemaphore.release()
+                if (acquired) {
+                    downloadSemaphore.release()
+                }
 
                 // If processing is idle, kick-start processing
                 if (!paused.get() && processingJob?.isActive != true) {
