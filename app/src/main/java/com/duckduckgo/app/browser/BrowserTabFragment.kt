@@ -363,13 +363,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.kahfads.sdk.KahfAdConfig
-import com.kahfads.sdk.KahfAdSdk
-import com.kahfads.sdk.KahfAdType
-import com.kahfads.sdk.KahfSdkConfig
-import com.kahfads.sdk.adviews.AdImpressionListener
-import com.kahfads.sdk.model.AdResult.Error
-import com.kahfads.sdk.model.ErrorType
+import com.kahfads.sdk.AdImpressionListener
+import com.kahfads.sdk.FallbackAdImpressionListener
+import com.kahfads.sdk.KahfAdsViewConfig
+import com.kahfads.sdk.PlacementId
 import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
@@ -923,7 +920,7 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private val kahfSdkConfig = KahfSdkConfig(
+    /*private val kahfSdkConfig = KahfSdkConfig(
         publisherId = "kahf-browser",
         campaignTypes = "paid|publisher-house|community|house",
         format = "json"
@@ -934,7 +931,7 @@ class BrowserTabFragment :
         divId = "home_banner",
         screenName = "HomeView",
         refreshRateInMillis = 20_000,
-    )
+    )*/
 
     private lateinit var deviceLockAuthenticator: DeviceLockAuthenticator
 
@@ -978,10 +975,10 @@ class BrowserTabFragment :
             pendingUploadTask = null
         }
 
-        KahfAdSdk.initialize(
+        /*KahfAdSdk.initialize(
             requireContext(),
             kahfSdkConfig,
-        )
+        )*/
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             if (!this@BrowserTabFragment::deviceLockAuthenticator.isInitialized) {
@@ -1962,7 +1959,7 @@ class BrowserTabFragment :
                 lifecycleScope.launch(dispatchers.io()) {
                     delay(100)
                     withContext(dispatchers.main()) {
-                        binding.includeNewBrowserTab.kahfBannerAd.pauseAutoRefresh()
+                        // binding.includeNewBrowserTab.kahfBannerAd.pauseAutoRefresh()
                         Timber.d("adLog pause refresh. $tabId | ${webView?.url}")
                     }
                 }
@@ -1972,7 +1969,7 @@ class BrowserTabFragment :
                     && requireActivity() is BrowserActivity
                     && (requireActivity() as BrowserActivity).isActiveTab(tabId)
                     && webView?.isInvisible == true) {
-                    binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
+                    // binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
                     Timber.d("adLog resume refresh. $tabId | ${webView?.url}")
                 }
             }
@@ -4598,46 +4595,50 @@ class BrowserTabFragment :
 
             // Kahf Ad
             newBrowserTab.kahfBannerAd.apply {
-                loadAd(kahfAdConfig)
-                setAdClickListener {
-                    viewModel.onUserSubmittedQuery(it)
-                }
-                setAdImpressionListener(
-                    object : AdImpressionListener {
-                        override fun onAdClicked() {
-                            Timber.i("adLog onAdClicked")
-                            analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
-                        }
-
-                        override fun onAdFailedToLoad(error: Error) {
-                            Timber.i("adLog onAdFailedToLoad ${error.message}")
-                            when (error.type) {
-                                ErrorType.TIMEOUT -> {
-                                    analyticsService.logEvent(AnalyticsEvent.AdTimeout)
-                                }
-                                ErrorType.NO_AD_FOUND -> {
-                                    analyticsService.logEvent(AnalyticsEvent.AdNotFound)
-                                }
-                                ErrorType.SERVER_ERROR -> {
-                                    analyticsService.logEvent(AnalyticsEvent.AdServerError)
-                                }
-                                else -> {
-                                    // No op
-                                }
-                            }
-                        }
-
-                        override fun onAdLoaded() {
-                            if (webView?.isVisible != false) {
-                                Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
-                                viewModel.pauseAdRefresh()
-                            } else {
-                                Timber.i("adLog onAdLoaded $tabId")
-                                analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
-                            }
-                        }
-                    },
+                configure(
+                    config = KahfAdsViewConfig(
+                        screenName = "BrowserTabFragment",
+                        placementId = PlacementId.Epom("0dfa8081b94508f158a190b8805ed9e8"),
+                        refreshIntervalInMillis = 30_000L  // Optional, 30 seconds
+                    )
                 )
+
+                // Optioally set event listeners
+                setEventsListener(object : AdImpressionListener() {
+                    override fun onAdLoaded() {
+                        if (webView?.isVisible != false) {
+                            Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
+                            viewModel.pauseAdRefresh()
+                        } else {
+                            Timber.i("adLog onAdLoaded $tabId")
+                            analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                        }
+                    }
+
+                    override fun onAdFailedToLoad(message: String, cause: Throwable?) {
+                        /*when (error.type) {
+                            ErrorType.TIMEOUT -> {
+                                analyticsService.logEvent(AnalyticsEvent.AdTimeout)
+                            }
+                            ErrorType.NO_AD_FOUND -> {
+                                analyticsService.logEvent(AnalyticsEvent.AdNotFound)
+                            }
+                            ErrorType.SERVER_ERROR -> {
+                                analyticsService.logEvent(AnalyticsEvent.AdServerError)
+                            }
+                            else -> {
+                                // No op
+                            }
+                        }*/
+                    }
+
+                    override fun onAdClicked() {
+                        // viewModel.onUserSubmittedQuery(it)
+                        Timber.i("adLog onAdClicked")
+                        analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                        super.onAdClicked()
+                    }
+                })
             }
 
             // App Statistics section

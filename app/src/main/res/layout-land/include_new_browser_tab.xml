@@ -219,7 +219,7 @@
                     android:orientation="vertical"
                     app:layout_constraintGuide_percent="0.5" />
 
-                <com.kahfads.sdk.adviews.KahfBannerAdView
+                <com.kahfads.sdk.LargeBannerAdView
                     android:id="@+id/kahfBannerAd"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
