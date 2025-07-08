@@ -43,17 +43,17 @@ class GlobalActivityStarterImpl @Inject constructor(
     }
 
     override fun startIntent(context: Context, params: GlobalActivityStarter.ActivityParams): Intent? {
-        val activityClass = activityMappers.firstNotNullOfOrNull {
+        /*val activityClass = activityMappers.firstNotNullOfOrNull {
             it.map(params)
-        }
+        }*/
 
-        return activityClass?.let {
+        return null/*activityClass?.let {
             logcat { "Activity $it for params $params found" }
 
             Intent(context, it).apply {
                 putExtra(ACTIVITY_SERIALIZABLE_PARAMETERS_ARG, params)
             }
-        }
+        }*/
     }
 
     override fun start(

@@ -17,7 +17,7 @@
 plugins {
     id 'java-library'
     id 'kotlin'
-    id 'com.google.devtools.ksp' version "$ksp_version"
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/code-formatting.gradle"

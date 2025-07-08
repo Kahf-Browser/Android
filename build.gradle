@@ -3,16 +3,16 @@
 buildscript {
 
     ext {
-        kotlin_version = '1.9.22'
+        kotlin_version = '2.2.0'
         spotless = '6.1.2'
         anvil_version = '2.5.0-beta07'
-        ksp_version = '1.9.22-1.0.17'
-        gradle_plugin = '8.2.0'
+        ksp_version = '2.2.0-2.0.2'
+        gradle_plugin = '8.11.0'
         min_sdk = 26
         target_sdk = 34
-        compile_sdk = 34
+        compile_sdk = 35
         fladle_version = '0.17.4'
-        kotlinter_version = '3.12.0'
+        kotlinter_version = '5.1.1'
         dokka_version = '1.8.20'
         google_services_version = '4.4.2'
         firebase_crashlytics_version = '3.0.2'
@@ -44,6 +44,7 @@ plugins {
     id 'org.jetbrains.dokka' version "$dokka_version"
     id 'com.osacky.fulladle' version "$fladle_version"
     id 'org.jmailen.kotlinter' version "$kotlinter_version" apply false
+    id 'com.google.devtools.ksp' version '2.2.0-2.0.2' apply false
 }
 
 allprojects {
@@ -209,5 +210,3 @@ fladle {
         }
     }
 }
-
-apply plugin: 'android-reporting'

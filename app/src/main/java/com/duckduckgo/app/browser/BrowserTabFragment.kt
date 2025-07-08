@@ -363,18 +363,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.kahfads.sdk.KahfAdConfig
-import com.kahfads.sdk.KahfAdSdk
-import com.kahfads.sdk.KahfAdType
-import com.kahfads.sdk.KahfSdkConfig
-import com.kahfads.sdk.adviews.AdImpressionListener
-import com.kahfads.sdk.model.AdResult.Error
-import com.kahfads.sdk.model.ErrorType
+import com.kahfads.sdk.AdImpressionListener
+import com.kahfads.sdk.FallbackAdImpressionListener
+import com.kahfads.sdk.KahfAdsViewConfig
+import com.kahfads.sdk.LargeBannerAdView
+import com.kahfads.sdk.PlacementId
 import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
@@ -730,6 +727,10 @@ class BrowserTabFragment :
 
     private val gson = Gson()
 
+    private val kahfAdBannerView: LargeBannerAdView by lazy {
+        binding.includeNewBrowserTab.kahfBannerAd
+    }
+
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
             EmailProtectionInContextSignUpScreenResult.SUCCESS -> {
@@ -923,7 +924,7 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private val kahfSdkConfig = KahfSdkConfig(
+    /*private val kahfSdkConfig = KahfSdkConfig(
         publisherId = "kahf-browser",
         campaignTypes = "paid|publisher-house|community|house",
         format = "json"
@@ -934,7 +935,7 @@ class BrowserTabFragment :
         divId = "home_banner",
         screenName = "HomeView",
         refreshRateInMillis = 20_000,
-    )
+    )*/
 
     private lateinit var deviceLockAuthenticator: DeviceLockAuthenticator
 
@@ -978,10 +979,10 @@ class BrowserTabFragment :
             pendingUploadTask = null
         }
 
-        KahfAdSdk.initialize(
+        /*KahfAdSdk.initialize(
             requireContext(),
             kahfSdkConfig,
-        )
+        )*/
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             if (!this@BrowserTabFragment::deviceLockAuthenticator.isInitialized) {
@@ -1962,7 +1963,7 @@ class BrowserTabFragment :
                 lifecycleScope.launch(dispatchers.io()) {
                     delay(100)
                     withContext(dispatchers.main()) {
-                        binding.includeNewBrowserTab.kahfBannerAd.pauseAutoRefresh()
+                        // binding.includeNewBrowserTab.kahfBannerAd.pauseAutoRefresh()
                         Timber.d("adLog pause refresh. $tabId | ${webView?.url}")
                     }
                 }
@@ -1972,7 +1973,7 @@ class BrowserTabFragment :
                     && requireActivity() is BrowserActivity
                     && (requireActivity() as BrowserActivity).isActiveTab(tabId)
                     && webView?.isInvisible == true) {
-                    binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
+                    // binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
                     Timber.d("adLog resume refresh. $tabId | ${webView?.url}")
                 }
             }
@@ -2316,7 +2317,7 @@ class BrowserTabFragment :
         runCatching {
             if (activities.size == 1 || useFirstActivityFound) {
                 val activity = activities.first()
-                val appTitle = activity.loadLabel(pm)
+                val appTitle = activity.loadLabel(pm!!)
                 Timber.i("Exactly one app available for intent: $appTitle")
                 launchExternalAppDialog(context) { context.startActivity(intent) }
             } else {
@@ -4597,9 +4598,46 @@ class BrowserTabFragment :
             }
 
             // Kahf Ad
-            newBrowserTab.kahfBannerAd.apply {
-                loadAd(kahfAdConfig)
-                setAdClickListener {
+            kahfAdBannerView.apply {
+                configure(
+                    config = KahfAdsViewConfig(
+                        screenName = "MainActivity",
+                        placementId = PlacementId.Epom("0dfa8081b94508f158a190b8805ed9e8"),
+                        refreshIntervalInMillis = 30_000L  // Optional, 30 seconds
+                    )
+                )
+
+                setEventsListener(object : AdImpressionListener() {
+                    override fun onAdLoaded() {
+                        if (webView?.isVisible != false) {
+                            Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
+                            viewModel.pauseAdRefresh()
+                        } else {
+                            Timber.i("adLog onAdLoaded $tabId")
+                            analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                        }
+                    }
+
+                    override fun onAdFailedToLoad(message: String, cause: Throwable?) {
+                        // Handle ad load failure
+                    }
+
+                    override fun onAdClicked() {
+                        // viewModel.onUserSubmittedQuery(it)
+                    }
+                })
+
+                // Optionally set fallback ad listeners
+                setFallbackEventsListener(object : FallbackAdImpressionListener() {
+                    override fun onFallbackAdLoaded(primaryAdError: Throwable?, headline: String) {
+                        // Handle fallback ad loaded
+                    }
+
+                    override fun onFallbackAdFailedToLoad(message: String, cause: Throwable?) {
+                        // Handle fallback ad load failure
+                    }
+                })
+                /*setAdClickListener {
                     viewModel.onUserSubmittedQuery(it)
                 }
                 setAdImpressionListener(
@@ -4637,7 +4675,7 @@ class BrowserTabFragment :
                             }
                         }
                     },
-                )
+                )*/
             }
 
             // App Statistics section

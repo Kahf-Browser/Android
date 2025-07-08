@@ -1,4 +1,4 @@
-[*.{kt,kts}]
+[*.{kt,kts,gradle}]
 charset = utf-8
 end_of_line = lf
 indent_size = 4
@@ -91,3 +91,4 @@ ij_kotlin_while_on_new_line = false
 ij_kotlin_wrap_elvis_expressions = 1
 ij_kotlin_wrap_expression_body_functions = 1
 ij_kotlin_wrap_first_method_in_call_chain = false
+disable_rules=no-wildcard-imports,filename,package-name,annotation-spacing

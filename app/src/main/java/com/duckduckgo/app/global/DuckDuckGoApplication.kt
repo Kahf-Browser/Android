@@ -217,7 +217,6 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     private fun setupKahfAdsSDK() {
         KahfAdsSdk.initialize(
             config = KahfAdsSdkConfig(
-                publisherId = "kahf-browser",
                 fallbackPublisherId = "kahf-browser"
             ),
             context = this
