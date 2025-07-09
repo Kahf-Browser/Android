@@ -35,10 +35,10 @@ fun String.primaryDomain(): String {
 }
 
 fun isZikrTab(): Boolean {
-    val model = Build.MODEL
-    // val manufacturer = Build.MANUFACTURER
+    // val model = Build.MODEL
+    val manufacturer = Build.MANUFACTURER
 
-    return if (model.equals("E101GCM", ignoreCase = true) /*&& manufacturer.equals("google", ignoreCase = true)*/) {
+    return if (manufacturer.equals("Zikr", ignoreCase = true) /*&& manufacturer.equals("google", ignoreCase = true)*/) {
         // println("DeviceCheck -- Zikr detected")
         true
     } else {
