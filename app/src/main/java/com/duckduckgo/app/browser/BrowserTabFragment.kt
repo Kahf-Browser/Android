@@ -365,6 +365,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.kahfads.sdk.AdImpressionListener
 import com.kahfads.sdk.FallbackAdImpressionListener
+import com.kahfads.sdk.KahfAdsError
 import com.kahfads.sdk.KahfAdsViewConfig
 import com.kahfads.sdk.PlacementId
 import io.kahf.kahf_segmentation.ImageProcessor
@@ -4603,7 +4604,6 @@ class BrowserTabFragment :
                     )
                 )
 
-                // Optioally set event listeners
                 setEventsListener(object : AdImpressionListener() {
                     override fun onAdLoaded() {
                         if (webView?.isVisible != false) {
@@ -4615,28 +4615,34 @@ class BrowserTabFragment :
                         }
                     }
 
-                    override fun onAdFailedToLoad(message: String, cause: Throwable?) {
-                        /*when (error.type) {
-                            ErrorType.TIMEOUT -> {
+                    override fun onAdFailedToLoad(
+                        message: String,
+                        cause: KahfAdsError?
+                    ) {
+                        when(cause) {
+                            is KahfAdsError.TimeoutError -> {
                                 analyticsService.logEvent(AnalyticsEvent.AdTimeout)
                             }
-                            ErrorType.NO_AD_FOUND -> {
+
+                            is KahfAdsError.NoAdFoundError -> {
                                 analyticsService.logEvent(AnalyticsEvent.AdNotFound)
                             }
-                            ErrorType.SERVER_ERROR -> {
+
+                            is KahfAdsError.ServerError -> {
                                 analyticsService.logEvent(AnalyticsEvent.AdServerError)
                             }
+
                             else -> {
                                 // No op
                             }
-                        }*/
+                        }
                     }
 
-                    override fun onAdClicked() {
-                        // viewModel.onUserSubmittedQuery(it)
+                    override fun onAdClicked(urlToLoad: String): Boolean {
+                        viewModel.onUserSubmittedQuery(urlToLoad)
                         Timber.i("adLog onAdClicked")
                         analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
-                        super.onAdClicked()
+                        return true
                     }
                 })
             }
