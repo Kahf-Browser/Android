@@ -22,8 +22,8 @@ android {
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
-        versionCode 202505281
-        versionName "1.9"
+        versionCode 202507091
+        versionName "2.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "kahf_browser_${versionName}_${versionCode}"
         vectorDrawables.useSupportLibrary = true
