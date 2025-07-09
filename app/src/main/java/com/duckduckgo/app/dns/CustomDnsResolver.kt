@@ -52,7 +52,7 @@ class CustomDnsResolver(
 
     private fun setupDotSocket(): SSLSocket {
         val socketFactory = SSLSocketFactory.getDefault() as SSLSocketFactory
-        val sslSocket = socketFactory.createSocket(privateDns.dnsServerIps.random(), 853) as SSLSocket
+        val sslSocket = socketFactory.createSocket(privateDns.url, 853) as SSLSocket
         sslSocket.keepAlive = true
         sslSocket.soTimeout = 2000
         sslSocket.tcpNoDelay = true

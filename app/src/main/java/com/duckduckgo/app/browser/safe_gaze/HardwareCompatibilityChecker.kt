@@ -19,8 +19,8 @@ package com.duckduckgo.app.browser.safe_gaze
 import android.content.Context
 import android.graphics.BitmapFactory
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
-import io.kahf.porda_segmentation.ImageProcessor
-import io.kahf.porda_segmentation.InputImage
+import io.kahf.kahf_segmentation.ImageProcessor
+import io.kahf.kahf_segmentation.InputImage
 import timber.log.Timber
 import kotlin.system.measureTimeMillis
 
