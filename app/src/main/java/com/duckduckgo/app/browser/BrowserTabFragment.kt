@@ -309,6 +309,7 @@ import com.duckduckgo.common.ui.view.setFormattedCount
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.AD_REFRESH_INTERVAL
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DEFAULT_FACE_COVER
@@ -352,6 +353,7 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
+import com.duckduckgo.site.permissions.store.edit
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -4600,7 +4602,7 @@ class BrowserTabFragment :
                     config = KahfAdsViewConfig(
                         screenName = "BrowserTabFragment",
                         placementId = PlacementId.Epom("0dfa8081b94508f158a190b8805ed9e8"),
-                        refreshIntervalInMillis = 30_000L  // Optional, 30 seconds
+                        refreshIntervalInMillis = sharedPreferences.getLong(AD_REFRESH_INTERVAL, 20_000L)
                     )
                 )
 
