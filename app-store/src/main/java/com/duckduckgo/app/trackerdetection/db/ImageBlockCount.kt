@@ -24,5 +24,5 @@ import androidx.room.PrimaryKey
 )
 data class ImageBlockCount(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val count: Int
+    val count: Int,
 )

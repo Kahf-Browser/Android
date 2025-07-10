@@ -309,10 +309,12 @@ import com.duckduckgo.common.ui.view.setFormattedCount
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.AD_REFRESH_INTERVAL
 import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DEFAULT_FACE_COVER
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.EPOM_PLACEMENT_ID
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
 import com.duckduckgo.common.utils.extensions.dpToPx
@@ -363,18 +365,14 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
-import com.kahfads.sdk.KahfAdConfig
-import com.kahfads.sdk.KahfAdSdk
-import com.kahfads.sdk.KahfAdType
-import com.kahfads.sdk.KahfSdkConfig
-import com.kahfads.sdk.adviews.AdImpressionListener
-import com.kahfads.sdk.model.AdResult.Error
-import com.kahfads.sdk.model.ErrorType
+import com.kahfads.sdk.AdImpressionListener
+import com.kahfads.sdk.KahfAdsError
+import com.kahfads.sdk.KahfAdsViewConfig
+import com.kahfads.sdk.PlacementId
 import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
@@ -923,19 +921,6 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    private val kahfSdkConfig = KahfSdkConfig(
-        publisherId = "kahf-browser",
-        campaignTypes = "paid|publisher-house|community|house",
-        format = "json"
-    )
-
-    private val kahfAdConfig = KahfAdConfig(
-        adType = KahfAdType.BANNER_AD_640_200,
-        divId = "home_banner",
-        screenName = "HomeView",
-        refreshRateInMillis = 20_000,
-    )
-
     private lateinit var deviceLockAuthenticator: DeviceLockAuthenticator
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -977,11 +962,6 @@ class BrowserTabFragment :
             }
             pendingUploadTask = null
         }
-
-        KahfAdSdk.initialize(
-            requireContext(),
-            kahfSdkConfig,
-        )
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             if (!this@BrowserTabFragment::deviceLockAuthenticator.isInitialized) {
@@ -1962,7 +1942,6 @@ class BrowserTabFragment :
                 lifecycleScope.launch(dispatchers.io()) {
                     delay(100)
                     withContext(dispatchers.main()) {
-                        binding.includeNewBrowserTab.kahfBannerAd.pauseAutoRefresh()
                         Timber.d("adLog pause refresh. $tabId | ${webView?.url}")
                     }
                 }
@@ -1972,7 +1951,6 @@ class BrowserTabFragment :
                     && requireActivity() is BrowserActivity
                     && (requireActivity() as BrowserActivity).isActiveTab(tabId)
                     && webView?.isInvisible == true) {
-                    binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
                     Timber.d("adLog resume refresh. $tabId | ${webView?.url}")
                 }
             }
@@ -4598,46 +4576,55 @@ class BrowserTabFragment :
 
             // Kahf Ad
             newBrowserTab.kahfBannerAd.apply {
-                loadAd(kahfAdConfig)
-                setAdClickListener {
-                    viewModel.onUserSubmittedQuery(it)
-                }
-                setAdImpressionListener(
-                    object : AdImpressionListener {
-                        override fun onAdClicked() {
-                            Timber.i("adLog onAdClicked")
-                            analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
-                        }
-
-                        override fun onAdFailedToLoad(error: Error) {
-                            Timber.i("adLog onAdFailedToLoad ${error.message}")
-                            when (error.type) {
-                                ErrorType.TIMEOUT -> {
-                                    analyticsService.logEvent(AnalyticsEvent.AdTimeout)
-                                }
-                                ErrorType.NO_AD_FOUND -> {
-                                    analyticsService.logEvent(AnalyticsEvent.AdNotFound)
-                                }
-                                ErrorType.SERVER_ERROR -> {
-                                    analyticsService.logEvent(AnalyticsEvent.AdServerError)
-                                }
-                                else -> {
-                                    // No op
-                                }
-                            }
-                        }
-
-                        override fun onAdLoaded() {
-                            if (webView?.isVisible != false) {
-                                Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
-                                viewModel.pauseAdRefresh()
-                            } else {
-                                Timber.i("adLog onAdLoaded $tabId")
-                                analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
-                            }
-                        }
-                    },
+                configure(
+                    config = KahfAdsViewConfig(
+                        screenName = "BrowserTabFragment",
+                        placementId = PlacementId.Epom(EPOM_PLACEMENT_ID),
+                        refreshIntervalInMillis = sharedPreferences.getLong(AD_REFRESH_INTERVAL, 20_000L)
+                    )
                 )
+
+                setEventsListener(object : AdImpressionListener() {
+                    override fun onAdLoaded() {
+                        if (webView?.isVisible != false) {
+                            Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
+                            viewModel.pauseAdRefresh()
+                        } else {
+                            Timber.i("adLog onAdLoaded $tabId")
+                            analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                        }
+                    }
+
+                    override fun onAdFailedToLoad(
+                        message: String,
+                        cause: KahfAdsError?
+                    ) {
+                        when(cause) {
+                            is KahfAdsError.TimeoutError -> {
+                                analyticsService.logEvent(AnalyticsEvent.AdTimeout)
+                            }
+
+                            is KahfAdsError.NoAdFoundError -> {
+                                analyticsService.logEvent(AnalyticsEvent.AdNotFound)
+                            }
+
+                            is KahfAdsError.ServerError -> {
+                                analyticsService.logEvent(AnalyticsEvent.AdServerError)
+                            }
+
+                            else -> {
+                                // No op
+                            }
+                        }
+                    }
+
+                    override fun onAdClicked(urlToLoad: String): Boolean {
+                        viewModel.onUserSubmittedQuery(urlToLoad)
+                        Timber.i("adLog onAdClicked")
+                        analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                        return true
+                    }
+                })
             }
 
             // App Statistics section

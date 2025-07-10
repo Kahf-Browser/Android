@@ -21,10 +21,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
+import android.content.SharedPreferences
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewTreeObserver
@@ -70,13 +72,16 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.AD_REFRESH_INTERVAL
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.MIN_VERSION
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
+import com.duckduckgo.site.permissions.store.edit
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
@@ -132,6 +137,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var kahfImageBlockedDao: KahfImageBlockedDao
+
+    @Inject
+    lateinit var spProvider: SharedPreferencesProvider
 
     private val lastActiveTabs = TabList()
 
@@ -211,6 +219,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     0L
                 }
 
+                val adRefreshInterval: Long = try {
+                    rc[AD_REFRESH_INTERVAL].asLong()
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to get ad_refresh_interval from remote config")
+                    20_000L
+                }
+                spProvider.getKahfSharedPreferences().edit {
+                    putLong(AD_REFRESH_INTERVAL, adRefreshInterval)
+                }
+
                 val updateType = if (minimumRequiredVersionCode > BuildConfig.VERSION_CODE) {
                     AppUpdateType.IMMEDIATE
                 } else {
@@ -220,7 +238,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 Timber.d(
                     "rcLog Fetched from remote: $fetchedFromRemote. " +
                         "MinRequiredVersion: $minimumRequiredVersionCode. " +
-                        "UpdateType: ${if (updateType == AppUpdateType.IMMEDIATE) "IMMEDIATE" else "FLEXIBLE"}",
+                        "UpdateType: ${if (updateType == AppUpdateType.IMMEDIATE) "IMMEDIATE" else "FLEXIBLE"}, adRefreshInterval: $adRefreshInterval",
                 )
 
                 appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->

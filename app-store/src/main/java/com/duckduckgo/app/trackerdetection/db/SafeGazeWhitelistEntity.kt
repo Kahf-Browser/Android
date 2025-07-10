@@ -22,5 +22,5 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "safegaze_whitelist")
 data class SafeGazeWhitelistEntity(
     @PrimaryKey val host: String,
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
 )

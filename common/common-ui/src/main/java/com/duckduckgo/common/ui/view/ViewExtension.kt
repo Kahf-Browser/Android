@@ -226,7 +226,7 @@ fun TextView.setFormattedCount(number: Int) {
         number < 10 -> String.format("%02d", number)
         number < 1000 -> number.toString()
         number < 1000000 -> String.format("%.1fk", number / 1000.0)
-        else -> String.format("%.1fM", number /1000000.0)
+        else -> String.format("%.1fM", number / 1000000.0)
     }
 }
 
