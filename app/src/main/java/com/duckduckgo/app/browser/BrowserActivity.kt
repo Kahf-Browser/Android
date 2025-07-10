@@ -222,7 +222,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 val adRefreshInterval: Long = try {
                     rc[AD_REFRESH_INTERVAL].asLong()
                 } catch (e: Exception) {
-                    e.printStackTrace()
+                    Timber.e(e, "Failed to get ad_refresh_interval from remote config")
                     20_000L
                 }
                 spProvider.getKahfSharedPreferences().edit {
