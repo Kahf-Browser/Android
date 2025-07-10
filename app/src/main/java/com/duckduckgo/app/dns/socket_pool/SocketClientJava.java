@@ -1,7 +1,6 @@
 package com.duckduckgo.app.dns.socket_pool;
 
 import android.os.Build;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,7 +13,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.net.ssl.SNIHostName;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
@@ -38,13 +36,15 @@ public class SocketClientJava {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
             SSLSocketFactory socketFactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
-            Future<?> future = executor.submit(() -> {
-                try {
-                    client = (SSLSocket) socketFactory.createSocket(host, port);
-                } catch (Exception e) {
-                    throw new RuntimeException("Socket creation failed", e);
-                }
-            });
+            Future<?> future =
+                    executor.submit(
+                            () -> {
+                                try {
+                                    client = (SSLSocket) socketFactory.createSocket(host, port);
+                                } catch (Exception e) {
+                                    throw new RuntimeException("Socket creation failed", e);
+                                }
+                            });
 
             try {
                 // Wait for the socket creation to complete, with a timeout
@@ -79,11 +79,12 @@ public class SocketClientJava {
         final SSLParameters parameters = new SSLParameters();
         parameters.setServerNames(Collections.singletonList(new SNIHostName(dnsHostName)));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            parameters.setApplicationProtocols(new String[]{"http/1.1"});
+            parameters.setApplicationProtocols(new String[] {"http/1.1"});
         } else {
             try {
-                Method method = this.getClass().getMethod("setApplicationProtocols", String[].class);
-                method.invoke(this, (Object) new String[]{"http/1.1"});
+                Method method =
+                        this.getClass().getMethod("setApplicationProtocols", String[].class);
+                method.invoke(this, (Object) new String[] {"http/1.1"});
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error setting application protocols: %s", e.getMessage());
             }
@@ -125,5 +126,4 @@ public class SocketClientJava {
         }
         return false;
     }
-
 }

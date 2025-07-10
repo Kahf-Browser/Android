@@ -23,6 +23,7 @@ import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.di.scopes.ActivityScope
+import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -30,15 +31,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
 class AutoconsentSettingsViewModel @Inject constructor(private val autoconsent: Autoconsent) : ViewModel() {
     data class ViewState(
         val autoconsentEnabled: Boolean,
     )
+
     sealed class Command {
-        data class LaunchLearnMoreWebPage(val url: String = LEARN_MORE_URL, @StringRes val titleId: Int = R.string.autoconsentTitle) : Command()
+        data class LaunchLearnMoreWebPage(
+            val url: String = LEARN_MORE_URL,
+            @StringRes val titleId: Int = R.string.autoconsentTitle,
+        ) : Command()
     }
 
     private val command = Channel<Command>(1, BufferOverflow.DROP_OLDEST)

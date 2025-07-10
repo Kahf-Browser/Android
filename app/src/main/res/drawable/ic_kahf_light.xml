@@ -13,7 +13,7 @@
     <path
         android:pathData="M81.39,11.06C71.93,10.25 56.29,7.74 44.85,0V44.12C44.93,44.21 45.02,44.29 45.1,44.38C51.25,38.82 60.85,37.29 68.07,41.72C70.03,42.88 71.75,44.38 73.14,46.12C74.09,47.31 73.79,49.08 72.52,49.92C66.13,41.5 52.28,42.66 48.41,52.69C47.74,54.14 46.29,54.85 44.84,54.84V99.97C44.84,99.97 44.88,99.99 44.9,100C88.83,79.38 89.69,43.71 89.69,43.71V20.12C89.69,15.4 86.09,11.47 81.39,11.06Z">
       <aapt:attr name="android:fillColor">
-        <gradient 
+        <gradient
             android:startX="7.32"
             android:startY="81.17"
             android:endX="59.73"
@@ -29,7 +29,7 @@
         android:strokeAlpha="0.1"
         android:fillAlpha="0.1">
       <aapt:attr name="android:fillColor">
-        <gradient 
+        <gradient
             android:startX="0"
             android:startY="13.66"
             android:endX="89.69"
