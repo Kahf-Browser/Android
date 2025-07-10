@@ -98,3 +98,4 @@ report
 /posthog.properties
 *.tflite
 /config.properties
+/app/play/debug/output-metadata.json

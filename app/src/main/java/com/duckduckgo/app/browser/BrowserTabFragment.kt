@@ -314,6 +314,7 @@ import com.duckduckgo.common.utils.AppUrl.ParamKey
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DEFAULT_FACE_COVER
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.EPOM_PLACEMENT_ID
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
 import com.duckduckgo.common.utils.extensions.dpToPx
@@ -353,7 +354,6 @@ import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
-import com.duckduckgo.site.permissions.store.edit
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
@@ -366,7 +366,6 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.kahfads.sdk.AdImpressionListener
-import com.kahfads.sdk.FallbackAdImpressionListener
 import com.kahfads.sdk.KahfAdsError
 import com.kahfads.sdk.KahfAdsViewConfig
 import com.kahfads.sdk.PlacementId
@@ -374,7 +373,6 @@ import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
@@ -923,19 +921,6 @@ class BrowserTabFragment :
 
     private lateinit var privacyProtectionsPopup: PrivacyProtectionsPopup
 
-    /*private val kahfSdkConfig = KahfSdkConfig(
-        publisherId = "kahf-browser",
-        campaignTypes = "paid|publisher-house|community|house",
-        format = "json"
-    )
-
-    private val kahfAdConfig = KahfAdConfig(
-        adType = KahfAdType.BANNER_AD_640_200,
-        divId = "home_banner",
-        screenName = "HomeView",
-        refreshRateInMillis = 20_000,
-    )*/
-
     private lateinit var deviceLockAuthenticator: DeviceLockAuthenticator
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -977,11 +962,6 @@ class BrowserTabFragment :
             }
             pendingUploadTask = null
         }
-
-        /*KahfAdSdk.initialize(
-            requireContext(),
-            kahfSdkConfig,
-        )*/
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             if (!this@BrowserTabFragment::deviceLockAuthenticator.isInitialized) {
@@ -1962,7 +1942,6 @@ class BrowserTabFragment :
                 lifecycleScope.launch(dispatchers.io()) {
                     delay(100)
                     withContext(dispatchers.main()) {
-                        // binding.includeNewBrowserTab.kahfBannerAd.pauseAutoRefresh()
                         Timber.d("adLog pause refresh. $tabId | ${webView?.url}")
                     }
                 }
@@ -1972,7 +1951,6 @@ class BrowserTabFragment :
                     && requireActivity() is BrowserActivity
                     && (requireActivity() as BrowserActivity).isActiveTab(tabId)
                     && webView?.isInvisible == true) {
-                    // binding.includeNewBrowserTab.kahfBannerAd.resumeAutoRefresh()
                     Timber.d("adLog resume refresh. $tabId | ${webView?.url}")
                 }
             }
@@ -4601,7 +4579,7 @@ class BrowserTabFragment :
                 configure(
                     config = KahfAdsViewConfig(
                         screenName = "BrowserTabFragment",
-                        placementId = PlacementId.Epom("0dfa8081b94508f158a190b8805ed9e8"),
+                        placementId = PlacementId.Epom(EPOM_PLACEMENT_ID),
                         refreshIntervalInMillis = sharedPreferences.getLong(AD_REFRESH_INTERVAL, 20_000L)
                     )
                 )
