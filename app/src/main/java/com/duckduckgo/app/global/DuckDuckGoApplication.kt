@@ -30,6 +30,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.FALLBACK_PUBLISHER_ID
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
@@ -216,7 +217,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     private fun setupKahfAdsSDK() {
         KahfAdsSdk.initialize(
             config = KahfAdsSdkConfig(
-                fallbackPublisherId = "kahf-browser"
+                fallbackPublisherId = FALLBACK_PUBLISHER_ID
             ),
             context = this
         )

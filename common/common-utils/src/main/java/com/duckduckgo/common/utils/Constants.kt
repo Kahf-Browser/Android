@@ -44,3 +44,4 @@ const val DEFAULT_FACE_COVER = false
 const val MIN_VERSION = "minimum_version"
 const val AD_REFRESH_INTERVAL = "ad_refresh_interval"
 const val EPOM_PLACEMENT_ID = "0dfa8081b94508f158a190b8805ed9e8"
+const val FALLBACK_PUBLISHER_ID = "kahf-browser"
