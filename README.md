@@ -14,4 +14,4 @@
 
 3. Put the following files in the root directory of the project:
     - `posthog.properties`
-    - `gradle-secrets.properties`
+    - `config.properties`
