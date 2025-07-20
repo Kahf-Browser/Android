@@ -461,10 +461,10 @@ dependencies {
     // MLKit
     // implementation "com.google.mlkit:object-detection:_"
     // implementation 'com.google.mlkit:face-detection:16.1.6'
-
-    // Tensorflow-lite
-    implementation 'org.tensorflow:tensorflow-lite-support:0.1.0'
-    implementation 'org.tensorflow:tensorflow-lite-metadata:0.1.0'
+    implementation 'com.google.ai.edge.litert:litert-support-api:1.4.0'
+    implementation 'com.google.ai.edge.litert:litert-api:1.4.0'
+    implementation 'com.google.ai.edge.litert:litert-metadata:1.4.0'
+    implementation 'com.google.ai.edge.litert:litert:1.4.0'
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
