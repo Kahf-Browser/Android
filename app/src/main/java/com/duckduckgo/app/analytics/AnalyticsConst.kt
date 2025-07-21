@@ -30,8 +30,8 @@ sealed class AnalyticsEvent(val name: String) {
     data object PrivateDnsLow : AnalyticsEvent("private_dns_low")
     data object AvgDnsResolutionTime : AnalyticsEvent("avg_dns_resolution_time")
     data object AvgKahfGuardResponseTime : AnalyticsEvent("avg_kahf_guard_response_time")
-    data object DNSTimeoutError : AnalyticsEvent("dns_timeout_error")
-    data object DNSErrorLog : AnalyticsEvent("dns_error_log")
+data object DnsTimeoutError : AnalyticsEvent("dns_timeout_error")
+data object DnsErrorLog : AnalyticsEvent("dns_error_log")
 
     // Image Filter (Decent Internet)
     data object ImageFilerEnable : AnalyticsEvent("image_filter_enable")
