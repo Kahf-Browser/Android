@@ -1631,8 +1631,11 @@ class BrowserTabFragment :
         }
     }
 
-    fun submitQuery(query: String) {
+    fun submitQuery(query: String, isSavedSite: Boolean) {
         viewModel.onUserSubmittedQuery(query)
+        if (isSavedSite) {
+            analyticsService.logEvent(AnalyticsEvent.BookmarkOpened)
+        }
     }
 
     private fun navigate(
@@ -1873,7 +1876,7 @@ class BrowserTabFragment :
             }
 
             is Command.LaunchPlayStore -> launchPlayStore(it.appPackage)
-            is Command.SubmitUrl -> submitQuery(it.url)
+            is Command.SubmitUrl -> submitQuery(it.url, false)
             is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(activity)
             is Command.LaunchDefaultBrowser -> launchDefaultBrowser()
             is Command.LaunchAppTPOnboarding -> launchAppTPOnboardingScreen()
@@ -4107,8 +4110,15 @@ class BrowserTabFragment :
         }
 
         fun incrementTabs() {
-            tabsButton?.increment {
-                addTabsObserver()
+            tabsButton?.let {
+                it.apply {
+                    increment {
+                        addTabsObserver()
+                    }
+                    if (it.count > 3) {
+                        analyticsService.logEvent(AnalyticsEvent.MultipleTabsOpened)
+                    }
+                }
             }
         }
     }

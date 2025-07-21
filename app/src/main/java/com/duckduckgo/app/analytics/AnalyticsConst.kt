@@ -30,6 +30,8 @@ sealed class AnalyticsEvent(val name: String) {
     data object PrivateDnsLow : AnalyticsEvent("private_dns_low")
     data object AvgDnsResolutionTime : AnalyticsEvent("avg_dns_resolution_time")
     data object AvgKahfGuardResponseTime : AnalyticsEvent("avg_kahf_guard_response_time")
+    data object DNSTimeoutError : AnalyticsEvent("dns_timeout_error")
+    data object DNSErrorLog : AnalyticsEvent("dns_error_log")
 
     // Image Filter (Decent Internet)
     data object ImageFilerEnable : AnalyticsEvent("image_filter_enable")
@@ -66,10 +68,24 @@ sealed class AnalyticsEvent(val name: String) {
     data object AdNotFound : AnalyticsEvent("kahf_ad_not_found")
     data object AdServerError : AnalyticsEvent("kahf_ad_server_error")
     data object AdTimeout : AnalyticsEvent("kahf_ad_timeout")
+
+    //bookmark
+    data object BookmarkAdded : AnalyticsEvent("bookmark_added")
+    data object BookmarkOpened : AnalyticsEvent("bookmark_opened")
+
+    //tab
+    data object TabClosed : AnalyticsEvent("tab_closed")
+    data object MultipleTabsOpened : AnalyticsEvent("multiple_tabs_opened")
+    data object TabSwitched : AnalyticsEvent("tab_switch")
+
+    data object LightTheme : AnalyticsEvent("light_theme_enabled")
+    data object DarkTheme : AnalyticsEvent("dark_theme_enabled")
+    data object SystemDefaultTheme : AnalyticsEvent("system_theme_enabled")
 }
 
 sealed class AnalyticsParam(val name: String) {
     data object Url : AnalyticsParam("url")
+    data object Error : AnalyticsParam("error")
     data object TimedOutImageUrl : AnalyticsParam("timed_out_image_url")
     data object DnsResolutionTime : AnalyticsParam("dns_resolution_time_ms")
     data object ImageProcessingTime : AnalyticsParam("image_processing_time_ms")

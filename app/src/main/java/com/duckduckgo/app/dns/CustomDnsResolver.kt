@@ -25,6 +25,7 @@ import timber.log.Timber
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.net.InetAddress
+import java.net.SocketTimeoutException
 import java.util.concurrent.ConcurrentHashMap
 import javax.net.ssl.SSLSocket
 import javax.net.ssl.SSLSocketFactory
@@ -87,7 +88,12 @@ class CustomDnsResolver(
                     listOf(InetAddress.getByName(it.first))
                 } ?: emptyList()
             }
+        } catch (e: SocketTimeoutException) {
+            analytics.logEvent(AnalyticsEvent.DNSTimeoutError, mapOf(AnalyticsParam.Error to "${e.message}"))
+            Timber.e("tpLog Lookup error: ${e.message}")
+            emptyList()
         } catch (e: Exception) {
+            analytics.logEvent(AnalyticsEvent.DNSErrorLog, mapOf(AnalyticsParam.Error to "{${e.message}"))
             Timber.e("tpLog Lookup error: ${e.message}")
             emptyList()
         }
