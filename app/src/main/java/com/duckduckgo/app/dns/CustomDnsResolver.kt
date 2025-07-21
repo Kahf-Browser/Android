@@ -89,11 +89,11 @@ class CustomDnsResolver(
                 } ?: emptyList()
             }
         } catch (e: SocketTimeoutException) {
-            analytics.logEvent(AnalyticsEvent.DNSTimeoutError, mapOf(AnalyticsParam.Error to "${e.message}"))
+            analytics.logEvent(AnalyticsEvent.DnsTimeoutError, mapOf(AnalyticsParam.Error to "${e.message}"))
             Timber.e("tpLog Lookup error: ${e.message}")
             emptyList()
         } catch (e: Exception) {
-analytics.logEvent(AnalyticsEvent.DNSErrorLog, mapOf(AnalyticsParam.Error to "${e.message}"))
+analytics.logEvent(AnalyticsEvent.DnsErrorLog, mapOf(AnalyticsParam.Error to "${e.message}"))
             Timber.e("tpLog Lookup error: ${e.message}")
             emptyList()
         }
