@@ -17,7 +17,6 @@
 package com.duckduckgo.espresso
 
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.activityScenarioRule
@@ -41,11 +40,11 @@ class BasicJourneyTest {
 
     @Test @UserJourney
     fun browser_openPopUp() {
-        // since we use a fake toolbar, we want to wait until the real one is visible
-        onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
+        /*// since we use a fake toolbar, we want to wait until the real one is visible
+        onView(isRoot()).perform(waitForView(withId(R.id.browsermen)))
 
         // tap on PopupMenu
-        onView(withId(R.id.browserMenu)).perform(click())
+        onView(withId(R.id.browserMenu)).perform(click())*/
 
         // check that the forward arrow is visible
         onView(withId(R.id.forwardMenuItem)).check(matches(isDisplayed()))

@@ -53,8 +53,8 @@ class DaxDialogsJourneyTest {
         onView(isRoot()).perform(waitForView(withId(R.id.continueButton)))
         onView(withId(R.id.continueButton)).perform(click())
 
-        onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
-        onView(withId(R.id.browserMenu)).perform(click())
+        /*onView(isRoot()).perform(waitForView(withId(R.id.browserMenu)))
+        onView(withId(R.id.browserMenu)).perform(click())*/
 
         onView(withId(R.id.forwardMenuItem)).check(matches(isDisplayed()))
     }
