@@ -2101,6 +2101,9 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                 saveSiteBookmark(url, title ?: "")
+                analyticsService.logEvent(
+                    AnalyticsEvent.BookmarkAdded
+                )
             }
         }
     }

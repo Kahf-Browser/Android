@@ -21,12 +21,10 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
-import android.content.SharedPreferences
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewTreeObserver
@@ -50,9 +48,11 @@ import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
@@ -485,7 +485,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
                 Timber.w("New Tab: open in current tab requested")
                 if (currentTab != null) {
-                    currentTab?.submitQuery(sharedText)
+                    currentTab?.submitQuery(sharedText,false)
                 } else {
                     Timber.w("New Tab: can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
@@ -551,13 +551,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         Timber.i("Processing command: $command")
         when (command) {
-            is Query -> currentTab?.submitQuery(command.query)
+            is Query -> currentTab?.submitQuery(command.query, false)
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentDialog(command.promptCount)
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
             is Command.ShowAppFeedbackPrompt -> showGiveFeedbackDialog(command.promptCount)
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
-            is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
+            is Command.OpenSavedSite -> {
+                currentTab?.submitQuery(command.url, true)
+            }
         }
     }
 
