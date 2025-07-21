@@ -4111,13 +4111,11 @@ class BrowserTabFragment :
 
         fun incrementTabs() {
             tabsButton?.let {
-                it.apply {
-                    increment {
-                        addTabsObserver()
-                    }
-                    if (it.count > 3) {
-                        analyticsService.logEvent(AnalyticsEvent.MultipleTabsOpened)
-                    }
+                it.increment {
+                    addTabsObserver()
+                }
+                if (it.count > 3) {
+                    analyticsService.logEvent(AnalyticsEvent.MultipleTabsOpened)
                 }
             }
         }
