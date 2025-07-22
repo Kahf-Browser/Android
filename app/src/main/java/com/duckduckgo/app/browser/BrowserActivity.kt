@@ -220,18 +220,17 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun checkIfAppIsStillDefault() {
-        val lastCheckTime = spProvider.getKahfSharedPreferences().getLong(LAST_DEFAULT_APP_CHECK_TIME, 0L)
-        if (lastCheckTime == 0L) spProvider.getKahfSharedPreferences().edit {
-            putLong(LAST_DEFAULT_APP_CHECK_TIME, System.currentTimeMillis())
-        }
-        if (System.currentTimeMillis() - lastCheckTime > 7.Days() ) {
-            val isDefault = isMyBrowserDefault(packageManager = packageManager, myPackageName = packageName)
-            if (isDefault) {
+        val prefs = spProvider.getKahfSharedPreferences()
+        val lastCheckTime = prefs.getLong(LAST_DEFAULT_APP_CHECK_TIME, 0L)
+        val currentTime = System.currentTimeMillis()
+
+        // Check on first run or after 7 days.
+        if (lastCheckTime == 0L || currentTime - lastCheckTime > 7.Days()) {
+            if (isMyBrowserDefault(packageManager = packageManager, myPackageName = packageName)) {
                 analyticsService.logEvent(AnalyticsEvent.DefaultBrowserCheck)
-                spProvider.getKahfSharedPreferences().edit {
-                    putLong(LAST_DEFAULT_APP_CHECK_TIME, System.currentTimeMillis())
-                }
             }
+            // Always update the timestamp after a check to avoid re-checking on every launch.
+            prefs.edit { putLong(LAST_DEFAULT_APP_CHECK_TIME, currentTime) }
         }
     }
 
