@@ -38,6 +38,9 @@ import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.Days
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
@@ -56,6 +59,7 @@ import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.isMyBrowserDefault
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -74,6 +78,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.AD_REFRESH_INTERVAL
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.LAST_DEFAULT_APP_CHECK_TIME
 import com.duckduckgo.common.utils.MIN_VERSION
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -137,6 +142,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var kahfImageBlockedDao: KahfImageBlockedDao
+
+    @Inject
+    lateinit var analyticsService: AnalyticsService
 
     @Inject
     lateinit var spProvider: SharedPreferencesProvider
@@ -208,7 +216,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
         observeKeyboardVisibility()
 
         checkForAppUpdate()
+        checkIfAppIsStillDefault()
     }
+
+    private fun checkIfAppIsStillDefault() {
+        val prefs = spProvider.getKahfSharedPreferences()
+        val lastCheckTime = prefs.getLong(LAST_DEFAULT_APP_CHECK_TIME, 0L)
+        val currentTime = System.currentTimeMillis()
+
+        // Check on first run or after 7 days.
+        if (lastCheckTime == 0L || currentTime - lastCheckTime > 7.Days()) {
+            if (isMyBrowserDefault(packageManager = packageManager, myPackageName = packageName)) {
+                analyticsService.logEvent(AnalyticsEvent.DefaultBrowserCheck)
+            }
+            // Always update the timestamp after a check to avoid re-checking on every launch.
+            prefs.edit { putLong(LAST_DEFAULT_APP_CHECK_TIME, currentTime) }
+        }
+    }
+
 
     private fun checkForAppUpdate() {
         FirebaseRemoteConfig.getInstance().let { rc ->

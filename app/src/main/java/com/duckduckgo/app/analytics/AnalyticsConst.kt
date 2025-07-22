@@ -32,6 +32,7 @@ sealed class AnalyticsEvent(val name: String) {
     data object AvgKahfGuardResponseTime : AnalyticsEvent("avg_kahf_guard_response_time")
     data object DnsTimeoutError : AnalyticsEvent("dns_timeout_error")
     data object DnsErrorLog : AnalyticsEvent("dns_error_log")
+    data object DefaultBrowserCheck : AnalyticsEvent("browser_default_still_active")
 
     // Image Filter (Decent Internet)
     data object ImageFilerEnable : AnalyticsEvent("image_filter_enable")
