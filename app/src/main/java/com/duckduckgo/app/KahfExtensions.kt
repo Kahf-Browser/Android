@@ -44,4 +44,4 @@ fun isMyBrowserDefault(
     return defaultResolutionInfo?.activityInfo?.packageName == myPackageName
 }
 
-fun Int.Days() = this.times(24).times(60).times(60).times(1000)
+fun Int.Days(): Long = this.toLong() * 24 * 60 * 60 * 1000
