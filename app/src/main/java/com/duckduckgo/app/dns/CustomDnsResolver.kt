@@ -93,7 +93,7 @@ class CustomDnsResolver(
             Timber.e("tpLog Lookup error: ${e.message}")
             emptyList()
         } catch (e: Exception) {
-analytics.logEvent(AnalyticsEvent.DnsErrorLog, mapOf(AnalyticsParam.Error to "${e.message}"))
+            analytics.logEvent(AnalyticsEvent.DnsErrorLog, mapOf(AnalyticsParam.Error to "${e.message}"))
             Timber.e("tpLog Lookup error: ${e.message}")
             emptyList()
         }

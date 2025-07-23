@@ -23,12 +23,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.withTimeout
 import timber.log.Timber
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.PriorityBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.system.measureTimeMillis
 
 class SafeGazeJsInterface(
@@ -79,6 +79,7 @@ class SafeGazeJsInterface(
 
     @JavascriptInterface
     fun sendMessageFromWebView(messageType: String, data: String) {
+        // Log.d("kLog", "messageType: $messageType, data: $data")
         when (messageType) {
             "detectImg" -> addTaskToQueue(parseImageInfo(data))
             // "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))

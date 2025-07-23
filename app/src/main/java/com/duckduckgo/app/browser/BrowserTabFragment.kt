@@ -2743,6 +2743,7 @@ class BrowserTabFragment :
             safeGazeInterface = SafeGazeJsInterface(
                 requireContext(), nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onImageClassified = { type, data ->
+                    // Log.d("kLog", "onImageClassified: $type, data: ${gson.toJson(data)}")
                     webView?.post {
                         val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
                         webView?.evaluateJavascript(jsScript, null)
