@@ -87,8 +87,8 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
         itemList.add(PredefinedBookmark(R.drawable.ic_twitter,"X", "https://x.com"))
         itemList.add(PredefinedBookmark(R.drawable.ic_gmail,"Gmail", "https://gmail.com"))
         itemList.add(PredefinedBookmark(R.drawable.ic_quran_gtaf,"Al Quran", "https://quran.gtaf.org"))
-        itemList.add(PredefinedBookmark(R.drawable.ic_hikmah,"Hikmah", "https://hikmah.net/"))
-        itemList.add(PredefinedBookmark(R.drawable.ic_kahf_kids,"Kahf Kids", "https://kahfkids.com/"))
+        itemList.add(PredefinedBookmark(R.drawable.ic_hikmah,"Hikmah", "https://hikmah.net"))
+        itemList.add(PredefinedBookmark(R.drawable.ic_kahf_kids,"Kahf Kids", "https://kahfkids.com"))
 
         rvAdapter = PredefinedBookmarkAdapter(itemList) { position->
             itemList[position].selected = !itemList[position].selected
