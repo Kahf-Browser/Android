@@ -38,6 +38,9 @@ import androidx.webkit.ServiceWorkerClientCompat
 import androidx.webkit.ServiceWorkerControllerCompat
 import androidx.webkit.WebViewFeature
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.Days
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.BrowserViewModel.Command.Query
 import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
@@ -48,12 +51,15 @@ import com.duckduckgo.app.downloads.DownloadsActivity
 import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
-import com.duckduckgo.app.global.*
+import com.duckduckgo.app.global.ApplicationClearDataState
 import com.duckduckgo.app.global.events.db.UserEventsStore
+import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
+import com.duckduckgo.app.global.sanitize
 import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
+import com.duckduckgo.app.isMyBrowserDefault
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -70,13 +76,17 @@ import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.AD_REFRESH_INTERVAL
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.LAST_DEFAULT_APP_CHECK_TIME
 import com.duckduckgo.common.utils.MIN_VERSION
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreen.PrivacyDashboardHybridWithTabIdParam
 import com.duckduckgo.savedsites.impl.bookmarks.BookmarksActivity.Companion.SAVED_SITE_URL_EXTRA
+import com.duckduckgo.site.permissions.store.edit
 import com.google.android.play.core.appupdate.AppUpdateInfo
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
@@ -132,6 +142,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var kahfImageBlockedDao: KahfImageBlockedDao
+
+    @Inject
+    lateinit var analyticsService: AnalyticsService
+
+    @Inject
+    lateinit var spProvider: SharedPreferencesProvider
 
     private val lastActiveTabs = TabList()
 
@@ -200,7 +216,24 @@ open class BrowserActivity : DuckDuckGoActivity() {
         observeKeyboardVisibility()
 
         checkForAppUpdate()
+        checkIfAppIsStillDefault()
     }
+
+    private fun checkIfAppIsStillDefault() {
+        val prefs = spProvider.getKahfSharedPreferences()
+        val lastCheckTime = prefs.getLong(LAST_DEFAULT_APP_CHECK_TIME, 0L)
+        val currentTime = System.currentTimeMillis()
+
+        // Check on first run or after 7 days.
+        if (lastCheckTime == 0L || currentTime - lastCheckTime > 7.Days()) {
+            if (isMyBrowserDefault(packageManager = packageManager, myPackageName = packageName)) {
+                analyticsService.logEvent(AnalyticsEvent.DefaultBrowserCheck)
+            }
+            // Always update the timestamp after a check to avoid re-checking on every launch.
+            prefs.edit { putLong(LAST_DEFAULT_APP_CHECK_TIME, currentTime) }
+        }
+    }
+
 
     private fun checkForAppUpdate() {
         FirebaseRemoteConfig.getInstance().let { rc ->
@@ -209,6 +242,16 @@ open class BrowserActivity : DuckDuckGoActivity() {
                     rc[MIN_VERSION].asLong()
                 } catch (e: Exception) {
                     0L
+                }
+
+                val adRefreshInterval: Long = try {
+                    rc[AD_REFRESH_INTERVAL].asLong()
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to get ad_refresh_interval from remote config")
+                    20_000L
+                }
+                spProvider.getKahfSharedPreferences().edit {
+                    putLong(AD_REFRESH_INTERVAL, adRefreshInterval)
                 }
 
                 val updateType = if (minimumRequiredVersionCode > BuildConfig.VERSION_CODE) {
@@ -220,7 +263,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 Timber.d(
                     "rcLog Fetched from remote: $fetchedFromRemote. " +
                         "MinRequiredVersion: $minimumRequiredVersionCode. " +
-                        "UpdateType: ${if (updateType == AppUpdateType.IMMEDIATE) "IMMEDIATE" else "FLEXIBLE"}",
+                        "UpdateType: ${if (updateType == AppUpdateType.IMMEDIATE) "IMMEDIATE" else "FLEXIBLE"}, adRefreshInterval: $adRefreshInterval",
                 )
 
                 appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
@@ -467,7 +510,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             } else if (intent.getBooleanExtra(OPEN_IN_CURRENT_TAB_EXTRA, false)) {
                 Timber.w("New Tab: open in current tab requested")
                 if (currentTab != null) {
-                    currentTab?.submitQuery(sharedText)
+                    currentTab?.submitQuery(sharedText,false)
                 } else {
                     Timber.w("New Tab: can't use current tab, opening in new tab instead")
                     lifecycleScope.launch { viewModel.onOpenInNewTabRequested(query = sharedText, skipHome = true) }
@@ -533,13 +576,15 @@ open class BrowserActivity : DuckDuckGoActivity() {
     private fun processCommand(command: Command) {
         Timber.i("Processing command: $command")
         when (command) {
-            is Query -> currentTab?.submitQuery(command.query)
+            is Query -> currentTab?.submitQuery(command.query, false)
             is Command.LaunchPlayStore -> launchPlayStore()
             is Command.ShowAppEnjoymentPrompt -> showAppEnjoymentDialog(command.promptCount)
             is Command.ShowAppRatingPrompt -> showAppRatingDialog(command.promptCount)
             is Command.ShowAppFeedbackPrompt -> showGiveFeedbackDialog(command.promptCount)
             is Command.LaunchFeedbackView -> startActivity(FeedbackActivity.intent(this))
-            is Command.OpenSavedSite -> currentTab?.submitQuery(command.url)
+            is Command.OpenSavedSite -> {
+                currentTab?.submitQuery(command.url, true)
+            }
         }
     }
 

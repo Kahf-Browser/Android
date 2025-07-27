@@ -19,11 +19,17 @@
 package com.duckduckgo.app.browser
 
 import android.net.Uri
-import android.webkit.*
+import android.webkit.WebBackForwardList
+import android.webkit.WebHistoryItem
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
+import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.test.annotation.UiThreadTest
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
+import com.duckduckgo.app.dns.CustomDnsResolver
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
@@ -47,13 +53,20 @@ import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.impl.RealUserAgentProvider
 import com.duckduckgo.user.agent.impl.UserAgent
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyMap
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.kotlin.*
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 class WebViewRequestInterceptorTest {
 
@@ -72,6 +85,7 @@ class WebViewRequestInterceptorTest {
     private val mockAdClickManager: AdClickManager = mock()
     private val mockCloakedCnameDetector: CloakedCnameDetector = mock()
     private val mockRequestFilterer: RequestFilterer = mock()
+    private val dnsResolver: CustomDnsResolver = mock()
     private val fakeUserAgent: UserAgent = UserAgentFake()
     private val fakeToggle: FeatureToggle = FeatureToggleFake()
     private val fakeUserAllowListRepository = UserAllowListRepositoryFake()
@@ -102,6 +116,7 @@ class WebViewRequestInterceptorTest {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
+            dnsResolver = dnsResolver
         )
     }
 
@@ -114,6 +129,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
         assertCancelledResponse(response)
     }
@@ -126,6 +142,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         verify(mockHttpsUpgrader).upgrade(any())
@@ -139,6 +156,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertCancelledResponse(response)
@@ -153,6 +171,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
@@ -167,6 +186,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
@@ -180,6 +200,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         verify(mockHttpsUpgrader, never()).upgrade(any())
@@ -193,6 +214,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
         assertRequestCanContinueToLoad(response)
     }
@@ -205,6 +227,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "duckduckgo.com/a/b/c?q=123".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertRequestCanContinueToLoad(response)
@@ -218,6 +241,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "donttrack.us/a/b/c?q=123".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertRequestCanContinueToLoad(response)
@@ -231,6 +255,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "spreadprivacy.com/a/b/c?q=123".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertRequestCanContinueToLoad(response)
@@ -244,6 +269,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "duckduckhack.com/a/b/c?q=123".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertRequestCanContinueToLoad(response)
@@ -257,6 +283,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "privatebrowsingmyths.com/a/b/c?q=123".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertRequestCanContinueToLoad(response)
@@ -270,6 +297,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "duck.co/a/b/c?q=123".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertRequestCanContinueToLoad(response)
@@ -286,6 +314,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = mockListener,
+            privateDnsEnabled = true
         )
 
         verify(mockListener).pageHasHttpResources(any<Uri>())
@@ -303,6 +332,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = mockListener,
+            privateDnsEnabled = true
         )
 
         verify(mockListener, never()).pageHasHttpResources(anyString())
@@ -320,6 +350,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertCancelledResponse(response)
@@ -342,6 +373,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertEquals(availableSurrogate.jsFunction.byteInputStream().read(), response!!.data.read())
@@ -365,6 +397,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(mockWebViewClientListener).surrogateDetected(availableSurrogate)
@@ -379,6 +412,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(mockWebViewClientListener).upgradedToHttps()
@@ -395,6 +429,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(webView).loadUrl(validHttpsUri().toString(), mockGpc.getHeaders(validHttpsUri().toString()))
@@ -412,6 +447,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(mockWebViewClientListener).redirectTriggeredByGpc()
@@ -429,6 +465,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(webView).loadUrl(validUri().toString(), mockGpc.getHeaders(validUri().toString()))
@@ -446,6 +483,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -463,6 +501,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -479,6 +518,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -495,6 +535,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(webView).loadUrl(any(), any())
@@ -511,6 +552,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -527,6 +569,7 @@ class WebViewRequestInterceptorTest {
             documentUri = null,
             webView = webView,
             webViewClientListener = mockWebViewClientListener,
+            privateDnsEnabled = true
         )
 
         verify(webView, never()).loadUrl(any(), any())
@@ -586,6 +629,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         assertRequestCanContinueToLoad(response)
@@ -624,6 +668,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
@@ -645,6 +690,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)
@@ -664,6 +710,7 @@ class WebViewRequestInterceptorTest {
             documentUri = "foo.com".toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         verify(mockCloakedCnameDetector).detectCnameCloakedHost("foo.com", uri)

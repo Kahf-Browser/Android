@@ -16,16 +16,18 @@
 
 package com.duckduckgo.app.browser.omnibar
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
-import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.animation.doOnEnd
 import androidx.core.view.ViewCompat
 import com.duckduckgo.app.browser.R
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import android.animation.ValueAnimator
 import com.duckduckgo.app.browser.omnibar.ScrollAwareBottomNavigationViewBehavior.Companion.DURATION
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlin.math.abs
 
 class ScrollAwareBottomNavigationViewBehavior(
     context: Context,
@@ -34,6 +36,7 @@ class ScrollAwareBottomNavigationViewBehavior(
 
     companion object {
         const val DURATION = 100L
+        private const val SCROLL_THRESHOLD = 10
     }
 
     private var webViewContainer: View? = null
@@ -61,16 +64,18 @@ class ScrollAwareBottomNavigationViewBehavior(
         type: Int,
         consumed: IntArray
     ) {
+        if (abs(dyConsumed) < SCROLL_THRESHOLD) return
+
         if (dyConsumed > 0) {
             showBottomNav(child)
-        } else if (dyConsumed < 0 && child.isShown) {
+        } else if (dyConsumed < 0) {
             hideBottomNav(child)
         }
     }
 
     fun hideBottomNav(navBar: BottomNavigationView) {
-        webViewContainer?.let {
-            val layoutParams = it.layoutParams as? ViewGroup.MarginLayoutParams ?: return@let
+        webViewContainer?.let { container ->
+            val layoutParams = container.layoutParams as? FrameLayout.LayoutParams ?: return@let
             val currentMargin = layoutParams.bottomMargin
 
             // Don't animate if margin is already 0
@@ -79,34 +84,36 @@ class ScrollAwareBottomNavigationViewBehavior(
             ValueAnimator.ofInt(currentMargin, 0).apply {
                 duration = DURATION
                 addUpdateListener { animator ->
-                    layoutParams.bottomMargin = animator.animatedValue as Int
-                    it.layoutParams = layoutParams
+                    layoutParams.bottomMargin = 0
+                    container.layoutParams = layoutParams
                 }
                 start()
+            }.doOnEnd {
+                navBar.animate().translationY(navBar.height.toFloat()).setDuration(DURATION)
             }
         }
-        navBar.animate().translationY(navBar.height.toFloat()).setDuration(DURATION)
     }
 
     fun showBottomNav(navBar: BottomNavigationView) {
-        webViewContainer?.let {
-            val layoutParams = it.layoutParams as? ViewGroup.MarginLayoutParams ?: return@let
-            val currentMargin = layoutParams.bottomMargin
-            val targetMargin = navBar.height
+        navBar.animate().translationY(0f).setDuration(DURATION).withEndAction {
+            webViewContainer?.let {
+                val layoutParams = it.layoutParams as? FrameLayout.LayoutParams ?: return@let
+                val currentMargin = layoutParams.bottomMargin
+                val targetMargin = navBar.height
 
-            // Don't animate if margin is already at target value
-            if (currentMargin >= targetMargin) return@let
+                // Don't animate if margin is already at target value
+                if (currentMargin >= targetMargin) return@let
 
-            ValueAnimator.ofInt(currentMargin, targetMargin).apply {
-                duration = DURATION
-                addUpdateListener { animator ->
-                    layoutParams.bottomMargin = animator.animatedValue as Int
-                    it.layoutParams = layoutParams
+                ValueAnimator.ofInt(currentMargin, targetMargin).apply {
+                    duration = DURATION
+                    addUpdateListener { animator ->
+                        layoutParams.bottomMargin = navBar.height
+                        it.layoutParams = layoutParams
+                    }
+                    start()
                 }
-                start()
             }
         }
-        navBar.animate().translationY(0f).setDuration(DURATION)
     }
 }
 

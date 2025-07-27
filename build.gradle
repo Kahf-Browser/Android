@@ -52,7 +52,7 @@ allprojects {
         mavenCentral()
         maven {
             name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/KahfAds/kahf-ads-android-sdk")
+            url = uri("https://maven.pkg.github.com/KahfAds/kahf-ads-kmp-sdk")
             credentials {
                 def secretsFile = file("$rootProject.projectDir/config.properties")
                 if (secretsFile.exists()) {

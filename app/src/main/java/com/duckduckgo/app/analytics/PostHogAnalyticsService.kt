@@ -26,7 +26,26 @@ class PostHogAnalyticsService(): AnalyticsService {
     ) {
         PostHog.capture(
             event = event.name,
-            properties = params?.mapKeys { it.key.name }?.mapValues { it.value }
+            properties = params?.mapKeys { it.key.name }?.mapValues {
+                val value = it.value
+                when {
+                    value == "true" || value == "false" -> {
+                        value.toBoolean()
+                    }
+                    value.toLongOrNull() != null -> {
+                        value.toLong()
+                    }
+                    value.toDoubleOrNull() != null -> {
+                        value.toDouble()
+                    }
+                    value.toIntOrNull() != null -> {
+                        value.toInt()
+                    }
+                    else -> {
+                        value
+                    }
+                }
+            }
         )
     }
 

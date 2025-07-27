@@ -30,6 +30,9 @@ sealed class AnalyticsEvent(val name: String) {
     data object PrivateDnsLow : AnalyticsEvent("private_dns_low")
     data object AvgDnsResolutionTime : AnalyticsEvent("avg_dns_resolution_time")
     data object AvgKahfGuardResponseTime : AnalyticsEvent("avg_kahf_guard_response_time")
+    data object DnsTimeoutError : AnalyticsEvent("dns_timeout_error")
+    data object DnsErrorLog : AnalyticsEvent("dns_error_log")
+    data object DefaultBrowserCheck : AnalyticsEvent("browser_default_still_active")
 
     // Image Filter (Decent Internet)
     data object ImageFilerEnable : AnalyticsEvent("image_filter_enable")
@@ -39,6 +42,11 @@ sealed class AnalyticsEvent(val name: String) {
     data object AvgQueueTime : AnalyticsEvent("avg_queue_time")
     data object ImageProcessingTimeout : AnalyticsEvent("image_processing_timeout")
     data object ModelInitTime : AnalyticsEvent("model_initialization_time")
+
+    data object P90NSFWProcessing: AnalyticsEvent("p90_nsfw_processing")
+    data object P90CoreInference: AnalyticsEvent("p90_core_inference")
+    data object P90ApplySolidMask: AnalyticsEvent("p90_apply_solid_mask")
+    data object P90ApplyPixelationMask: AnalyticsEvent("p90_apply_pixelation_mask")
 
     // Onboarding
     data object OnboardSetAsDefaultBrowser : AnalyticsEvent("onboard_set_as_default_browser")
@@ -61,10 +69,24 @@ sealed class AnalyticsEvent(val name: String) {
     data object AdNotFound : AnalyticsEvent("kahf_ad_not_found")
     data object AdServerError : AnalyticsEvent("kahf_ad_server_error")
     data object AdTimeout : AnalyticsEvent("kahf_ad_timeout")
+
+    //bookmark
+    data object BookmarkAdded : AnalyticsEvent("bookmark_added")
+    data object BookmarkOpened : AnalyticsEvent("bookmark_opened")
+
+    //tab
+    data object TabClosed : AnalyticsEvent("tab_closed")
+    data object MultipleTabsOpened : AnalyticsEvent("multiple_tabs_opened")
+    data object TabSwitched : AnalyticsEvent("tab_switch")
+
+    data object LightTheme : AnalyticsEvent("light_theme_enabled")
+    data object DarkTheme : AnalyticsEvent("dark_theme_enabled")
+    data object SystemDefaultTheme : AnalyticsEvent("system_theme_enabled")
 }
 
 sealed class AnalyticsParam(val name: String) {
     data object Url : AnalyticsParam("url")
+    data object Error : AnalyticsParam("error")
     data object TimedOutImageUrl : AnalyticsParam("timed_out_image_url")
     data object DnsResolutionTime : AnalyticsParam("dns_resolution_time_ms")
     data object ImageProcessingTime : AnalyticsParam("image_processing_time_ms")
@@ -73,6 +95,11 @@ sealed class AnalyticsParam(val name: String) {
     data object ModelInitTimeMS : AnalyticsParam("model_initialization_time_ms")
     data object AvgResolutionTimeMs : AnalyticsParam("avg_resolution_time_ms")
     data object AvgKahfGuardTimeMs : AnalyticsParam("avg_kahf_guard_time_ms")
+
+    data object NSFWProcessingTime : AnalyticsParam("nsfw_processing_time_ms")
+    data object CoreInferenceTime : AnalyticsParam("core_inference_time_ms")
+    data object ApplySolidMaskTime : AnalyticsParam("apply_solid_mask_time_ms")
+    data object ApplyPixelationMaskTime : AnalyticsParam("apply_pixelation_mask_time_ms")
 
     // Search
     data object SuggestionSearchEngine : AnalyticsParam("autosuggestion_search_engine")

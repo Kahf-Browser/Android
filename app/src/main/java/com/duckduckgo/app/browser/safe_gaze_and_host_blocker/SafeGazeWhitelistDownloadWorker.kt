@@ -96,9 +96,16 @@ class SafeGazeWhitelistDownloadWorkerScheduler @Inject constructor(
         val workerRequest = PeriodicWorkRequestBuilder<SafeGazeWhitelistDownloadWorker>(24, TimeUnit.HOURS)
             .addTag(WHITELIST_DOWNLOAD_WORKER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
+            .setInitialDelay(15, TimeUnit.SECONDS) // Add initial delay to stagger job execution
             .build()
 
-        workManager.enqueueUniquePeriodicWork(WHITELIST_DOWNLOAD_WORKER_TAG, ExistingPeriodicWorkPolicy.KEEP, workerRequest)
+        workManager.cancelUniqueWork(WHITELIST_DOWNLOAD_WORKER_TAG)
+
+        workManager.enqueueUniquePeriodicWork(
+            WHITELIST_DOWNLOAD_WORKER_TAG,
+            ExistingPeriodicWorkPolicy.REPLACE,
+            workerRequest
+        )
     }
 
     companion object {

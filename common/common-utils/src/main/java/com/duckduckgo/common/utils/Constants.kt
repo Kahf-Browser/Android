@@ -38,6 +38,11 @@ const val KAHF_GUARD_DEFAULT = "Medium"
 // SafeGaze (image blur) Settings
 const val SAFE_GAZE_DEFAULT = "Pixelation"
 const val SAFE_GAZE_MODE = "safe_gaze_mode"
+const val DEFAULT_FACE_COVER = false
 
 // Firebase Remote Config
 const val MIN_VERSION = "minimum_version"
+const val AD_REFRESH_INTERVAL = "ad_refresh_interval"
+const val EPOM_PLACEMENT_ID = "0dfa8081b94508f158a190b8805ed9e8"
+const val FALLBACK_PUBLISHER_ID = "kahf-browser"
+const val LAST_DEFAULT_APP_CHECK_TIME = "last_default_app_check_time"

@@ -447,7 +447,6 @@ class BrowserTabViewModel @Inject constructor(
     private var refreshOnViewVisible = MutableStateFlow(true)
     private var ctaChangedTicker = MutableStateFlow("")
     val hiddenIds = MutableStateFlow(HiddenBookmarksIds())
-    private var lastBlockedUrl: String = ""
     private var isAdAutoRefreshing = false
 
     data class HiddenBookmarksIds(
@@ -976,33 +975,8 @@ class BrowserTabViewModel @Inject constructor(
                     clearPreviousUrl()
                 }
 
-                if (privateDnsEnabled) {
-                    runBlocking {
-                        if (!isKahfBlockedUrl(urlToNavigate) && !urlToNavigate.isDataUri()) {
-                            val originalUrl = String(urlToNavigate.toCharArray())
-                            val ip = dnsResolver.resolveDomain(urlToNavigate.toUri())
-
-                            if (ip?.first == KAHF_GUARD_BLOCKED_IP || ip?.second == KAHF_GUARD_BLOCKED_URL) {
-                                urlToNavigate = "https://$KAHF_GUARD_BLOCKED_URL?url=$originalUrl"
-
-                                withContext(dispatchers.io()) {
-                                    if (lastBlockedUrl != originalUrl) {
-                                        lastBlockedUrl = originalUrl
-                                        harmfulSiteBlockedDao.insert(HarmfulSiteBlocked(siteUrl = urlToNavigate, mode = ""))
-                                    }
-                                }
-
-                                analyticsService.logEvent(AnalyticsEvent.PageBlocked, mapOf(AnalyticsParam.Url to originalUrl))
-                            }
-                        }
-
-                        site?.nextUrl = urlToNavigate
-                        command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
-                    }
-                } else {
-                    site?.nextUrl = urlToNavigate
-                    command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
-                }
+                site?.nextUrl = urlToNavigate
+                command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
         }
 
@@ -1295,11 +1269,15 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     override fun onUrlBlocked(url: String) {
-        onUserSubmittedQuery(url)
         viewModelScope.launch(dispatchers.io()) {
-            if (lastBlockedUrl != url) {
-                lastBlockedUrl = url
-                harmfulSiteBlockedDao.insert(HarmfulSiteBlocked(siteUrl = url, mode = ""))
+            harmfulSiteBlockedDao.insert(HarmfulSiteBlocked(siteUrl = url, mode = ""))
+
+            analyticsService.logEvent(AnalyticsEvent.PageBlocked, mapOf(AnalyticsParam.Url to url))
+
+            val urlToNavigate = "https://$KAHF_GUARD_BLOCKED_URL?url=$url"
+            site?.nextUrl = urlToNavigate
+            withContext(dispatchers.main()) {
+                command.value = NavigationCommand.Navigate(urlToNavigate, getUrlHeaders(urlToNavigate))
             }
         }
     }
@@ -2123,6 +2101,9 @@ class BrowserTabViewModel @Inject constructor(
             } else {
                 pixel.fire(AppPixelName.MENU_ACTION_ADD_BOOKMARK_PRESSED.pixelName)
                 saveSiteBookmark(url, title ?: "")
+                analyticsService.logEvent(
+                    AnalyticsEvent.BookmarkAdded
+                )
             }
         }
     }

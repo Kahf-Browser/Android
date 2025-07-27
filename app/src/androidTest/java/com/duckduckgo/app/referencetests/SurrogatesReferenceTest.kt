@@ -19,7 +19,9 @@
 package com.duckduckgo.app.referencetests
 
 import android.util.Base64
-import android.webkit.*
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebView
 import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.annotation.UiThreadTest
@@ -27,6 +29,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.browser.WebViewRequestInterceptor
 import com.duckduckgo.app.browser.useragent.provideUserAgentOverridePluginPoint
+import com.duckduckgo.app.dns.CustomDnsResolver
 import com.duckduckgo.app.fakes.FeatureToggleFake
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
@@ -52,6 +55,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.ContentBlocking
@@ -66,13 +70,16 @@ import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestScope
 import org.json.JSONObject
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import org.mockito.kotlin.*
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 @RunWith(Parameterized::class)
 class SurrogatesReferenceTest(private val testCase: TestCase) {
@@ -113,6 +120,8 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
     private val mockGpc: Gpc = mock()
     private val mockAdClickManager: AdClickManager = mock()
     private val mockCloakedCnameDetector: CloakedCnameDetector = mock()
+    private val dnsResolver: CustomDnsResolver = mock()
+    private val dispatcherProvider: DispatcherProvider = mock()
 
     companion object {
         private val moshi = Moshi.Builder().add(ActionJsonAdapter()).build()
@@ -168,6 +177,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             adClickManager = mockAdClickManager,
             cloakedCnameDetector = mockCloakedCnameDetector,
             requestFilterer = mockRequestFilterer,
+            dnsResolver = dnsResolver
         )
     }
 
@@ -185,6 +195,7 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
             documentUri = testCase.siteURL.toUri(),
             webView = webView,
             webViewClientListener = null,
+            privateDnsEnabled = true
         )
 
         when (testCase.expectAction) {

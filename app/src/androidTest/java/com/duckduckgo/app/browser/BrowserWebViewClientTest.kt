@@ -56,8 +56,10 @@ import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
+import com.duckduckgo.app.dns.CustomDnsResolver
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autofill.api.BrowserAutofill
 import com.duckduckgo.autofill.api.InternalTestUserChecker
@@ -68,12 +70,10 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.subscriptions.api.Subscriptions
-import java.math.BigInteger
-import java.security.cert.X509Certificate
-import java.security.interfaces.RSAPublicKey
 import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
@@ -93,6 +93,9 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import java.math.BigInteger
+import java.security.cert.X509Certificate
+import java.security.interfaces.RSAPublicKey
 
 class BrowserWebViewClientTest {
 
@@ -133,6 +136,10 @@ class BrowserWebViewClientTest {
     private val mediaPlayback: MediaPlayback = mock()
     private val subscriptions: Subscriptions = mock()
     private val navigationHistory: NavigationHistory = mock()
+    private val dnsResolver: CustomDnsResolver = mock()
+    private val sgWhitelistDao: SafeGazeWhitelistDao = mock()
+    private val spProvider: SharedPreferencesProvider = mock()
+    private val ampDetector: AmpDetector = mock()
 
     @UiThreadTest
     @Before
@@ -159,12 +166,17 @@ class BrowserWebViewClientTest {
             pixel,
             crashLogger,
             jsPlugins,
+            context,
             currentTimeProvider,
             pageLoadedHandler,
             pagePaintedHandler,
             navigationHistory,
             mediaPlayback,
             subscriptions,
+            dnsResolver = dnsResolver,
+            sgWhitelistDao = sgWhitelistDao,
+            spProvider = spProvider,
+            ampDetector = ampDetector
         )
         testee.webViewClientListener = listener
         whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -310,7 +322,7 @@ class BrowserWebViewClientTest {
         TestScope().launch {
             val webResourceRequest = mock<WebResourceRequest>()
             testee.shouldInterceptRequest(webView, webResourceRequest)
-            verify(requestInterceptor).shouldIntercept(any(), any(), any<Uri>(), any())
+            verify(requestInterceptor).shouldIntercept(any(), any(), any<Uri>(), any(), any())
         }
     }
 

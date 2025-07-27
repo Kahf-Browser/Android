@@ -24,6 +24,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.appearance.AppearanceViewModel.Command
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityAppearanceBinding
@@ -38,6 +40,7 @@ import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
+import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AppearanceScreenNoParams::class)
@@ -45,6 +48,8 @@ class AppearanceActivity : DuckDuckGoActivity() {
 
     private val viewModel: AppearanceViewModel by bindViewModel()
     private val binding: ActivityAppearanceBinding by viewBinding()
+    @Inject
+    lateinit var analyticsService: AnalyticsService
 
     private val forceDarkModeToggleListener = CompoundButton.OnCheckedChangeListener { view, isChecked ->
         viewModel.onForceDarkModeSettingChanged(isChecked)
@@ -149,9 +154,18 @@ class AppearanceActivity : DuckDuckGoActivity() {
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         val selectedTheme = when (selectedItem) {
-                            2 -> DuckDuckGoTheme.LIGHT
-                            3 -> DuckDuckGoTheme.DARK
-                            else -> DuckDuckGoTheme.SYSTEM_DEFAULT
+                            2 -> {
+                                analyticsService.logEvent(AnalyticsEvent.LightTheme)
+                                DuckDuckGoTheme.LIGHT
+                            }
+                            3 -> {
+                                analyticsService.logEvent(AnalyticsEvent.DarkTheme)
+                                DuckDuckGoTheme.DARK
+                            }
+                            else -> {
+                                analyticsService.logEvent(AnalyticsEvent.SystemDefaultTheme)
+                                DuckDuckGoTheme.SYSTEM_DEFAULT
+                            }
                         }
                         viewModel.onThemeSelected(selectedTheme)
                     }

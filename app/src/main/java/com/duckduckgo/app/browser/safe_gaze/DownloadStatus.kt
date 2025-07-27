@@ -1,3 +1,7 @@
+package com.duckduckgo.app.browser.safe_gaze
+
+import android.graphics.Bitmap
+
 /*
  * Copyright (c) 2025 DuckDuckGo
  *
@@ -14,13 +18,8 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.db
-
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "safegaze_whitelist")
-data class SafeGazeWhitelistEntity(
-    @PrimaryKey val host: String,
-    val timestamp: Long = System.currentTimeMillis(),
-)
+sealed class DownloadStatus {
+    data object Pending : DownloadStatus()
+    data class Success(val bitmap: Bitmap) : DownloadStatus()
+    data object Failed : DownloadStatus()
+}

@@ -45,6 +45,7 @@ import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
+import com.duckduckgo.app.analytics.PostHogAnalyticsService
 import com.duckduckgo.app.autocomplete.api.AutoComplete
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteResult
 import com.duckduckgo.app.autocomplete.api.AutoComplete.AutoCompleteSuggestion.AutoCompleteBookmarkSuggestion
@@ -113,6 +114,7 @@ import com.duckduckgo.app.cta.ui.CtaViewModel
 import com.duckduckgo.app.cta.ui.DaxBubbleCta
 import com.duckduckgo.app.cta.ui.HomePanelCta
 import com.duckduckgo.app.cta.ui.OnboardingDaxDialogCta
+import com.duckduckgo.app.dns.CustomDnsResolver
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteDao
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepositoryImpl
@@ -152,6 +154,7 @@ import com.duckduckgo.app.survey.notification.SurveyNotificationScheduler
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.EntityLookup
+import com.duckduckgo.app.trackerdetection.db.HarmfulSiteBlockedDao
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -167,6 +170,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.downloads.api.DownloadStateListener
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -472,6 +476,10 @@ class BrowserTabViewModelTest {
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val commandActionMapper: CommandActionMapper = mock()
+    private val analyticsService: PostHogAnalyticsService = mock()
+    private val dnsResolver: CustomDnsResolver = mock()
+    private val harmfulSiteBlockedDao: HarmfulSiteBlockedDao = mock()
+    private val spProvider: SharedPreferencesProvider = mock()
 
     @Before
     fun before() {
@@ -618,6 +626,10 @@ class BrowserTabViewModelTest {
             userBrowserProperties = mockUserBrowserProperties,
             history = mockNavigationHistory,
             commandActionMapper = commandActionMapper,
+            analyticsService = analyticsService,
+            dnsResolver = dnsResolver,
+            spProvider = spProvider,
+            harmfulSiteBlockedDao = harmfulSiteBlockedDao
         )
 
         testee.loadData("abc", null, false)

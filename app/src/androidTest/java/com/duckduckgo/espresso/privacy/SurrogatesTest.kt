@@ -17,18 +17,22 @@
 package com.duckduckgo.espresso.privacy
 
 import android.webkit.WebView
-import androidx.test.core.app.*
-import androidx.test.espresso.*
+import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
+import androidx.test.espresso.IdlingResource
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.web.model.Atoms.script
 import androidx.test.espresso.web.sugar.Web.onWebView
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.espresso.*
+import com.duckduckgo.espresso.PrivacyTest
+import com.duckduckgo.espresso.WebViewIdlingResource
+import com.duckduckgo.espresso.waitForView
 import com.duckduckgo.privacy.config.impl.network.JSONObjectAdapter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -93,7 +97,7 @@ class SurrogatesTest {
         val idlingResourceForDisableProtections = WebViewIdlingResource(webView!!)
         IdlingRegistry.getInstance().register(idlingResourceForDisableProtections)
 
-        onView(withId(R.id.browserMenu)).perform(ViewActions.click())
+        // onView(withId(R.id.browserMenu)).perform(ViewActions.click())
         onView(isRoot()).perform(waitForView(withId(R.id.privacyProtectionMenuItem)))
         onView(withId(R.id.privacyProtectionMenuItem)).perform(ViewActions.click())
 

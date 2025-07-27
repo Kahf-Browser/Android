@@ -21,8 +21,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-        tableName = "kahf_image_blocked",
-        indices = [Index(value = ["imageUrl"], unique = true)],
+    tableName = "kahf_image_blocked",
+    indices = [Index(value = ["imageUrl"], unique = true)],
 )
 data class KahfImageBlocked(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

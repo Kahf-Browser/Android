@@ -21,8 +21,8 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-        tableName = "zikr_whitelist",
-        indices = [Index(value = ["url"], unique = true)],
+    tableName = "zikr_whitelist",
+    indices = [Index(value = ["url"], unique = true)],
 )
 data class ZikrWhiteListItem(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,

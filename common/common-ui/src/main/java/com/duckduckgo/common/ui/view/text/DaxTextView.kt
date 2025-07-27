@@ -17,7 +17,6 @@
 package com.duckduckgo.common.ui.view.text
 
 import android.content.Context
-import android.graphics.Typeface
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
 import com.duckduckgo.common.ui.view.TypedArrayUtils

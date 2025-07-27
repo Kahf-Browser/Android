@@ -22,7 +22,6 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.BuildConfig
-import com.duckduckgo.app.browser.safe_gaze.JsDownloadWorker
 import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.WallpaperDownloadWorker
 import com.duckduckgo.app.di.AppComponent
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -31,10 +30,13 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.FALLBACK_PUBLISHER_ID
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
+import com.kahfads.sdk.KahfAdsSdk
+import com.kahfads.sdk.KahfAdsSdkConfig
 import com.posthog.android.PostHogAndroid
 import com.posthog.android.PostHogAndroidConfig
 import dagger.android.AndroidInjector
@@ -44,6 +46,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
@@ -111,6 +114,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         ) {
             PostHogAndroid.setup(this@DuckDuckGoApplication, this)
         }
+        setupKahfAdsSDK()
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
@@ -148,19 +152,31 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun scheduleTasks() {
-        val jsDownloadWorkReq = OneTimeWorkRequest.from(JsDownloadWorker::class.java)
-        val wallpaperDownloadWorkReq = OneTimeWorkRequest.from(WallpaperDownloadWorker::class.java)
-
         val workManager = WorkManager.getInstance(this)
-
-        // Cancel all existing work with the same tags
         workManager.cancelAllWorkByTag("jsDownloader")
         workManager.cancelAllWorkByTag("com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker")
 
-        workManager.apply {
-            enqueue(jsDownloadWorkReq)
-            enqueue(wallpaperDownloadWorkReq)
-        }
+        /*val jsDownloadWorkReq = OneTimeWorkRequest.Builder(JsDownloadWorker::class.java)
+            .addTag("jsDownloader")
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "jsDownloadWork",
+            androidx.work.ExistingWorkPolicy.REPLACE,
+            jsDownloadWorkReq,
+        )*/
+
+
+        val wallpaperDownloadWorkReq = OneTimeWorkRequest.Builder(WallpaperDownloadWorker::class.java)
+            .addTag("com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker")
+            .setInitialDelay(15, TimeUnit.SECONDS)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker",
+            androidx.work.ExistingWorkPolicy.REPLACE,
+            wallpaperDownloadWorkReq
+        )
     }
 
     private fun configRemoteConfig() {
@@ -196,6 +212,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                     .build(),
             )
         }
+    }
+
+    private fun setupKahfAdsSDK() {
+        KahfAdsSdk.initialize(
+            config = KahfAdsSdkConfig(
+                fallbackPublisherId = FALLBACK_PUBLISHER_ID
+            ),
+            context = this
+        )
     }
 
     // vtodo - Work around for https://crbug.com/558377

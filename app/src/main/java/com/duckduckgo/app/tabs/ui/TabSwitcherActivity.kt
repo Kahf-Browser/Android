@@ -19,23 +19,19 @@ package com.duckduckgo.app.tabs.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatDelegate.FEATURE_SUPPORT_ACTION_BAR
-import androidx.appcompat.widget.Toolbar
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
-import com.duckduckgo.app.browser.databinding.PopupWindowBrowserMenuBinding
 import com.duckduckgo.app.browser.databinding.PopupWindowTabSwitcherBinding
 import com.duckduckgo.app.browser.favicon.FaviconManager
-import com.duckduckgo.app.browser.menu.BrowserPopupMenu
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.downloads.DownloadsActivity
@@ -51,7 +47,6 @@ import com.duckduckgo.app.tabs.ui.TabSwitcherViewModel.Command.CloseAllTabsReque
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.IconButton
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -100,6 +95,9 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
 
     @Inject
     lateinit var dispatcherProvider: DispatcherProvider
+
+    @Inject
+    lateinit var analyticsService: AnalyticsService
 
     private val viewModel: TabSwitcherViewModel by bindViewModel()
 
@@ -278,7 +276,10 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     override fun onTabSelected(tab: TabEntity) {
         selectedTabId = tab.tabId
         updateTabGridItemDecorator(tab)
-        launch { viewModel.onTabSelected(tab) }
+        launch {
+            viewModel.onTabSelected(tab)
+            analyticsService.logEvent(AnalyticsEvent.TabSwitched)
+        }
     }
 
     private fun updateTabGridItemDecorator(tab: TabEntity) {
@@ -291,6 +292,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
     }
 
     private fun onDeletableTab(tab: TabEntity) {
+        analyticsService.logEvent(AnalyticsEvent.TabClosed)
         Snackbar.make(findViewById(R.id.toolbar), getString(R.string.tabClosed), Snackbar.LENGTH_LONG)
             .setDuration(3500) // 3.5 seconds
             .setAction(R.string.tabClosedUndo) {
