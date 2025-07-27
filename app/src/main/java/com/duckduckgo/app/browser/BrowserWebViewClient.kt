@@ -586,7 +586,7 @@ class BrowserWebViewClient @Inject constructor(
             }
         }
 
-        /*return runBlocking {
+        return runBlocking {
             withContext(dispatcherProvider.io()) {
                 try {
                     val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
@@ -599,7 +599,7 @@ class BrowserWebViewClient @Inject constructor(
                     null
                 }
             }
-        }*/
+        }
     }
 
     override fun onRenderProcessGone(
