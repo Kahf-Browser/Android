@@ -51,6 +51,7 @@ import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
 import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
+import com.duckduckgo.app.browser.autoplayvideo.AutoPlayBlockerScript
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
 import com.duckduckgo.app.browser.certificates.rootstore.TrustedCertificateStore
 import com.duckduckgo.app.browser.cookies.ThirdPartyCookieManager
@@ -491,6 +492,7 @@ class BrowserWebViewClient @Inject constructor(
             }
             url?.let {
                 // We call this for any url but it will only be processed for an internal tester verification url
+                webView.evaluateJavascript(AutoPlayBlockerScript.gptSampleScript, null)
                 internalTestUserChecker.verifyVerificationCompleted(it)
             }
             val navigationList = webView.safeCopyBackForwardList() ?: return
