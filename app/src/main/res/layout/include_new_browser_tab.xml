@@ -28,7 +28,6 @@
         android:id="@+id/browserBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingTop="?attr/actionBarSize"
         android:visibility="gone"
         tools:visibility="visible"
         android:foreground="@android:color/transparent">

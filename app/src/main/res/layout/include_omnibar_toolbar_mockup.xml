@@ -26,6 +26,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/appBarLayoutMockup"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="?attr/actionBarSize"
         android:background="@drawable/omnibar_field_selector">
 
