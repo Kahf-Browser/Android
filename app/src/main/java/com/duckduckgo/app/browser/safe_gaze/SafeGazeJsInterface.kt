@@ -64,6 +64,8 @@ class SafeGazeJsInterface(
         scope.launch {
             imageDetector.updateFaceCoverMode(shouldCoverFace)
             imageDetector.updateBlurMode(grayBlur)
+            // videoDetector.updateBlurMode(grayBlur)
+            // videoDetector.updateFaceCoverMode(shouldCoverFace)
         }
     }
 
@@ -79,10 +81,9 @@ class SafeGazeJsInterface(
 
     @JavascriptInterface
     fun sendMessageFromWebView(messageType: String, data: String) {
-        // Log.d("kLog", "messageType: $messageType, data: $data")
         when (messageType) {
             "detectImg" -> addTaskToQueue(parseImageInfo(data))
-            // "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
+            "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
         }
     }
 
@@ -400,6 +401,10 @@ class SafeGazeJsInterface(
             return true
         }
         return listOfEndsWith.any { url.endsWith(it, ignoreCase = true) } || listOfContains.any { url.contains(it) }
+    }
+
+    fun closePordaSegment() {
+        imageDetector.closePordaSegment()
     }
 
     private val listOfContains = listOf("image/gif", "image/svg", "/assets/thesun/images/teaser", "grey-placeholder")
