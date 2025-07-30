@@ -25,6 +25,7 @@ const val SAFE_GAZE_JS_FILENAME = "safe_gaze.js"
 const val SAFE_GAZE_INTERFACE = "SafeGazeInterface"
 const val SAFE_GAZE_PREFERENCES = "safe_gaze_preferences"
 const val SAFE_GAZE_FACE_COVER = "safe_gaze_face_cover"
+const val SAFE_GAZE_AUTOPLAY_VIDEO = "safe_gaze_autoplay_video"
 const val SAFE_GAZE_LOCK = "safe_gaze_lock"
 const val SAFE_GAZE_MAX_IMG_SIZE = 300
 const val KAHF_GUARD_BLOCKED_WITH_DOT = "blocked.kahfguard.com."
@@ -39,6 +40,7 @@ const val KAHF_GUARD_DEFAULT = "Medium"
 const val SAFE_GAZE_DEFAULT = "Pixelation"
 const val SAFE_GAZE_MODE = "safe_gaze_mode"
 const val DEFAULT_FACE_COVER = false
+const val DEFAULT_AUTOPLAY_VIDEO = true
 
 // Firebase Remote Config
 const val MIN_VERSION = "minimum_version"

@@ -65,6 +65,7 @@ import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
+import com.duckduckgo.app.isAutoPlayVideoEnabled
 import com.duckduckgo.app.isZikrTab
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
@@ -484,7 +485,9 @@ class BrowserWebViewClient @Inject constructor(
 
         // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
         if (webView.progress == 100) {
-            loadAutoplayBlockerJs(webView)
+            if (!sharedPreferences.isAutoPlayVideoEnabled()) {
+                loadAutoplayBlockerJs(webView)
+            }
 
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
