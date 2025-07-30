@@ -301,6 +301,37 @@
                         app:layout_constraintTop_toBottomOf="@id/btnToggleSiteBlur"
                         tools:ignore="UseSwitchCompatOrMaterialXml" />
 
+                    <TextView
+                        android:id="@+id/tvAutoPlayVideo"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:text="@string/kahf_autoplay_video"
+                        android:textColor="?attr/kahfPrimaryText"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/switchCoverFace"
+                        app:layout_constraintEnd_toStartOf="@+id/switchAutoplayVideo"
+                        tools:ignore="DeprecatedWidgetInXml" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchAutoplayVideo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:track="@drawable/switch_track"
+                        app:trackTint="@color/switch_track_color"
+                        app:thumbTint="?attr/kahfCardBackground"
+                        android:checked="false"
+                        tools:checked="true"
+                        android:scaleX="0.75"
+                        android:scaleY="0.75"
+                        android:layout_marginEnd="-5dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/switchCoverFace"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.duckduckgo.common.ui.view.divider.HorizontalDivider

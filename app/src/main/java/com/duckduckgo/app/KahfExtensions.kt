@@ -6,7 +6,9 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import androidx.core.content.edit
+import com.duckduckgo.common.utils.DEFAULT_AUTOPLAY_VIDEO
 import com.duckduckgo.common.utils.DEFAULT_FACE_COVER
+import com.duckduckgo.common.utils.SAFE_GAZE_AUTOPLAY_VIDEO
 import com.duckduckgo.common.utils.SAFE_GAZE_FACE_COVER
 import com.duckduckgo.common.utils.SAFE_GAZE_LOCK
 
@@ -14,6 +16,12 @@ fun SharedPreferences.isFaceCoverEnabled() = this.getBoolean(SAFE_GAZE_FACE_COVE
 
 fun SharedPreferences.setFaceCoverMode(enabled: Boolean) {
     this.edit { putBoolean(SAFE_GAZE_FACE_COVER, enabled) }
+}
+
+fun SharedPreferences.isAutoPlayVideoEnabled() = this.getBoolean(SAFE_GAZE_AUTOPLAY_VIDEO, DEFAULT_AUTOPLAY_VIDEO)
+
+fun SharedPreferences.setAutoPlayVideoEnabled(enabled: Boolean) {
+    this.edit { putBoolean(SAFE_GAZE_AUTOPLAY_VIDEO, enabled) }
 }
 
 fun SharedPreferences.isSgLockEnabled() = this.getBoolean(SAFE_GAZE_LOCK, false)

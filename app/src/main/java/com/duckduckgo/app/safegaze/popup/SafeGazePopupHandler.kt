@@ -26,10 +26,12 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
+import com.duckduckgo.app.isAutoPlayVideoEnabled
 import com.duckduckgo.app.isFaceCoverEnabled
 import com.duckduckgo.app.isSgLockEnabled
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
+import com.duckduckgo.app.setAutoPlayVideoEnabled
 import com.duckduckgo.app.setFaceCoverMode
 import com.duckduckgo.app.setSgLockMode
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
@@ -176,6 +178,14 @@ class SafeGazePopupHandler(
                         onSgWhitelistUpdated(host, false)
                     }
                 }
+            }
+        }
+
+        //Autoplay video
+        binding.switchAutoplayVideo.apply {
+            isChecked = sharedPreferences.isAutoPlayVideoEnabled()
+            setOnCheckedChangeListener { _, isChecked ->
+                sharedPreferences.setAutoPlayVideoEnabled(isChecked)
             }
         }
 
