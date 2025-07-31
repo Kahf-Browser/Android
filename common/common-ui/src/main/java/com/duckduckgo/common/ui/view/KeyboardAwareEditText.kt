@@ -60,16 +60,17 @@ class KeyboardAwareEditText : AppCompatEditText {
     ) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
         if (focused) {
+
             if (text != null && text?.isWebUrl() == false) {
                 if (didSelectQueryFirstTime) {
-                    // trigger the text change listener so that we can show autocomplete
-                    showSuggestionsListener?.showSuggestions()
                     // cursor at the end of the word
                     setSelection(text!!.length)
                 } else {
                     didSelectQueryFirstTime = true
                     post { Selection.selectAll(text) }
                 }
+                // trigger the text change listener so that we can show favorites
+                showSuggestionsListener?.showSuggestions(true)
             } else if (text?.isWebUrl() == true) {
                 // We always want URLs to be selected
                 // we need to post for the selectAll to take effect. The wonders of Android layout !
@@ -131,6 +132,6 @@ class KeyboardAwareEditText : AppCompatEditText {
     }
 
     interface ShowSuggestionsListener {
-        fun showSuggestions()
+        fun showSuggestions(showFavourites: Boolean)
     }
 }

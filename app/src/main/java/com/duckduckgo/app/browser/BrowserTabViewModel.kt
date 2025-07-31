@@ -25,6 +25,7 @@ import android.net.http.SslCertificate
 import android.os.Message
 import android.print.PrintAttributes
 import android.provider.MediaStore
+import android.util.Log
 import android.util.Patterns
 import android.view.ContextMenu
 import android.view.MenuItem
@@ -2017,6 +2018,7 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         hasFocus: Boolean,
         hasQueryChanged: Boolean,
+        browserShowing: Boolean = currentBrowserViewState().browserShowing
     ) {
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
@@ -2029,9 +2031,10 @@ class BrowserTabViewModel @Inject constructor(
         val showAutoCompleteSuggestions = hasFocus && query.isNotBlank() && hasQueryChanged && autoCompleteSuggestionsEnabled
         val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
             val urlFocused = hasFocus && query.isNotBlank() && !hasQueryChanged && UriString.isWebUrl(query)
-            val emptyQueryBrowsing = query.isBlank() && currentBrowserViewState().browserShowing
+            val emptyQueryBrowsing = query.isBlank() && browserShowing
             val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
-            hasFocus && (urlFocused || emptyQueryBrowsing) && favoritesAvailable
+            val returnValue = hasFocus && (urlFocused || emptyQueryBrowsing) && favoritesAvailable
+            returnValue
         } else {
             false
         }
