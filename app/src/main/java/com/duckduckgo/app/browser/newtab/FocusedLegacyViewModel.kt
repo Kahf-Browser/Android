@@ -30,6 +30,8 @@ import com.duckduckgo.app.browser.viewstate.SavedSiteChangedViewState
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
+import com.duckduckgo.history.api.HistoryEntry
+import com.duckduckgo.history.impl.RealNavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.api.models.BookmarkFolder
 import com.duckduckgo.savedsites.api.models.SavedSite
@@ -38,19 +40,21 @@ import com.duckduckgo.savedsites.api.models.SavedSite.Favorite
 import com.duckduckgo.savedsites.impl.SavedSitesPixelName
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.DeleteBookmarkListener
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment.EditSavedSiteListener
-import javax.inject.Inject
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
+import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
 @ContributesViewModel(ViewScope::class)
@@ -59,6 +63,8 @@ class FocusedLegacyViewModel @Inject constructor(
     private val savedSitesRepository: SavedSitesRepository,
     private val pixel: Pixel,
 ) : ViewModel(), DefaultLifecycleObserver, EditSavedSiteListener, DeleteBookmarkListener {
+    @Inject
+    lateinit var historyRepository: RealNavigationHistory
 
     data class ViewState(
         val favourites: List<Favorite> = emptyList(),
@@ -80,7 +86,18 @@ class FocusedLegacyViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
+        var combinedFavouriteWithHistory = mutableListOf<Favorite>()
+
         viewModelScope.launch(dispatchers.io()) {
+            historyRepository.getHistoryFlow().flowOn(dispatchers.io())
+                .distinctUntilChanged()
+                .onEach {
+                    val uniqueItems = it.distinctBy { history -> history.url.host }
+                    combinedFavouriteWithHistory = uniqueItems.convertToFavorites()
+                    Timber.d("History updated. Should update UI now. ${uniqueItems.size}")
+                }
+                .launchIn(viewModelScope)
+
             savedSitesRepository.getFavorites()
                 .combine(hiddenIds) { favorites, hiddenIds ->
                     favorites.filter { it.id !in hiddenIds.favorites }
@@ -88,9 +105,10 @@ class FocusedLegacyViewModel @Inject constructor(
                 .flowOn(dispatchers.io())
                 .onEach { favourites ->
                     withContext(dispatchers.main()) {
+                        combinedFavouriteWithHistory.addAll(favourites)
                         _viewState.emit(
                             viewState.value.copy(
-                                favourites = favourites,
+                                favourites = combinedFavouriteWithHistory,
                             ),
                         )
                     }
@@ -100,10 +118,19 @@ class FocusedLegacyViewModel @Inject constructor(
         }
     }
 
+    private fun List<HistoryEntry>.convertToFavorites(): MutableList<Favorite> {
+        val newList = mutableListOf<Favorite>()
+        this.forEach {
+            Timber.d("kahfLog: title: ${it.title},  host: ${it.url.host}")
+            newList.add(Favorite(title = it.title, url = it.url.toString(), id = "", lastModified = "", position = 0))
+        }
+        return newList
+    }
+
     fun onEditSavedSiteRequested(savedSite: SavedSite) {
         viewModelScope.launch(dispatchers.io()) {
             val bookmarkFolder =
-                if (savedSite is SavedSite.Bookmark) {
+                if (savedSite is Bookmark) {
                     getBookmarkFolder(savedSite)
                 } else {
                     null
@@ -185,7 +212,7 @@ class FocusedLegacyViewModel @Inject constructor(
         }
     }
 
-    private suspend fun getBookmarkFolder(bookmark: SavedSite.Bookmark?): BookmarkFolder? {
+    private suspend fun getBookmarkFolder(bookmark: Bookmark?): BookmarkFolder? {
         if (bookmark == null) return null
         return withContext(dispatchers.io()) {
             savedSitesRepository.getFolder(bookmark.parentId)

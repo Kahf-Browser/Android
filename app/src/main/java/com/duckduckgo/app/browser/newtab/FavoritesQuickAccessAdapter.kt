@@ -20,7 +20,11 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DiffUtil
@@ -35,9 +39,9 @@ import com.duckduckgo.app.browser.newtab.QuickAccessAdapterDiffCallback.Companio
 import com.duckduckgo.app.browser.newtab.QuickAccessAdapterDiffCallback.Companion.DIFF_KEY_URL
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.savedsites.api.models.SavedSite
-import kotlin.math.absoluteValue
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.math.absoluteValue
 
 class FavoritesQuickAccessAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -192,7 +196,11 @@ class FavoritesQuickAccessAdapter(
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = binding.quickAccessFavicon, fetchFromRemote = true)
+                Timber.d("kahfLog: Loading favicon for url: $url")
+                faviconManager.getFaviconFromGlide(url.toUri())?.let { bitmap ->
+                    binding.quickAccessFavicon.setImageBitmap(bitmap)
+                }
+                // faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = binding.quickAccessFavicon, fetchFromRemote = true)
             }
         }
 
