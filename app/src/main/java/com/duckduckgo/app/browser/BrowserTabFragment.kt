@@ -176,6 +176,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.browser.newtab.FocusedLegacyView
 import com.duckduckgo.app.browser.newtab.FocusedViewProvider
 import com.duckduckgo.app.browser.newtab.HistoryQuickAccessAdapter
 import com.duckduckgo.app.browser.newtab.NewTabPageProvider
@@ -366,6 +367,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.kahfads.sdk.AdImpressionListener
+import com.kahfads.sdk.FallbackAdImpressionListener
 import com.kahfads.sdk.KahfAdsError
 import com.kahfads.sdk.KahfAdsViewConfig
 import com.kahfads.sdk.PlacementId
@@ -767,7 +769,8 @@ class BrowserTabFragment :
 
     private val showSuggestionsListener = object : ShowSuggestionsListener {
         override fun showSuggestions(showFavourites: Boolean) {
-            viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
+            if (showFavourites) bottomNav.botNav.hide()
+            viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true, browserShowing = showFavourites)
         }
     }
 
@@ -2557,13 +2560,19 @@ class BrowserTabFragment :
     private fun configureFocusedView() {
         viewLifecycleOwnerLiveData.observe(viewLifecycleOwner) { lifecycleOwner ->
             focusedViewProvider.provideFocusedViewVersion().onEach { focusedView ->
+                val finalView = focusedView.getView(requireContext())
                 binding.focusedViewContainerLayout.addView(
-                    focusedView.getView(requireContext()),
+                    finalView,
                     LayoutParams(
                         LayoutParams.MATCH_PARENT,
                         LayoutParams.MATCH_PARENT,
                     ),
                 )
+                (finalView as FocusedLegacyView).apply {
+                    setOnClickAdListener { url ->
+                        viewModel.onUserSubmittedQuery(url)
+                    }
+                }
             }.launchIn(lifecycleOwner.lifecycleScope)
         }
     }
@@ -2679,6 +2688,7 @@ class BrowserTabFragment :
                     cancelPendingAutofillRequestsToChooseCredentials()
                     omnibar.omniBarContainer.isPressed = true
                 } else {
+                    bottomNav.botNav.show()
                     omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
                     omnibar.omniBarContainer.isPressed = false
@@ -2743,6 +2753,7 @@ class BrowserTabFragment :
             safeGazeInterface = SafeGazeJsInterface(
                 requireContext(), nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onImageClassified = { type, data ->
+                    Timber.d("imgLog Send from Kotlin: type: $type, data: ${gson.toJson(data)}")
                     webView?.post {
                         val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
                         webView?.evaluateJavascript(jsScript, null)
@@ -4632,6 +4643,27 @@ class BrowserTabFragment :
                         Timber.i("adLog onAdClicked")
                         analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
                         return true
+                    }
+                })
+
+                setFallbackEventsListener(object : FallbackAdImpressionListener() {
+                    override fun onFallbackAdClicked(urlToLoad: String): Boolean {
+                        viewModel.onUserSubmittedQuery(urlToLoad)
+                        return true
+                    }
+
+                    override fun onFallbackAdFailedToLoad(
+                        message: String,
+                        cause: KahfAdsError?
+                    ) {
+                        super.onFallbackAdFailedToLoad(message, cause)
+                    }
+
+                    override fun onFallbackAdLoaded(
+                        primaryAdError: KahfAdsError?,
+                        headline: String
+                    ) {
+                        super.onFallbackAdLoaded(primaryAdError, headline)
                     }
                 })
             }

@@ -55,22 +55,31 @@ import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.AD_REFRESH_INTERVAL
+import com.duckduckgo.common.utils.EPOM_PLACEMENT_ID
 import com.duckduckgo.common.utils.ViewViewModelFactory
 import com.duckduckgo.common.utils.extensions.html
+import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.savedsites.api.models.SavedSite
 import com.duckduckgo.savedsites.api.models.SavedSitesNames
 import com.duckduckgo.savedsites.impl.dialogs.EditSavedSiteDialogFragment
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import com.kahfads.sdk.AdImpressionListener
+import com.kahfads.sdk.FallbackAdImpressionListener
+import com.kahfads.sdk.KahfAdsError
+import com.kahfads.sdk.KahfAdsViewConfig
+import com.kahfads.sdk.PlacementId
 import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import timber.log.Timber
+import javax.inject.Inject
 
 @InjectWith(ViewScope::class)
 class FocusedLegacyView @JvmOverloads constructor(
@@ -78,6 +87,13 @@ class FocusedLegacyView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyle: Int = 0,
 ) : LinearLayout(context, attrs, defStyle) {
+
+    private var onClickAd: ((String) -> Unit)? = null
+
+    fun setOnClickAdListener(listener: (String) -> Unit) {
+        onClickAd = listener
+        Timber.d("Setting onClickAd listener: $listener")
+    }
 
     @Inject
     lateinit var viewModelFactory: ViewViewModelFactory
@@ -93,6 +109,9 @@ class FocusedLegacyView @JvmOverloads constructor(
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var spProvider: SharedPreferencesProvider
 
     private var coroutineScope: CoroutineScope? = null
 
@@ -135,6 +154,7 @@ class FocusedLegacyView @JvmOverloads constructor(
 
     private fun configureViews() {
         configureHomeTabQuickAccessGrid()
+        configureAdView()
         setOnClickListener(null)
     }
 
@@ -147,6 +167,82 @@ class FocusedLegacyView @JvmOverloads constructor(
         quickAccessItemTouchHelper = createQuickAccessItemHolder(binding.quickAccessSuggestionsRecyclerView, quickAccessAdapter)
         binding.quickAccessSuggestionsRecyclerView.adapter = quickAccessAdapter
         binding.quickAccessSuggestionsRecyclerView.disableAnimation()
+    }
+
+    private fun configureAdView() {
+        binding.kahfBannerAd.apply {
+            configure(
+                config = KahfAdsViewConfig(
+                    screenName = "BrowserTabFragment",
+                    placementId = PlacementId.Epom(EPOM_PLACEMENT_ID),
+                    refreshIntervalInMillis = spProvider.getKahfSharedPreferences().getLong(AD_REFRESH_INTERVAL, 20_000L)
+                )
+            )
+
+            setEventsListener(object : AdImpressionListener() {
+                override fun onAdLoaded() {
+                    // if (webView?.isVisible != false) {
+                    //     Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
+                    //     viewModel.pauseAdRefresh()
+                    // } else {
+                    //     Timber.i("adLog onAdLoaded $tabId")
+                    //     // analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                    // }
+                }
+
+                override fun onAdFailedToLoad(
+                    message: String,
+                    cause: KahfAdsError?
+                ) {
+                    when(cause) {
+                        is KahfAdsError.TimeoutError -> {
+                            // analyticsService.logEvent(AnalyticsEvent.AdTimeout)
+                        }
+
+                        is KahfAdsError.NoAdFoundError -> {
+                            // analyticsService.logEvent(AnalyticsEvent.AdNotFound)
+                        }
+
+                        is KahfAdsError.ServerError -> {
+                            // analyticsService.logEvent(AnalyticsEvent.AdServerError)
+                        }
+
+                        else -> {
+                            // No op
+                        }
+                    }
+                }
+
+                override fun onAdClicked(urlToLoad: String): Boolean {
+                    Timber.i("adLog onAdClicked: $urlToLoad")
+                    onClickAd?.invoke(urlToLoad)
+                    // analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                    return true
+                }
+            })
+
+            setFallbackEventsListener(object : FallbackAdImpressionListener() {
+                override fun onFallbackAdClicked(urlToLoad: String): Boolean {
+                    Timber.i("adLog onFallbackAdClicked: $urlToLoad, onClickAd: $onClickAd")
+                    onClickAd?.invoke(urlToLoad)
+                    return true
+                }
+
+                override fun onFallbackAdFailedToLoad(
+                    message: String,
+                    cause: KahfAdsError?
+                ) {
+                    super.onFallbackAdFailedToLoad(message, cause)
+                }
+
+                override fun onFallbackAdLoaded(
+                    primaryAdError: KahfAdsError?,
+                    headline: String
+                ) {
+                    super.onFallbackAdLoaded(primaryAdError, headline)
+                }
+            })
+        }
     }
 
     private fun createQuickAccessAdapter(
@@ -263,3 +359,4 @@ class FocusedLegacyView @JvmOverloads constructor(
             .show()
     }
 }
+
