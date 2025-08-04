@@ -767,7 +767,7 @@ class BrowserTabFragment :
 
     private val showSuggestionsListener = object : ShowSuggestionsListener {
         override fun showSuggestions(showFavourites: Boolean) {
-            viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true, browserShowing = showFavourites)
+            viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
         }
     }
 
