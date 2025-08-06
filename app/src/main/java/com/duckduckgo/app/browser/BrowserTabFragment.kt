@@ -2753,7 +2753,7 @@ class BrowserTabFragment :
             safeGazeInterface = SafeGazeJsInterface(
                 requireContext(), nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onImageClassified = { type, data ->
-                    Timber.d("imgLog Send from Kotlin: type: $type, data: ${gson.toJson(data)}")
+                    // Timber.d("imgLog Send to WebView from Kotlin: type: $type, data: ${gson.toJson(data)}")
                     webView?.post {
                         val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
                         webView?.evaluateJavascript(jsScript, null)

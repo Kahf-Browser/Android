@@ -81,6 +81,7 @@ class SafeGazeJsInterface(
 
     @JavascriptInterface
     fun sendMessageFromWebView(messageType: String, data: String) {
+        // Timber.d("imgLog Received message from WebView: type: $messageType, data: ${gson.toJson(data)}")
         when (messageType) {
             "detectImg" -> addTaskToQueue(parseImageInfo(data))
             "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
@@ -98,6 +99,7 @@ class SafeGazeJsInterface(
 
     private fun addTaskToQueue(input: InputImage?) {
         if (input == null || isInvalidImageUrl(input.src)) {
+            // Timber.d("imgLog: 1. imageId: ${input?.id}")
             onImageClassified("detectionResult", OutputImage(
                 result = "null",
                 id = input?.id ?: "",
@@ -189,6 +191,7 @@ class SafeGazeJsInterface(
                         is DownloadStatus.Failed -> {
                             // Download failed, remove from tracker
                             downloadTracker.remove(readyTask.id)
+                            // Timber.d("imgLog: 2. imageId: ${readyTask.id}")
                             onImageClassified("detectionResult", OutputImage(
                                 result = "null",
                                 id = readyTask.id ?: "",
@@ -200,7 +203,7 @@ class SafeGazeJsInterface(
                         is DownloadStatus.Success -> {
                             // Small delay to avoid overwhelming the processor
                             delay(10)
-
+                            // Timber.d("imgLog: 3. imageId: ${readyTask.id}")
                             var output = OutputImage(
                                 result = "null",
                                 id = readyTask.id ?: "",
@@ -215,6 +218,7 @@ class SafeGazeJsInterface(
                                 )
 
                                 if (cachedResult != null) {
+                                    // Timber.d("imgLog: 4. imageId: ${it.id}")
                                     output = OutputImage(
                                         result = cachedResult.responseStr,
                                         id = it.id ?: "",
@@ -260,6 +264,7 @@ class SafeGazeJsInterface(
                                     } else {
                                         val segmentationInf = measureTimeMillis {
                                             output = imageDetector.downloadAndStore(readyTask.copy(imgBitmap = bmp))
+                                            // Timber.d("imgLog: 5. imageId: ${output.id}")
                                         }
                                         Timber.d("kLog Segmentation inference time: $segmentationInf ms")
 
