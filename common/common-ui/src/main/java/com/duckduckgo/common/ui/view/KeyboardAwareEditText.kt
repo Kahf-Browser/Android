@@ -60,7 +60,7 @@ class KeyboardAwareEditText : AppCompatEditText {
     ) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
         if (focused) {
-
+            showSuggestionsListener?.hideBottomBar()
             if (text != null && text?.isWebUrl() == false) {
                 if (didSelectQueryFirstTime) {
                     // cursor at the end of the word
@@ -133,5 +133,6 @@ class KeyboardAwareEditText : AppCompatEditText {
 
     interface ShowSuggestionsListener {
         fun showSuggestions(showFavourites: Boolean)
+        fun hideBottomBar()
     }
 }

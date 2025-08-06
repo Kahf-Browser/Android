@@ -29,21 +29,17 @@
         android:layout_height="match_parent"
         android:background="?attr/colorPrimaryDark"
         android:elevation="10dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/autoCompleteSuggestionsList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"
         android:background="@android:color/transparent"
+        android:padding="10dp"
         android:clipToPadding="false"
         android:elevation="4dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_marginTop="?actionBarSize"
         tools:itemCount="3"
         tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
@@ -52,9 +48,9 @@
         android:id="@+id/focusedViewContainerLayout"
         android:clipToPadding="false"
         android:elevation="4dp"
+        android:layout_marginTop="?actionBarSize"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:layout_height="match_parent" />
 
     <include
         android:id="@+id/includeNewBrowserTab"
