@@ -21,6 +21,7 @@ import android.graphics.BitmapFactory
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.kahf_segmentation.InputImage
+import io.kahf.kahf_segmentation.OutputImage
 import timber.log.Timber
 import kotlin.system.measureTimeMillis
 
@@ -32,8 +33,9 @@ import kotlin.system.measureTimeMillis
 suspend fun isHardwareCompatible(
     context: Context,
     nsfwDetector: NsfwDetector,
-    imageDetector: ImageProcessor
-): Boolean {
+    imageDetector: ImageProcessor,
+    isCompatible: (result: Boolean) -> Unit
+) {
     Timber.d("kLog checking hardware compatibility")
 
     val bitmap = context.assets.open("test_image.webp").use {
@@ -53,8 +55,8 @@ suspend fun isHardwareCompatible(
     val inferenceTime = measureTimeMillis {
         val nsfwPrediction = nsfwDetector.isNsfw(bitmap)
         Timber.d("kLog nsfw classified. IsSafe: ${nsfwPrediction?.isSafe()}")
-
-        val segmentationResult = imageDetector.downloadAndStore(
+        var segmentationResult: OutputImage? = null
+         imageDetector.downloadAndStore(
             InputImage(
                 src = "test_image.webp",
                 id = "test_image",
@@ -64,15 +66,18 @@ suspend fun isHardwareCompatible(
                 order = 1F,
                 baseImg = "none", // Assuming toBase64() is a valid method
             ),
-        )
-        Timber.d("kLog segmentation completed. Image modified: ${segmentationResult.isManipulated}")
+        ) {
+             segmentationResult = it
+             Timber.d("kLog segmentation completed. seg result: $segmentationResult")
+        }
+        Timber.d("kLog segmentation completed. Image modified: ${segmentationResult?.isManipulated}")
     }
 
-    return if (inferenceTime > 750) {
+    if (inferenceTime > 750) {
         Timber.e("kLog Will make it slower: $inferenceTime ms")
-        false
+        isCompatible.invoke(false)
     } else {
         Timber.d("kLog Will run fine: $inferenceTime ms")
-        true
+        isCompatible.invoke(true)
     }
 }

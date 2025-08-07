@@ -23,9 +23,9 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import io.kahf.kahf_segmentation.ImageProcessor
 import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -127,28 +127,28 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
         lifecycleScope.launch(dispatcher.io() + exceptionHandler) {
             // Wait for the View to be ready
             delay(500)
-            val result = isHardwareCompatible(requireContext(), nsfwDetector, imageProcessor)
+            isHardwareCompatible(requireContext(), nsfwDetector, imageProcessor) { result ->
+                CoroutineScope(dispatcher.main()).launch {
+                    binding.tvCompatibility.text = getString(
+                        if (result) {
+                            R.string.kahf_onboarding_compatible
+                        } else {
+                            R.string.kahf_onboarding_slow
+                        }
+                    ).also { text = it }
 
-            withContext(dispatcher.main()) {
-                binding.tvCompatibility.text = getString(
-                    if (result) {
-                        R.string.kahf_onboarding_compatible
-                    } else {
-                        R.string.kahf_onboarding_slow
-                    }
-                ).also { text = it }
+                    binding.tvCompatibility.setTextColor(
+                        ContextCompat.getColor(requireContext(), if (result) {
+                            com.duckduckgo.mobile.android.R.color.kahf_green
+                        } else {
+                            com.duckduckgo.mobile.android.R.color.kahf_orange
+                        }).also { textColor = it }
+                    )
 
-                binding.tvCompatibility.setTextColor(
-                    ContextCompat.getColor(requireContext(), if (result) {
-                        com.duckduckgo.mobile.android.R.color.kahf_green
-                    } else {
-                        com.duckduckgo.mobile.android.R.color.kahf_orange
-                    }).also { textColor = it }
-                )
-
-                binding.progressLoader.visibility = View.GONE
+                    binding.progressLoader.visibility = View.GONE
+                }
+                hardwareCompatibilityChecked = true
             }
-            hardwareCompatibilityChecked = true
         }
     }
 

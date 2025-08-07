@@ -263,7 +263,9 @@ class SafeGazeJsInterface(
                                         )
                                     } else {
                                         val segmentationInf = measureTimeMillis {
-                                            output = imageDetector.downloadAndStore(readyTask.copy(imgBitmap = bmp))
+                                            imageDetector.downloadAndStore(readyTask.copy(imgBitmap = bmp)) { result ->
+                                                output = result
+                                            }
                                             // Timber.d("imgLog: 5. imageId: ${output.id}")
                                         }
                                         Timber.d("kLog Segmentation inference time: $segmentationInf ms")
