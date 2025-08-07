@@ -84,7 +84,7 @@ class SafeGazeJsInterface(
         // Timber.d("imgLog Received message from WebView: type: $messageType, data: ${gson.toJson(data)}")
         when (messageType) {
             "detectImg" -> addTaskToQueue(parseImageInfo(data))
-            "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
+            // "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
         }
     }
 
