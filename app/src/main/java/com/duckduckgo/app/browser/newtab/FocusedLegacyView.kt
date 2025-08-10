@@ -227,20 +227,6 @@ class FocusedLegacyView @JvmOverloads constructor(
                     onClickAd?.invoke(urlToLoad)
                     return true
                 }
-
-                override fun onFallbackAdFailedToLoad(
-                    message: String,
-                    cause: KahfAdsError?
-                ) {
-                    super.onFallbackAdFailedToLoad(message, cause)
-                }
-
-                override fun onFallbackAdLoaded(
-                    primaryAdError: KahfAdsError?,
-                    headline: String
-                ) {
-                    super.onFallbackAdLoaded(primaryAdError, headline)
-                }
             })
         }
     }

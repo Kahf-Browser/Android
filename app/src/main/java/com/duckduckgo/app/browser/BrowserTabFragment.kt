@@ -2558,6 +2558,65 @@ class BrowserTabFragment :
             },
         )
         binding.autoCompleteSuggestionsList.adapter = autoCompleteSuggestionsAdapter
+        binding.kahfSmallBannerAd.apply {
+            configure(
+                config = KahfAdsViewConfig(
+                    screenName = "BrowserTabFragment",
+                    placementId = PlacementId.Epom(EPOM_PLACEMENT_ID),
+                    refreshIntervalInMillis = spProvider.getKahfSharedPreferences().getLong(AD_REFRESH_INTERVAL, 20_000L)
+                )
+            )
+
+            setEventsListener(object : AdImpressionListener() {
+                override fun onAdLoaded() {
+                    if (webView?.isVisible != false) {
+                        Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
+                        viewModel.pauseAdRefresh()
+                    } else {
+                        Timber.i("adLog onAdLoaded $tabId")
+                        analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                    }
+                }
+
+                override fun onAdFailedToLoad(
+                    message: String,
+                    cause: KahfAdsError?
+                ) {
+                    when(cause) {
+                        is KahfAdsError.TimeoutError -> {
+                            analyticsService.logEvent(AnalyticsEvent.AdTimeout)
+                        }
+
+                        is KahfAdsError.NoAdFoundError -> {
+                            analyticsService.logEvent(AnalyticsEvent.AdNotFound)
+                        }
+
+                        is KahfAdsError.ServerError -> {
+                            analyticsService.logEvent(AnalyticsEvent.AdServerError)
+                        }
+
+                        else -> {
+                            // No op
+                        }
+                    }
+                }
+
+                override fun onAdClicked(urlToLoad: String): Boolean {
+                    Timber.i("adLog onAdClicked: $urlToLoad")
+                    viewModel.onUserSubmittedQuery(urlToLoad)
+                    analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                    return true
+                }
+            })
+
+            setFallbackEventsListener(object : FallbackAdImpressionListener() {
+                override fun onFallbackAdClicked(urlToLoad: String): Boolean {
+                    Timber.i("adLog onFallbackAdClicked: $urlToLoad")
+                    viewModel.onUserSubmittedQuery(urlToLoad)
+                    return true
+                }
+            })
+        }
     }
 
     private fun configureFocusedView() {
@@ -4166,10 +4225,15 @@ class BrowserTabFragment :
                 if (viewState.showSuggestions || viewState.showFavorites) {
                     if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
                         binding.autoCompleteSuggestionsList.gone()
+                        binding.kahfSmallBannerAd.gone()
                         binding.focusedViewContainerLayout.show()
                         binding.suggestionListBg.gone()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
+                        Handler(Looper.myLooper() ?: Looper.getMainLooper()).postDelayed(
+                            {
+                                binding.kahfSmallBannerAd.show()
+                            }, 500)
                         binding.focusedViewContainerLayout.gone()
 
                         val suggestionsWithClipboardContent = viewModel.appendClipboardUrlToSuggestions(
@@ -4187,6 +4251,7 @@ class BrowserTabFragment :
                     }
                 } else {
                     binding.autoCompleteSuggestionsList.gone()
+                    binding.kahfSmallBannerAd.gone()
                     binding.focusedViewContainerLayout.gone()
                     binding.suggestionListBg.gone()
                 }
