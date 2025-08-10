@@ -41,6 +41,7 @@
             android:id="@+id/kahfBannerAd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             android:layout_marginHorizontal="@dimen/kahf_new_tab_content_margin"
             android:layout_marginBottom="@dimen/kahf_ad_bottom_margin_in_quick_access_page"
             app:layout_constraintBottom_toBottomOf="parent"
