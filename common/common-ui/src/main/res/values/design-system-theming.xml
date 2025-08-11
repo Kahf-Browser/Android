@@ -204,6 +204,7 @@
         <!-- Text Input -->
         <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
         <item name="daxColorTextInputEnabledOutline">@color/white30</item>
+        <item name="daxColorSuggestionBg">@color/white18</item>
 
         <!-- InfoPanel Input -->
         <item name="daxInfoPanelTooltipBackgroundColor">@color/daxInfoPanelTooltipBackgroundColorDark</item>
@@ -296,6 +297,7 @@
         <!-- Text Input -->
         <item name="daxColorTextInputFocusedOutline">?attr/daxColorAccentBlue</item>
         <item name="daxColorTextInputEnabledOutline">@color/black30</item>
+        <item name="daxColorSuggestionBg">@color/black18</item>
 
         <!-- Info Panel -->
         <item name="daxInfoPanelTooltipBackgroundColor">@color/daxInfoPanelTooltipBackgroundColorLight</item>

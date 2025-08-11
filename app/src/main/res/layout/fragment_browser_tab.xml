@@ -37,7 +37,7 @@
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
         android:padding="10dp"
-        android:layout_marginBottom="64dp"
+        android:layout_marginBottom="124dp"
         android:clipToPadding="false"
         android:elevation="4dp"
         android:layout_marginTop="?actionBarSize"
@@ -53,7 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.kahfads.sdk.SmallBannerAdView
+    <com.kahfads.sdk.MediumBannerAdView
         android:id="@+id/kahfSmallBannerAd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -142,7 +142,7 @@
         android:id="@+id/suggestionListBg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/gradient_kahf"
+        android:background="?daxColorSurface"
         android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
