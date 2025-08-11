@@ -1117,16 +1117,15 @@ class BrowserTabFragment :
                                 (requireActivity() as BrowserActivity).relaunchCurrentTab(uri.toString())
                             }
                         }
+                        analyticsService.logEvent(
+                            when (dnsLevel) {
+                                PrivateDnsLevel.High -> PrivateDnsHigh
+                                PrivateDnsLevel.Medium -> PrivateDnsMedium
+                                PrivateDnsLevel.Low -> PrivateDnsLow
+                                PrivateDnsLevel.Off -> PrivateDnsDisable
+                            },
+                        )
                     }
-
-                    analyticsService.logEvent(
-                        when (dnsLevel) {
-                            PrivateDnsLevel.High -> PrivateDnsHigh
-                            PrivateDnsLevel.Medium -> PrivateDnsMedium
-                            PrivateDnsLevel.Low -> PrivateDnsLow
-                            PrivateDnsLevel.Off -> PrivateDnsDisable
-                        },
-                    )
                 },
                 onSafeGazeModeChanged = {
                     val updated = updateSafeGazeSettings(it)
