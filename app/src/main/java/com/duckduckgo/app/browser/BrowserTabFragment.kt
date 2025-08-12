@@ -4231,7 +4231,11 @@ class BrowserTabFragment :
                         binding.autoCompleteSuggestionsList.show()
                         Handler(Looper.myLooper() ?: Looper.getMainLooper()).postDelayed(
                             {
-                                binding.kahfSmallBannerAd.show()
+                                try {
+                                    binding.kahfSmallBannerAd.show()
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }, 500)
                         binding.focusedViewContainerLayout.gone()
 
