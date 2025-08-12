@@ -4229,14 +4229,17 @@ class BrowserTabFragment :
                         binding.suggestionListBg.gone()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
-                        Handler(Looper.myLooper() ?: Looper.getMainLooper()).postDelayed(
-                            {
-                                try {
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            delay(500)
+                            try {
+                                // Check if fragment is still added to prevent crashes
+                                if (isAdded) {
                                     binding.kahfSmallBannerAd.show()
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
                                 }
-                            }, 500)
+                            } catch (e: Exception) {
+                                Timber.e(e, "Failed to show banner ad.")
+                            }
+                        }
                         binding.focusedViewContainerLayout.gone()
 
                         val suggestionsWithClipboardContent = viewModel.appendClipboardUrlToSuggestions(
