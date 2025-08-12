@@ -17,8 +17,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="?attr/daxColorSurface"
@@ -41,8 +40,7 @@
             android:id="@+id/kahfBannerAd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"
-            android:layout_marginHorizontal="@dimen/kahf_new_tab_content_margin"
+            android:layout_marginHorizontal="@dimen/kahf_ad_bottom_margin_in_quick_access_page"
             android:layout_marginBottom="@dimen/kahf_ad_bottom_margin_in_quick_access_page"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

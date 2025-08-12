@@ -81,7 +81,7 @@ class SafeGazeJsInterface(
 
     @JavascriptInterface
     fun sendMessageFromWebView(messageType: String, data: String) {
-        // Timber.d("imgLog Received message from WebView: type: $messageType, data: ${gson.toJson(data)}")
+        Timber.d("kLog: imgLog Received message from WebView: type: $messageType, data: ${gson.toJson(data)}")
         when (messageType) {
             "detectImg" -> addTaskToQueue(parseImageInfo(data))
             // "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
@@ -104,7 +104,8 @@ class SafeGazeJsInterface(
                 result = "null",
                 id = input?.id ?: "",
                 width = input?.width ?: 0,
-                height = input?.height ?: 0
+                height = input?.height ?: 0,
+                from = "addTaskToQueue"
             ))
             return
         }
@@ -196,7 +197,8 @@ class SafeGazeJsInterface(
                                 result = "null",
                                 id = readyTask.id ?: "",
                                 width = readyTask.width ?: 0,
-                                height = readyTask.height ?: 0
+                                height = readyTask.height ?: 0,
+                                from = "statusFailed"
                             ))
                             continue
                         }
@@ -208,7 +210,8 @@ class SafeGazeJsInterface(
                                 result = "null",
                                 id = readyTask.id ?: "",
                                 width = readyTask.width ?: 0,
-                                height = readyTask.height ?: 0
+                                height = readyTask.height ?: 0,
+                                from = "statusSuccess"
                             )
 
                             readyTask.let {
@@ -223,7 +226,8 @@ class SafeGazeJsInterface(
                                         result = cachedResult.responseStr,
                                         id = it.id ?: "",
                                         width = it.width ?: 0,
-                                        height = it.height ?: 0
+                                        height = it.height ?: 0,
+                                        from = "cache"
                                     )
                                     Timber.d("kLog cache hit")
                                     downloadTracker.remove(it.id)
@@ -259,7 +263,8 @@ class SafeGazeJsInterface(
                                             id = readyTask.id ?: "",
                                             width = readyTask.width ?: 0,
                                             height = readyTask.height ?: 0,
-                                            isManipulated = true
+                                            isManipulated = true,
+                                            from = "nsfw"
                                         )
                                     } else {
                                         val segmentationInf = measureTimeMillis {

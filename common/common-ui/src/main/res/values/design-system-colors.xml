@@ -95,6 +95,7 @@
 
     <attr name="daxColorTextInputFocusedOutline" format="color"/>
     <attr name="daxColorTextInputEnabledOutline" format="color"/>
+    <attr name="daxColorSuggestionBg" format="color"/>
 
     <!-- Design System Brand Colors -->
     <color name="disabledColor">#59000000</color>

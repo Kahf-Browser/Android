@@ -2018,7 +2018,7 @@ class BrowserTabViewModel @Inject constructor(
         query: String,
         hasFocus: Boolean,
         hasQueryChanged: Boolean,
-        browserShowing: Boolean = currentBrowserViewState().browserShowing
+        browserShowing: Boolean = currentBrowserViewState().browserShowing|| query.isBlank()
     ) {
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {

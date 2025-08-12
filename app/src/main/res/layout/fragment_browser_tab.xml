@@ -36,11 +36,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@android:color/transparent"
-        android:layout_margin="10dp"
+        android:padding="10dp"
+        android:layout_marginBottom="64dp"
         android:clipToPadding="false"
         android:elevation="4dp"
+        android:layout_marginTop="?actionBarSize"
         tools:itemCount="3"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
 
@@ -48,9 +49,18 @@
         android:id="@+id/focusedViewContainerLayout"
         android:clipToPadding="false"
         android:elevation="4dp"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_marginTop="?actionBarSize"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <com.kahfads.sdk.SmallBannerAdView
+        android:id="@+id/kahfSmallBannerAd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="10dp"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginBottom="10dp"/>
 
     <include
         android:id="@+id/includeNewBrowserTab"
@@ -132,7 +142,7 @@
         android:id="@+id/suggestionListBg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/gradient_kahf"
+        android:background="?daxColorSurface"
         android:visibility="gone"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
