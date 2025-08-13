@@ -46,7 +46,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -86,32 +85,34 @@ class FocusedLegacyViewModel @Inject constructor(
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
 
-        var combinedFavouriteWithHistory = mutableListOf<Favorite>()
+        val combinedFavouriteWithHistory = mutableListOf<Favorite>()
 
         viewModelScope.launch(dispatchers.io()) {
-            historyRepository.getHistoryFlow().flowOn(dispatchers.io())
-                .distinctUntilChanged()
-                .onEach {
-                    val uniqueItems = it.distinctBy { history -> history.url.host }
-                    combinedFavouriteWithHistory = uniqueItems.convertToFavorites()
-                    Timber.d("History updated. Should update UI now. ${uniqueItems.size}")
-                }
-                .launchIn(viewModelScope)
-
             savedSitesRepository.getFavorites()
                 .combine(hiddenIds) { favorites, hiddenIds ->
                     favorites.filter { it.id !in hiddenIds.favorites }
                 }
+                .combine(historyRepository.getHistoryFlow()) { favorites, history ->
+                    val uniqueHistory = history
+                        .distinctBy { it.url.host }
+                        .convertToFavorites()
+
+                    val sponsoredList = listOf(
+                        Favorite(title = "Hikmah", url = "https://hikmah.net", id = "", lastModified = "", position = 0),
+                        Favorite(title = "Mahfil", url = "https://mahfil.net", id = "", lastModified = "", position = 0),
+                        Favorite(title = "Kahf Kids", url = "https://kahfkids.com", id = "", lastModified = "", position = 0),
+                        Favorite(title = "Muslims Day", url = "https://muslimsday.com/", id = "", lastModified = "", position = 0)
+                    )
+                    // ✅ Favorites first, then history
+                    sponsoredList + favorites + uniqueHistory
+                }
                 .flowOn(dispatchers.io())
-                .onEach { favourites ->
-                    withContext(dispatchers.main()) {
-                        combinedFavouriteWithHistory.addAll(favourites)
-                        _viewState.emit(
-                            viewState.value.copy(
-                                favourites = combinedFavouriteWithHistory,
-                            ),
-                        )
-                    }
+                .onEach { combinedList ->
+                    combinedFavouriteWithHistory.addAll(combinedList)
+                    _viewState.emit(
+                        viewState.value.copy(favourites = combinedList)
+                    )
+                    Timber.d("Updated UI with ${combinedList.size} items (favorites first)")
                 }
                 .flowOn(dispatchers.main())
                 .launchIn(viewModelScope)

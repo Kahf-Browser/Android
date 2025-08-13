@@ -34,16 +34,19 @@
         android:layout_gravity="center_horizontal"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
-        app:cardBackgroundColor="?attr/daxColorBackground"
         app:cardCornerRadius="@dimen/smallShapeCornerRadius"
-        app:cardElevation="4dp">
+        app:cardUseCompatPadding="false"
+        app:cardPreventCornerOverlap="true"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.FaviconCard">
 
         <ImageView
             android:id="@+id/quickAccessFavicon"
             android:layout_width="@dimen/savedSiteGridItemFavicon"
             android:layout_height="@dimen/savedSiteGridItemFavicon"
-            android:importantForAccessibility="no"/>
-
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:importantForAccessibility="no"
+            android:clipToOutline="true" />
     </com.google.android.material.card.MaterialCardView>
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
