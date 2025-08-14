@@ -4230,7 +4230,7 @@ class BrowserTabFragment :
                     } else {
                         binding.autoCompleteSuggestionsList.show()
                         viewLifecycleOwner.lifecycleScope.launch {
-                            delay(500)
+                            delay(1_000L)
                             try {
                                 // Check if fragment is still added to prevent crashes
                                 if (isAdded) {
