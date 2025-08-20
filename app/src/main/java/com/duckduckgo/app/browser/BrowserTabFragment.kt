@@ -929,7 +929,7 @@ class BrowserTabFragment :
 
     private lateinit var deviceLockAuthenticator: DeviceLockAuthenticator
 
-    private var bannerAdJob: Job? = null
+    private var smallBannerAdJobForSuggestionList: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -1384,8 +1384,8 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
-        bannerAdJob?.cancel()
-        bannerAdJob = null
+        smallBannerAdJobForSuggestionList?.cancel()
+        smallBannerAdJobForSuggestionList = null
         super.onDestroyView()
     }
 
@@ -4227,8 +4227,8 @@ class BrowserTabFragment :
                 // viewState.showFavourites needs to be moved to FocusedViewModel
                 if (viewState.showSuggestions || viewState.showFavorites) {
                     if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
-                        bannerAdJob?.cancel()
-                        bannerAdJob = null
+                        smallBannerAdJobForSuggestionList?.cancel()
+                        smallBannerAdJobForSuggestionList = null
 
                         binding.autoCompleteSuggestionsList.gone()
                         binding.kahfSmallBannerAd.gone()
@@ -4236,8 +4236,8 @@ class BrowserTabFragment :
                         binding.suggestionListBg.gone()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
-                        bannerAdJob?.cancel()
-                        bannerAdJob = viewLifecycleOwner.lifecycleScope.launch {
+                        smallBannerAdJobForSuggestionList?.cancel()
+                        smallBannerAdJobForSuggestionList = viewLifecycleOwner.lifecycleScope.launch {
                             delay(1_000L)
                             try {
                                 // Check if fragment is still added and job wasn't cancelled
@@ -4274,7 +4274,7 @@ class BrowserTabFragment :
         }
 
         private fun isJobCancelled(): Boolean {
-            return bannerAdJob?.isCancelled == true
+            return smallBannerAdJobForSuggestionList?.isCancelled == true
         }
 
         fun renderOmnibar(viewState: OmnibarViewState) {
