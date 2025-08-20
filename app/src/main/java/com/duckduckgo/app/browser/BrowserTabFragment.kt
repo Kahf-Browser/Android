@@ -929,6 +929,8 @@ class BrowserTabFragment :
 
     private lateinit var deviceLockAuthenticator: DeviceLockAuthenticator
 
+    private var bannerAdJob: Job? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("onCreate called for tabId=$tabId")
@@ -1382,6 +1384,8 @@ class BrowserTabFragment :
         webView?.removeEnableSwipeRefreshCallback()
         webView?.stopNestedScroll()
         webView?.stopLoading()
+        bannerAdJob?.cancel()
+        bannerAdJob = null
         super.onDestroyView()
     }
 
@@ -4223,23 +4227,28 @@ class BrowserTabFragment :
                 // viewState.showFavourites needs to be moved to FocusedViewModel
                 if (viewState.showSuggestions || viewState.showFavorites) {
                     if (viewState.favorites.isNotEmpty() && viewState.showFavorites) {
+                        bannerAdJob?.cancel()
+                        bannerAdJob = null
+
                         binding.autoCompleteSuggestionsList.gone()
                         binding.kahfSmallBannerAd.gone()
                         binding.focusedViewContainerLayout.show()
                         binding.suggestionListBg.gone()
                     } else {
                         binding.autoCompleteSuggestionsList.show()
-                        viewLifecycleOwner.lifecycleScope.launch {
+                        bannerAdJob?.cancel()
+                        bannerAdJob = viewLifecycleOwner.lifecycleScope.launch {
                             delay(1_000L)
                             try {
-                                // Check if fragment is still added to prevent crashes
-                                if (isAdded) {
+                                // Check if fragment is still added and job wasn't cancelled
+                                if (isAdded && !isJobCancelled()) {
                                     binding.kahfSmallBannerAd.show()
                                 }
                             } catch (e: Exception) {
                                 Timber.e(e, "Failed to show banner ad.")
                             }
                         }
+
                         binding.focusedViewContainerLayout.gone()
 
                         val suggestionsWithClipboardContent = viewModel.appendClipboardUrlToSuggestions(
@@ -4262,6 +4271,10 @@ class BrowserTabFragment :
                     binding.suggestionListBg.gone()
                 }
             }
+        }
+
+        private fun isJobCancelled(): Boolean {
+            return bannerAdJob?.isCancelled == true
         }
 
         fun renderOmnibar(viewState: OmnibarViewState) {
