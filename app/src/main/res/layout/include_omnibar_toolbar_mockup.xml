@@ -175,7 +175,7 @@
                     android:layout_height="wrap_content"
                     android:background="?selectableItemBackgroundBorderless"
                     android:padding="@dimen/toolbarIconPadding"
-                    app:srcCompat="@drawable/ic_kahf" />
+                    app:srcCompat="@drawable/safe_gaze_latest_logo_light" />
 
                 <ImageButton
                     android:id="@+id/kahfShareButton"

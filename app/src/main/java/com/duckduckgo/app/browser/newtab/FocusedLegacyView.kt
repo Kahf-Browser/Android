@@ -30,6 +30,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.BrowserTabFragment.Companion.ADD_SAVED_SITE_FRAGMENT_TAG
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ViewFocusedViewLegacyBinding
@@ -109,6 +111,9 @@ class FocusedLegacyView @JvmOverloads constructor(
 
     @Inject
     lateinit var pixel: Pixel
+
+    @Inject
+    lateinit var analyticsService: AnalyticsService
 
     @Inject
     lateinit var spProvider: SharedPreferencesProvider
@@ -196,15 +201,15 @@ class FocusedLegacyView @JvmOverloads constructor(
                 ) {
                     when(cause) {
                         is KahfAdsError.TimeoutError -> {
-                            // analyticsService.logEvent(AnalyticsEvent.AdTimeout)
+                            analyticsService.logEvent(AnalyticsEvent.AdTimeout)
                         }
 
                         is KahfAdsError.NoAdFoundError -> {
-                            // analyticsService.logEvent(AnalyticsEvent.AdNotFound)
+                            analyticsService.logEvent(AnalyticsEvent.AdNotFound)
                         }
 
                         is KahfAdsError.ServerError -> {
-                            // analyticsService.logEvent(AnalyticsEvent.AdServerError)
+                            analyticsService.logEvent(AnalyticsEvent.AdServerError)
                         }
 
                         else -> {
@@ -216,7 +221,7 @@ class FocusedLegacyView @JvmOverloads constructor(
                 override fun onAdClicked(urlToLoad: String): Boolean {
                     Timber.i("adLog onAdClicked: $urlToLoad")
                     onClickAd?.invoke(urlToLoad)
-                    // analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                    analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
                     return true
                 }
             })
