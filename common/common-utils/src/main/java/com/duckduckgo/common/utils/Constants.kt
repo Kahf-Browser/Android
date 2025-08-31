@@ -46,5 +46,6 @@ const val DEFAULT_AUTOPLAY_VIDEO = true
 const val MIN_VERSION = "minimum_version"
 const val AD_REFRESH_INTERVAL = "ad_refresh_interval"
 const val EPOM_PLACEMENT_ID = "0dfa8081b94508f158a190b8805ed9e8"
+const val EPOM_PLACEMENT_ID_600_94 = "e536bedd8b3f6c79c23bd829874b3876"
 const val FALLBACK_PUBLISHER_ID = "kahf-browser"
 const val LAST_DEFAULT_APP_CHECK_TIME = "last_default_app_check_time"

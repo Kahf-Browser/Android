@@ -316,6 +316,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DEFAULT_FACE_COVER
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.EPOM_PLACEMENT_ID
+import com.duckduckgo.common.utils.EPOM_PLACEMENT_ID_600_94
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.SAFE_GAZE_INTERFACE
 import com.duckduckgo.common.utils.extensions.dpToPx
@@ -2564,8 +2565,8 @@ class BrowserTabFragment :
         binding.kahfSmallBannerAd.apply {
             configure(
                 config = KahfAdsViewConfig(
-                    screenName = "BrowserTabFragment",
-                    placementId = PlacementId.Epom(EPOM_PLACEMENT_ID),
+                    screenName = "AutoCompleteSuggestions",
+                    placementId = PlacementId.Epom(EPOM_PLACEMENT_ID_600_94),
                     refreshIntervalInMillis = spProvider.getKahfSharedPreferences().getLong(AD_REFRESH_INTERVAL, 20_000L)
                 )
             )
