@@ -4267,6 +4267,8 @@ class BrowserTabFragment :
                     }
                 } else {
                     binding.autoCompleteSuggestionsList.gone()
+                    smallBannerAdJobForSuggestionList?.cancel()
+                    smallBannerAdJobForSuggestionList = null
                     binding.kahfSmallBannerAd.gone()
                     binding.focusedViewContainerLayout.gone()
                     binding.suggestionListBg.gone()
