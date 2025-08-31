@@ -236,7 +236,7 @@
                         android:background="?selectableItemBackgroundBorderless"
                         android:contentDescription="@string/app_bar_menu_share"
                         android:paddingHorizontal="5dp"
-                        app:srcCompat="@drawable/safe_gaze_latest_logo"
+                        app:srcCompat="@drawable/kahf_globe_logo"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@id/kahfShareButton"
                         app:layout_constraintTop_toTopOf="parent" />
