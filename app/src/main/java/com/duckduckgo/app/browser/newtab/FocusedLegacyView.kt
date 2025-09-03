@@ -186,13 +186,7 @@ class FocusedLegacyView @JvmOverloads constructor(
 
             setEventsListener(object : AdImpressionListener() {
                 override fun onAdLoaded() {
-                    // if (webView?.isVisible != false) {
-                    //     Timber.d("adLog ad loaded but webView is visible. Pause ad refresh $tabId")
-                    //     viewModel.pauseAdRefresh()
-                    // } else {
-                    //     Timber.i("adLog onAdLoaded $tabId")
-                    //     // analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
-                    // }
+                    analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
                 }
 
                 override fun onAdFailedToLoad(
