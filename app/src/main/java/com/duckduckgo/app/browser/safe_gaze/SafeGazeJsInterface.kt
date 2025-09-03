@@ -64,19 +64,21 @@ class SafeGazeJsInterface(
         scope.launch {
             imageDetector.updateFaceCoverMode(shouldCoverFace)
             imageDetector.updateBlurMode(grayBlur)
-            // videoDetector.updateBlurMode(grayBlur)
-            // videoDetector.updateFaceCoverMode(shouldCoverFace)
+            videoDetector.updateBlurMode(grayBlur)
+            videoDetector.updateFaceCoverMode(shouldCoverFace)
         }
     }
 
     fun updateBlurMode(boolean: Boolean) {
         grayBlur = boolean
         imageDetector.updateBlurMode(boolean)
+        videoDetector.updateBlurMode(boolean)
     }
 
     fun updateFaceCoverMode(boolean: Boolean) {
         shouldCoverFace = boolean
         imageDetector.updateFaceCoverMode(boolean)
+        videoDetector.updateFaceCoverMode(boolean)
     }
 
     @JavascriptInterface
