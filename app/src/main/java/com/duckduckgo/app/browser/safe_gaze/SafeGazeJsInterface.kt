@@ -84,7 +84,7 @@ class SafeGazeJsInterface(
         Timber.d("kLog: imgLog Received message from WebView: type: $messageType, data: ${gson.toJson(data)}")
         when (messageType) {
             "detectImg" -> addTaskToQueue(parseImageInfo(data))
-            // "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
+            "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
         }
     }
 
@@ -99,7 +99,7 @@ class SafeGazeJsInterface(
 
     private fun addTaskToQueue(input: InputImage?) {
         if (input == null || isInvalidImageUrl(input.src)) {
-            // Timber.d("imgLog: 1. imageId: ${input?.id}")
+            Timber.d("imgLog: 1. imageId: ${input?.id}")
             onImageClassified("detectionResult", OutputImage(
                 result = "null",
                 id = input?.id ?: "",
