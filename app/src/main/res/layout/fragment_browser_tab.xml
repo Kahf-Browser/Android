@@ -40,7 +40,7 @@
         android:layout_marginBottom="64dp"
         android:clipToPadding="false"
         android:elevation="4dp"
-        android:layout_marginTop="?actionBarSize"
+        android:layout_marginTop="120dp"
         tools:itemCount="3"
         tools:listitem="@layout/item_autocomplete_search_suggestion"
         tools:visibility="visible" />
@@ -59,7 +59,8 @@
         android:layout_height="wrap_content"
         android:elevation="10dp"
         android:visibility="gone"
-        android:layout_gravity="bottom"
+        android:layout_marginTop="64dp"
+        android:layout_gravity="top"
         android:layout_marginHorizontal="10dp"
         android:layout_marginBottom="10dp"/>
 
