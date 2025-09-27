@@ -21,7 +21,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.core.view.isVisible
+import android.view.View.GONE
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,7 +31,6 @@ import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.about.AboutScreenNoParams
 import com.duckduckgo.app.accessibility.AccessibilityScreens
-import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.appearance.AppearanceScreenNoParams
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
@@ -52,9 +53,9 @@ import com.duckduckgo.autofill.api.AutofillScreens.AutofillSettingsScreen
 import com.duckduckgo.autofill.api.AutofillSettingsLaunchSource
 import com.duckduckgo.browser.api.ui.BrowserScreens.SettingsScreenNoParams
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.ui.LanguageManager
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.CheckListItem
-import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -70,7 +71,6 @@ import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -116,6 +116,10 @@ class SettingsActivity : DuckDuckGoActivity() {
     private val viewsPro
         get() = binding.includeSettings.settingsSectionPro
 
+    override fun attachBaseContext(newBase: Context?) {
+        super.attachBaseContext(newBase)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -147,6 +151,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
+            languageSetting.setClickListener { showLanguageDialog() }
             // syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
             // fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
@@ -161,6 +166,32 @@ class SettingsActivity : DuckDuckGoActivity() {
         // }
     }
 
+    private fun showLanguageDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Select Language")
+
+        builder.setPositiveButton("English") { _, _ ->
+            switchLanguage("en")
+        }
+
+        builder.setNegativeButton("العربية") { _, _ ->
+            switchLanguage("ar")
+        }
+
+        builder.show()
+    }
+
+    private fun switchLanguage(lang: String) {
+        // Save preference
+        getSharedPreferences("settings", MODE_PRIVATE)?.edit {
+            putString("language", lang)
+        }
+
+        // Apply immediately
+        LanguageManager.setLocale(this, lang)
+        recreate()
+    }
+
     private fun configureSettings() {
         if (proSettingsPlugin.isEmpty()) {
             viewsPro.gone()
@@ -172,8 +203,8 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun configureInternalFeatures() {
-        viewsInternal.settingsSectionInternal.visibility = if (internalFeaturePlugins.getPlugins().isEmpty()) View.GONE else View.VISIBLE
-        internalFeaturePlugins.getPlugins().forEach { feature ->
+        viewsInternal.settingsSectionInternal.visibility = GONE /*if (internalFeaturePlugins.getPlugins().isEmpty()) View.GONE else View.VISIBLE*/
+        /*internalFeaturePlugins.getPlugins().forEach { feature ->
             Timber.v("Adding internal feature ${feature.internalFeatureTitle()}")
             val view = TwoLineListItem(this).apply {
                 setPrimaryText(feature.internalFeatureTitle())
@@ -181,7 +212,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             }
             viewsInternal.settingsInternalFeaturesContainer.addView(view)
             view.setClickListener { feature.onInternalFeatureClicked(this) }
-        }
+        }*/
     }
 
     private fun observeViewModel() {

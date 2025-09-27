@@ -22,7 +22,7 @@ import android.util.TypedValue
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor.PHONE
 import com.duckduckgo.common.utils.device.DeviceInfo.FormFactor.TABLET
-import java.util.*
+import java.util.Locale
 
 interface DeviceInfo {
 
@@ -56,7 +56,7 @@ class ContextDeviceInfo(private val context: Context) : DeviceInfo {
     override val country: String by lazy {
         val telephonyCountry = telephonyManager.networkCountryIso
         val deviceCountry =
-            if (telephonyCountry.isNotBlank()) telephonyCountry else Locale.getDefault().country
+            telephonyCountry.ifBlank { Locale.getDefault().country }
         deviceCountry.lowercase(Locale.getDefault())
     }
 

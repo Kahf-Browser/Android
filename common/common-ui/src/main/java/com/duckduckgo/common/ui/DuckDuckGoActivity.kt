@@ -40,6 +40,7 @@ import com.duckduckgo.common.ui.store.ThemingDataStore
 import com.duckduckgo.mobile.android.R
 import dagger.android.AndroidInjection
 import dagger.android.DaggerActivity
+import java.util.Locale
 import javax.inject.Inject
 
 abstract class DuckDuckGoActivity : DaggerActivity() {
@@ -63,6 +64,28 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     @SuppressLint("MissingSuperCall")
     override fun onCreate(savedInstanceState: Bundle?) {
         onCreate(savedInstanceState, true)
+    }
+
+    override fun attachBaseContext(newBase: Context?) {
+        val lang = getSavedLanguage(newBase) // from SharedPreferences
+        val context = if (VERSION.SDK_INT < VERSION_CODES.TIRAMISU) {
+            updateBaseContextLocale(newBase, lang)
+        } else newBase
+
+        super.attachBaseContext(context)
+    }
+
+    private fun getSavedLanguage(context: Context?): String {
+        val prefs = context?.getSharedPreferences("settings", MODE_PRIVATE)
+        return prefs?.getString("language", "en") ?: "en"
+    }
+
+    private fun updateBaseContextLocale(context: Context?, lang: String): Context? {
+        val locale = Locale(lang)
+        Locale.setDefault(locale)
+        val config = context?.resources?.configuration
+        config?.setLocale(locale)
+        return context?.createConfigurationContext(config!!)
     }
 
     /**

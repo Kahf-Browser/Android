@@ -759,11 +759,6 @@
     <string name="autofillLoginSavedSnackbarMessage">تم حفظ كلمة المرور</string>
     <string name="autofillLoginUpdatedSnackbarMessage">تم تحديث كلمة المرور</string>
     <string name="safe_gaze_arrow" translatable="false">safe_gaze_arrow</string>
-    <string name="pointer_arrow">سهم المؤشر</string>
-    <string name="safe_gaze_up">نظرة آمنة لأعلى</string>
-    <string name="ads_and_other_creepy_things_blocked">تم حظر الإعلانات وأشياء مخيفة أخرى</string>
-    <string name="if_this_site_appears_broken_try_shields_down">إذا بدا هذا الموقع معطلاً، جرب تعطيل الدروع</string>
-    <string name="_0">0</string>
 
     <string name="safegaze_popup_report_title">الرجاء الإبلاغ عن أي علل أو اقتراحات إلى هذا النموذج</string>
     <string name="safegaze_popup_support_title">دعم هذا المشروع</string>
@@ -781,5 +776,213 @@
     <string name="safegaze_popup_takecontrol_title">قم بتعزيز تجربتك عبر الإنترنت مع SafeGaze ، ملحق تنقية الصور الذي يحمي رؤيتك من المحتوى غير الملائم.</string>
     <string name="safegaze_popup_turnon_title">تشغيل SafeGaze</string>
 
+    <string name="searchBookmarks">بحث في العلامات</string>
+    <string name="deleteFolder">هل تريد حذف المجلد "%1$s"؟</string>
+    <string name="deleteBookmark">حذف العلامة "%1$s"؟</string>
+    <string name="addToFavorites">أضف إلى المفضلة</string>
+    <string name="bookmarkAddedInBookmarks">تمت إضافة العلامة إلى المجلد "%1$s"</string>
+    <string name="editBookmark">تعديل العلامة</string>
+    <string name="importBookmarksDescription">إذا كانت العلامات الخاصة بك محفوظة في متصفح آخر، يمكنك استيرادها إلى كهف.</string>
+    <string name="importBookmarks">استيراد العلامات</string>
+    <string name="noResultsFor">لم يتم العثور على نتائج للبحث "%1$s"</string>
+    <string name="removeFromFavorites">إزالة من المفضلة</string>
+    <string name="addToFavoritesMenu">أضف إلى المفضلة</string>
+    <string name="not_implemented">لم يتم التنفيذ بعد</string>
+    <string name="clipboardYouCopied">لصق من الحافظة</string>
+    <string name="kahf_menu">القائمة</string>
+    <string name="kahf_safer_internet">إنترنت أكثر أماناً</string>
+    <string name="kahf_mode_desc_high">بحث آمن + يوتيوب مناسب للأطفال. حظر الإعلانات + المتعقبين + المواقع الضارة + المحتويات الإباحية</string>
+    <string name="kahf_mode_desc_medium">مواقع ضارة + حظر الإعلانات + بحث آمن</string>
+    <string name="kahf_mode_desc_low">المواقع الضارة + حظر الإعلانات فقط</string>
+    <string name="kahf_decent_internet">إنترنت لائق</string>
+    <string name="kahf_cover_face">تغطية الوجه</string>
+    <string name="kahf_autoplay_video">تشغيل الفيديو تلقائياً</string>
+    <string name="kahf_desc_blur_full_image">إخفاء الصور غير اللائقة. تجنب الكبائر. <font color="#FF2400">التشويش ليس دقيقاً بنسبة 100٪.</font></string>
+    <string name="kahf_human_only">بشر فقط</string>
+    <string name="kahf_premium">(مدفوع)</string>
+    <string name="kahf_full_image">صورة كاملة</string>
+    <string name="kahf_free">(مجاني)</string>
+    <string name="kahf_harm_avoided">تم تجنب الضرر</string>
+    <string name="kahf_harmful_sites">مواقع ضارة</string>
+    <string name="kahf_indecent_pictures">صور غير لائقة</string>
+    <string name="kahf_ads_trackers">إعلانات + متعقبون</string>
+    <string name="kahf_share">مشاركة</string>
+    <string name="kahf_support">الدعم</string>
+    <string name="kahf_dark_mode">الوضع الداكن</string>
+    <string name="kahf_high">عالي</string>
+    <string name="kahf_medium">متوسط</string>
+    <string name="kahf_low">منخفض</string>
+    <string name="kahf_off">إيقاف</string>
+
+    <string name="kahf_safegaze_lock">قفل SafeGaze</string>
+    <string name="kahf_prevent_turning_off_safety_feature">منع إيقاف ميزات الأمان</string>
+    <string name="kahf_safegaze_lock_desc">إذا كان هناك رمز PIN أو نمط أو كلمة مرور مفعّلة على الجهاز، سيُطلب منك التحقق عند فتح إعدادات SafeGaze.</string>
+    <string name="kahf_no_security_enabled">لا يوجد قفل آمن مفعّل على الجهاز</string>
+
+    <string name="kahf_onboarding_disclaimer">مبني على متصفح DuckDuckGo الواعي بالخصوصية</string>
+    <string name="kahf_onboarding_get_what_you_want">تصفح خاص وآمن ولائق -\nمدعوم بالذكاء الاصطناعي</string>
+    <string name="kahf_onboarding_lets_go">هيا بنا</string>
+    <string name="kahf_onboarding_skip">تخطي</string>
+    <string name="kahf_onboarding_subtitle">اختبر إنترنت أكثر أماناً مع متصفح كهف. مدعوم بالذكاء الاصطناعي المتقدم، يقوم بتصفية الصور غير اللائقة والمحتوى الضار في الوقت الفعلي، مما يتيح لك التصفح مع الحفاظ على قيمك الأخلاقية.</string>
+    <string name="kahf_onboarding_title">تصفح خاص وآمن ولائق -\nمدعوم بالذكاء الاصطناعي</string>
+    <string name="kahf_onboarding_sg_title">إخفاء الصور غير اللائقة</string>
+    <string name="kahf_onboarding_sg_subtitle">إخفاء الصور غير المناسبة.\nتجنب الكبائر\n\n<b>هذه الميزة تجريبية.\nقد لا تكون دقيقة بنسبة 100٪.</b></string>
+    <string name="kahf_onboarding_sg_enable">تفعيل تشويش الصور</string>
+    <string name="kahf_onboarding_next">التالي</string>
+    <string name="kahf_onboarding_skip_now">تخطي الآن</string>
+    <string name="kahf_onboarding_choose">اختر\nالتطبيق الذي \nتستخدمه أكثر</string>
+    <string name="kahf_onboarding_choose_details">اختر تطبيقاتك المفضلة للاحتفاظ بها في الشاشة الرئيسية</string>
+    <string name="kahf_onboarding_checking_compatibility">جارٍ التحقق من التوافق</string>
+    <string name="kahf_onboarding_compatible">الجهاز متوافق مع إخفاء الصور</string>
+    <string name="kahf_onboarding_incompatible">الجهاز غير متوافق مع إخفاء الصور</string>
+    <string name="kahf_onboarding_slow">الجهاز متوافق.\nلكن إخفاء الصور سيجعل المتصفح أبطأ</string>
+    <string name="kahf_running_prayer">الصلاة الحالية</string>
+    <string name="kahf_running">جارٍ التشغيل…</string>
+    <string name="kahf_fajr">الفجر</string>
+    <string name="kahf_sunrise">الشروق</string>
+    <string name="kahf_dhuhr">الظهر</string>
+    <string name="kahf_asr">العصر</string>
+    <string name="kahf_tomorrow">غداً</string>
+    <string name="kahf_yesterday">أمس</string>
+    <string name="kahf_next_prayer_time">وقت الصلاة القادمة</string>
+    <string name="kahf_magrib">المغرب</string>
+    <string name="kahf_hours">ساعات</string>
+    <string name="kahf_hours_left">الساعات المتبقية</string>
+    <string name="kahf_secs_left">الثواني المتبقية</string>
+    <string name="kahf_hours_until">ساعات حتى</string>
+    <string name="kahf_minutes_until">دقائق حتى</string>
+    <string name="kahf_secs_until">ثوانٍ حتى</string>
+    <string name="kahf_isha">العشاء</string>
+    <string name="kahf_today">اليوم</string>
+    <string name="kahf_alert">تنبيه</string>
+    <string name="kahf_location_could_not_get">تعذّر استرجاع معلومات موقعك. يرجى التأكد من تفعيل ميزات الموقع في هاتفك.</string>
+    <string name="kahf_location_could_not_get_app_level">يجب منح إذن الموقع في إعدادات جهازك لعرض هذه الصفحة. يرجى الانتقال إلى إذن الموقع في الصفحة المحوّلة ومنح الإذن.</string>
+    <string name="kahf_ok">موافق</string>
+    <string name="kahf_madhab_asr_time">المذهب / وقت العصر</string>
+    <string name="kahf_calculation_method">طريقة الحساب</string>
+    <string name="kahf_adhan">الأذان</string>
+    <string name="kahf_notification">الإشعار</string>
+    <string name="kahf_notification_message">رسالة إشعار (صوت فقط)</string>
+    <string name="kahf_full_adhan_notification">الأذان الكامل مع إشعار</string>
+    <string name="kahf_silent">صامت</string>
+    <string name="kahf_no_notification_adhan">بدون إشعار</string>
+    <string name="kahf_adhan_and_notification">الأذان + إشعار</string>
+    <string name="kahf_update_location">تحديث الموقع</string>
+    <string name="kahf_location_updated">تم تحديث الموقع</string>
+    <string name="kahf_on_off">تشغيل / إيقاف</string>
+
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">هل أنت متأكد أنك تريد حذف هذا المجلد و%1$d عنصر؟</item>
+        <item quantity="other">هل أنت متأكد أنك تريد حذف هذا المجلد و%1$d عناصر؟</item>
+    </plurals>
+
+    <string name="removeFromRecent">إزالة من الأخيرة</string>
+    <string name="clearAllRecent">إزالة الكل</string>
+    <string name="kahf_pause_on_site">إيقاف مؤقت في هذا الموقع</string>
+    <string name="kahf_resume_blurring">استئناف التشويش</string>
+    <string name="inactivity_notification_title">اشتقنا إليك!</string>
+    <string name="inactivity_notification_body">لقد مر وقت منذ أن استخدمت كهف. نود أن نسمع رأيك - اضغط لمشاركة ملاحظاتك.</string>
+
+    <string name="kahf_restart_app">تم تنزيل التحديث! جارٍ إعادة تشغيل التطبيق…</string>
+    <string name="kahf_update_required">التحديث مطلوب للمتابعة!</string>
+
+    <string name="pointer_arrow">سهم المؤشر</string>
+    <string name="safe_gaze_up">Safe Gaze UP</string>
+    <string name="ads_and_other_creepy_things_blocked">تم حظر الإعلانات والأشياء المريبة الأخرى</string>
+    <string name="if_this_site_appears_broken_try_shields_down">إذا بدا هذا الموقع معطلاً، جرّب إيقاف الدروع</string>
+    <string name="_0">٠</string>
+    <string name="profile">الملف الشخصي</string>
+    <string name="preference">التفضيلات</string>
+    <string name="unsubscribe_haram_channels">إلغاء الاشتراك في القنوات المحرمة</string>
+    <string name="gender">الجنس</string>
+    <string name="religion_status">الحالة الدينية</string>
+    <string name="save">حفظ</string>
+    <string name="allow">السماح</string>
+    <string name="refresh_again">تحديث مرة أخرى</string>
+    <string name="unsubscribe">إلغاء الاشتراك</string>
+    <string name="haram_channels_found">تم العثور على %1$d قناة محرمة</string>
+
+    <string name="kahf_dns_up">متصل</string>
+    <string name="kahf_dns_down">غير متصل</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">افتح في كهف</string>
+    <string name="runningInDdgMenuItemTitle">يعمل في كهف</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">تحذير: قد يكون هذا الموقع غير آمن</string>
+    <string name="sslErrorHeadline">شهادة هذا الموقع غير صالحة. قد تكون متصلاً بخادم يتظاهر بأنه %1$s مما قد يعرض معلوماتك السرية للخطر.</string>
+    <string name="sslErrorLeaveCTA">مغادرة هذا الموقع</string>
+    <string name="sslErrorAdvancedCTA">خيارات متقدمة</string>
+    <string name="sslErrorExpandedHeadline">يحذّرك كهف عندما يحتوي موقع ويب على شهادة غير صالحة.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>قبول المخاطرة وزيارة الموقع<u/>]]></string>
+    <string name="sslErrorExpiredMessage">شهادة الأمان الخاصة بـ %1$s منتهية الصلاحية. قد يكون الموقع غير مُكوّن بشكل صحيح، أو أن مهاجماً قد اخترق اتصالك، أو أن ساعة نظامك غير صحيحة.</string>
+    <string name="sslErrorWrongHostMessage">شهادة الأمان الخاصة بـ %1$s لا تطابق *.%2$s. قد يكون الموقع غير مُكوّن بشكل صحيح أو أن مهاجماً قد اخترق اتصالك، أو أن ساعة نظامك غير صحيحة.</string>
+    <string name="sslErrorUntrustedMessage">شهادة الأمان الخاصة بـ %1$s غير موثوقة من نظام تشغيل جهازك. قد يكون الموقع غير مُكوّن بشكل صحيح أو أن مهاجماً قد اخترق اتصالك، أو أن ساعة نظامك غير صحيحة.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[مرحباً بك.<br/><br/>هل أنت مستعد لإنترنت أفضل وأكثر خصوصية؟]]></string>
+    <string name="preOnboardingDaxDialog1Button">لنقم بذلك!</string>
+    <string name="preOnboardingDaxDialog2Title">تم تفعيل حماية الخصوصية!</string>
+    <string name="preOnboardingDaxDialog2Button">اختر متصفحك</string>
+    <string name="preOnboardingComparisonChartItem1">بحث خاص بشكل افتراضي</string>
+    <string name="preOnboardingComparisonChartItem2">حظر المتعقبين من الطرف الثالث</string>
+    <string name="preOnboardingComparisonChartItem3">حظر النوافذ المنبثقة للكوكيز</string>
+    <string name="preOnboardingComparisonChartItem4">حظر الإعلانات المريبة</string>
+    <string name="preOnboardingComparisonChartItem5">مسح بيانات التصفح بسرعة</string>
+    <string name="preOnboardingDaxDialog3Title">رائع! أهلاً بك في الجانب المشرق.</string>
+    <string name="preOnboardingDaxDialog3Button">ابدأ التصفح</string>
+    <string name="onboardingSearchDaxDialogTitle">جرّب البحث!</string>
+    <string name="onboardingSearchDaxDialogDescription">عمليات بحثك في كهف دائماً مجهولة.</string>
+    <string name="onboardingSearchDaxDialogOption1">كيف أقول "بطة" بالإنجليزية</string>
+    <string name="onboardingSearchDaxDialogOption1English">كيف أقول "بطة" بالإسبانية</string>
+    <string name="onboardingSearchQueryOption1">كيف أقول بطة بالإنجليزية</string>
+    <string name="onboardingSearchQueryOption1English">كيف أقول بطة بالإسبانية</string>
+    <string name="onboardingSearchDaxDialogOption2">طاقم فيلم أفاتار</string>
+    <string name="onboardingSearchDaxDialogOption2US">طاقم فيلم البط الأقوياء</string>
+    <string name="onboardingSearchDaxDialogOption3">الطقس المحلي</string>
+    <string name="onboardingSearchDaxDialogOption4">فاجئني!</string>
+    <string name="onboardingSearchQueryOption4">وصفات عشاء</string>
+    <string name="onboardingSearchQueryOption4US">وصفات بسكويت برقائق الشوكولاتة</string>
+    <string name="onboardingSitesDaxDialogTitle">جرّب زيارة موقع!</string>
+    <string name="onboardingSitesDaxDialogDescription">سأحظر المتعقبين حتى لا يتمكنوا من التجسس عليك.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">فاجئني!</string>
+    <string name="onboardingSerpDaxDialogDescription">هذا هو بحث كهف. خاص. سريع. إعلانات أقل.</string>
+    <string name="onboardingSerpDaxDialogButton">تم!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">بعد ذلك، جرّب زيارة موقع!</string>
+
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[&#160;و<b>آخر %1$d</b> كان يحاول تتبعك هنا. لقد حظرتهم!<br/><br/>☝️ اضغط على الدرع لمزيد من المعلومات.️]]></item>
+        <item quantity="other"><![CDATA[&#160;و<b>آخرون %1$d</b> كانوا يحاولون تتبعك هنا. لقد حظرتهم!<br/><br/>☝️ اضغط على الدرع لمزيد من المعلومات.️]]></item>
+    </plurals>
+
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[&#160;كان يحاول تتبعك هنا. لقد حظرته!<br/><br/>☝️ اضغط على الدرع لمزيد من المعلومات.️]]></item>
+        <item quantity="other"><![CDATA[&#160;كانوا يحاولون تتبعك هنا. لقد حظرتهم!<br/><br/>☝️ اضغط على الدرع لمزيد من المعلومات.️]]></item>
+    </plurals>
+
+    <string name="onboardingTrackersBlockedDaxDialogButton">تم!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[امسح نشاط التصفح فوراً باستخدام <b>زر النار</b>.<br/><br/>جرّبه الآن! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">لقد أتقنت الأمر!</string>
+    <string name="onboardingEndDaxDialogDescription">تذكر: في كل مرة تتصفح فيها معي، يفقد إعلان مريب أجنحته. 👌</string>
+    <string name="onboardingEndDaxDialogButton">انتهيت!</string>
+
+    <string name="deleteBookmarkConfirmationDescription">هل أنت متأكد أنك تريد حذف العلامة المرجعية لـ &lt;b>%1$s&lt;/b>؟</string>
+    <string name="kahf_dns_not_protected_text">أنت غير محمي من 5,906,168 موقع محرم</string>
+    <string name="kahf_dns_protected_text">أنت محمي من 5,906,168 موقع محرم</string>
+    <string name="verify_protection">تحقق من الحماية</string>
+    <string name="by_halalz_e_ticaret_ltd_ti">بواسطة Halalz e-ticaret Ltd Şti</string>
+    <string name="kahf_guard">KahfGuard</string>
+
+    <string name="privateSearchAutocompleteHint">إظهار اقتراحات البحث أثناء الكتابة، بما في ذلك العلامات المرجعية الخاصة بك. جميع عمليات البحث خاصة.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">المواقع التي تمت زيارتها مؤخرًا</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">إظهار المواقع التي تمت زيارتها مؤخرًا في اقتراحات البحث. يتم تخزين المواقع التي تمت زيارتها مؤخرًا بشكل خاص على جهازك فقط، ويمكن مسحها باستخدام زر 🔥.</string>
+    <string name="improvedAutoCompleteIAMContent">اقتراحات الإكمال التلقائي تتضمن الآن المواقع التي تمت زيارتها مؤخرًا. يمكنك إيقافها من الإعدادات أو مسحها في أي وقت باستخدام زر 🔥.</string>
+    <string name="improvedAutoCompleteIAMTitle">نفس الخصوصية.\nاقتراحات بحث أفضل!</string>
+    <string name="openAutoCompleteSettings">افتح الإعدادات</string>
+    <string name="languageSettings">اللغة</string>
 
 </resources>

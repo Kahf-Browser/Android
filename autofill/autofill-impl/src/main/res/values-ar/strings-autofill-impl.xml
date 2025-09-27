@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ حقوق النشر (c) 2022 Kahf
+  ~
+  ~ مرخّص بموجب رخصة أباتشي، الإصدار 2.0 ("الرخصة")؛
+  ~ لا يجوز لك استخدام هذا الملف إلا وفقًا للرخصة.
+  ~ يمكنك الحصول على نسخة من الرخصة على
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ ما لم يُطلب ذلك بموجب القانون أو تمت الموافقة عليه كتابيًا، يتم توزيع البرنامج
+  ~ بموجب الرخصة على أساس "كما هو"،
+  ~ دون أي ضمانات أو شروط من أي نوع، سواء صريحة أو ضمنية.
+  ~ انظر الرخصة للاطلاع على اللغة المحددة التي تحكم الأذونات
+  ~ والقيود بموجب الرخصة.
+  -->
+
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <string name="managementDisabledModeCta"><b>إعداد من الإعدادات</b></string>
+
+    <string name="saveLoginDialogButtonSave">حفظ كلمة المرور</string>
+    <string name="saveLoginMissingUsernameDialogButtonSave">حفظ كلمة المرور</string>
+    <string name="saveLoginDialogNotNow">لا تحفظ</string>
+    <string name="saveLoginDialogTitle">هل تريد من Kahf حفظ كلمة المرور الخاصة بك؟</string>
+    <string name="saveLoginDialogMoreOptionsButtonLabel">خيارات أخرى</string>
+
+    <string name="useSavedLoginDialogTitle">استخدام كلمة مرور محفوظة؟</string>
+    <string name="useSavedLoginDialogMissingUsernameButtonText">كلمة المرور لـ %1$s</string>
+    <string name="useSavedLoginDialogMissingUsernameMissingDomainButtonText">كلمة المرور للموقع</string>
+    <string name="useSavedLoginDialogGroupThisWebsite">من هذا الموقع</string>
+    <string name="useSavedLoginDialogFromDomainLabel">من %1$s</string>
+
+    <string name="updateLoginDialogButtonUpdatePassword">تحديث كلمة المرور</string>
+    <string name="updateLoginDialogButtonNotNow">لا تحفظ</string>
+
+    <string name="updateLoginDialogTitleUpdateUsername">تحديث اسم المستخدم؟</string>
+    <string name="updateLoginDialogButtonUpdateUsername">تحديث اسم المستخدم</string>
+
+    <string name="updateLoginDialogTitleLine">تحديث كلمة المرور لـ \n%1$s؟</string>
+    <string name="updateLoginUpdatePasswordExplanation">سيقوم Kahf بتحديث كلمة المرور المخزنة على جهازك.</string>
+
+    <string name="autofillDialogCloseButtonContentDescription">إغلاق نافذة الملء التلقائي</string>
+
+    <string name="credentialManagementEditUsernameHint">اسم المستخدم</string>
+    <string name="credentialManagementEditPasswordHint">كلمة المرور</string>
+    <string name="credentialManagementEditWebsiteHint">رابط الموقع</string>
+    <string name="credentialManagementEditNotesHint">ملاحظات</string>
+    <string name="credentialManagementEditButtonDelete">حذف</string>
+    <string name="credentialManagementEditButtonSaveChanges">حفظ التغييرات</string>
+    <string name="credentialManagementEditButtonCopyUsername">نسخ اسم المستخدم</string>
+    <string name="credentialManagementEditButtonCopyPassword">نسخ كلمة المرور</string>
+
+    <string name="credentialManagementViewMenuEdit">تعديل</string>
+    <string name="credentialManagementViewMenuDelete">حذف</string>
+
+    <string name="credentialManagementSuggestionsLabel">مقترحات</string>
+
+    <string name="credentialManagementWebViewIncompatibleErrorMessage">الملء التلقائي لكلمات المرور غير متاح لأن إصدار Android WebView لديك قديم جدًا.</string>
+
+    <string name="autofillManagementSearchClearDescription">مسح البحث</string>
+    <string name="autofillManagementNoSearchResults">لا توجد نتائج لـ %1$s</string>
+
+    <string name="autofillDeleteLoginDialogCancel">إلغاء</string>
+    <string name="autofillDeleteLoginDialogDelete">حذف</string>
+
+    <!-- Survey (إنجليزي فقط) -->
+    <string name="autofillManagementSurveyPromptTitle" translatable="false">Help us improve!</string>
+    <string name="autofillManagementSurveyPromptMessage" translatable="false">We want to make using passwords in Kahf better.</string>
+    <string name="autofillManagementSurveyPromptAcceptButtonText" translatable="false">Take Survey</string>
+
+    <string name="autofillManagementUsernameCopied">تم نسخ اسم المستخدم</string>
+    <string name="autofillManagementPasswordCopied">تم نسخ كلمة المرور</string>
+
+    <string name="autofill_password_generation_offer_title">هل تريد استخدام كلمة مرور قوية من Kahf؟</string>
+    <string name="autofill_password_generation_offer_accept">استخدام كلمة مرور قوية</string>
+    <string name="autofill_password_generation_offer_decline">إنشاء كلمة مروري الخاصة</string>
+
+    <string name="deviceNotSupportedTitle">الجهاز غير مدعوم</string>
+
+    <string name="autofillManagementUndoDeletion">تراجع</string>
+
+    <string name="credentialManagementLinkButtonContentDescription">فتح الموقع</string>
+
+    <string name="credentialManagementDuckAddressLabel" translatable="false">Duck Address</string>
+
+    <string name="credentialManagementDeactivateDuckAddressDialogTitle">إلغاء تنشيط العنوان الخاص Duck Address؟</string>
+    <string name="credentialManagementDeactivateDuckAddressDialogMessage">لن يتم إعادة توجيه الرسائل المرسلة إلى %1$s إلى صندوق الوارد الخاص بك بعد الآن.</string>
+    <string name="credentialManagementDeactivateDuckAddressPositiveButton">إلغاء التنشيط</string>
+    <string name="credentialManagementActivateDuckAddressDialogTitle">إعادة تنشيط العنوان الخاص Duck Address؟</string>
+    <string name="credentialManagementActivateDuckAddressDialogMessage">سيتم إعادة توجيه الرسائل المرسلة إلى %1$s مرة أخرى إلى صندوق الوارد الخاص بك.</string>
+    <string name="credentialManagementActivateDuckAddressPositiveButton">إعادة التنشيط</string>
+
+    <string name="credentialManagementDuckAddressActivatedLabel">مفعل</string>
+    <string name="credentialManagementDuckAddressActivatingLabel">جارٍ التفعيل…</string>
+
+    <string name="credentialManagementDuckAddressDeactivatedLabel">معطل</string>
+    <string name="credentialManagementDuckAddressDeactivatingLabel">جارٍ التعطيل…</string>
+
+    <string name="credentialManagementDuckAddressManagementTemporarilyUnavailable">إدارة هذا العنوان غير متاحة مؤقتًا.</string>
+
+    <string name="credentialManagementEnableEmailProtectionPrompt"><annotation type="enable_duck_address">تفعيل حماية البريد الإلكتروني</annotation> لإدارة عناوين Duck على هذا الجهاز.</string>
+
+    <string name="autofill_email_protection_choose_email_dialog_title">اختر عنوان البريد الإلكتروني</string>
+    <string name="autofillTooltipUseYourAliasDescription">منع متعقبات البريد الإلكتروني</string>
+    <string name="autofillTooltipGenerateAddress">إنشاء عنوان Duck خاص</string>
+    <string name="autofillTooltipGenerateAddressDescription">منع متعقبات البريد الإلكتروني وإخفاء العنوان</string>
+
+    <string name="autofillDisableAutofillPromptMessage">يمكنك تعطيل هذا في أي وقت من الإعدادات.</string>
+    <string name="autofillDisableAutofillPromptPositiveButton">استمر في الحفظ</string>
+    <string name="autofillDisableAutofillPromptNegativeButton">تعطيل</string>
+
+    <string name="autofillEmailProtectionInContextSignUpDialogTitle">إخفاء بريدك الإلكتروني ومنع المتعقبات</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogFeatureName">حماية البريد الإلكتروني</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogExplanation">إنشاء عنوان فريد وعشوائي يقوم أيضًا بإزالة المتعقبات الخفية ويعيد توجيه البريد الإلكتروني إلى صندوق الوارد الخاص بك.</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogProtectEmailButtonText">حماية بريدي الإلكتروني</string>
+    <string name="autofillEmailProtectionInContextSignUpDialogDoNotShowAgainButtonText">عدم العرض مرة أخرى</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogTitle">إذا خرجت الآن، فلن يتم حفظ عنوان Duck الخاص بك</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogPositiveButton">متابعة الإعداد</string>
+    <string name="autofillEmailProtectionInContextSignUpConfirmExitDialogNegativeButton">خروج من الإعداد</string>
+
+    <string name="autofillManagementScreenTitle">كلمات المرور</string>
+    <string name="credentialManagementNoLoginsSavedTitle">لم يتم حفظ كلمات مرور بعد</string>
+    <string name="credentialManagementAutofillToggleLabel">حفظ وملء كلمات المرور تلقائيًا</string>
+    <string name="credentialManagementAutofillToggleSubtitle">يتم تخزين كلمات المرور بأمان على جهازك</string>
+    <string name="saveLoginDialogSubtitle">يتم تخزين كلمات المرور بأمان على جهازك.</string>
+    <string name="autofillManagementAddLogin">إضافة كلمة مرور</string>
+    <string name="credentialManagementEditLoginTitleHint">العنوان</string>
+    <string name="autofillManagementDeletedConfirmation">تم حذف كلمة المرور</string>
+    <string name="credentialManagementEditLastUpdated">آخر تحديث %1$s</string>
+    <string name="autofillDisableAutofillPromptTitle">هل تريد الاستمرار في حفظ كلمات المرور؟</string>
+    <string name="deviceNotSupportedSubtitle">لتخزين كلمات المرور بأمان، نحتاج إلى تشفيرها وتخزينها على جهازك. نظرًا لأن جهازك لا يدعم التخزين المشفر، فإن حفظ وملء كلمات المرور غير متاح.</string>
+    <string name="autofill_password_generation_offer_message">يتم تخزين كلمات المرور بأمان على جهازك.</string>
+    <string name="autofillManagementSearchLogins">بحث في كلمات المرور</string>
+    <string name="biometric_prompt_title">كلمات المرور مقفلة</string>
+    <string name="autofill_auth_text_for_access">افتح الجهاز للوصول إلى كلمات المرور</string>
+    <string name="managementDisabledModeTitle">أمّن جهازك لحفظ كلمات المرور</string>
+    <string name="managementDisabledModeSubtitle">يلزم وجود نمط قفل أو رمز PIN أو بصمة لحماية كلمات المرور الخاصة بك.</string>
+    <string name="credentialManagementEditTitle">تعديل كلمة المرور</string>
+
+    <string name="credentials_limit_warning"><b>تم إيقاف المزامنة</b>\nلقد وصلت إلى الحد الأقصى لعدد كلمات المرور. يرجى حذف بعضها لاستئناف المزامنة.\n\n<annotation type="manage_logins">إدارة كلمات المرور</annotation></string>
+    <string name="credentials_limit_warning_notif"><b>تم إيقاف مزامنة كلمات المرور</b>\nلقد وصلت إلى الحد الأقصى لعدد كلمات المرور. يرجى حذف بعض كلمات المرور لاستئناف المزامنة.</string>
+    <string name="credentials_invalid_request_warning"><b>تم إيقاف المزامنة</b>\nبعض كلمات المرور غير صحيحة التنسيق أو طويلة جدًا ولم تتم مزامنتها.\n\n<annotation type="manage_logins">إدارة كلمات المرور</annotation></string>
+    <string name="credentials_invalid_request_warning_notif"><b>تم إيقاف مزامنة كلمات المرور</b>\nبعض كلمات المرور غير صحيحة التنسيق أو طويلة جدًا ولم تتم مزامنتها.</string>
+
+    <string name="saveLoginDialogNeverForThisSite">عدم السؤال لهذا الموقع</string>
+    <string name="credentialManagementInstructionNeverForThisSite">إذا قمت بإعادة تعيين المواقع المستبعدة، سيتم سؤالك عن حفظ كلمة المرور في المرة التالية التي تقوم فيها بتسجيل الدخول إلى أي من هذه المواقع.</string>
+    <string name="credentialManagementClearNeverForThisSiteList">إعادة تعيين المواقع المستبعدة</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogTitle">هل تريد إعادة تعيين المواقع المستبعدة؟</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogPositiveButton">إعادة تعيين</string>
+    <string name="credentialManagementClearNeverForThisSiteDialogNegativeButton">إلغاء</string>
+
+    <string name="credentialManagementDeleteAllPasswordsMenu">حذف جميع كلمات المرور</string>
+
+    <plurals name="credentialManagementDeleteAllPasswordsSnackbarConfirmation">
+        <item quantity="one">تم حذف كلمة مرور %1$d</item>
+        <item quantity="other">تم حذف %1$d كلمات مرور</item>
+    </plurals>
+
+    <string name="autofill_auth_text_for_delete_all">قم بالمصادقة لتأكيد رغبتك في حذف جميع كلمات المرور</string>
+    <string name="autofill_title_text_for_delete_all">حذف جميع كلمات المرور</string>
+
+    <!-- إعدادات المزامنة -->
+    <plurals name="syncCredentialInvalidItemsWarning">
+        <item quantity="one">لا يمكن مزامنة كلمة المرور الخاصة بك لـ %1$s لأن أحد الحقول يتجاوز الحد المسموح للأحرف.\n\n</item>
+        <item quantity="other">لا يمكن مزامنة كلمات المرور الخاصة بك لـ %1$s و %2$d مواقع أخرى لأن بعض الحقول تتجاوز الحد المسموح للأحرف.\n\n</item>
+    </plurals>
+    <string name="syncCredentialInvalidItemsWarningLink"><annotation type="manage_passwords">إدارة كلمات المرور</annotation></string>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedSingular">ستُحذف كلمة المرور من هذا الجهاز.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogFirstInstructionNotSyncedPlural">
+        <item quantity="other">ستُحذف كلمات المرور من هذا الجهاز.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedSingular">ستُحذف كلمة المرور من جميع الأجهزة المتزامنة.</string>
+    <plurals name="credentialManagementDeleteAllPasswordsFirstInstructionSyncedPlural">
+        <item quantity="other">ستُحذف كلمات المرور من جميع الأجهزة المتزامنة.</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllPasswordsDialogConfirmationTitleSingular">هل أنت متأكد أنك تريد حذف كلمة المرور هذه؟</string>
+    <plurals name="credentialManagementDeleteAllPasswordsDialogConfirmationTitlePlural">
+        <item quantity="other">هل أنت متأكد أنك تريد حذف %1$d كلمات مرور؟</item>
+    </plurals>
+
+    <string name="credentialManagementDeleteAllSecondInstructionSingular">تأكد من أنك ما زلت قادرًا على الوصول إلى حسابك.</string>
+    <plurals name="credentialManagementDeleteAllSecondInstructionPlural">
+        <item quantity="other">تأكد من أنك ما زلت قادرًا على الوصول إلى حساباتك.</item>
+    </plurals>
+
+</resources>

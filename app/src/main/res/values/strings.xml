@@ -162,6 +162,7 @@
     <string name="privateSearchTitle">Private Search is Enabled</string>
     <string name="privateSearchDescription">Kahf Private Search is your default search engine, so you can search the web without being tracked.</string>
     <string name="privateSearchHeadingSearchSettings">Search Settings</string>
+    <string name="languageSettings">Language</string>
     <string name="privateSearchMoreSearchSettingsPrimaryText">More Search Settings</string>
     <string name="privateSearchMoreSearchSettingsSecondaryText">Customize your search language, region, and more</string>
     <string name="privateSearchMoreSearchSettingsTitle">More Search Settings</string>
