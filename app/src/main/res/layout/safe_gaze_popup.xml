@@ -263,12 +263,13 @@
                         android:layout_marginTop="8dp"
                         android:fontFamily="@font/lato"
                         android:paddingHorizontal="12dp"
+                        android:visibility="gone"
                         app:backgroundTint="@color/blue0_50"
                         android:text="@string/kahf_pause_on_site"
                         android:textColor="?attr/kahfPrimaryText"
                         android:textSize="12sp"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/blueIndecentPhotosText" />
+                        app:layout_constraintTop_toBottomOf="@id/ivBlurPixelationContainer" />
 
                     <TextView
                         android:id="@+id/tvCoverFace"

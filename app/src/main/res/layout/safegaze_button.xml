@@ -16,26 +16,26 @@
         android:scaleType="fitCenter"
         android:src="@drawable/ic_check_green" />
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/btnContainer"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="25dp"
         android:paddingHorizontal="25dp"
-        android:background="@drawable/kahf_button_bg">
+        android:background="@drawable/kahf_button_bg"
+        android:gravity="center">
 
-        <TextView
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/btnLabel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            tools:text="@string/kahf_high"
             android:layout_marginVertical="12dp"
             android:textColor="?attr/kahfCardBackground"
             android:textSize="13sp"
             android:textStyle="bold"
+            tools:text="@string/kahf_high"
             tools:ignore="DeprecatedWidgetInXml" />
+    </LinearLayout>
 
-    </RelativeLayout>
 
 </FrameLayout>
