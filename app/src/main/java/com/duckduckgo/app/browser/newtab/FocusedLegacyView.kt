@@ -186,7 +186,7 @@ class FocusedLegacyView @JvmOverloads constructor(
 
             setEventsListener(object : AdImpressionListener() {
                 override fun onAdLoaded() {
-                    analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                    // analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
                 }
 
                 override fun onAdFailedToLoad(
