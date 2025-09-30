@@ -134,7 +134,7 @@
     <string name="kahf_pause_on_site">Metti in pausa su questo sito</string>
     <string name="kahf_resume_blurring">Riprendi sfocatura</string>
     <string name="inactivity_notification_title">Ci manchi!</string>
-    <string name="inactivity_notification_body">È passato un po' di tempo dall'ultima volta che hai usato Kahf. Ci piacerebbe conoscere la tua opinione – tocca per condividere il tuo feedback.</string>
+    <string name="inactivity_notification_body">È passato un po\' di tempo dall\'ultima volta che hai usato Kahf. Ci piacerebbe conoscere la tua opinione – tocca per condividere il tuo feedback.</string>
     <string name="kahf_restart_app">Aggiornamento scaricato! Riavvio dell’app…</string>
     <string name="kahf_update_required">Aggiornamento necessario per continuare!</string>
 

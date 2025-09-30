@@ -58,7 +58,6 @@
     <string name="kahf_decent_internet">Internet correct</string>
     <string name="kahf_cover_face">Couvrir le visage</string>
     <string name="kahf_autoplay_video">Lecture automatique des vidéos</string>
-    <string name="kahf_desc_blur_full_image">Masquer les images inappropriées. Évitez les grands péchés. <font color="#FF2400">Le flou n'est pas 100% précis.</font></string>
     <string name="kahf_human_only">Humains uniquement</string>
     <string name="kahf_premium">(Premium)</string>
     <string name="kahf_full_image">Image complète</string>
@@ -76,14 +75,18 @@
     <string name="kahf_off">Désactivé</string>
     <string name="kahf_safegaze_lock">Verrou SafeGaze</string>
     <string name="kahf_prevent_turning_off_safety_feature">Empêcher la désactivation des fonctions de sécurité</string>
-    <string name="kahf_safegaze_lock_desc">Si un PIN, un motif ou un mot de passe est activé sur l'appareil, vous serez invité à vérifier lors de l'ouverture des paramètres SafeGaze.</string>
-    <string name="kahf_no_security_enabled">Aucun verrou sécurisé activé sur l'appareil</string>
+    <string name="kahf_safegaze_lock_desc">Si un PIN, un motif ou un mot de passe est activé sur l appareil, vous serez invité à vérifier lors de l ouverture des paramètres SafeGaze.</string>
+
+
+    <string name="kahf_no_security_enabled">Aucun verrou sécurisé activé sur l\'appareil</string>
     <string name="kahf_onboarding_disclaimer">Basé sur le navigateur DuckDuckGo respectueux de la vie privée</string>
-    <string name="kahf_onboarding_get_what_you_want">Navigation privée, sûre et décente -\nPropulsée par l'IA</string>
+    <string name="kahf_onboarding_get_what_you_want">Navigation privée, sûre et décente Propulsée par l IA</string>
+
     <string name="kahf_onboarding_lets_go">Allons-y</string>
     <string name="kahf_onboarding_skip">Passer</string>
     <string name="kahf_onboarding_subtitle">Profitez d’un internet plus sûr avec Kahf Browser. Grâce à une IA avancée, il filtre en temps réel les images indécentes et contenus nuisibles, vous permettant de naviguer tout en respectant vos valeurs morales.</string>
-    <string name="kahf_onboarding_title">Navigation privée, sûre et décente -\nPropulsée par l'IA</string>
+    <string name="kahf_onboarding_title">Navigation privée, sûre et décente Propulsée par l IA</string>
+
     <string name="kahf_onboarding_sg_title">Masquer les images indécentes</string>
     <string name="kahf_onboarding_sg_subtitle">Masquer les images inappropriées.\nÉvitez les grands péchés\n\n<b>Cette fonctionnalité est expérimentale.\nPeut ne pas être 100% précise.</b></string>
     <string name="kahf_onboarding_sg_enable">Activer le floutage des images</string>
