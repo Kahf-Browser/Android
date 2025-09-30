@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.service
 
 import android.annotation.SuppressLint
 import android.app.ActivityManager
+import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Service
 import android.content.ComponentName
 import android.content.Context
@@ -64,13 +65,6 @@ import com.squareup.anvil.annotations.ContributesTo
 import dagger.Binds
 import dagger.Module
 import dagger.android.AndroidInjection
-import java.net.Inet4Address
-import java.net.Inet6Address
-import java.net.InetAddress
-import java.util.concurrent.Executors
-import javax.inject.Inject
-import kotlin.properties.Delegates
-import kotlin.system.exitProcess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -82,6 +76,13 @@ import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
+import java.net.Inet4Address
+import java.net.Inet6Address
+import java.net.InetAddress
+import java.util.concurrent.Executors
+import javax.inject.Inject
+import kotlin.properties.Delegates
+import kotlin.system.exitProcess
 
 @InjectWith(
     scope = VpnScope::class,
@@ -688,12 +689,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }
         }
 
-        ServiceCompat.startForeground(
-            this,
-            VPN_FOREGROUND_SERVICE_ID,
-            VpnEnabledNotificationBuilder.buildVpnEnabledNotification(applicationContext, vpnNotification),
-            FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
-        )
+        try {
+            ServiceCompat.startForeground(
+                this,
+                VPN_FOREGROUND_SERVICE_ID,
+                VpnEnabledNotificationBuilder.buildVpnEnabledNotification(applicationContext, vpnNotification),
+                FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
+            )
+        } catch (_: Throwable) {
+            // signal the error
+            return false
+        }
 
         return vpnNotification != emptyNotification
     }
@@ -839,7 +845,24 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             val applicationContext = context.applicationContext
 
             restartIntent(applicationContext).run {
-                ContextCompat.startForegroundService(applicationContext, this)
+                applicationContext.startForegroundServiceWithFallback( this)
+            }
+        }
+
+        @SuppressLint("DenyListedApi") // static private method
+        private fun Context.startForegroundServiceWithFallback(intent: Intent) {
+            try {
+                ContextCompat.startForegroundService(this, intent)
+            } catch (ex: ForegroundServiceStartNotAllowedException) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    try {
+                        this.startService(intent)
+                    } catch (_: Throwable) {
+                        // no-op
+                    }
+                } else {
+                    throw ex
+                }
             }
         }
 
