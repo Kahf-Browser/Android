@@ -138,6 +138,7 @@
     <string name="inactivity_notification_body">Ha pasado un tiempo desde que usaste Kahf. Nos encantaría conocer tu opinión: toca para compartir tus comentarios.</string>
     <string name="kahf_restart_app">¡Actualización descargada! Reiniciando app…</string>
     <string name="kahf_update_required">¡Se requiere actualización para continuar!</string>
+    <string name="selectLanguage">Seleccionar idioma</string>
 
 
     <!-- Onboarding Activity -->

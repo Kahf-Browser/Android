@@ -22,7 +22,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.View.GONE
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -38,6 +37,9 @@ import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.languages.Language
+import com.duckduckgo.app.languages.LanguageSelectionBottomSheetDialogFragment
+import com.duckduckgo.app.languages.OnLanguageClickedListener
 import com.duckduckgo.app.permissions.PermissionsScreenNoParams
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.PRIVACY_PRO_IS_ENABLED_AND_ELIGIBLE
@@ -68,6 +70,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.windows.api.ui.WindowsScreenWithEmptyParams
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -151,7 +154,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             homeScreenWidgetSetting.setClickListener { viewModel.userRequestedToAddHomeScreenWidget() }
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
-            languageSetting.setClickListener { showLanguageDialog() }
+            languageSetting.setClickListener { showLanguageSelectionBottomSheet() }
             // syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
             // fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
@@ -166,19 +169,19 @@ class SettingsActivity : DuckDuckGoActivity() {
         // }
     }
 
-    private fun showLanguageDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Select Language")
-
-        builder.setPositiveButton("English") { _, _ ->
-            switchLanguage("en")
-        }
-
-        builder.setNegativeButton("العربية") { _, _ ->
-            switchLanguage("ar")
-        }
-
-        builder.show()
+    private fun showLanguageSelectionBottomSheet() {
+        LanguageSelectionBottomSheetDialogFragment
+            .builder()
+            .setListener(
+                object : OnLanguageClickedListener {
+                    override fun onLanguageClicked(language: Language) {
+                        switchLanguage(language.code)
+                        (supportFragmentManager.findFragmentByTag("langBs") as BottomSheetDialogFragment).dismiss()
+                    }
+                },
+            )
+            .build()
+            .show(supportFragmentManager, "langBs")
     }
 
     private fun switchLanguage(lang: String) {

@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">Het is een tijdje geleden dat je Kahf hebt gebruikt. We horen graag je feedback – tik om deze te delen.</string>
     <string name="kahf_restart_app">Update gedownload! App wordt opnieuw gestart…</string>
     <string name="kahf_update_required">Update vereist om door te gaan!</string>
+    <string name="selectLanguage">Selecteer taal</string>
 
 
     <!-- Onboarding Activity -->

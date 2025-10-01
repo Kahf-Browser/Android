@@ -139,6 +139,8 @@
     <string name="inactivity_notification_body">Det er et stykke tid siden, du brugte Kahf. Vi vil gerne høre din mening – tryk for at dele feedback.</string>
     <string name="kahf_restart_app">Opdatering downloadet! Genstarter app…</string>
     <string name="kahf_update_required">Opdatering kræves for at fortsætte!</string>
+    <string name="selectLanguage">Vælg sprog</string>
+
 
 
     <!-- Onboarding Activity -->

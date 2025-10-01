@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">Käytit Kahfia viimeksi jonkin aikaa sitten. Haluaisimme kuulla mielipiteesi – napauta jakaa palautteesi.</string>
     <string name="kahf_restart_app">Päivitys ladattu! Käynnistetään sovellus uudelleen…</string>
     <string name="kahf_update_required">Jatkamiseen tarvitaan päivitys!</string>
+    <string name="selectLanguage">Valitse kieli</string>
 
 
     <!-- Onboarding Activity -->

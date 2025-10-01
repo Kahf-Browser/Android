@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">Už je to nejaký čas, čo ste použili Kahf. Radi by sme počuli vašu spätnú väzbu – ťuknite a podeľte sa o ňu.</string>
     <string name="kahf_restart_app">Aktualizácia stiahnutá! Reštartuje sa aplikácia…</string>
     <string name="kahf_update_required">Na pokračovanie je potrebná aktualizácia!</string>
+    <string name="selectLanguage">Vyberte jazyk</string>
 
 
     <!-- Onboarding Activity -->

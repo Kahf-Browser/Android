@@ -138,6 +138,8 @@
     <string name="inactivity_notification_body">Už je to chvíle, co jste nepoužili Kahf. Rádi uslyšíme váš názor – klepněte pro sdílení zpětné vazby.</string>
     <string name="kahf_restart_app">Aktualizace stažena! Restartování aplikace…</string>
     <string name="kahf_update_required">Pro pokračování je vyžadována aktualizace!</string>
+    <string name="selectLanguage">Vyberte jazyk</string>
+
 
 
 

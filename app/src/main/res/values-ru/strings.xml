@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">Прошло время с последнего использования Kahf. Нам интересно ваше мнение – нажмите, чтобы отправить отзыв.</string>
     <string name="kahf_restart_app">Обновление загружено! Перезапуск приложения…</string>
     <string name="kahf_update_required">Для продолжения требуется обновление!</string>
+    <string name="selectLanguage">Выберите язык</string>
 
 
     <!-- Onboarding Activity -->

@@ -10,16 +10,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboarding1Binding
+import com.duckduckgo.app.languages.Language
+import com.duckduckgo.app.languages.LanguageSelectionBottomSheetDialogFragment
+import com.duckduckgo.app.languages.OnLanguageClickedListener
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.LanguageManager
 import com.duckduckgo.di.scopes.FragmentScope
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,7 +45,7 @@ class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
         binding.btnContinue.setOnClickListener {
             Timber.d("saved Lang: ${getSavedLanguage(requireContext())}")
             if (getSavedLanguage(requireContext()) == "xx") {
-                showLanguageDialog()
+                showLanguageSelectionBottomSheet()
             } else {
                 (requireActivity() as KahfOnboardingActivity).onContinueClicked()
             }
@@ -56,19 +59,19 @@ class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
         return prefs?.getString("language", "xx") ?: "xx"
     }
 
-    private fun showLanguageDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setTitle("Select Language")
-
-        builder.setPositiveButton("English") { _, _ ->
-            switchLanguage("en")
-        }
-
-        builder.setNegativeButton("العربية") { _, _ ->
-            switchLanguage("ar")
-        }
-
-        builder.show()
+    private fun showLanguageSelectionBottomSheet() {
+        LanguageSelectionBottomSheetDialogFragment
+            .builder()
+            .setListener(
+                object : OnLanguageClickedListener {
+                    override fun onLanguageClicked(language: Language) {
+                        switchLanguage(language.code)
+                        (parentFragmentManager.findFragmentByTag("langBs") as BottomSheetDialogFragment).dismiss()
+                    }
+                },
+            )
+            .build()
+            .show(parentFragmentManager, "langBs")
     }
 
     private fun switchLanguage(lang: String) {

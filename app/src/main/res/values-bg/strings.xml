@@ -138,6 +138,8 @@
     <string name="inactivity_notification_body">От известно време не сте използвали Kahf. Ще се радваме да чуем мнението ви – натиснете, за да споделите обратна връзка.</string>
     <string name="kahf_restart_app">Актуализацията е изтеглена! Рестартиране на приложението…</string>
     <string name="kahf_update_required">Необходима е актуализация за продължаване!</string>
+    <string name="selectLanguage">Изберете език</string>
+
 
 
 

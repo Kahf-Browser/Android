@@ -86,6 +86,7 @@
     <string name="kahf_onboarding_skip">Passer</string>
     <string name="kahf_onboarding_subtitle">Profitez d’un internet plus sûr avec Kahf Browser. Grâce à une IA avancée, il filtre en temps réel les images indécentes et contenus nuisibles, vous permettant de naviguer tout en respectant vos valeurs morales.</string>
     <string name="kahf_onboarding_title">Navigation privée, sûre et décente Propulsée par l IA</string>
+    <string name="selectLanguage">Sélectionner la langue</string>
 
     <string name="kahf_onboarding_sg_title">Masquer les images indécentes</string>
     <string name="kahf_onboarding_sg_subtitle">Masquer les images inappropriées.\nÉvitez les grands péchés\n\n<b>Cette fonctionnalité est expérimentale.\nPeut ne pas être 100% précise.</b></string>
