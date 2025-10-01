@@ -1,0 +1,967 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="appName" translatable="false">Kahf ব্রাউজার</string>
+
+    <string name="facebook_app_id" translatable="false">1065904702070183</string>
+    <string name="facebook_client_token" translatable="false">3f9fdd9ae789fab1a44a977a901b7d45</string>
+
+    <string name="appDescription" translatable="false">Kahf ব্রাউজার</string>
+    <string name="asilLogoDescription">Kahf লোগো</string>
+    <string name="asilPrivacySimplified">গোপনীয়তা, সহজভাবে</string>
+    <string name="yes">হ্যাঁ</string>
+    <string name="no">না</string>
+    <string name="open">খোলা</string>
+    <string name="cancel">বাতিল</string>
+    <string name="search">খুঁজুন</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserDescription">প্রতি বার Kahf দিয়ে সার্চ ও ব্রাউজ করতে সেটিংসে যান।</string>
+    <string name="onboardingDefaultBrowserTitle">Kahf কে ডিফল্ট করুন</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">ডিফল্ট অ্যাপ সেটিংস স্ক্রিন খুলতে পারছি না</string>
+    <string name="settingsDefaultBrowserEnabled">ডিফল্ট ব্রাউজার হিসাবে সেট করুন</string>
+    <string name="defaultBrowserMaybeLater">পরবর্তীতে</string>
+    <string name="defaultBrowserLetsDoIt">ডিফল্ট ব্রাউজার হিসাবে সেট করুন</string>
+    <string name="defaultBrowserDescriptionNoDefault">প্রতি বার শান্ত মনে লিঙ্ক খোলার সুবিধা।</string>
+    <string name="defaultBrowserInstructions">Kahf নির্বাচন করুন এবং <font color='#678fff'>সবসময়</font> চাপুন।</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">ব্রাউজার মেনু</string>
+    <string name="refresh">রিফ্রেশ</string>
+    <string name="back">পেছনে</string>
+    <string name="forward">সামনে</string>
+
+    <string name="omnibarInputHint">সার্চ করুন বা URL লিখুন</string>
+    <string name="clearButtonContentDescription">সার্চ ইনপুট পরিষ্কার করুন</string>
+    <string name="no_compatible_third_party_app_installed">কোনো উপযুক্ত অ্যাপ ইনস্টল নেই</string>
+    <string name="addBookmarkMenuTitle">বুকমার্ক যোগ করুন</string>
+    <string name="editBookmarkMenuTitle">বুকমার্ক সম্পাদনা করুন</string>
+    <string name="addFavoriteMenuTitle">পছন্দের যোগ করুন</string>
+    <string name="removeFavoriteMenuTitle">পছন্দের সরান</string>
+    <string name="favoriteAddedMessage">পছন্দের যোগ করা হয়েছে</string>
+    <string name="bookmarkAddedMessage">বুকমার্ক যোগ করা হয়েছে</string>
+    <string name="requestDesktopSiteMenuTitle">ডেস্কটপ সাইট</string>
+    <string name="fireproofWebsiteMenuTitleRemove">ফায়ারপ্রুফ সরান</string>
+    <string name="requestMobileSiteMenuTitle">মোবাইল সাইট</string>
+    <string name="downloadsMenuTitle">ডাউনলোডস</string>
+    <string name="printMenuTitle">পৃষ্ঠা প্রিন্ট করুন</string>
+    <string name="favoriteDeleteConfirmationMessage">পছন্দের সরানো হয়েছে</string>
+    <string name="fireproofDeleteConfirmationMessage">ফায়ারপ্রুফিং সরানো হয়েছে</string>
+    <string name="privacyProtectionEnabledConfirmationMessage" instruction="Placeholder is a website">%1$s এর জন্য প্রাইভেসি প্রোটেকশন সক্রিয়</string>
+    <string name="privacyProtectionDisabledConfirmationMessage" instruction="Placeholder is a website">%1$s এর জন্য প্রাইভেসি প্রোটেকশন নিষ্ক্রিয়</string>
+    <string name="undoSnackbarAction">পুনরায় করুন</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">ছবি ডাউনলোড করুন</string>
+    <string name="permissionRequiredToDownload">ডাউনলোড করতে স্টোরেজ অনুমতি প্রয়োজন</string>
+
+    <!-- Sharing options -->
+    <string name="options">বিকল্প</string>
+    <string name="shareLink">লিঙ্ক শেয়ার করুন</string>
+    <string name="shareMenuTitle">শেয়ার</string>
+    <string name="copyUrl">লিঙ্ক ঠিকানা কপি করুন</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">পৃষ্ঠায় খুঁজুন</string>
+    <string name="nextSearchTermDescription">পরবর্তী খুঁজুন</string>
+    <string name="previousSearchTermDescription">পূর্ববর্তী খুঁজুন</string>
+    <string name="closeFindInPageButtonDescription">পৃষ্ঠায় খুঁজুন ভিউ বন্ধ করুন</string>
+    <string name="findInPageHint">পৃষ্ঠায় খুঁজুন</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">সার্চ করার আগে প্রশ্ন সম্পাদনা করুন</string>
+    <string name="settingsAutocompleteEnabled">স্বয়ংসম্পূর্ণ পরামর্শ</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">বহিঃস্থ অ্যাপ খুলুন</string>
+    <string name="launchingExternalApp">অন্য অ্যাপে খুলুন</string>
+    <string name="confirmOpenExternalApp">এই কনটেন্ট দেখতে Kahf ছেড়ে যেতে চান কি?</string>
+    <string name="unableToOpenLink">এই ধরনের লিঙ্ক খোলা যাচ্ছে না</string>
+
+    <!-- Tabs -->
+    <string name="homeTab" translatable="false">Kahf</string>
+    <string name="tabActivityTitle">ট্যাবস</string>
+    <string name="tabsMenuItem">ট্যাবস</string>
+    <string name="newTabMenuItem">নতুন ট্যাব</string>
+    <string name="openInNewTab">নতুন ট্যাবে খুলুন</string>
+    <string name="openInNewBackgroundTab">ব্যাকগ্রাউন্ড ট্যাবে খুলুন</string>
+    <string name="openImageInNewTab">ছবি ব্যাকগ্রাউন্ড ট্যাবে খুলুন</string>
+    <string name="faviconContentDescription">ফ্যাভিকন</string>
+    <string name="closeContentDescription">বন্ধ করুন</string>
+    <string name="closeAllTabsMenuItem">সব ট্যাব বন্ধ করুন</string>
+    <string name="closeTab">ট্যাব বন্ধ করুন</string>
+    <string name="tabClosed">ট্যাব বন্ধ হয়েছে</string>
+    <string name="tabClosedUndo">পুনরায় করুন</string>
+    <string name="downloadsMenuItemTitle">ডাউনলোডস</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">ডেটা মুছে ফেলুন</string>
+    <string name="fireClearAll">সব ট্যাব এবং ডেটা মুছে ফেলুন</string>
+    <string name="fireCancel">বাতিল</string>
+    <string name="fireDataCleared">ডেটা মুছে ফেলা হয়েছে</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">সেটিংস</string>
+    <string name="settingsMenuItemTitle">সেটিংস</string>
+    <string name="settingsHeadingPrivacy">গোপনীয়তা</string>
+    <string name="settingsHeadingAppearance">দৃশ্যমানতা</string>
+    <string name="settingsHeadingCustomize">কাস্টমাইজ করুন</string>
+    <string name="settingsHeadingAbout">সম্পর্কিত</string>
+    <string name="settingsAboutAsil">Kahf সম্পর্কে</string>
+    <string name="settingsVersion">ভার্সন</string>
+    <string name="settingsVersionFull" translatable="false">ভার্সন: %1$s (%2$s) - JS %3$s</string>
+    <string name="leaveFeedback">মতামত শেয়ার করুন</string>
+    <string name="settingsEmailProtectionTitle">ইমেইল প্রোটেকশন</string>
+    <string name="settingsEmailProtectionSubtitle">ইমেইল ট্র্যাকার ব্লক করুন এবং ঠিকানা লুকান</string>
+    <string name="settingsHeadingMore">Kahf থেকে আরও</string>
+    <string name="settingsLightTheme">লাইট</string>
+    <string name="settingsTheme">থিম</string>
+    <string name="settingsDarkTheme">ডার্ক</string>
+    <string name="settingsSystemTheme">সিস্টেম ডিফল্ট</string>
+    <string name="settingsThemeDialogSave">থিম সেট করুন</string>
+    <string name="settingsTitleAppLinks">অ্যাপে লিঙ্ক খুলুন</string>
+    <string name="settingsTitleAppLinksDialog">অ্যাপে লিঙ্ক খুলুন</string>
+    <string name="settingsAppLinksAskEveryTime">প্রতি বার জিজ্ঞাসা করুন</string>
+    <string name="settingsAppLinksAlways">সবসময়</string>
+    <string name="settingsAppLinksNever">কখনো না</string>
+    <string name="settingsTitleNotifications">নোটিফিকেশন</string>
+    <string name="settingsSubtitleNotificationsDisabled">নিষ্ক্রিয়</string>
+    <string name="settingsSubtitleNotificationsEnabled">সক্রিয়</string>
+    <string name="settingsDefaultBrowserTitle">ডিফল্ট ব্রাউজার</string>
+    <string name="settingsDefaultBrowserSetDescription">Kahf আপনার ডিফল্ট ব্রাউজার</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Kahf কে ডিফল্ট ব্রাউজার করুন</string>
+    <string name="settingsPrivateSearchTitle">প্রাইভেট সার্চ</string>
+    <string name="settingsPrivateSearchDescription">ডিফল্টভাবে সক্রিয়</string>
+    <string name="settingsWebTrackingProtectionTitle">ওয়েব ট্র্যাকিং প্রোটেকশন</string>
+    <string name="settingsWebTrackingProtectionDescription">ডিফল্টভাবে সক্রিয়</string>
+    <string name="settingsHeadingSettings">সেটিংস</string>
+    <string name="settingsPermissionsSetting">অনুমতি</string>
+    <string name="settingsSyncSetting">সিঙ্ক &amp; ব্যাকআপ</string>
+    <string name="settingsFireButton">ফায়ার বোতাম</string>
+
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">প্রাইভেট সার্চ</string>
+    <string name="privateSearchTitle">প্রাইভেট সার্চ সক্রিয়</string>
+    <string name="privateSearchDescription">Kahf প্রাইভেট সার্চ আপনার ডিফল্ট সার্চ ইঞ্জিন, তাই আপনি ট্র্যাক না হওয়া অবস্থায় ওয়েব সার্চ করতে পারবেন।</string>
+    <string name="privateSearchHeadingSearchSettings">সার্চ সেটিংস</string>
+    <string name="languageSettings">ভাষা</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">আরও সার্চ সেটিংস</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">আপনার সার্চ ভাষা, অঞ্চল এবং আরও কাস্টমাইজ করুন</string>
+    <string name="privateSearchMoreSearchSettingsTitle">আরও সার্চ সেটিংস</string>
+    <string name="privateSearchAutocompleteToggle">স্বয়ংসম্পূর্ণ পরামর্শ</string>
+    <string name="privateSearchAutocompleteHint">আপনি টাইপ করার সময় সার্চ পরামর্শ দেখান, যার মধ্যে আপনার বুকমার্কও রয়েছে। সব সার্চ প্রাইভেট।</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">সাম্প্রতিকভাবে ভিজিট করা সাইট</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">সাম্প্রতিকভাবে ভিজিট করা সাইট সার্চ পরামর্শে দেখান। এই সাইটগুলো প্রাইভেট, শুধুমাত্র আপনার ডিভাইসে সংরক্ষিত থাকে এবং 🔥 ফায়ার বোতাম দিয়ে মুছে ফেলা যায়।</string>
+    <string name="improvedAutoCompleteIAMContent">স্বয়ংসম্পূর্ণ পরামর্শ এখন আপনার সম্প্রতি ভিজিট করা সাইটও অন্তর্ভুক্ত করে। সেটিংসে বন্ধ করুন, বা 🔥 ফায়ার বোতাম দিয়ে যেকোনো সময় পরিষ্কার করুন।</string>
+    <string name="improvedAutoCompleteIAMTitle">একই প্রাইভেসি।\nভালো সার্চ পরামর্শ!</string>
+    <string name="openAutoCompleteSettings">সেটিংস খুলুন</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">ওয়েব ট্র্যাকিং প্রোটেকশন</string>
+    <string name="webTrackingProtectionLearnMoreTitle">ওয়েব ট্র্যাকিং প্রোটেকশন</string>
+    <string name="webTrackingProtectionTitle">ওয়েব ট্র্যাকিং প্রোটেকশন সক্রিয়</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[Kahf কখনো আপনাকে ট্র্যাক করে না এবং আমরা আপনার প্রাইভেসি যতটা সম্ভব সুরক্ষিত রাখার চেষ্টা করি। আমরা নতুন ট্র্যাকিং পদ্ধতির সাথে খাপ খাইয়ে নিতে নিয়মিত প্রোটেকশন লেয়ার বজায় রাখি এবং এমন অনেক প্রোটেকশন প্রদান করি যা অন্যান্য ব্রাউজার ডিফল্টভাবে দেয় না। <u><a href="">আরও জানুন</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">কুকি পপ-আপ প্রোটেকশন</string>
+    <string name="cookiePopupProtectionDescription">এই পপ-আপগুলো বন্ধ করুন এবং কুকি কমান</string>
+    <string name="cookiePopupProtectionEnabled">সক্রিয়</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">ফায়ার বোতাম</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">অনুমতি</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">দৃশ্যমানতা</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">সংরক্ষণ</string>
+
+    <string name="settingsAutomaticallyClearWhat">স্বয়ংক্রিয়ভাবে মুছুন…</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">স্বয়ংক্রিয়ভাবে মুছুন…</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">কোনোটি নয়</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">ট্যাবস</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">ট্যাবস এবং ডেটা</string>
+
+    <string name="settingsAutomaticallyClearWhen">মুছুন…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">মুছুন…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">শুধুমাত্র অ্যাপ বন্ধের সময়</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">অ্যাপ বন্ধ, ৫ সেকেন্ড নিষ্ক্রিয় থাকলে</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">অ্যাপ বন্ধ, ৫ মিনিট নিষ্ক্রিয় থাকলে</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">অ্যাপ বন্ধ, ১৫ মিনিট নিষ্ক্রিয় থাকলে</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">অ্যাপ বন্ধ, ৩০ মিনিট নিষ্ক্রিয় থাকলে</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">অ্যাপ বন্ধ, ১ ঘণ্টা নিষ্ক্রিয় থাকলে</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Kahf সম্পর্কে</string>
+    <string name="aboutHeader">Kahf-এ স্বাগতম!</string>
+    <string name="aboutDescription">Kahf হল স্বাধীন ইন্টারনেট প্রাইভেসি কোম্পানি, যা ২০০৮ সালে প্রতিষ্ঠিত হয়েছে এমন কারও জন্য যারা অনলাইনে ট্র্যাক হওয়া থেকে বিরক্ত এবং সহজ সমাধান চায়। আমরা প্রমাণ করি যে আপনি কোনো আপস ছাড়া অনলাইনে প্রকৃত প্রাইভেসি প্রোটেকশন পেতে পারেন।\n\nKahf ব্রাউজারটি সেই সকল ফিচার নিয়ে আসে যা একটি মানক ব্রাউজার থেকে আশা করা যায়, যেমন বুকমার্ক, ট্যাব, পাসওয়ার্ড, এবং আরও অনেক কিছু, প্লাস <annotation type="privacy_protection_link">এক ডজনের বেশি শক্তিশালী প্রাইভেসি প্রোটেকশন</annotation> যা বেশিরভাগ জনপ্রিয় ব্রাউজারে ডিফল্টভাবে নেই। এই অনন্য পূর্ণাঙ্গ প্রাইভেসি প্রোটেকশন সেটটি আপনার অনলাইন কার্যকলাপ সুরক্ষিত রাখতে সাহায্য করে, সার্চ থেকে ব্রাউজিং, ইমেইল এবং আরও অনেক কিছুতে।\n\nআমাদের প্রাইভেসি প্রোটেকশন প্রযুক্তিগত বিবরণ না জেনে বা জটিল সেটিংসের সাথে মোকাবিলা ছাড়াই কাজ করে। আপনাকে কেবল সব ডিভাইসে ব্রাউজারটি Kahf-এ পরিবর্তন করতে হবে এবং আপনি ডিফল্টভাবে প্রাইভেসি পাবেন।\n\nকিন্তু যদি আপনি অন্তর্দৃষ্টি পেতে চান, Kahf প্রাইভেসি প্রোটেকশন কীভাবে কাজ করে সে সম্পর্কে আরও তথ্য আমাদের <annotation type="learn_more_link">হেল্প পেজে</annotation> পাবেন।</string>
+    <string name="no_suggestions">কোনো পরামর্শ নেই</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">ভাঙা সাইট রিপোর্ট করুন</string>
+    <string name="brokenSiteHeading">ভাঙা সাইট রিপোর্ট করুন</string>
+    <string name="brokenSiteSubmitted">ধন্যবাদ! ফিডব্যাক জমা হয়েছে।</string>
+    <string name="brokenSitesCategoriesTitle">ঘটনাটি বর্ণনা করুন</string>
+    <string name="brokenSitesCategoriesHint">ঘটনাটি বর্ণনা করুন</string>
+    <string name="brokenSiteSubmitButton">রিপোর্ট পাঠান</string>
+    <string name="brokenSiteDescription">গোপনীয়ভাবে ভাঙা সাইট রিপোর্ট জমা দেওয়া আমাদের অ্যাপ উন্নত করতে সাহায্য করে।</string>
+
+    <string name="brokenSiteCategoryBlocked">সাইট ব্লক হয়েছে বা লোড হয়নি</string>
+    <string name="brokenSiteCategoryLayout">সাইটের লেআউট ভাঙা</string>
+    <string name="brokenSiteCategoryEmptySpaces">সাইটে বড় খালি স্থান আছে</string>
+    <string name="brokenSiteCategoryShopping">পেমেন্ট, চেক আউট বা কেনাকাটা সম্ভব নয়</string>
+    <string name="brokenSiteCategoryPaywall">সাইট আমাকে অ্যাড ব্লকার বন্ধ করতে বলেছে</string>
+    <string name="brokenSiteCategoryComments">কমেন্ট, রিভিউ, বা চ্যাট লোড হয়নি</string>
+    <string name="brokenSiteCategoryVideos">ভিডিও প্লে বা লোড হয়নি</string>
+    <string name="brokenSiteCategoryLogin">সাইন ইন/রেজিস্টার করা যায়নি</string>
+    <string name="brokenSiteCategoryOther">অন্যান্য</string>
+    <string name="brokenSiteDescriptionTextInputHint">আরও বিস্তারিত শেয়ার করুন (ঐচ্ছিক)</string>
+    <string name="brokenSiteDescriptionCaption">কি ঘটেছিল? কি হওয়া উচিত ছিল? প্রোটেকশন বন্ধ করলে সাহায্য হয়েছে কি?</string>
+
+    <string name="brokenSiteProtectionsOn">এই সাইটের জন্য প্রোটেকশন <b>চালু</b></string>
+    <string name="brokenSiteProtectionsOff">এই সাইটের জন্য প্রোটেকশন <b>বন্ধ</b></string>
+    <string name="brokenSiteProtectionsOnBannerMessage">প্রোটেকশন বন্ধ করলে সাহায্য হতে পারে।</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">আমরা সাময়িকভাবে প্রাইভেসি প্রোটেকশন বন্ধ করেছি কারণ এটি সাইটে সমস্যা তৈরি করছে।</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">নিশ্চিত করুন</string>
+    <string name="dialogSave">সংরক্ষণ</string>
+    <string name="delete">মুছে ফেলুন</string>
+    <string name="edit">সম্পাদনা</string>
+    <string name="remove">সরান</string>
+    <string name="removeAll">সব সরান</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Kahf সার্চ করুন</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 পছন্দের যোগ করুন</string>
+    <string name="widgetConfigurationTitleText">থিম নির্বাচন করুন</string>
+    <string name="widgetConfigurationSystemThemeOption">সিস্টেম ডিফল্ট</string>
+    <string name="widgetConfigurationLightThemeOption">লাইট</string>
+    <string name="widgetConfigurationDarkThemeOption">ডার্ক</string>
+    <string name="widgetConfigurationAddWidgetOption">উইজেট যোগ করুন</string>
+    <string name="searchWidgetEmtpyFavoritesHint">কোনো পছন্দের এখনও যোগ করা হয়নি</string>
+    <string name="searchWidgetEmtpyFavoritesCta">পছন্দের যোগ করুন</string>
+    <string name="widgetConfigurationActivityTitle">উইজেট কনফিগারেশন</string>
+    <string name="favoritesWidgetLabel">পছন্দের</string>
+    <string name="searchWidgetLabel">সার্চ</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">হোম স্ক্রিনে যোগ করুন</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">সাফল্য! %1$s হোম স্ক্রিনে যোগ করা হয়েছে।</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">অ্যাপ উন্নত করতে সাহায্য করুন!</string>
+    <string name="surveyCtaDescription">আমাদের সংক্ষিপ্ত সার্ভে নিন এবং মতামত শেয়ার করুন।</string>
+    <string name="surveyCtaLaunchButton">সার্ভে নিন</string>
+    <string name="surveyCtaDismissButton">ধন্যবাদ নয়</string>
+    <string name="surveyActivityTitle">ব্যবহারকারী সার্ভে</string>
+    <string name="surveyTitle">Kahf সার্ভে</string>
+    <string name="surveyDismissContentDescription">সার্ভে বাতিল করুন</string>
+    <string name="surveyLoadingErrorTitle">হায় না!</string>
+    <string name="surveyLoadingErrorText">আমাদের সার্ভে বর্তমানে লোড হচ্ছে না।\nঅনুগ্রহ করে পরে আবার চেষ্টা করুন।</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">আমাদের সার্চ উইজেট চেষ্টা করুন!</string>
+    <string name="addWidgetCtaDescription">দ্রুত এবং সহজ অ্যাক্সেসের জন্য আমাদের সার্চ উইজেট হোম স্ক্রিনে যোগ করুন।</string>
+    <string name="addWidgetCtaAutoLaunchButton">উইজেট যোগ করুন</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">আমাকে দেখান</string>
+    <string name="addWidgetCtaDismissButton">বাতিল</string>
+    <string name="addWidgetInstructionsActivityTitle">উইজেট যোগ করুন</string>
+    <string name="addWidgetInstruction1Label">১</string>
+    <string name="addWidgetInstruction1">হোম স্ক্রিনে দীর্ঘ প্রেস করুন, তারপর উইজেট মেনু খুলুন।</string>
+    <string name="addWidgetInstruction2Label">২</string>
+    <string name="addWidgetInstruction2">Kahf উইজেটটি খুঁজুন।</string>
+    <string name="addWidgetInstruction3Label">৩</string>
+    <string name="addWidgetInstruction3">উইজেটটি হোম স্ক্রিনে টেনে আনুন।</string>
+    <string name="addWidgetInstructionsButtonGoHome">হোম স্ক্রিনে যান</string>
+    <string name="addWidgetInstructionsButtonClose">বন্ধ করুন</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Kahf উপভোগ করছেন?</string>
+    <string name="appEnjoymentDialogMessage">আমরা জানতে চাই আপনি কী মনে করেন।</string>
+    <string name="appEnjoymentDialogPositiveButton">আমি এটি পছন্দ করি</string>
+    <string name="appEnjoymentDialogNegativeButton">এতে আরও কাজ দরকার</string>
+
+    <string name="rateAppDialogTitle">অ্যাপ রেট করুন</string>
+    <string name="rateAppDialogMessage">আপনার মতামত গুরুত্বপূর্ণ। একটি রিভিউ দিয়ে শেয়ার করুন।</string>
+    <string name="rateAppDialogPositiveButton">অ্যাপ রেট করুন</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">দুঃখিত এটি শুনে</string>
+    <string name="giveFeedbackDialogMessage">আমাদের জানান আমরা কিভাবে আপনার জন্য অ্যাপ উন্নত করতে পারি।</string>
+    <string name="giveFeedbackDialogPositiveButton">মতামত শেয়ার করুন</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="noThanks">ধন্যবাদ নয়</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelTutorials">টিউটোরিয়াল</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">ডেটা ম্যানুয়ালি মুছে ফেলা সেট করা হয়েছে</string>
+    <string name="clearNotificationDescription">প্রতি সেশন শেষে স্বয়ংক্রিয়ভাবে ব্রাউজিং ডেটা মুছে ফেলার জন্য Kahf কাস্টমাইজ করুন।</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">আমরা আপনার প্রাইভেসি রক্ষা করছি</string>
+    <string name="privacyProtectionNotificationReportTitle">আপনার প্রাইভেসি রিপোর্ট</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Kahf অ্যাপ ব্যবহার করলে ট্র্যাকার ব্লক করে এবং সংযোগ এনক্রিপ্ট করে আপনার ডেটা সুরক্ষিত থাকে।</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">আপনি Kahf ব্যবহার করে %1$d অ-এনক্রিপ্টেড সংযোগ সুরক্ষিত করে আপনার ডেটা রক্ষা করেছেন।</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">আপনি Kahf ব্যবহার করে %1$d ট্র্যাকার ব্লক করে আপনার ডেটা রক্ষা করেছেন।</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">আপনি Kahf ব্যবহার করে %1$d ট্র্যাকার ব্লক এবং %2$d অ-এনক্রিপ্টেড সংযোগ সুরক্ষিত করে আপনার ডেটা রক্ষা করেছেন।</string>
+    <string name="privacyProtectionNotificationLaunchButton">ব্রাউজিং পুনরায় চালু করুন</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">সাইন ইন করুন</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">%1$s-এ ব্যবহারকারীর নাম এবং পাসওয়ার্ড প্রয়োজন।</string>
+    <string name="authenticationDialogPositiveButton">সাইন ইন</string>
+    <string name="authenticationDialogNegativeButton">বাতিল</string>
+    <string name="authenticationDialogUsernameHint">ব্যবহারকারীর নাম</string>
+    <string name="authenticationDialogPasswordHint">পাসওয়ার্ড</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">Kahf সার্চ করুন</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">মতামত শেয়ার করুন</string>
+    <string name="missingBrowserFeaturesTitleLong">ব্রাউজারের কিছু ফিচার অনুপস্থিত বা অসুবিধাজনক</string>
+    <string name="missingBrowserFeaturesTitleShort">ব্রাউজার ফিচার সমস্যা</string>
+    <string name="missingBrowserFeaturesSubtitle">কোনো ব্রাউজিং ফিচার আমরা যোগ বা উন্নত করতে পারি?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">ফরোয়ার্ড, ব্যাকওয়ার্ড নেভিগেশন বা রিফ্রেশ করা</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">ট্যাব তৈরি ও পরিচালনা করা</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">বিজ্ঞাপন ও পপ-আপ ব্লকিং</string>
+    <string name="missingBrowserFeatureSubReasonVideos">ভিডিও দেখা</string>
+    <string name="missingBrowserFeatureSubReasonImages">ইমেজের সাথে ইন্টারঅ্যাকশন</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">বুকমার্ক তৈরি ও পরিচালনা করা</string>
+    <string name="missingBrowserFeatureSubReasonOther">উপরের কোনোটি নয়</string>
+
+    <string name="websiteNotLoadingTitleLong">ওয়েবসাইট লোডিং সমস্যা</string>
+    <string name="websiteNotLoadingTitleShort">ওয়েবসাইট সমস্যা</string>
+    <string name="websiteNotLoadingSubtitle">কোন ওয়েবসাইটটি ভেঙেছে?</string>
+
+    <string name="searchNotGoodEnoughTitleLong">Kahf সার্চ পর্যাপ্ত নয়</string>
+    <string name="searchNotGoodEnoughTitleShort">Kahf সার্চ সমস্যা</string>
+    <string name="searchNotGoodEnoughSubtitle">কোন সার্চ ফিচার আমরা যোগ বা উন্নত করতে পারি?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">প্রোগ্রামিং/টেকনিক্যাল সার্চ</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">লেআউটটি গুগলের মতো হওয়া উচিত</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">দ্রুত লোড সময়</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">নির্দিষ্ট ভাষা বা অঞ্চলে সার্চ</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">ভাল অটো-কমপ্লিট</string>
+    <string name="searchNotGoodEnoughSubReasonOther">উপরের কোনোটি নয়</string>
+
+    <string name="needMoreCustomizationTitleLong">অ্যাপ কাস্টমাইজ করার পর্যাপ্ত উপায় নেই</string>
+    <string name="needMoreCustomizationTitleShort">কাস্টমাইজেশন সমস্যা</string>
+    <string name="needMoreCustomizationSubtitle">কোন কাস্টমাইজেশন অপশন আমরা যোগ বা উন্নত করতে পারি?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">হোম স্ক্রিন কনফিগারেশন</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">কিভাবে ট্যাব প্রদর্শিত হয়</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">অ্যাপের চেহারা</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">কোন ডেটা মুছে ফেলা হয়</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">ডেটা কখন মুছে ফেলা হয়</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">কিভাবে বুকমার্ক প্রদর্শিত হয়</string>
+    <string name="needMoreCustomizationSubReasonOther">উপরের কোনোটি নয়</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">অ্যাপ ধীর, বাগযুক্ত বা ক্র্যাশ হচ্ছে</string>
+    <string name="appIsSlowOrBuggyTitleShort">পারফরম্যান্স সমস্যা</string>
+    <string name="appIsSlowOrBuggySubtitle">আপনি কোন সমস্যা অনুভব করছেন?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">ওয়েবপেজ বা সার্চ রেজাল্ট ধীরগতিতে লোড হচ্ছে</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">অ্যাপ ক্র্যাশ বা ফ্রিজ হচ্ছে</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">ভিডিও বা মিডিয়া প্লেব্যাক বাগ</string>
+    <string name="appIsSlowOrBuggySubReasonOther">উপরের কোনোটি নয়</string>
+
+    <string name="otherMainReasonTitleLong">উপরের কোনোটি নয়</string>
+    <string name="otherMainReasonTitleShort">অন্যান্য সমস্যা</string>
+
+    <string name="openEndedInputHint">যতটা সম্ভব নির্দিষ্ট লিখুন</string>
+    <string name="submitFeedback">জমা দিন</string>
+
+    <string name="tellUsHowToImprove">আমাদের জানান আমরা কীভাবে উন্নতি করতে পারি।</string>
+    <string name="thanksForTheFeedback">মতামতের জন্য ধন্যবাদ!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">আপনার হতাশা মূলত কিসের সাথে সম্পর্কিত?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">দুঃখিত এটি শুনে</string>
+    <string name="feedbackShareDetails">বিস্তারিত শেয়ার করুন</string>
+    <string name="sharePositiveFeedbackWithTheTeam">আপনি কি দলের সাথে কোনো তথ্য শেয়ার করতে চান?</string>
+    <string name="whatHaveYouBeenEnjoying">আপনি কী উপভোগ করছেন?</string>
+    <string name="awesomeToHear">এটি শুনে দারুন!</string>
+    <string name="shareTheLoveWithARating">প্লে স্টোরে রেটিং দিয়ে ভালোবাসা শেয়ার করুন।</string>
+    <string name="rateTheApp">অ্যাপ রেট করুন</string>
+    <string name="declineFurtherFeedback">ধন্যবাদ নয়, আমি শেষ করেছি</string>
+    <string name="whichBrokenSites">আপনি কোথায় এই সমস্যাগুলি দেখছেন?</string>
+    <string name="whichBrokenSitesHint">কোন ওয়েবসাইটে সমস্যা রয়েছে?</string>
+    <string name="feedbackSpecificAsPossible">যতটা সম্ভব নির্দিষ্ট লিখুন</string>
+    <string name="feedbackInitialDisambiguationTitle">চলুন শুরু করি!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">আপনার মতামত কোন বিভাগে পড়ে?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">ধনাত্মক মতামত বোতাম</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">ঋণাত্মক মতামত বোতাম</string>
+    <string name="feedbackIsImportantToUs">আপনার অজ্ঞাতসারে মতামত আমাদের জন্য গুরুত্বপূর্ণ।</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">"ওয়েবপেজটি প্রদর্শন করা যায়নি।"</string>
+    <string name="crashedWebViewErrorAction">"পুনরায় লোড"</string>
+
+    <!-- System Search-->
+    <string name="systemSearchDeviceAppLabel">এই ডিভাইস থেকে</string>
+    <string name="systemSearchAppNotFound">অ্যাপ্লিকেশন পাওয়া যায়নি</string>
+    <string name="systemSearchOnboardingText">Kahf বেছে নেওয়ার জন্য ধন্যবাদ!\nএখন, আমাদের সার্চ বা অ্যাপ ব্যবহার করলে, আপনার সার্চগুলি সুরক্ষিত।</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Kahf অ্যাপ এছাড়াও:</string>
+    <string name="systemSearchOnboardingFeatureOneText">অসুরক্ষিত ট্র্যাকার ব্লক করে।</string>
+    <string name="systemSearchOnboardingFeatureTwoText">ওয়েবসাইটে এনক্রিপশন জোরদার করে।</string>
+    <string name="systemSearchOnboardingFeatureThreeText">একটি ট্যাপেই ডেটা মুছে দেয়।</string>
+    <string name="systemSearchOnboardingButtonMore">আরও দেখান</string>
+    <string name="systemSearchOnboardingButtonLess">লুকান</string>
+    <string name="systemSearchOnboardingButtonOk">বুঝেছি</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHighFive">হাই ফাইভ!</string>
+    <string name="daxDialogGotIt">বুঝেছি</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[আপনি এখন ওয়েব জুড়ে ট্র্যাকার ব্লক করছেন 🎉<br/><br/>আমি আপনার অন্য অ্যাপগুলিতে লুকানো ট্র্যাকারও ব্লক করতে পারি, এমনকি যখন আপনি ফোন ব্যবহার করছেন না।]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">অ্যাপ ট্র্যাকিং প্রোটেকশন চালু করুন</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">এখন নয়</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">"Kahf-এ স্বাগতম!"</string>
+    <string name="onboardingDaxText"><![CDATA[ইন্টারনেট কিছুটা ভয়ঙ্কর হতে পারে।<br/><br/>চিন্তা করবেন না! প্রাইভেটভাবে সার্চ এবং ব্রাউজ করা সহজ।]]></string>
+    <string name="onboardingLetsDoItButton">চলুন করি!</string>
+    <string name="daxNonSerpCtaText"><![CDATA[আপনি ট্যাপ ও স্ক্রল করলে, আমি বিরক্তিকর ট্র্যাকার ব্লক করব। <br/><br/>চলুন, ব্রাউজ চালিয়ে যান!]]></string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">সতর্ক! আমি %1$s-কে %2$s-এ আপনার কার্যক্রম দেখার থেকে থামাতে পারি না।<br/><br/>কিন্তু আমার সাথে ব্রাউজ করুন, এবং আমি অন্যান্য অনেক সাইটে তাদের ট্র্যাকার ব্লক করে %3$s সম্পর্কে আপনার তথ্য কমাতে পারি।</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">সতর্ক! যেহেতু %1$s %2$s-এর মালিক, আমি তাদের এখানকার কার্যক্রম দেখার থেকে থামাতে পারি না।<br/><br/>কিন্তু আমার সাথে ব্রাউজ করুন, এবং আমি অন্যান্য অনেক সাইটে তাদের ট্র্যাকার ব্লক করে %3$s সম্পর্কে আপনার তথ্য কমাতে পারি।</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">ডাউনলোডে সংরক্ষণ করুন</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">%1$s সংরক্ষণ করুন</string>
+    <string name="downloadConfirmationKeepBothFilesText">উভয় রাখুন</string>
+    <string name="downloadConfirmationReplaceOldFileText">প্রতিস্থাপন করুন</string>
+    <string name="downloadConfirmationOpenFileText">খুলুন</string>
+    <string name="downloadConfirmationUnableToOpenFileText">ফাইল খুলতে পারিনি</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">পুরানো ফাইল মুছতে পারিনি</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">অ্যাপ আইকন</string>
+    <string name="changeIconCtaLabel">অ্যাপ আইকন</string>
+    <string name="changeIconCtaAccept">প্রয়োগ করুন</string>
+    <string name="changeIconCtaCancel">বাতিল</string>
+    <string name="changeIconDialogTitle">নতুন আইকন প্রয়োগ করবেন?</string>
+    <string name="changeIconDialogMessage">অ্যাপ পরিবর্তন প্রয়োগ করতে বন্ধ হতে পারে। নতুন আইকনটি উপভোগ করার পর ফিরে আসুন।</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageAllowlist">অরক্ষিত সাইট</string>
+    <string name="reportBrokenSite">ভাঙা সাইট রিপোর্ট করুন</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">যোগ করুন</string>
+    <string name="dialogEditTitle">সম্পাদনা</string>
+    <string name="dialogSaveAction">সংরক্ষণ</string>
+
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">অরক্ষিত সাইট</string>
+    <string name="enablePrivacyProtection">গোপনীয়তা সুরক্ষা চালু করুন</string>
+    <string name="disablePrivacyProtection">গোপনীয়তা সুরক্ষা বন্ধ করুন</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">%1$s এর অরক্ষিত সাইটের আরও অপশন</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">আপনি কি নিশ্চিত &lt;b;%1$s&lt;/b> অরক্ষিত সাইট থেকে মুছে ফেলতে চান?</string>
+    <string name="allowlistExplanation">এই সাইটগুলো গোপনীয়তা সুরক্ষা দ্বারা উন্নত হবে না।</string>
+    <string name="allowlistNoEntries">সমস্ত সাইটের জন্য গোপনীয়তা সুরক্ষা চালু আছে</string>
+    <string name="allowlistDomainHint">www.example.com</string>
+    <string name="allowlistFormatError">একটি ডোমেইন লিখুন যেমন <b>example.com</b> এবং পুনরায় চেষ্টা করুন</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionAllowlist">অরক্ষিত সাইট</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">ফায়ারপ্রুফ সাইট</string>
+    <string name="settingsFireproofWebsites">ফায়ারপ্রুফ সাইট</string>
+    <string name="fireproofWebsiteMenuTitleAdd">এই সাইট ফায়ারপ্রুফ করুন</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b>%1$s&lt;/b> এখন ফায়ারপ্রুফ</string>
+    <string name="fireproofWebsiteSnackbarAction">ফিরিয়ে আনুন</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">আপনি কি নিশ্চিত &lt;b>%1$s&lt;/b> মুছে ফেলতে চান?</string>
+    <string name="fireproofWebsiteFeatureDescription">সাইটগুলো আপনার লগইন ধরে রাখতে কুকিজ ব্যবহার করে। যখন আপনি একটি সাইট ফায়ারপ্রুফ করবেন, কুকিজ মুছে যাবে না এবং আপনি লগইন থাকবেন, এমনকি ফায়ার বাটন ব্যবহার করার পরও। তৃতীয় পক্ষের ট্র্যাকার ফায়ারপ্রুফ সাইটে আমরা এখনও ব্লক করি।</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">%1$s ফায়ারপ্রুফ সাইটের আরও অপশন</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">আপনি কি %1$s ফায়ারপ্রুফ করতে চান?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">এই সাইট ফায়ারপ্রুফ করলে ফায়ার বাটন ব্যবহার করার পরও লগইন থাকবে।</string>
+    <string name="fireproofWebsiteLoginDialogPositive">ফায়ারপ্রুফ</string>
+    <string name="fireproofWebsiteLoginDialogNegative">এখন নয়</string>
+    <string name="fireproofWebsiteItemsSectionTitle">ফায়ারপ্রুফ সাইট</string>
+    <string name="fireproofWebsiteEmptyListHint">এখনও কোনো ফায়ারপ্রুফ সাইট নেই</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">সাইন-ইনের সময় ফায়ারপ্রুফ সাইট</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">সমস্ত সাইটের ফায়ারপ্রুফ মুছে ফেলা হয়েছে</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">&lt;b>%1$s&lt;/b> এর ফায়ারপ্রুফ মুছে ফেলা হয়েছে</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">প্রতিবার জিজ্ঞাসা করুন</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">সদা</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">কখনও নয়</string>
+    <string name="disableLoginDetectionDialogTitle">সাইন-ইনের সময় ফায়ারপ্রুফ রিমাইন্ডার বন্ধ করবেন?</string>
+    <string name="disableLoginDetectionDialogDescription">আপনি যে কোনো সময় সেটিংসে এটি পরিবর্তন করতে পারেন।</string>
+    <string name="disableLoginDetectionDialogPositive">বন্ধ করুন</string>
+    <string name="disableLoginDetectionDialogNegative">বাতিল</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">সাইন-ইনের সময় স্বয়ংক্রিয়ভাবে ফায়ারপ্রুফ করবেন?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">সাইট ফায়ারপ্রুফ করলে ফায়ার বাটন ব্যবহার করার পরও লগইন থাকবে। পরে সেটিংসে এটি পরিবর্তন করা যাবে।</string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">সদা ফায়ারপ্রুফ</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">এই সাইট ফায়ারপ্রুফ করুন</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">এখন নয়</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">ফায়ার বাটন অ্যানিমেশন</string>
+    <string name="settingsHeroFireAnimation">ইনফারনো</string>
+    <string name="settingsHeroWaterAnimation">হুইরপুল</string>
+    <string name="settingsHeroAbstractAnimation">এয়ারস্ট্রীম</string>
+    <string name="settingsNoneAnimation">কোনোটিই নয়</string>
+    <string name="settingsSelectFireAnimationDialog">ফায়ার বাটন অ্যানিমেশন</string>
+    <string name="settingsSelectFireAnimationDialogSave">সংরক্ষণ</string>
+
+    <!-- Dos Attack error-->
+    <string name="dosErrorMessage">সংযোগ বন্ধ হয়েছে। এই ওয়েবসাইটটি আপনার ডিভাইসের জন্য ক্ষতিকর হতে পারে।</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Kahf Privacy Browser-এর জন্য ডিভাইস অবস্থান চালু করবেন?</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s আপনার ডিভাইস অবস্থান চাচ্ছে। প্রথমে অ্যাপকে ডিভাইস অবস্থান পাঠাতে অনুমতি দিন, তারপর %2$s অনুমতি চাইতে পারবে।</string>
+    <string name="preciseLocationSystemDialogAllow">চালু করুন</string>
+    <string name="preciseLocationSystemDialogDeny">পরবর্তীতে</string>
+    <string name="preciseLocationSystemDialogNeverAllow">এই সাইটের জন্য আর না জিজ্ঞাসা করুন</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">%1$s কে অবস্থান অ্যাক্সেসের অনুমতি দেবেন?</string>
+    <string name="preciseLocationDDGDialogSubtitle">আমরা শুধুমাত্র আপনার অজ্ঞাত অবস্থান ব্যবহার করি যাতে আপনার নিকটবর্তী আরও ভালো ফলাফল প্রদর্শন করা যায়। আপনি পরে এটি পরিবর্তন করতে পারবেন।</string>
+    <string name="preciseLocationSiteDialogSubtitle">আপনি যেসব সাইটে অনুমতি দিয়েছেন তা সেটিংসে পরিচালনা করতে পারেন।</string>
+    <string name="preciseLocationSiteDialogAllowAlways">সদা</string>
+    <string name="preciseLocationSiteDialogAllowOnce">শুধু এই সেশনের জন্য</string>
+    <string name="preciseLocationSiteDialogDenyAlways">সদা অনুমতি বাতিল</string>
+    <string name="preciseLocationSiteDialogDenyOnce">এই সেশনের জন্য বাতিল</string>
+    <string name="preciseLocationFeatureDescription">আপনি যে সাইটগুলো ভিজিট করেন তারা আপনার ডিভাইস অবস্থান জানতে চাইতে পারে। আপনি স্পষ্টভাবে অনুমতি না দেওয়া পর্যন্ত তারা এটি অ্যাক্সেস করতে পারবে না। Kahf শুধুমাত্র স্থানীয় সার্চ ফলাফলের জন্য অজ্ঞাত অবস্থান ব্যবহার করে।</string>
+    <string name="preciseLocationToggleText">সাইটগুলো আমার অবস্থান জিজ্ঞাসা করতে পারবে</string>
+    <string name="preciseLocationEmptyListHint">কোনো সাইট অবস্থান অনুমতি পায়নি</string>
+    <string name="preciseLocationNoSystemPermission">আপনি যেসব সাইটে অবস্থান অনুমতি দিয়েছেন তা পরিচালনা করতে, Android সেটিংসে এই অ্যাপের জন্য অবস্থান চালু করুন।</string>
+    <string name="preciseLocationActivityTitle">অবস্থান</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">আপনি কি নিশ্চিত &lt;b>%1$s&lt;/b> মুছে ফেলতে চান?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">%1$s ডোমেইনের অবস্থান অনুমতির আরও অপশন</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">অনুমোদিত</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">বাতিল</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">আপনি পূর্বে %1$s কে আপনার ডিভাইস অবস্থান অ্যাক্সেসের অনুমতি দিয়েছিলেন।</string>
+
+    <!-- Fire button education -->
+    <string name="daxClearDataCtaText">আপনার ব্রাউজারে ব্যক্তিগত তথ্য জমা হতে পারে। উফ। সব মুছে দিতে ফায়ার বাটন ব্যবহার করুন। এখনই চেষ্টা করুন! &#128071;</string>
+
+    <!-- Global Privacy Control -->
+    <string name="globalPrivacyControlActivityTitle">গ্লোবাল প্রাইভেসি কন্ট্রোল (GPC)</string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Kahf স্বয়ংক্রিয়ভাবে অনেক ট্র্যাকার ব্লক করে। গ্লোবাল প্রাইভেসি কন্ট্রোল (GPC) ব্যবহার করে, আপনি অংশগ্রহণকারী সাইটগুলোকে অনুরোধ করতে পারেন যাতে আপনার ব্যক্তিগত তথ্য অন্য কোম্পানির সঙ্গে বিক্রি বা শেয়ার করা সীমিত করা হয়। <u><a href="">আরও জানুন</a></u>]]></string>
+    <string name="globalPrivacyControlSetting">গ্লোবাল প্রাইভেসি কন্ট্রোল (GPC)</string>
+    <string name="globalPrivacyControlToggle">গ্লোবাল প্রাইভেসি কন্ট্রোল (GPC)</string>
+    <string name="disabled">বন্ধ</string>
+    <string name="enabled">চালু</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">লিঙ্ক সংশ্লিষ্ট অ্যাপে খুলুন</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">অটো লিঙ্ক খোলা বন্ধ করতে এটি নিষ্ক্রিয় করুন।</string>
+    <string name="appLinkDialogTitle">অন্য অ্যাপে খুলবেন?</string>
+    <string name="appLinkSnackBarAction">অ্যাপে খুলুন</string>
+    <string name="appLinkMultipleSnackBarAction">অ্যাপ নির্বাচন করুন</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">আপনি এই লিঙ্ক %1$s-এ খুলতে পারেন।</string>
+    <string name="appLinkMultipleSnackBarMessage">আপনি এই লিঙ্ক অন্য অ্যাপগুলোতে খুলতে পারেন।</string>
+    <string name="appLinkIntentChooserTitle">সাথে খুলুন</string>
+    <string name="appLinkMenuItemTitle">অ্যাপে খুলুন</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">নতুন ঠিকানা আপনার ক্লিপবোর্ডে কপি করা হয়েছে</string>
+    <string name="newEmailAliasMenuTitle">ডাক ঠিকানা তৈরি করুন</string>
+
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">দেখুন</string>
+
+    <!-- Waitlist Notification -->
+    <string name="waitlistNotificationDialogDescription">আপনার পালা হলে আমরা কি আপনাকে নোটিফিকেশন পাঠাই?</string>
+    <string name="waitlistNotificationDialogNoThanks">না ধন্যবাদ</string>
+    <string name="waitlistNotificationDialogNotifyMe">নোটিফাই করুন</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">ইমেইল সুরক্ষা (বেটা)</string>
+    <string name="emailNotSupported">ডিভাইস সমর্থিত নয়</string>
+    <string name="emailNotSupportedExplanation">ইমেইল সুরক্ষা আপনাকে ব্যক্তিগত ইমেইল ঠিকানা তৈরি করতে দেয় যা ইমেইল ট্র্যাকার সরিয়ে দেয়। আমরা এই ঠিকানাগুলোকে আপনার ডিভাইসে স্থানীয়ভাবে এনক্রিপ্ট এবং সংরক্ষণ করি। যেহেতু আপনার ডিভাইস এনক্রিপ্টেড স্টোরেজ সমর্থন করে না, ইমেইল সুরক্ষা ব্যবহারযোগ্য নয়।</string>
+
+    <!-- Accessibility -->
+    <string name="settingsAccessibility">অ্যাক্সেসিবিলিটি</string>
+    <string name="accessibilityActivityTitle">অ্যাক্সেসিবিলিটি</string>
+    <string name="accessibilityFontSizeTitle">লেখার আকার</string>
+    <string name="accessibilityFontSizeHint">স্লাইডারটি এমনভাবে টানুন যাতে আপনি এটি আরামদায়কভাবে পড়তে পারেন। Kahf-এ যে সাইটগুলো দেখবেন তা সামঞ্জস্য করবে।</string>
+    <string name="accessibilityForceZoomTitle">ম্যানুয়াল পেজ জুম জোরদার করুন</string>
+    <string name="accessibilityForceZoomSubtitle">যে কোনো সাইটে পিন্চ এবং জুম করুন, এমন সাইটেও যা অন্যথায় এটি প্রতিরোধ করে</string>
+    <string name="accessibilityTextSizeOverrideTitle">লেখার আকার নিয়ন্ত্রণ করুন</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Kahf-এ যে সাইটগুলো দেখবেন তা নিচের সেটিং অনুযায়ী লেখা সামঞ্জস্য করবে</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyAsil">গোপনীয়তা নীতি</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s উইজেট হোম স্ক্রিনে যোগ করা হয়েছে</string>
+    <string name="settingsAddHomeScreenWidget">হোম স্ক্রিন উইজেট</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Mac-এর জন্য আমাদের অ্যাপ দিয়ে প্রাইভেট ব্রাউজ করুন</string>
+    <string name="macos_settings_title">Kahf Mac ব্রাউজার</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">ডাউনলোড</string>
+    <string name="downloadsActivityTitle">ডাউনলোড</string>
+    <string name="downloadsActivityNoItemsDescription">এখনও কোনো ফাইল ডাউনলোড করা হয়নি</string>
+    <string name="downloadsShareTitle">শেয়ার করুন…</string>
+    <string name="downloadsDownloadFinishedActionName">খুলুন</string>
+    <string name="downloadsCannotOpenFileErrorMessage">ফাইল খোলা যায়নি। উপযুক্ত অ্যাপ চেক করুন।</string>
+    <string name="downloadsFileNotFoundErrorMessage">ফাইলটি আর নেই</string>
+    <string name="downloadsItemMenuShare">শেয়ার</string>
+    <string name="downloadsItemMenuDelete">মুছুন</string>
+    <string name="downloadsItemMenuCancel">বাতিল</string>
+    <string name="downloadsActivityMenuDeleteAll">সব মুছুন</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">%1$s মুছে ফেলা হয়েছে</string>
+    <string name="downloadsAllFilesDeletedMessage">সমস্ত ফাইল মুছে ফেলা হয়েছে</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">%1$s এর আরও অপশন</string>
+    <string name="downloadsUndoActionName">ফিরিয়ে আনুন</string>
+    <string name="downloadsStateInProgress">চলছে…</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">অ্যাপ ট্র্যাকিং সুরক্ষা</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">আপনার ডিভাইসের অ্যাপ ট্র্যাকার ব্লক করুন</string>
+    <string name="atp_SettingsDeviceShieldEnabled">চালু</string>
+    <string name="atp_SettingsDeviceShieldDisabled">বন্ধ</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle"><![CDATA[<b>আপনি কি চাইবেন আমি কুকি পপ-আপগুলো পরিচালনা করি?</b>]]></string>
+    <string name="autoconsentDialogDescription">আমি চেষ্টা করতে পারি সবচেয়ে ব্যক্তিগত সেটিং নির্বাচন করতে এবং এমন পপ-আপগুলো লুকাতে।</string>
+    <string name="autoconsentPrimaryCta">আমার জন্য পপ-আপ পরিচালনা করুন</string>
+    <string name="autoconsentSecondaryCta">না, আমি নিজেই পরিচালনা করব</string>
+
+    <string name="autoconsentSetting">কুকি পপ-আপ পরিচালনা করুন</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">পপ-আপ লুকানো হয়েছে</string>
+    <string name="autoconsentManagedNoticeAnimationText">কুকি পরিচালিত হয়েছে</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">সাইট অনুমতি</string>
+    <string name="sitePermissionsSettingsDescription">আপনি যে সাইটগুলো ভিজিট করবেন, তারা আপনার ডিভাইসের লোকেশন, ক্যামেরা, মাইক্রোফোন বা DRM সফটওয়্যারের অ্যাক্সেস চাইতে পারে। আপনি স্পষ্টভাবে অনুমতি না দিলে তারা এগুলো ব্যবহার করতে পারবে না।</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">সমস্ত সাইটকে অনুমতি দিতে বলুন:</string>
+    <string name="sitePermissionsSettingsLocation">লোকেশন</string>
+    <string name="sitePermissionsSettingsCamera">ক্যামেরা</string>
+    <string name="sitePermissionsSettingsMicrophone">মাইক্রোফোন</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">সাইট পরিচালনা করুন</string>
+    <string name="sitePermissionsSettingsEmptyText">এখনো কোনো সাইট নেই</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">সমস্ত সাইটের অনুমতি বাতিল হয়েছে</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">"%1$s" এর জন্য অনুমতি</string>
+    <string name="permissionsPerWebsiteAskSetting">জিজ্ঞাসা করুন</string>
+    <string name="permissionsPerWebsiteDenySetting">বাতিল</string>
+    <string name="permissionsPerWebsiteAllowSetting">অনুমতি দিন</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">সমস্ত সাইটের জন্য "জিজ্ঞাসা করুন" নিষ্ক্রিয়</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">%2$s এর জন্য %1$s অনুমতি</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">ডাউনলোড প্রস্তুত হলে জানুন</string>
+    <string name="downloadsNotifyMeSubtitle">ডাউনলোড সম্পন্ন হলে নোটিফিকেশন পাবেন।</string>
+
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">Kahf Windows ব্রাউজার</string>
+    <string name="windows_settings_description">Windows-এর জন্য আমাদের অ্যাপ দিয়ে প্রাইভেট ব্রাউজ করুন</string>
+    <string name="windows_settings_description_ready">ডাউনলোড উপলব্ধ</string>
+    <string name="windows_settings_description_list">আপনি তালিকায় আছেন!</string>
+
+    <!-- Full screen message -->
+    <string name="fullScreenMessage">ফুল স্ক্রিন থেকে বের হতে, উপরের দিকে ড্র্যাগ করুন এবং ব্যাক বাটনে চাপুন</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle">সব ট্যাব বন্ধ করবেন?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">আপনি কি নিশ্চিত সব ট্যাব বন্ধ করতে চান?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">বাতিল</string>
+    <string name="closeAppTabsConfirmationDialogClose">বন্ধ করুন</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">অ্যাড্রেস বারে প্রাইভেট ভয়েস সার্চ অপশন যোগ করুন। অডিও সংরক্ষণ বা কারও সঙ্গে শেয়ার করা হয় না, Kahf-সহ।</string>
+    <string name="accessibilityVoiceSearchTitle">প্রাইভেট ভয়েস সার্চ</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">ক্যামেরা অ্যাক্সেস করা যায়নি</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">একটি ছবি আপলোড করুন</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">ফাইল নির্বাচন করুন</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">ছবি তুলুন</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">এই ডিভাইসে ক্যামেরা অ্যাক্সেসের অনুমতির জন্য Kahf-কে জিজ্ঞাসা করতে দিন</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">আপনি যদি Kahf-কে অনুমতি দিতে না বলেন, সাইটগুলো আপনার ক্যামেরা ব্যবহার করতে পারবে না।</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">সেটিংস খুলুন</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">বাতিল</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">পাসওয়ার্ড</string>
+    <string name="autofillLoginSavedSnackbarMessage">পাসওয়ার্ড সংরক্ষিত</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">পাসওয়ার্ড আপডেট হয়েছে</string>
+    <string name="safe_gaze_arrow" translatable="false">safe_gaze_arrow</string>
+    <string name="pointer_arrow">পয়েন্টার অ্যারো</string>
+    <string name="safe_gaze_up">সেফ গেজ আপ</string>
+    <string name="ads_and_other_creepy_things_blocked">বিজ্ঞাপন এবং অন্যান্য অনাকাঙ্ক্ষিত বিষয় ব্লক করা হয়েছে</string>
+    <string name="if_this_site_appears_broken_try_shields_down">যদি এই সাইটটি ভাঙা মনে হয়, Shields ডাউন চেষ্টা করুন</string>
+    <string name="_0">0</string>
+    <string name="profile">প্রোফাইল</string>
+    <string name="preference">পছন্দ</string>
+    <string name="unsubscribe_haram_channels">হারাম চ্যানেল থেকে আনসাবস্ক্রাইব করুন</string>
+    <string name="gender">লিঙ্গ</string>
+    <string name="religion_status">ধর্ম অবস্থা</string>
+    <string name="save">সংরক্ষণ করুন</string>
+    <string name="allow">অনুমতি দিন</string>
+    <string name="refresh_again">আবার রিফ্রেশ করুন</string>
+    <string name="unsubscribe">আনসাবস্ক্রাইব</string>
+    <string name="haram_channels_found">%1$d হারাম চ্যানেল পাওয়া গেছে</string>
+
+    <string name="kahf_dns_up">সংযুক্ত</string>
+    <string name="kahf_dns_down">বিচ্ছিন্ন</string>
+
+    <string name="safegaze_popup_report_title">যেকোনো বাগ বা প্রস্তাব এই ফর্মে রিপোর্ট করুন</string>
+    <string name="safegaze_popup_support_title">এই প্রজেক্টকে সহায়তা করুন</string>
+    <string name="safegaze_popup_woman_title">আমি নারী</string>
+    <string name="safegaze_popup_man_title">আমি পুরুষ</string>
+    <string name="safegaze_popup_comingsoon_title">শীঘ্রই আসছে</string>
+    <string name="safegaze_popup_gendermode_title">লিঙ্গ মোড</string>
+    <string name="safegaze_popup_sinfulacts_title">পাপী কাজ এড়ানো হয়েছে</string>
+    <string name="safegaze_popup_thispage_title">এই পৃষ্ঠা</string>
+    <string name="safegaze_popup_lifetime_title">সর্বদা</string>
+    <string name="safegaze_popup_alwayspurify_title">সদা বিশুদ্ধ করুন</string>
+    <string name="safegaze_popup_neverpurify_title">কখনও বিশুদ্ধ করবেন না</string>
+    <string name="safegaze_popup_safegazeup_title">সেফগেজ আপ</string>
+    <string name="safegaze_popup_imageblur_title">ছবির ব্লার তীব্রতা</string>
+    <string name="safegaze_popup_takecontrol_title">SafeGaze দিয়ে আপনার অনলাইন অভিজ্ঞতা উন্নত করুন, আমাদের ইমেজ পিউরিফিকেটর এক্সটেনশন যা আপনার চোখকে অনুপযুক্ত বিষয়বস্তুর থেকে রক্ষা করে।</string>
+    <string name="safegaze_popup_turnon_title">SafeGaze চালু করুন</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Kahf-এ খুলুন</string>
+    <string name="runningInDdgMenuItemTitle">Kahf-এ চলছে</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">সতর্কতা: এই সাইটটি নিরাপদ নাও হতে পারে</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">এই সাইটের সার্টিফিকেট বৈধ নয়। আপনি এমন একটি সার্ভারের সাথে সংযুক্ত হচ্ছেন যা %1$s হতে চেষ্টাকারী হতে পারে, যা আপনার গোপন তথ্যের ঝুঁকি বাড়ায়।</string>
+    <string name="sslErrorLeaveCTA">এই সাইট ত্যাগ করুন</string>
+    <string name="sslErrorAdvancedCTA">উন্নত</string>
+    <string name="sslErrorExpandedHeadline">Kahf আপনাকে সতর্ক করে যখন কোনো সাইটের সার্টিফিকেট বৈধ নয়।</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>ঝুঁকি মেনে সাইটটি দেখুন<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">%1$s এর সিকিউরিটি সার্টিফিকেটের মেয়াদ শেষ হয়েছে। সম্ভবত সাইটটি ভুলভাবে কনফিগার করা হয়েছে, কেউ আপনার সংযোগে হস্তক্ষেপ করেছে, অথবা আপনার সিস্টেম ঘড়ি সঠিক নয়।</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">%1$s এর সিকিউরিটি সার্টিফিকেট *.%2$s এর সাথে মিলে না। সম্ভবত সাইটটি ভুলভাবে কনফিগার করা হয়েছে, কেউ আপনার সংযোগে হস্তক্ষেপ করেছে, অথবা আপনার সিস্টেম ঘড়ি সঠিক নয়।</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">%1$s এর সিকিউরিটি সার্টিফিকেটটি আপনার ডিভাইসের OS দ্বারা বিশ্বাসযোগ্য নয়। সম্ভবত সাইটটি ভুলভাবে কনফিগার করা হয়েছে, কেউ আপনার সংযোগে হস্তক্ষেপ করেছে, অথবা আপনার সিস্টেম ঘড়ি সঠিক নয়।</string>
+
+    <!-- Onboarding Experiment -->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[হাই।<br/><br/>একটি ভালো, আরও প্রাইভেট ইন্টারনেটের জন্য প্রস্তুত?]]></string>
+    <string name="preOnboardingDaxDialog1Button">চলুন শুরু করি!</string>
+    <string name="preOnboardingDaxDialog2Title">প্রাইভেসি সুরক্ষা সক্রিয় হয়েছে!</string>
+    <string name="preOnboardingDaxDialog2Button">আপনার ব্রাউজার নির্বাচন করুন</string>
+    <string name="preOnboardingComparisonChartItem1">ডিফল্টভাবে প্রাইভেট অনুসন্ধান</string>
+    <string name="preOnboardingComparisonChartItem2">3য় পক্ষের ট্র্যাকার ব্লক করুন</string>
+    <string name="preOnboardingComparisonChartItem3">কুকি পপ-আপ ব্লক করুন</string>
+    <string name="preOnboardingComparisonChartItem4">ভীতিকর বিজ্ঞাপন ব্লক করুন</string>
+    <string name="preOnboardingComparisonChartItem5">ব্রাউজিং ডেটা দ্রুত মুছে দিন</string>
+    <string name="preOnboardingDaxDialog3Title">দারুন! ডাক পক্ষের স্বাগতম।</string>
+    <string name="preOnboardingDaxDialog3Button">ব্রাউজ শুরু করুন</string>
+    <string name="onboardingSearchDaxDialogTitle">একটি অনুসন্ধান চেষ্টা করুন!</string>
+    <string name="onboardingSearchDaxDialogDescription">আপনার Kahf অনুসন্ধান সবসময় অজ্ঞাতনামা।</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate 'duck' too.">কিভাবে ইংরেজিতে “ডাক” বলা হয়</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate 'duck' too. Don't add question mark">কিভাবে স্প্যানিশে “ডাক” বলা হয়</string>
+    <string name="onboardingSearchQueryOption1">কিভাবে ইংরেজিতে ডাক বলা হয়</string>
+    <string name="onboardingSearchQueryOption1English">কিভাবে স্প্যানিশে ডাক বলা হয়</string>
+    <string name="onboardingSearchDaxDialogOption2">অ্যাভাটারের কাস্ট</string>
+    <string name="onboardingSearchDaxDialogOption2US">মাইটি ডাকস কাস্ট</string>
+    <string name="onboardingSearchDaxDialogOption3">স্থানীয় আবহাওয়া</string>
+    <string name="onboardingSearchDaxDialogOption4">আমায় চমক দিন!</string>
+    <string name="onboardingSearchQueryOption4">ডিনার রেসিপি</string>
+    <string name="onboardingSearchQueryOption4US">চকলেট চিপ কুকি রেসিপি</string>
+    <string name="onboardingSitesDaxDialogTitle">একটি সাইট ভিজিট করুন!</string>
+    <string name="onboardingSitesDaxDialogDescription">আমি ট্র্যাকার ব্লক করব যাতে তারা আপনার ওপর নজর রাখতে না পারে।</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">আমায় চমক দিন!</string>
+    <string name="onboardingSerpDaxDialogDescription">এটাই Kahf সার্চ। প্রাইভেট। দ্রুত। কম বিজ্ঞাপন।</string>
+    <string name="onboardingSerpDaxDialogButton">বুঝেছি!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">পরবর্তী, একটি সাইট ভিজিট করুন!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one">&#160;এবং <b>%1$d অন্য</b> এখানে আপনাকে ট্র্যাক করতে চেয়েছিল। আমি তাদের ব্লক করেছি!<br/><br/>☝️ আরও তথ্যের জন্য শিল্ডে চাপুন।</item>
+        <item quantity="other">&#160;এবং <b>%1$d অন্যরা</b> এখানে আপনাকে ট্র্যাক করতে চেয়েছিল। আমি তাদের ব্লক করেছি!<br/><br/>☝️ আরও তথ্যের জন্য শিল্ডে চাপুন।</item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription">
+        <item quantity="one">&#160;এখানে আপনাকে ট্র্যাক করতে চেয়েছিল। আমি তাদের ব্লক করেছি!<br/><br/>☝️ আরও তথ্যের জন্য শিল্ডে চাপুন।</item>
+        <item quantity="other">&#160;এখানে আপনাকে ট্র্যাক করতে চেয়েছিল। আমি তাদের ব্লক করেছি!<br/><br/>☝️ আরও তথ্যের জন্য শিল্ডে চাপুন।</item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">বুঝেছি!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[<b>ফায়ার বাটন</b> দিয়ে আপনার ব্রাউজিং কার্যক্রম তাত্ক্ষণিকভাবে মুছে দিন।<br/><br/>চেষ্টা করুন! ☝️️]]></string>
+    <string name="onboardingEndDaxDialogTitle">আপনি এটি পেয়েছেন!</string>
+    <string name="onboardingEndDaxDialogDescription">মনে রাখবেন: প্রতিবার আপনি আমার সাথে ব্রাউজ করলে একটি ভীতিকর বিজ্ঞাপন তার পাখি হারায়। 👌</string>
+    <string name="onboardingEndDaxDialogButton">সব শেষ!</string>
+
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">আপনি কি নিশ্চিত যে &lt;b;%1$s&lt;/b> এর বুকমার্ক মুছে দিতে চান?</string>
+    <string name="kahf_dns_not_protected_text">আপনি 5,906,168 হারাম সাইট থেকে সুরক্ষিত নন</string>
+    <string name="kahf_dns_protected_text">আপনি 5,906,168 হারাম সাইট থেকে সুরক্ষিত</string>
+    <string name="verify_protection">সুরক্ষা যাচাই করুন</string>
+    <string name="by_halalz_e_ticaret_ltd_ti">Halalz e-ticaret Ltd Şti দ্বারা</string>
+    <string name="kahf_guard">KahfGuard</string>
+
+    <plurals name="bookmarkFolderDeleteDialogMessage" tools:ignore="MissingQuantity">
+        <item quantity="one" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s এবং %3$dটি আইটেম মুছে ফেলবেন?</item>
+        <item quantity="other" instruction="%1$s is the text from bookmarkFolderDeleteDialogMessage, %2$s is the name of the folder and %3$d is the number of items inside the folder">%1$s%2$s এবং %3$dটি আইটেম মুছে ফেলবেন?</item>
+    </plurals>
+
+    <plurals name="bookmarkFolderItems" tools:ignore="MissingQuantity">
+        <item quantity="one">%1$dটি আইটেম</item>
+        <item quantity="other">%1$dটি আইটেম</item>
+    </plurals>
+
+    <string name="bookmarksMenuTitle">বুকমার্ক</string>
+    <string name="bookmarksActivityTitle">বুকমার্ক</string>
+    <string name="noBookmarks">এখনও কোনো বুকমার্ক যোগ করা হয়নি</string>
+    <string name="exportBookmarksMenu">এক্সপোর্ট</string>
+    <string name="exportBookmarksEmpty">আপনার কোনো বুকমার্ক নেই, কিছু এক্সপোর্ট হবে না</string>
+    <string name="exportBookmarksError">কোনো বুকমার্ক এক্সপোর্ট হয়নি, কিছু ভুল হয়েছে</string>
+    <string name="exportBookmarksSuccess">সকল বুকমার্ক সফলভাবে এক্সপোর্ট হয়েছে</string>
+    <string name="importBookmarksMenu">ইমপোর্ট</string>
+    <string name="importBookmarksFileTitle">ইমপোর্ট করার জন্য বুকমার্ক ফাইল নির্বাচন করুন</string>
+    <string name="importBookmarksError">কোনো বুকমার্ক ইমপোর্ট হয়নি, কিছু ভুল হয়েছে</string>
+    <string name="importBookmarksEmpty">ফাইলটি কোনো বুকমার্ক ধারণ করছে না</string>
+    <string name="importBookmarksSuccess">%1$d বুকমার্ক সফলভাবে ইমপোর্ট হয়েছে</string>
+    <string name="savedSiteDialogTitleHint">ঠিকানা</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">সংশোধন</string>
+    <string name="bookmarksSectionTitle">বুকমার্ক</string>
+    <string name="favoritesSectionTitle">প্রিয়</string>
+    <string name="bookmarksEmptyHint">এখনও কোনো বুকমার্ক যোগ করা হয়নি</string>
+    <string name="favoritesEmptyHint">এখনও কোনো প্রিয় যোগ করা হয়নি</string>
+    <string name="bookmarkDialogTitleEdit">বুকমার্ক সম্পাদনা করুন</string>
+    <string name="favoriteDialogTitleEdit">প্রিয় সম্পাদনা করুন</string>
+    <string name="locationLabel">সাইট</string>
+    <string name="folderLocationTitle">অবস্থান নির্বাচন করুন</string>
+    <string name="addFolder">ফোল্ডার যোগ করুন</string>
+    <string name="editFolder">ফোল্ডার সম্পাদনা করুন</string>
+    <string name="bookmarkFolderDeleteDialogTitle">ফোল্ডার এবং এর বিষয়বস্তু মুছে ফেলবেন?</string>
+    <string name="bookmarkFolderEmpty">খালি</string>
+    <string name="bookmarkFolderDeleteDialogMessage">আপনি কি নিশ্চিত যে মুছে ফেলতে চান</string>
+    <string name="deleteBookmarkConfirmationDialogTitle">এই বুকমার্ক মুছে ফেলবেন?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription">এটি &lt;b>%1$s&lt;/b> এর বুকমার্ক মুছে দেবে।</string>
+    <string name="deleteFavoriteConfirmationDialogTitle">এই প্রিয় মুছে ফেলবেন?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription">এটি &lt;b>%1$s&lt;/b> এর প্রিয় মুছে দেবে।</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle">এই বুকমার্ক ফোল্ডার মুছে ফেলবেন?</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">বাতিল</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">মুছে ফেলুন</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription">এটি আপনার বুকমার্ক ফোল্ডার &lt;b>%1$s&lt;/b> মুছে দেবে।</string>
+    <string name="bookmarkDeleteConfirmationMessage">&lt;b>%1$s&lt;/b> মুছে ফেলা হয়েছে</string>
+    <string name="bookmarkOverflowContentDescription">%1$s এর আরও বিকল্প</string>
+    <string name="searchBookmarks">বুকমার্ক অনুসন্ধান</string>
+    <string name="deleteFolder">আপনি কি ফোল্ডার "%1$s" মুছে ফেলতে চান?</string>
+    <string name="deleteBookmark">বুকমার্ক "%1$s" মুছে ফেলবেন?</string>
+    <string name="addToFavorites">প্রিয়তে যোগ করুন</string>
+    <string name="bookmarkAddedInBookmarks">বুকমার্ক ফোল্ডার "%1$s"-এ যোগ করা হয়েছে</string>
+    <string name="editBookmark">বুকমার্ক সম্পাদনা করুন</string>
+    <string name="importBookmarksDescription">আপনার বুকমার্ক যদি অন্য ব্রাউজারে থাকে, আপনি সেগুলো Kahf-এ ইমপোর্ট করতে পারেন।</string>
+    <string name="importBookmarks">বুকমার্ক ইমপোর্ট করুন</string>
+    <string name="noResultsFor">অনুসন্ধান "%1$s" কোন ফলাফল দেয়নি</string>
+    <string name="removeFromFavorites">প্রিয় থেকে সরান</string>
+    <string name="addToFavoritesMenu">প্রিয়তে যোগ করুন</string>
+    <string name="not_implemented">এখনও বাস্তবায়িত হয়নি</string>
+    <string name="clipboardYouCopied">ক্লিপবোর্ড থেকে পেস্ট করুন</string>
+    <string name="kahf_menu">মেনু</string>
+    <string name="kahf_safer_internet">নিরাপদ ইন্টারনেট</string>
+    <string name="kahf_mode_desc_high">নিরাপদ সার্চ + শিশু বান্ধব ইউটিউব। বিজ্ঞাপন + ট্র্যাকার + ক্ষতিকর সাইট + প্রাপ্তবয়স্ক কনটেন্ট ব্লক করুন</string>
+    <string name="kahf_mode_desc_medium">ক্ষতিকর সাইট + বিজ্ঞাপন ব্লক + নিরাপদ সার্চ</string>
+    <string name="kahf_mode_desc_low">ক্ষতিকর সাইট + শুধুমাত্র বিজ্ঞাপন ব্লক করুন</string>
+    <string name="kahf_decent_internet">ভালো ইন্টারনেট</string>
+    <string name="kahf_cover_face">মুখ ঢাকুন</string>
+    <string name="kahf_autoplay_video">ভিডিও অটোপ্লে</string>
+    <string name="kahf_desc_blur_full_image">অপ্রয়োজনীয় ছবি লুকান। বড় পাপ এড়ান। <font color="#FF2400">ছবির ব্লার 100% সঠিক নয়।</font></string>
+    <string name="kahf_human_only">শুধু মানুষ</string>
+    <string name="kahf_premium">(প্রিমিয়াম)</string>
+    <string name="kahf_full_image">পূর্ণ চিত্র</string>
+    <string name="kahf_free">(ফ্রি)</string>
+    <string name="kahf_harm_avoided">ক্ষতি এড়ানো হয়েছে</string>
+    <string name="kahf_harmful_sites">ক্ষতিকর সাইট</string>
+    <string name="kahf_indecent_pictures">অশ্লীল ছবি</string>
+    <string name="kahf_ads_trackers">বিজ্ঞাপন + ট্র্যাকার</string>
+    <string name="kahf_share">শেয়ার করুন</string>
+    <string name="kahf_support">সাপোর্ট</string>
+    <string name="kahf_dark_mode">ডার্ক মোড</string>
+    <string name="kahf_high">উচ্চ</string>
+    <string name="kahf_medium">মধ্যম</string>
+    <string name="kahf_low">নিম্ন</string>
+    <string name="kahf_off">বন্ধ</string>
+    <string name="kahf_safegaze_lock">SafeGaze লক</string>
+    <string name="kahf_prevent_turning_off_safety_feature">সুরক্ষা ফিচার বন্ধ করা প্রতিরোধ করুন</string>
+    <string name="kahf_safegaze_lock_desc">যদি ডিভাইসে PIN, প্যাটার্ন বা পাসওয়ার্ড সক্রিয় থাকে, SafeGaze সেটিংস খোলার সময় যাচাই করতে বলা হবে।</string>
+    <string name="kahf_no_security_enabled">ডিভাইসে কোনো সুরক্ষিত লক সক্রিয় নেই</string>
+
+    <string name="kahf_onboarding_disclaimer">প্রাইভেসি সচেতন DuckDuckGo ব্রাউজারের উপর নির্মিত</string>
+    <string name="kahf_onboarding_get_what_you_want">প্রাইভেট, নিরাপদ এবং সুশৃঙ্খল ব্রাউজিং -\nAI দ্বারা চালিত</string>
+    <string name="kahf_onboarding_lets_go">চলুন শুরু করি</string>
+    <string name="kahf_onboarding_skip">এড়িয়ে যান</string>
+    <string name="kahf_onboarding_subtitle">Kahf ব্রাউজারের মাধ্যমে নিরাপদ ইন্টারনেটের অভিজ্ঞতা নিন। উন্নত AI দ্বারা পরিচালিত, এটি অশ্লীল ছবি এবং ক্ষতিকর কনটেন্ট রিয়েল টাইমে ফিল্টার করে, আপনাকে নৈতিক মূল্যবোধ বজায় রেখে ব্রাউজ করতে দেয়।</string>
+    <string name="kahf_onboarding_title">প্রাইভেট, নিরাপদ এবং সুশৃঙ্খল ব্রাউজিং -\nAI দ্বারা চালিত</string>
+    <string name="kahf_onboarding_sg_title">অশ্লীল ছবি লুকান</string>
+    <string name="kahf_onboarding_sg_subtitle">অপ্রয়োজনীয় ছবি লুকানো হচ্ছে।\nবড় পাপ এড়ান\n\n<b>এই ফিচারটি পরীক্ষামূলক।\n100% সঠিক নাও হতে পারে।</b></string>
+    <string name="kahf_onboarding_sg_enable">ছবি ব্লার সক্রিয় করুন</string>
+    <string name="kahf_onboarding_next">পরবর্তী</string>
+    <string name="kahf_onboarding_skip_now">এখনই এড়িয়ে যান</string>
+    <string name="kahf_onboarding_choose">নির্বাচন করুন\nআপনি সবচেয়ে বেশি\nব্যবহার করেন এমন অ্যাপ</string>
+    <string name="kahf_onboarding_choose_details">আপনার প্রিয় অ্যাপগুলো নির্বাচন করুন যাতে সেগুলো হোম স্ক্রিনে সহজে ব্যবহার করা যায়</string>
+    <string name="kahf_onboarding_checking_compatibility">কম্প্যাটিবিলিটি পরীক্ষা করা হচ্ছে</string>
+    <string name="kahf_onboarding_compatible">ডিভাইস ছবি লুকানোর জন্য উপযুক্ত</string>
+    <string name="kahf_onboarding_incompatible">ডিভাইস ছবি লুকানোর জন্য উপযুক্ত নয়</string>
+    <string name="kahf_onboarding_slow">ডিভাইস উপযুক্ত।\nকিন্তু ছবি লুকালে ব্রাউজার ধীর হতে পারে</string>
+    <string name="kahf_running_prayer">চলমান নামাজ</string>
+    <string name="kahf_running">চলছে…</string>
+    <string name="kahf_fajr">ফজর</string>
+    <string name="kahf_sunrise">সূর্যোদয়</string>
+    <string name="kahf_dhuhr">যোহর</string>
+    <string name="kahf_asr">আছর</string>
+    <string name="kahf_tomorrow">আগামীকাল</string>
+    <string name="kahf_yesterday">গতকাল</string>
+    <string name="kahf_next_prayer_time">পরবর্তী নামাজের সময়</string>
+    <string name="kahf_magrib">মাগরিব</string>
+    <string name="kahf_hours">ঘণ্টা</string>
+    <string name="kahf_hours_left">বাকি ঘণ্টা</string>
+    <string name="kahf_secs_left">বাকি সেকেন্ড</string>
+    <string name="kahf_hours_until">ঘণ্টা বাকি</string>
+    <string name="kahf_minutes_until">মিনিট বাকি</string>
+    <string name="kahf_secs_until">সেকেন্ড বাকি</string>
+    <string name="kahf_isha">ইশা</string>
+    <string name="kahf_today">আজ</string>
+    <string name="kahf_alert">সতর্কতা</string>
+    <string name="kahf_location_could_not_get">আমরা আপনার অবস্থানের তথ্য আনতে পারিনি। অনুগ্রহ করে নিশ্চিত করুন যে আপনার ফোনের অবস্থান বৈশিষ্ট্য চালু আছে।</string>
+    <string name="kahf_location_could_not_get_app_level">এই পৃষ্ঠা দেখার জন্য আপনার ডিভাইসের সেটিংসে অবস্থান অনুমতি দিতে হবে। অনুগ্রহ করে পুনঃনির্দেশিত পৃষ্ঠায় গিয়ে অনুমতি দিন।</string>
+    <string name="kahf_ok">ঠিক আছে</string>
+    <string name="kahf_madhab_asr_time">মাযহাব / আছরের সময়</string>
+    <string name="kahf_calculation_method">হিসাবের পদ্ধতি</string>
+    <string name="kahf_adhan">আজান</string>
+    <string name="kahf_notification">বিজ্ঞপ্তি</string>
+    <string name="kahf_notification_message">বিজ্ঞপ্তি বার্তা (শুধু সাউন্ড)</string>
+    <string name="kahf_full_adhan_notification">পূর্ণ আজান ও বিজ্ঞপ্তি</string>
+    <string name="kahf_silent">নীরব</string>
+    <string name="kahf_no_notification_adhan">কোনো বিজ্ঞপ্তি নেই</string>
+    <string name="kahf_adhan_and_notification">আজান &amp; বিজ্ঞপ্তি</string>
+    <string name="kahf_update_location">অবস্থান আপডেট করুন</string>
+    <string name="kahf_location_updated">অবস্থান আপডেট হয়েছে</string>
+    <string name="kahf_on_off">চালু / বন্ধ</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">আপনি কি নিশ্চিত যে এই ফোল্ডার এবং %1$dটি আইটেম মুছে ফেলবেন?</item>
+        <item quantity="other">আপনি কি নিশ্চিত যে এই ফোল্ডার এবং %1$dটি আইটেম মুছে ফেলবেন?</item>
+    </plurals>
+    <string name="removeFromRecent">সাম্প্রতিক থেকে সরান</string>
+    <string name="clearAllRecent">সব সরান</string>
+    <string name="kahf_pause_on_site">এই সাইটে বিরতি দিন</string>
+    <string name="kahf_resume_blurring">ব্লার পুনরায় শুরু করুন</string>
+    <string name="inactivity_notification_title">আমরা আপনাকে মিস করছি!</string>
+    <string name="inactivity_notification_body">আপনি কিছুদিন ধরে Kahf ব্যবহার করেননি। আমরা আপনার মতামত শুনতে চাই - ফিডব্যাক দিতে ট্যাপ করুন।</string>
+    <string name="kahf_restart_app">আপডেট ডাউনলোড হয়েছে! অ্যাপ পুনরায় চালু হচ্ছে…</string>
+    <string name="kahf_update_required">চালিয়ে যাওয়ার জন্য আপডেট প্রয়োজন!</string>
+    <string name="selectLanguage">ভাষা নির্বাচন করুন</string>
+
+</resources>

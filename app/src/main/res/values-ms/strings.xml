@@ -1,0 +1,961 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="appName" translatable="false">Kahf Browser</string>
+
+    <string name="facebook_app_id" translatable="false">1065904702070183</string>
+    <string name="facebook_client_token" translatable="false">3f9fdd9ae789fab1a44a977a901b7d45</string>
+
+    <string name="appDescription" translatable="false">Kahf Browser</string>
+    <string name="asilLogoDescription">Logo Kahf</string>
+    <string name="asilPrivacySimplified">Privasi, dipermudahkan</string>
+    <string name="yes">Ya</string>
+    <string name="no">Tidak</string>
+    <string name="open">Buka</string>
+    <string name="cancel">Batal</string>
+    <string name="search">Cari</string>
+
+    <!-- Onboarding Activity -->
+    <string name="onboardingDefaultBrowserDescription">Pergi ke Tetapan untuk mencari dan melayari dengan Kahf setiap kali.</string>
+    <string name="onboardingDefaultBrowserTitle">Jadikan Kahf lalai anda</string>
+
+    <!-- Default Browser -->
+    <string name="cannotLaunchDefaultAppSettings">Tidak dapat membuka skrin tetapan aplikasi lalai</string>
+    <string name="settingsDefaultBrowserEnabled">Tetapkan sebagai Pelayar Lalai</string>
+    <string name="defaultBrowserMaybeLater">Mungkin Nanti</string>
+    <string name="defaultBrowserLetsDoIt">Tetapkan sebagai Pelayar Lalai</string>
+    <string name="defaultBrowserDescriptionNoDefault">Buka pautan dengan tenang, setiap masa.</string>
+    <string name="defaultBrowserInstructions">Pilih Kahf dan ketik <font color='#678fff'>Sentiasa</font>.</string>
+
+    <!-- Browser Activity -->
+    <string name="browserPopupMenu">Menu pelayar</string>
+    <string name="refresh">Muat semula</string>
+    <string name="back">Kembali</string>
+    <string name="forward">Maju</string>
+
+    <string name="omnibarInputHint">Cari atau taip URL</string>
+    <string name="clearButtonContentDescription">Kosongkan input carian</string>
+    <string name="no_compatible_third_party_app_installed">Tiada aplikasi serasi dipasang</string>
+    <string name="addBookmarkMenuTitle">Tambah Penanda Laman</string>
+    <string name="editBookmarkMenuTitle">Edit Penanda Laman</string>
+    <string name="addFavoriteMenuTitle">Tambah Kegemaran</string>
+    <string name="removeFavoriteMenuTitle">Buang Kegemaran</string>
+    <string name="favoriteAddedMessage">Kegemaran ditambah</string>
+    <string name="bookmarkAddedMessage">Penanda laman ditambah</string>
+    <string name="requestDesktopSiteMenuTitle">Laman Desktop</string>
+    <string name="fireproofWebsiteMenuTitleRemove">Buang Fireproof</string>
+    <string name="requestMobileSiteMenuTitle">Laman Mudah Alih</string>
+    <string name="downloadsMenuTitle">Muat Turun</string>
+    <string name="printMenuTitle">Cetak Halaman</string>
+    <string name="favoriteDeleteConfirmationMessage">Kegemaran dibuang</string>
+    <string name="fireproofDeleteConfirmationMessage">Fireproof dibuang</string>
+    <string name="privacyProtectionEnabledConfirmationMessage">Perlindungan Privasi diaktifkan untuk %1$s</string>
+    <string name="privacyProtectionDisabledConfirmationMessage">Perlindungan Privasi dinyahaktifkan untuk %1$s</string>
+    <string name="undoSnackbarAction">Buat asal</string>
+
+    <!-- Downloading files -->
+    <string name="downloadImage">Muat Turun Imej</string>
+    <string name="permissionRequiredToDownload">Muat turun memerlukan kebenaran storan</string>
+
+    <!-- Sharing options -->
+    <string name="options">Pilihan</string>
+    <string name="shareLink">Kongsi Pautan</string>
+    <string name="shareMenuTitle">Kongsi</string>
+    <string name="copyUrl">Salin Alamat Pautan</string>
+
+    <!-- Find in page -->
+    <string name="findInPageMenuTitle">Cari dalam Halaman</string>
+    <string name="nextSearchTermDescription">Cari seterusnya</string>
+    <string name="previousSearchTermDescription">Cari sebelumnya</string>
+    <string name="closeFindInPageButtonDescription">Tutup paparan carian dalam halaman</string>
+    <string name="findInPageHint">Cari dalam halaman</string>
+    <string name="findInPageMatches" translatable="false">%1$d/%2$d</string>
+
+    <!-- AutoComplete Suggestions -->
+    <string name="editQueryBeforeSubmitting">Edit carian sebelum mencari</string>
+    <string name="settingsAutocompleteEnabled">Cadangan AutoLengkap</string>
+
+    <!-- Opening external apps -->
+    <string name="openExternalApp">Buka Aplikasi Luar</string>
+    <string name="launchingExternalApp">Buka dalam aplikasi lain</string>
+    <string name="confirmOpenExternalApp">Adakah anda ingin meninggalkan Kahf untuk melihat kandungan ini?</string>
+    <string name="unableToOpenLink">Tidak dapat membuka jenis pautan ini</string>
+
+    <!-- Tabs -->
+    <string name="homeTab" translatable="false">Kahf</string>
+    <string name="tabActivityTitle">Tab</string>
+    <string name="tabsMenuItem">Tab</string>
+    <string name="newTabMenuItem">Tab Baru</string>
+    <string name="openInNewTab">Buka dalam Tab Baru</string>
+    <string name="openInNewBackgroundTab">Buka dalam Tab Latar</string>
+    <string name="openImageInNewTab">Buka Imej dalam Tab Latar</string>
+    <string name="faviconContentDescription">Favicon</string>
+    <string name="closeContentDescription">Tutup</string>
+    <string name="closeAllTabsMenuItem">Tutup Semua Tab</string>
+    <string name="closeTab">Tutup Tab</string>
+    <string name="tabClosed">Tab ditutup</string>
+    <string name="tabClosedUndo">Buat asal</string>
+    <string name="downloadsMenuItemTitle">Muat Turun</string>
+
+    <!-- Fire -->
+    <string name="fireMenu">Kosongkan Data</string>
+    <string name="fireClearAll">Kosongkan Semua Tab dan Data</string>
+    <string name="fireCancel">Batal</string>
+    <string name="fireDataCleared">Data dikosongkan</string>
+
+    <!-- Settings Activity -->
+    <string name="settingsActivityTitle">Tetapan</string>
+    <string name="settingsMenuItemTitle">Tetapan</string>
+    <string name="settingsHeadingPrivacy">Privasi</string>
+    <string name="settingsHeadingAppearance">Paparan</string>
+    <string name="settingsHeadingCustomize">Sesuaikan</string>
+    <string name="settingsHeadingAbout">Mengenai</string>
+    <string name="settingsAboutAsil">Mengenai Kahf</string>
+    <string name="settingsVersion">Versi</string>
+    <string name="settingsVersionFull" translatable="false">Versi: %1$s (%2$s) - JS %3$s</string>
+    <string name="leaveFeedback">Kongsi Maklum Balas</string>
+    <string name="settingsEmailProtectionTitle">Perlindungan Emel</string>
+    <string name="settingsEmailProtectionSubtitle">Blok pengesan emel dan sembunyikan alamat anda</string>
+    <string name="settingsHeadingMore">Lebih Dari Kahf</string>
+    <string name="settingsLightTheme">Cerah</string>
+    <string name="settingsTheme">Tema</string>
+    <string name="settingsDarkTheme">Gelap</string>
+    <string name="settingsSystemTheme">Lalai Sistem</string>
+    <string name="settingsThemeDialogSave">Tetapkan Tema</string>
+    <string name="settingsTitleAppLinks">Buka Pautan dalam Aplikasi</string>
+    <string name="settingsTitleAppLinksDialog">Buka pautan dalam aplikasi</string>
+    <string name="settingsAppLinksAskEveryTime">Tanya setiap kali</string>
+    <string name="settingsAppLinksAlways">Sentiasa</string>
+    <string name="settingsAppLinksNever">Tidak Pernah</string>
+    <string name="settingsTitleNotifications">Pemberitahuan</string>
+    <string name="settingsSubtitleNotificationsDisabled">Dinonaktifkan</string>
+    <string name="settingsSubtitleNotificationsEnabled">Diaktifkan</string>
+    <string name="settingsDefaultBrowserTitle">Pelayar Lalai</string>
+    <string name="settingsDefaultBrowserSetDescription">Kahf adalah pelayar lalai anda</string>
+    <string name="settingsDefaultBrowserNotSetDescription">Jadikan Kahf pelayar lalai anda</string>
+    <string name="settingsPrivateSearchTitle">Carian Peribadi</string>
+    <string name="settingsPrivateSearchDescription">Diaktifkan secara lalai</string>
+    <string name="settingsWebTrackingProtectionTitle">Perlindungan Penjejakan Web</string>
+    <string name="settingsWebTrackingProtectionDescription">Diaktifkan secara lalai</string>
+    <string name="settingsHeadingSettings">Tetapan</string>
+    <string name="settingsPermissionsSetting">Kebenaran</string>
+    <string name="settingsSyncSetting">Segerak &amp; Sandaran</string>
+    <string name="settingsFireButton">Butang Kosongkan</string>
+
+    <!-- Private Search -->
+    <string name="privateSearchActivityTitle">Carian Peribadi</string>
+    <string name="privateSearchTitle">Carian Peribadi Diaktifkan</string>
+    <string name="privateSearchDescription">Carian Peribadi Kahf ialah enjin carian lalai anda, supaya anda boleh melayari web tanpa dijejak.</string>
+    <string name="privateSearchHeadingSearchSettings">Tetapan Carian</string>
+    <string name="languageSettings">Bahasa</string>
+    <string name="privateSearchMoreSearchSettingsPrimaryText">Lebih Banyak Tetapan Carian</string>
+    <string name="privateSearchMoreSearchSettingsSecondaryText">Sesuaikan bahasa carian, wilayah, dan lain-lain</string>
+    <string name="privateSearchMoreSearchSettingsTitle">Lebih Banyak Tetapan Carian</string>
+    <string name="privateSearchAutocompleteToggle">Cadangan AutoLengkap</string>
+    <string name="privateSearchAutocompleteHint">Tunjukkan cadangan carian semasa menaip, termasuk penanda laman anda. Semua carian adalah peribadi.</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesToggle">Laman Baru Dilawati</string>
+    <string name="privateSearchAutocompleteRecentlyVisitedSitesHint">Tunjukkan laman yang baru dilawati dalam cadangan carian. Laman baru dilawati adalah peribadi, hanya disimpan pada peranti anda, dan boleh dikosongkan menggunakan Butang 🔥.</string>
+    <string name="improvedAutoCompleteIAMContent">Cadangan AutoLengkap kini termasuk laman yang baru dilawati. Matikan dalam Tetapan, atau kosongkan bila-bila masa dengan Butang 🔥.</string>
+    <string name="improvedAutoCompleteIAMTitle">Privasi sama.\nCadangan carian lebih baik!</string>
+    <string name="openAutoCompleteSettings">Buka Tetapan</string>
+
+    <!-- Web Tracking Protection -->
+    <string name="webTrackingProtectionActivityTitle">Perlindungan Penjejakan Web</string>
+    <string name="webTrackingProtectionLearnMoreTitle">Perlindungan Penjejakan Web</string>
+    <string name="webTrackingProtectionTitle">Perlindungan Penjejakan Web Diaktifkan</string>
+    <string name="webTrackingProtectionDescription"><![CDATA[Kahf tidak menjejak anda dan kami berusaha melindungi privasi anda sebaik mungkin. Kami sentiasa mengekalkan dan membangunkan lapisan perlindungan untuk menyesuaikan diri dengan kaedah penjejakan baru dan menyediakan banyak perlindungan yang tidak ditawarkan oleh pelayar lain secara lalai. <u><a href="">Ketahui Lebih Lanjut</a><u/>]]></string>
+
+    <!-- Cookie Pop-Up Protection -->
+    <string name="cookiePopupProtectionTitle">Perlindungan Pop-Up Cookie</string>
+    <string name="cookiePopupProtectionDescription">Hapuskan pop-up ini &amp; minimakan cookie</string>
+    <string name="cookiePopupProtectionEnabled">Diaktifkan</string>
+
+    <!-- Fire Button -->
+    <string name="fireButtonActivityTitle">Butang Kosongkan</string>
+
+    <!-- Permissions -->
+    <string name="permissionsActivityTitle">Kebenaran</string>
+
+    <!-- Appearance -->
+    <string name="appearanceActivityTitle">Paparan</string>
+
+    <!-- Settings - Automatically clearing data -->
+    <string name="settingsAutomaticallyClearingDialogSave">Simpan</string>
+
+    <string name="settingsAutomaticallyClearWhat">Kosongkan Secara Automatik…</string>
+    <string name="settingsAutomaticallyClearWhatDialogTitle">Kosongkan secara automatik…</string>
+    <string name="settingsAutomaticallyClearWhatOptionNone">Tiada</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabs">Tab</string>
+    <string name="settingsAutomaticallyClearWhatOptionTabsAndData">Tab dan data</string>
+
+    <string name="settingsAutomaticallyClearWhen">Kosongkan Pada…</string>
+    <string name="settingsAutomaticallyClearWhenDialogTitle">Kosongkan pada…</string>
+    <string name="settingsAutomaticallyClearWhenAppExitOnly">Hanya ketika keluar aplikasi</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Seconds">Keluar aplikasi, tidak aktif selama 5 saat</string>
+    <string name="settingsAutomaticallyClearWhenAppExit5Minutes">Keluar aplikasi, tidak aktif selama 5 minit</string>
+    <string name="settingsAutomaticallyClearWhenAppExit15Minutes">Keluar aplikasi, tidak aktif selama 15 minit</string>
+    <string name="settingsAutomaticallyClearWhenAppExit30Minutes">Keluar aplikasi, tidak aktif selama 30 minit</string>
+    <string name="settingsAutomaticallyClearWhenAppExit60Minutes">Keluar aplikasi, tidak aktif selama 1 jam</string>
+
+    <!-- About Activity -->
+    <string name="aboutActivityTitle">Mengenai Kahf</string>
+    <string name="aboutHeader">Selamat datang ke Kahf!</string>
+    <string name="aboutDescription">Kahf ialah syarikat privasi Internet bebas yang ditubuhkan pada 2008 untuk sesiapa sahaja yang bosan dijejak dalam talian dan mahukan penyelesaian mudah. Kami membuktikan bahawa anda boleh mendapat perlindungan privasi sebenar dalam talian tanpa kompromi.\n\nPelayar Kahf dilengkapi dengan ciri yang anda jangkakan daripada pelayar utama, seperti penanda laman, tab, kata laluan, dan banyak lagi, serta lebih daripada <annotation type="privacy_protection_link">selusin perlindungan privasi yang kuat</annotation> yang tidak ditawarkan secara lalai oleh pelayar popular lain. Set unik perlindungan privasi ini membantu melindungi aktiviti dalam talian anda, dari carian hingga melayari, emel, dan banyak lagi.\n\nPerlindungan privasi kami berfungsi tanpa perlu mengetahui sebarang butiran teknikal atau berurusan dengan tetapan rumit. Apa yang anda perlu lakukan hanyalah menukar pelayar anda ke Kahf pada semua peranti dan anda mendapat privasi secara lalai.\n\nTetapi jika anda ingin melihat lebih mendalam, anda boleh mendapatkan maklumat lanjut tentang cara perlindungan privasi Kahf berfungsi di <annotation type="learn_more_link">halaman bantuan kami</annotation></string>
+    <string name="no_suggestions">Tiada Cadangan</string>
+
+    <!-- Broken Site Activity -->
+    <string name="brokenSiteReportBrokenSiteMenuItem">Laporkan Laman Rosak</string>
+    <string name="brokenSiteHeading">Laporkan Laman Rosak</string>
+    <string name="brokenSiteSubmitted">Terima kasih! Maklum balas dihantar.</string>
+    <string name="brokenSitesCategoriesTitle">Terangkan apa yang berlaku</string>
+    <string name="brokenSitesCategoriesHint">Terangkan apa yang berlaku</string>
+    <string name="brokenSiteSubmitButton">Hantar Laporan</string>
+    <string name="brokenSiteDescription">Menghantar laporan laman rosak secara anonim membantu kami meningkatkan aplikasi.</string>
+
+    <string name="brokenSiteCategoryBlocked">Laman disekat atau tidak dimuat</string>
+    <string name="brokenSiteCategoryLayout">Susun atur laman rosak</string>
+    <string name="brokenSiteCategoryEmptySpaces">Laman mengandungi ruang kosong besar</string>
+    <string name="brokenSiteCategoryShopping">Tidak boleh membayar, checkout, atau membeli</string>
+    <string name="brokenSiteCategoryPaywall">Laman meminta saya nyahaktifkan pemblok iklan</string>
+    <string name="brokenSiteCategoryComments">Komen, ulasan, atau sembang tidak dimuat</string>
+    <string name="brokenSiteCategoryVideos">Video tidak dimainkan atau dimuat</string>
+    <string name="brokenSiteCategoryLogin">Tidak boleh log masuk/daftar</string>
+    <string name="brokenSiteCategoryOther">Lain-lain</string>
+    <string name="brokenSiteDescriptionTextInputHint">Kongsi butiran lanjut (pilihan)</string>
+    <string name="brokenSiteDescriptionCaption">Apa yang berlaku? Apa yang sepatutnya berlaku? Adakah mematikan perlindungan membantu?</string>
+
+    <string name="brokenSiteProtectionsOn">Perlindungan <b>DIHIDUPKAN</b> untuk laman ini</string>
+    <string name="brokenSiteProtectionsOff">Perlindungan <b>=DITUTUP</b> untuk laman ini</string>
+    <string name="brokenSiteProtectionsOnBannerMessage">Mematikan perlindungan mungkin membantu.</string>
+    <string name="brokenSiteProtectionsOffByRemoteConfigBannerMessage">Kami sementara mematikan Perlindungan Privasi kerana ia kelihatan mengganggu laman ini.</string>
+
+    <!-- Dialogs -->
+    <string name="dialogConfirmTitle">Sahkan</string>
+    <string name="dialogSave">Simpan</string>
+    <string name="delete">Padam</string>
+    <string name="edit">Edit</string>
+    <string name="remove">Buang</string>
+    <string name="removeAll">Buang Semua</string>
+
+    <!-- Widget -->
+    <string name="searchWidgetTextHint">Cari Kahf</string>
+
+    <!-- Favorites widget -->
+    <string name="addFavoriteMenuTitleHighlighted">👋 Tambah Kegemaran</string>
+    <string name="widgetConfigurationTitleText">Pilih Tema</string>
+    <string name="widgetConfigurationSystemThemeOption">Lalai sistem</string>
+    <string name="widgetConfigurationLightThemeOption">Cerah</string>
+    <string name="widgetConfigurationDarkThemeOption">Gelap</string>
+    <string name="widgetConfigurationAddWidgetOption">Tambah widget</string>
+    <string name="searchWidgetEmtpyFavoritesHint">Tiada kegemaran ditambah lagi</string>
+    <string name="searchWidgetEmtpyFavoritesCta">Tambah Kegemaran</string>
+    <string name="widgetConfigurationActivityTitle">Konfigurasi Widget</string>
+    <string name="favoritesWidgetLabel">Kegemaran</string>
+    <string name="searchWidgetLabel">Cari</string>
+
+    <!-- Home Screen Shortcuts -->
+    <string name="addToHome">Tambah ke Skrin Utama</string>
+    <string name="shortcutAddedText" instruction="Placeholder is the name of a website">Berjaya! %1$s telah ditambah ke skrin utama anda.</string>
+
+    <!-- User Survey -->
+    <string name="surveyCtaTitle">Bantu kami memperbaiki aplikasi!</string>
+    <string name="surveyCtaDescription">Jawab tinjauan ringkas kami dan kongsikan maklum balas anda.</string>
+    <string name="surveyCtaLaunchButton">Ambil Tinjauan</string>
+    <string name="surveyCtaDismissButton">Tidak, Terima Kasih</string>
+    <string name="surveyActivityTitle">Tinjauan Pengguna</string>
+    <string name="surveyTitle">Tinjauan Kahf</string>
+    <string name="surveyDismissContentDescription">Tutup tinjauan</string>
+    <string name="surveyLoadingErrorTitle">Aduh!</string>
+    <string name="surveyLoadingErrorText">Tinjauan kami tidak dimuatkan buat masa ini.\nSila cuba lagi nanti.</string>
+
+    <!-- Add widget -->
+    <string name="addWidgetCtaTitle">Cuba widget carian kami!</string>
+    <string name="addWidgetCtaDescription">Tambah widget carian kami ke skrin utama anda untuk akses cepat dan mudah.</string>
+    <string name="addWidgetCtaAutoLaunchButton">Tambah Widget</string>
+    <string name="addWidgetCtaInstructionsLaunchButton">Tunjukkan Saya</string>
+    <string name="addWidgetCtaDismissButton">Tutup</string>
+    <string name="addWidgetInstructionsActivityTitle">Tambah widget</string>
+    <string name="addWidgetInstruction1Label">1</string>
+    <string name="addWidgetInstruction1">Tekan lama pada skrin utama, kemudian buka menu widget.</string>
+    <string name="addWidgetInstruction2Label">2</string>
+    <string name="addWidgetInstruction2">Cari widget Kahf.</string>
+    <string name="addWidgetInstruction3Label">3</string>
+    <string name="addWidgetInstruction3">Seret widget ke skrin utama anda.</string>
+    <string name="addWidgetInstructionsButtonGoHome">Pergi ke Skrin Utama</string>
+    <string name="addWidgetInstructionsButtonClose">Tutup</string>
+
+    <!-- App Enjoyment / Rating / Feedback -->
+    <string name="appEnjoymentDialogTitle">Menikmati Kahf?</string>
+    <string name="appEnjoymentDialogMessage">Kami ingin tahu pendapat anda.</string>
+    <string name="appEnjoymentDialogPositiveButton">Saya Suka</string>
+    <string name="appEnjoymentDialogNegativeButton">Perlu Diperbaiki</string>
+
+    <string name="rateAppDialogTitle">Nilai aplikasi</string>
+    <string name="rateAppDialogMessage">Maklum balas anda penting. Sila kongsi dengan ulasan.</string>
+    <string name="rateAppDialogPositiveButton">Nilai Aplikasi</string>
+    <string name="rateAppDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="giveFeedbackDialogTitle">Maaf mendengarnya</string>
+    <string name="giveFeedbackDialogMessage">Beritahu kami bagaimana kami boleh memperbaiki aplikasi untuk anda.</string>
+    <string name="giveFeedbackDialogPositiveButton">Kongsi Maklum Balas</string>
+    <string name="giveFeedbackDialogNegativeButton" translatable="false">@string/noThanks</string>
+
+    <string name="noThanks">Tidak, Terima Kasih</string>
+
+    <!-- Notification Channel Names -->
+    <string name="notificationChannelTutorials">Tutorial</string>
+
+    <!-- Clear Notification -->
+    <string name="clearNotificationTitle">Kosongkan data secara manual</string>
+    <string name="clearNotificationDescription">Sesuaikan Kahf untuk mengosongkan data pelayaran secara automatik selepas setiap sesi.</string>
+
+    <!-- Privacy Protection Notification -->
+    <string name="privacyProtectionNotificationDefaultTitle">Kami melindungi privasi anda</string>
+    <string name="privacyProtectionNotificationReportTitle">Laporan Privasi Anda</string>
+    <string name="privacyProtectionNotificationDefaultDescription">Menggunakan aplikasi Kahf melindungi data anda dengan menyekat pengesan dan menyulitkan sambungan.</string>
+    <string name="privacyProtectionNotificationUpgadeDescription" instruction="Placeholder is a the number of connections we have protected">Anda melindungi data anda dengan menyulitkan %1$d sambungan tidak disulitkan semasa menggunakan Kahf.</string>
+    <string name="privacyProtectionNotificationTrackerDescription" instruction="Placeholder is the numer of trackers blocked">Anda melindungi data anda dengan menyekat %1$d pengesan semasa menggunakan Kahf.</string>
+    <string name="privacyProtectionNotificationBothDescription" instruction="%1$d is the number of trackers blocked and %2$d is the number of unencrypted connections">Anda melindungi data anda dengan menyekat %1$d pengesan dan menyulitkan %2$d sambungan tidak disulitkan semasa menggunakan Kahf.</string>
+    <string name="privacyProtectionNotificationLaunchButton">Sambung Melayari</string>
+
+    <!-- Authentication -->
+    <string name="authenticationDialogTitle">Log Masuk</string>
+    <string name="authenticationDialogMessage" instruction="Placeholder is the name of a website">%1$s memerlukan nama pengguna dan kata laluan.</string>
+    <string name="authenticationDialogPositiveButton">Log Masuk</string>
+    <string name="authenticationDialogNegativeButton">Batal</string>
+    <string name="authenticationDialogUsernameHint">Nama Pengguna</string>
+    <string name="authenticationDialogPasswordHint">Kata Laluan</string>
+
+    <!-- User-facing label for when a user selects text and might want to search for that text -->
+    <string name="systemTextSearchMessage">Cari Kahf</string>
+
+    <!-- App feedback disambiguation -->
+    <string name="feedbackActivityTitle">Kongsi Maklum Balas</string>
+    <string name="missingBrowserFeaturesTitleLong">Ciri pelayar hilang atau mengecewakan</string>
+    <string name="missingBrowserFeaturesTitleShort">Isu Ciri Pelayar</string>
+    <string name="missingBrowserFeaturesSubtitle">Ciri pelayaran mana yang boleh kami tambah atau perbaiki?</string>
+    <string name="missingBrowserFeatureSubReasonNavigation">Navigasi ke hadapan, belakang, dan/atau segar semula</string>
+    <string name="missingBrowserFeatureSubReasonTabManagement">Membuat dan mengurus tab</string>
+    <string name="missingBrowserFeatureSubReasonAdPopups">Menyekat iklan dan pop-up</string>
+    <string name="missingBrowserFeatureSubReasonVideos">Menonton video</string>
+    <string name="missingBrowserFeatureSubReasonImages">Berinteraksi dengan imej</string>
+    <string name="missingBrowserFeatureSubReasonBookmarks">Membuat dan mengurus penanda halaman</string>
+    <string name="missingBrowserFeatureSubReasonOther">Tiada yang sesuai</string>
+
+    <string name="websiteNotLoadingTitleLong">Isu Memuat Laman Web</string>
+    <string name="websiteNotLoadingTitleShort">Isu memuat laman web</string>
+    <string name="websiteNotLoadingSubtitle">Laman web mana yang rosak?</string>
+
+    <string name="searchNotGoodEnoughTitleLong">Carian Kahf tidak memuaskan</string>
+    <string name="searchNotGoodEnoughTitleShort">Isu Carian Kahf</string>
+    <string name="searchNotGoodEnoughSubtitle">Ciri carian mana yang boleh kami tambah atau perbaiki?</string>
+    <string name="searchNotGoodEnoughSubReasonTechnicalSearches">Carian teknikal/pengaturcaraan</string>
+    <string name="searchNotGoodEnoughSubReasonGoogleLayout">Susun atur harus lebih mirip Google</string>
+    <string name="searchNotGoodEnoughSubReasonFasterLoadTimes">Masa muat lebih pantas</string>
+    <string name="searchNotGoodEnoughSubReasonSpecificLanguage">Carian dalam bahasa atau kawasan tertentu</string>
+    <string name="searchNotGoodEnoughSubReasonBetterAutocomplete">Cadangan automatik lebih baik</string>
+    <string name="searchNotGoodEnoughSubReasonOther">Tiada yang sesuai</string>
+
+    <string name="needMoreCustomizationTitleLong">Tiada cukup cara untuk menyesuaikan aplikasi</string>
+    <string name="needMoreCustomizationTitleShort">Isu Penyesuaian</string>
+    <string name="needMoreCustomizationSubtitle">Pilihan penyesuaian mana yang boleh kami tambah atau perbaiki?</string>
+    <string name="needMoreCustomizationSubReasonHomeScreenConfiguration">Konfigurasi skrin utama</string>
+    <string name="needMoreCustomizationSubReasonTabDisplay">Cara tab dipaparkan</string>
+    <string name="needMoreCustomizationSubReasonAppLooks">Penampilan aplikasi</string>
+    <string name="needMoreCustomizationSubReasonWhichDataIsCleared">Data mana yang dikosongkan</string>
+    <string name="needMoreCustomizationSubReasonWhenDataIsCleared">Bila data dikosongkan</string>
+    <string name="needMoreCustomizationSubReasonBookmarksDisplay">Cara penanda halaman dipaparkan</string>
+    <string name="needMoreCustomizationSubReasonOther">Tiada yang sesuai</string>
+
+    <string name="appIsSlowOrBuggyTitleLong">Aplikasi perlahan, rosak, atau terhenti</string>
+    <string name="appIsSlowOrBuggyTitleShort">Isu Prestasi</string>
+    <string name="appIsSlowOrBuggySubtitle">Isu mana yang anda alami?</string>
+    <string name="appIsSlowOrBuggySubReasonSlowResults">Halaman web atau hasil carian lambat dimuat</string>
+    <string name="appIsSlowOrBuggySubReasonAppCrashesOrFreezes">Aplikasi terhenti atau beku</string>
+    <string name="appIsSlowOrBuggySubReasonMediaPlayback">Masalah main balik video atau media</string>
+    <string name="appIsSlowOrBuggySubReasonOther">Tiada yang sesuai</string>
+
+    <string name="otherMainReasonTitleLong">Tiada yang sesuai</string>
+    <string name="otherMainReasonTitleShort">Isu Lain</string>
+
+    <string name="openEndedInputHint">Sila jelaskan sejelas mungkin</string>
+    <string name="submitFeedback">Hantar</string>
+
+    <string name="tellUsHowToImprove">Sila beritahu kami apa yang boleh diperbaiki.</string>
+    <string name="thanksForTheFeedback">Terima kasih atas maklum balas!</string>
+    <string name="feedbackNegativeMainReasonPageSubtitle">Kekecewaan anda berkaitan dengan apa?</string>
+    <string name="feedbackNegativeMainReasonPageTitle">Maaf mendengarnya</string>
+    <string name="feedbackShareDetails">Kongsi Butiran</string>
+    <string name="sharePositiveFeedbackWithTheTeam">Adakah sebarang butiran yang ingin anda kongsikan dengan pasukan?</string>
+    <string name="whatHaveYouBeenEnjoying">Apa yang anda nikmati?</string>
+    <string name="awesomeToHear">Seronok mendengarnya!</string>
+    <string name="shareTheLoveWithARating">Sila kongsi sokongan anda dengan memberi penilaian di Play Store.</string>
+    <string name="rateTheApp">Nilai Aplikasi</string>
+    <string name="declineFurtherFeedback">Tidak, Terima Kasih</string>
+    <string name="whichBrokenSites">Di mana anda melihat isu ini?</string>
+    <string name="whichBrokenSitesHint">Laman web mana yang mempunyai isu?</string>
+    <string name="feedbackSpecificAsPossible">Sila jelaskan sejelas mungkin</string>
+    <string name="feedbackInitialDisambiguationTitle">Mari Mula!</string>
+    <string name="feedbackInitialDisambiguationSubtitle">Bagaimana anda ingin mengkategorikan maklum balas anda?</string>
+    <string name="feedbackInitialDisambiguationHappyButtonContentDescription">Butang maklum balas positif</string>
+    <string name="feedbackInitialDisambiguationSadButtonContentDescription">Butang maklum balas negatif</string>
+    <string name="feedbackIsImportantToUs">Maklum balas anonim anda penting bagi kami.</string>
+
+    <!-- Webview Recovery -->
+    <string name="crashedWebViewErrorMessage">"Halaman web tidak dapat dipaparkan."</string>
+    <string name="crashedWebViewErrorAction">"Muat Semula"</string>
+
+    <!-- System Search -->
+    <string name="systemSearchDeviceAppLabel">Dari peranti ini</string>
+    <string name="systemSearchAppNotFound">Aplikasi tidak dapat ditemui</string>
+    <string name="systemSearchOnboardingText">Terima kasih kerana memilih Kahf!\nSekarang, semasa menggunakan carian atau aplikasi kami, carian anda dilindungi.</string>
+    <string name="systemSearchOnboardingFeaturesIntroText">Aplikasi Kahf juga:</string>
+    <string name="systemSearchOnboardingFeatureOneText">Menyekat pengesan yang tidak selamat.</string>
+    <string name="systemSearchOnboardingFeatureTwoText">Memaksa penyulitan pada laman web.</string>
+    <string name="systemSearchOnboardingFeatureThreeText">Mengosongkan data dengan satu ketikan.</string>
+    <string name="systemSearchOnboardingButtonMore">Tunjukkan lebih banyak</string>
+    <string name="systemSearchOnboardingButtonLess">Sembunyikan</string>
+    <string name="systemSearchOnboardingButtonOk">Faham</string>
+
+    <!-- Dax Dialog -->
+    <string name="daxDialogHighFive">High Five!</string>
+    <string name="daxDialogGotIt">Faham</string>
+
+    <!-- AppTP Retention Experiment Dax Dialog -->
+    <string name="daxDialogAppTpRetentionText"><![CDATA[Anda kini menyekat pengesan di seluruh web 🎉<br/><br/>Saya juga boleh menyekat pengesan yang tersembunyi di aplikasi lain, walaupun anda tidak menggunakan telefon.]]></string>
+    <string name="daxDialogAppTpRetentionPrimaryButtonText">Aktifkan Perlindungan Jejak Aplikasi</string>
+    <string name="daxDialogAppTpRetentionSecondaryButtonText">Tidak Sekarang</string>
+
+    <!-- New Onboarding Experience -->
+    <string name="onboardingWelcomeTitle">"Selamat Datang ke Kahf!"</string>
+    <string name="onboardingDaxText"><![CDATA[Internet boleh agak menakutkan.<br/><br/>Jangan risau! Mencari dan melayari secara peribadi lebih mudah daripada yang anda fikirkan.]]></string>
+    <string name="onboardingLetsDoItButton">Mari Lakukan!</string>
+    <string name="daxNonSerpCtaText"><![CDATA[Semasa anda mengetik dan menatal, saya akan menyekat pengesan menjengkelkan. <br/><br/>Teruskan — terus melayari!]]></string>
+    <string name="daxMainNetworkCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Berhati-hati! Saya tidak dapat menghalang %1$s daripada melihat aktiviti anda di %2$s &lt;br/&gt;&lt;br/&gt;Tetapi layari bersama saya, dan saya boleh mengurangkan apa yang %3$s tahu tentang anda secara keseluruhan dengan menyekat pengesan mereka di banyak laman lain.</string>
+    <string name="daxMainNetworkOwnedCtaText" instruction="%1$s is the name of a company, %2$s is the website where the tracking is happening, %3$s is the name of the company showing in %1$s">Berhati-hati! Oleh kerana %1$s memiliki %2$s, saya tidak dapat menghalang mereka daripada melihat aktiviti anda di sini.&lt;br/&gt;&lt;br/&gt;Tetapi layari bersama saya, dan saya boleh mengurangkan apa yang %3$s tahu tentang anda secara keseluruhan dengan menyekat pengesan mereka di banyak laman lain.</string>
+
+    <!-- Download Confirmation -->
+    <string name="downloadConfirmationContinue">Simpan ke muat turun</string>
+    <string name="downloadConfirmationSaveFileTitle" instruction="Placeholder is the name of a file">Simpan %1$s</string>
+    <string name="downloadConfirmationKeepBothFilesText">Simpan kedua-duanya</string>
+    <string name="downloadConfirmationReplaceOldFileText">Ganti</string>
+    <string name="downloadConfirmationOpenFileText">Buka</string>
+    <string name="downloadConfirmationUnableToOpenFileText">Tidak dapat membuka fail</string>
+    <string name="downloadConfirmationUnableToDeleteFileText">Tidak dapat memadam fail lama</string>
+
+    <!-- Change Icon Activity -->
+    <string name="changeIconActivityTitle">Ikon Aplikasi</string>
+    <string name="changeIconCtaLabel">Ikon Aplikasi</string>
+    <string name="changeIconCtaAccept">Guna</string>
+    <string name="changeIconCtaCancel">Batal</string>
+    <string name="changeIconDialogTitle">Guna ikon baru?</string>
+    <string name="changeIconDialogMessage">Aplikasi mungkin akan ditutup untuk menerapkan perubahan. Kembali selepas anda kagum dengan ikon baru anda.</string>
+
+    <!-- New dashboard / menu buttons -->
+    <string name="manageAllowlist">Laman Tidak Dilindungi</string>
+    <string name="reportBrokenSite">Laporkan Laman Rosak</string>
+
+    <!-- Dialogs -->
+    <string name="dialogAddTitle">Tambah</string>
+    <string name="dialogEditTitle">Sunting</string>
+    <string name="dialogSaveAction">Simpan</string>
+
+    <!-- Allowlist -->
+    <string name="allowlistActivityTitle">Laman Tidak Dilindungi</string>
+    <string name="enablePrivacyProtection">Aktifkan Perlindungan Privasi</string>
+    <string name="disablePrivacyProtection">Nyahaktifkan Perlindungan Privasi</string>
+    <string name="allowlistEntryOverflowContentDescription" instruction="Placeholder is a website">Pilihan lain untuk laman tidak dilindungi %1$s</string>
+    <string name="allowlistEntryDeleteConfirmMessage" instruction="Placeholder is a website">Adakah anda pasti mahu mengeluarkan &lt;b>%1$s&lt;/b> daripada Laman Tidak Dilindungi?</string>
+    <string name="allowlistExplanation">Laman ini tidak akan dipertingkatkan oleh Perlindungan Privasi.</string>
+    <string name="allowlistNoEntries">Perlindungan Privasi diaktifkan untuk semua laman</string>
+    <string name="allowlistDomainHint">www.contoh.com</string>
+    <string name="allowlistFormatError">Sila masukkan domain seperti <b>contoh.com</b> dan cuba lagi</string>
+
+    <!-- Settings -->
+    <string name="settingsPrivacyProtectionAllowlist">Laman Tidak Dilindungi</string>
+
+    <!-- Fireproof websites -->
+    <string name="fireproofWebsitesActivityTitle">Laman Kebal Api</string>
+    <string name="settingsFireproofWebsites">Laman Kebal Api</string>
+    <string name="fireproofWebsiteMenuTitleAdd">Kebalkan Laman Ini</string>
+    <string name="fireproofWebsiteSnackbarConfirmation" instruction="Placeholder is a website">&lt;b>%1$s&lt;/b> kini Kebal Api</string>
+    <string name="fireproofWebsiteSnackbarAction">Batal</string>
+    <string name="fireproofWebsiteDeleteConfirmMessage" instruction="Placeholder is a website">Adakah anda pasti mahu memadam &lt;b>%1$s&lt;/b>?</string>
+    <string name="fireproofWebsiteFeatureDescription">Laman web bergantung pada kuki untuk memastikan anda kekal log masuk. Apabila anda Kebalkan laman, kuki tidak akan dipadam dan anda kekal log masuk walaupun selepas menggunakan Butang Api. Kami masih menyekat pengesan pihak ketiga di laman Kebal Api.</string>
+    <string name="fireproofWebsiteOverflowContentDescription" instruction="Placeholder is a website">Pilihan lain untuk laman Kebal Api %1$s</string>
+    <string name="fireproofWebsiteLoginDialogTitle" instruction="Placeholder is a website">Adakah anda mahu Kebalkan %1$s?</string>
+    <string name="fireproofWebsiteLoginDialogDescription">Membuat laman ini Kebal Api akan memastikan anda kekal log masuk selepas menggunakan Butang Api.</string>
+    <string name="fireproofWebsiteLoginDialogPositive">Kebalkan</string>
+    <string name="fireproofWebsiteLoginDialogNegative">Tidak sekarang</string>
+    <string name="fireproofWebsiteItemsSectionTitle">Laman Kebal Api</string>
+    <string name="fireproofWebsiteEmptyListHint">Tiada laman Kebal Api lagi</string>
+    <string name="fireproofWebsiteSettingSelectionTitle">Kebalkan Laman Semasa Log Masuk</string>
+    <string name="fireproofWebsiteRemoveAllConfirmation">Kebalan dihapuskan untuk semua laman</string>
+    <string name="fireproofWebsiteRemovalConfirmation" instruction="Placeholder is a website">Kebalan dihapuskan untuk &lt;b>%1$s&lt;/b></string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAskEveryTime">Tanya setiap kali</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogAlways">Sentiasa</string>
+    <string name="fireproofWebsiteSettingsSelectionDialogNever">Tidak pernah</string>
+    <string name="disableLoginDetectionDialogTitle">Nyahaktifkan peringatan Kebal Api semasa log masuk ke laman?</string>
+    <string name="disableLoginDetectionDialogDescription">Anda boleh menukar tetapan ini bila-bila masa dalam Tetapan.</string>
+    <string name="disableLoginDetectionDialogPositive">Nyahaktif</string>
+    <string name="disableLoginDetectionDialogNegative">Batal</string>
+    <string name="automaticFireproofWebsiteLoginDialogTitle">Kebalkan laman secara automatik semasa log masuk?</string>
+    <string name="automaticFireproofWebsiteLoginDialogDescription">Membuat laman Kebal Api akan memastikan anda kekal log masuk selepas menggunakan Butang Api. Anda boleh menukar tetapan ini kemudian dalam Tetapan.</string>
+    <string name="automaticFireproofWebsiteLoginDialogFirstOption">Sentiasa Kebalkan</string>
+    <string name="automaticFireproofWebsiteLoginDialogSecondOption">Kebalkan laman ini</string>
+    <string name="automaticFireproofWebsiteLoginDialogThirdOption">Tidak sekarang</string>
+
+    <!-- Fire Animation settings -->
+    <string name="settingsFireAnimation">Animasi Butang Api</string>
+    <string name="settingsHeroFireAnimation">Inferno</string>
+    <string name="settingsHeroWaterAnimation">Pusaran</string>
+    <string name="settingsHeroAbstractAnimation">Airstream</string>
+    <string name="settingsNoneAnimation">Tiada</string>
+    <string name="settingsSelectFireAnimationDialog">Animasi Butang Api</string>
+    <string name="settingsSelectFireAnimationDialogSave">Simpan</string>
+
+    <!-- Dos Attack error -->
+    <string name="dosErrorMessage">Sambungan dihentikan. Laman ini mungkin berbahaya untuk peranti anda.</string>
+
+    <!-- Precise Location -->
+    <string name="preciseLocationSystemDialogTitle">Aktifkan lokasi peranti untuk Kahf Privacy Browser?</string>
+    <string name="preciseLocationSystemDialogSubtitle" instruction="%1$s and %2$s are both the name of the website requesting the location">%1$s sedang meminta lokasi peranti anda. Anda perlu membenarkan aplikasi menghantar lokasi peranti anda dahulu, kemudian %2$s boleh meminta kebenaran.</string>
+    <string name="preciseLocationSystemDialogAllow">Aktifkan</string>
+    <string name="preciseLocationSystemDialogDeny">Mungkin Nanti</string>
+    <string name="preciseLocationSystemDialogNeverAllow">Jangan Tanya Lagi untuk Laman Ini</string>
+    <string name="preciseLocationSiteDialogTitle" instruction="Placeholder is the name of a website">Benarkan %1$s mengakses lokasi?</string>
+    <string name="preciseLocationDDGDialogSubtitle">Kami hanya menggunakan lokasi anda secara anonim untuk memberikan hasil yang lebih dekat dengan anda. Anda boleh menukar fikiran bila-bila masa.</string>
+    <string name="preciseLocationSiteDialogSubtitle">Anda boleh mengurus kebenaran akses lokasi yang diberikan kepada laman individu dalam Tetapan.</string>
+    <string name="preciseLocationSiteDialogAllowAlways">Sentiasa</string>
+    <string name="preciseLocationSiteDialogAllowOnce">Hanya untuk Sesi Ini</string>
+    <string name="preciseLocationSiteDialogDenyAlways">Tolak Sentiasa</string>
+    <string name="preciseLocationSiteDialogDenyOnce">Tolak untuk Sesi Ini</string>
+    <string name="preciseLocationFeatureDescription">Laman yang anda lawati mungkin meminta lokasi peranti anda. Mereka tidak dapat mengaksesnya sehingga anda memberi kebenaran secara eksplisit. Kahf hanya menggunakan lokasi anda secara anonim untuk hasil carian tempatan.</string>
+    <string name="preciseLocationToggleText">Laman Boleh Meminta Lokasi Saya</string>
+    <string name="preciseLocationEmptyListHint">Tiada laman diberikan kebenaran untuk mengakses lokasi</string>
+    <string name="preciseLocationNoSystemPermission">Untuk mengurus kebenaran akses lokasi yang diberikan kepada laman individu, aktifkan lokasi untuk aplikasi ini dalam Tetapan Android.</string>
+    <string name="preciseLocationActivityTitle">Lokasi</string>
+    <string name="preciseLocationDeleteConfirmMessage" instruction="Placeholder is the name of a website">Adakah anda pasti mahu memadam &lt;b>%1$s&lt;/b>?</string>
+    <string name="preciseLocationDeleteContentDescription" instruction="Placeholder is the domain of a website">Pilihan lain untuk kebenaran lokasi di domain %1$s</string>
+    <string name="preciseLocationAllowedSitesSectionTitle">Dibenarkan</string>
+    <string name="preciseLocationDeniedSitesSectionTitle">Ditolak</string>
+    <string name="preciseLocationSnackbarMessage" instruction="Placeholder is the name of a website">Anda sebelum ini memberi kebenaran kepada %1$s untuk mengakses lokasi peranti anda.</string>
+
+    <!-- Fire button education -->
+    <string name="daxClearDataCtaText">Data peribadi boleh berkumpul dalam pelayar anda. Huhu. Gunakan Butang Api untuk membakarnya. Cuba sekarang! &#128071;</string>
+
+    <!--  Global Privacy Control-->
+    <string name="globalPrivacyControlActivityTitle">Kawalan Privasi Global (GPC)</string>
+    <string name="globalPrivacyControlDescription"><![CDATA[Kahf secara automatik menyekat banyak pengesan. Dengan Kawalan Privasi Global (GPC), anda juga boleh meminta laman web yang mengambil bahagian untuk mengehadkan penjualan atau perkongsian data peribadi anda dengan syarikat lain. <u><a href="">Ketahui Lebih Lanjut</a><u/>]]></string>
+    <string name="globalPrivacyControlSetting">Kawalan Privasi Global (GPC)</string>
+    <string name="globalPrivacyControlToggle">Kawalan Privasi Global (GPC)</string>
+    <string name="disabled">Dinonaktifkan</string>
+    <string name="enabled">Diaktifkan</string>
+
+    <!-- Opening app links -->
+    <string name="settingTitleOpenLinksInAssociatedApps">Buka Pautan dalam Aplikasi Berkaitan</string>
+    <string name="settingSubtitleOpenLinksInAssociatedApps">Nyahaktif untuk mengelakkan pautan dibuka secara automatik dalam aplikasi lain yang dipasang.</string>
+    <string name="appLinkDialogTitle">Buka dalam aplikasi lain?</string>
+    <string name="appLinkSnackBarAction">Buka dalam aplikasi</string>
+    <string name="appLinkMultipleSnackBarAction">Pilih aplikasi</string>
+    <string name="appLinkSnackBarMessage" instruction="Placeholder is the name of an app">Anda boleh membuka pautan ini dalam %1$s.</string>
+    <string name="appLinkMultipleSnackBarMessage">Anda boleh membuka pautan ini dalam aplikasi lain.</string>
+    <string name="appLinkIntentChooserTitle">Buka dengan</string>
+    <string name="appLinkMenuItemTitle">Buka dalam Aplikasi</string>
+
+    <!-- Email Autofill -->
+    <string name="aliasToClipboardMessage">Alamat baru disalin ke papan klip anda</string>
+    <string name="newEmailAliasMenuTitle">Hasilkan Alamat Duck</string>
+
+    <!-- Autofill -->
+    <string name="autofillSnackbarAction" instruction="Label for a button that lets the user view the details for a login credential">Lihat</string>
+
+    <!-- Waitlist Notification -->
+    <string name="waitlistNotificationDialogDescription">Adakah anda mahu kami menghantar pemberitahuan apabila giliran anda tiba?</string>
+    <string name="waitlistNotificationDialogNoThanks">Tidak, Terima Kasih</string>
+    <string name="waitlistNotificationDialogNotifyMe">Beritahu Saya</string>
+
+    <!-- Email Protection -->
+    <string name="emailProtectionActivityTitle">Perlindungan Emel (Beta)</string>
+    <string name="emailNotSupported">Peranti tidak disokong</string>
+    <string name="emailNotSupportedExplanation">Perlindungan Emel membolehkan anda membuat alamat emel peribadi yang menghapus pengesan emel. Kami perlu menyulitkan dan menyimpan alamat ini secara tempatan pada peranti anda. Oleh kerana peranti anda tidak menyokong penyimpanan tersulit, Perlindungan Emel tidak tersedia.</string>
+
+    <!-- Accessibility-->
+    <string name="settingsAccessibility">Aksesibiliti</string>
+    <string name="accessibilityActivityTitle">Aksesibiliti</string>
+    <string name="accessibilityFontSizeTitle">Saiz Teks</string>
+    <string name="accessibilityFontSizeHint">Seret penggelongsor sehingga anda boleh membaca dengan selesa. Laman web yang anda lihat dalam Kahf akan menyesuaikan saiz teks.</string>
+    <string name="accessibilityForceZoomTitle">Paksa zum halaman secara manual</string>
+    <string name="accessibilityForceZoomSubtitle">Cubitan dan zum di mana-mana laman, walaupun laman itu biasanya menghalangnya</string>
+    <string name="accessibilityTextSizeOverrideTitle">Urus saiz teks</string>
+    <string name="accessibilityTextSizeOverrideSubtitle">Teks pada laman web yang anda lihat dalam Kahf akan menyesuaikan diri dengan tetapan di bawah</string>
+
+    <!-- Privacy Policy -->
+    <string name="settingsPrivacyPolicyAsil">Dasar Privasi</string>
+
+    <!-- Home Screen Widget -->
+    <string name="homeScreenWidgetAdded" instruction="Placeholder is the name of the widget">%1$s widget ditambah ke skrin utama</string>
+    <string name="settingsAddHomeScreenWidget">Widget Skrin Utama</string>
+
+    <!-- MacOs Settings -->
+    <string name="macos_settings_description">Layari secara peribadi dengan aplikasi kami untuk Mac</string>
+    <string name="macos_settings_title">Pelayar Kahf Mac</string>
+
+    <!-- Downloads -->
+    <string name="downloadsMenuItem">Muat Turun</string>
+    <string name="downloadsActivityTitle">Muat Turun</string>
+    <string name="downloadsActivityNoItemsDescription">Tiada fail dimuat turun lagi</string>
+    <string name="downloadsShareTitle">Kongsi dengan…</string>
+    <string name="downloadsDownloadFinishedActionName">Buka</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Tidak boleh membuka fail. Semak aplikasi yang sesuai.</string>
+    <string name="downloadsFileNotFoundErrorMessage">Fail tidak lagi wujud</string>
+    <string name="downloadsItemMenuShare">Kongsi</string>
+    <string name="downloadsItemMenuDelete">Padam</string>
+    <string name="downloadsItemMenuCancel">Batal</string>
+    <string name="downloadsActivityMenuDeleteAll">Padam Semua</string>
+    <string name="downloadsFileDeletedMessage" instruction="Placeholder is the name of the file deleted">Dipadam %1$s</string>
+    <string name="downloadsAllFilesDeletedMessage">Semua fail dipadam</string>
+    <string name="downloadsMoreOptionsContentDescription" instruction="Placeholder is the name of a file">Pilihan lain untuk %1$s</string>
+    <string name="downloadsUndoActionName">Batal</string>
+    <string name="downloadsStateInProgress">Sedang dijalankan…</string>
+
+    <!-- App Tracking Protection -->
+    <string name="atp_SettingsTitle">Perlindungan Penjejakan Aplikasi</string>
+    <string name="atp_SettingsDeviceShieldNeverEnabled">Sekat pengesan aplikasi pada peranti anda</string>
+    <string name="atp_SettingsDeviceShieldEnabled">Diaktifkan</string>
+    <string name="atp_SettingsDeviceShieldDisabled">Dinonaktifkan</string>
+
+    <!-- Autoconsent -->
+    <string name="autoconsentDialogTitle"><![CDATA[<b>Mahukah saya mengurus pop-up kuki?</b>]]></string>
+    <string name="autoconsentDialogDescription">Saya boleh cuba memilih tetapan paling peribadi yang tersedia dan menyembunyikan pop-up seperti ini.</string>
+    <string name="autoconsentPrimaryCta">Urus Pop-up Untuk Saya</string>
+    <string name="autoconsentSecondaryCta">Tidak, Saya Akan Urus Sendiri</string>
+
+    <string name="autoconsentSetting">Urus Pop-up Kuki</string>
+    <string name="autoconsentCosmeticNoticeAnimationText">Pop-up Disembunyikan</string>
+    <string name="autoconsentManagedNoticeAnimationText">Kuki Diurus</string>
+
+    <!-- Site Permissions Settings -->
+    <string name="settingsSitePermissions">Kebenaran Laman</string>
+    <string name="sitePermissionsSettingsDescription">Laman yang anda lawati mungkin meminta akses ke lokasi peranti, kamera, mikrofon, atau perisian DRM (Pengurusan Hak Digital). Mereka tidak akan dapat mengakses ini melainkan anda secara jelas memberikan kebenaran.</string>
+    <string name="sitePermissionsSettingsEnablePermissionTitle">Benarkan semua laman meminta:</string>
+    <string name="sitePermissionsSettingsLocation">Lokasi</string>
+    <string name="sitePermissionsSettingsCamera">Kamera</string>
+    <string name="sitePermissionsSettingsMicrophone">Mikrofon</string>
+    <string name="sitePermissionsSettingsAllowedSitesTitle">Urus Laman</string>
+    <string name="sitePermissionsSettingsEmptyText">Tiada laman lagi</string>
+    <string name="sitePermissionsRemoveAllWebsitesSnackbarText">Kebenaran Dibuang untuk Semua Laman</string>
+    <string name="permissionPerWebsiteText" instruction="Placeholder is the name of a website">Kebenaran untuk \"%1$s\"</string>
+    <string name="permissionsPerWebsiteAskSetting">Tanya</string>
+    <string name="permissionsPerWebsiteDenySetting">Tolak</string>
+    <string name="permissionsPerWebsiteAllowSetting">Benarkan</string>
+    <string name="permissionsPerWebsiteAskDisabledSetting">“Tanya” dinyahaktif untuk semua laman</string>
+    <string name="permissionsPerWebsiteSelectorDialogTitle" instruction="%1$s is the name of a permissions and %2$s is the name of a website, i.e. Camera permission for example.com">Kebenaran %1$s untuk %2$s</string>
+
+    <!-- Notify Me View on Downloads -->
+    <string name="downloadsNotifyMeTitle">Ketahui apabila muat turun sedia</string>
+    <string name="downloadsNotifyMeSubtitle">Terima pemberitahuan apabila muat turun selesai.</string>
+
+    <!-- Windows Settings -->
+    <string name="windows_settings_title">Pelayar Kahf Windows</string>
+    <string name="windows_settings_description">Layari secara peribadi dengan aplikasi kami untuk Windows</string>
+    <string name="windows_settings_description_ready">Muat turun tersedia</string>
+    <string name="windows_settings_description_list">Anda berada dalam senarai!</string>
+
+    <!-- Full screen message-->
+    <string name="fullScreenMessage">Seret ke bawah dari atas dan ketik butang kembali untuk keluar dari skrin penuh</string>
+
+    <!-- Tab Switcher 'Close All Tabs' confirmation prompt -->
+    <string name="closeAppTabsConfirmationDialogTitle">Tutup semua tab?</string>
+    <string name="closeAppTabsConfirmationDialogDescription">Adakah anda pasti mahu menutup semua tab?</string>
+    <string name="closeAppTabsConfirmationDialogCancel">Batal</string>
+    <string name="closeAppTabsConfirmationDialogClose">Tutup</string>
+
+    <!-- Private voice search -->
+    <string name="accessibilityVoiceSearchSubtitle">Tambah pilihan Carian Suara Peribadi ke bar alamat. Audio tidak disimpan atau dikongsi dengan sesiapa, termasuk Kahf.</string>
+    <string name="accessibilityVoiceSearchTitle">Carian Suara Peribadi</string>
+
+    <!-- Uploading an image from the camera or choosing to use existing image -->
+    <string name="imageCaptureCameraUnavailable">Tidak dapat mengakses kamera</string>
+    <string name="imageCaptureCameraGalleryDisambiguationTitle">Muat naik imej</string>
+    <string name="imageCaptureCameraGalleryDisambiguationGalleryOption">Pilih Fail</string>
+    <string name="imageCaptureCameraGalleryDisambiguationCameraOption">Ambil Gambar</string>
+    <string name="imageCaptureCameraPermissionDeniedTitle">Benarkan Kahf meminta akses kamera pada peranti ini</string>
+    <string name="imageCaptureCameraPermissionDeniedMessage">Laman hanya boleh menggunakan kamera anda jika anda membenarkan Kahf meminta akses.</string>
+    <string name="imageCaptureCameraPermissionDeniedPositiveButton">Buka Tetapan</string>
+    <string name="imageCaptureCameraPermissionDeniedNegativeButton">Batal</string>
+
+    <!-- Autofill -->
+    <string name="settingsAutofillLoginsSetting">Kata Laluan</string>
+    <string name="autofillLoginSavedSnackbarMessage">Kata laluan disimpan</string>
+    <string name="autofillLoginUpdatedSnackbarMessage">Kata laluan dikemas kini</string>
+    <string name="safe_gaze_arrow" translatable="false">safe_gaze_arrow</string>
+    <string name="pointer_arrow">Anak Panah Penunjuk</string>
+    <string name="safe_gaze_up">Safe Gaze ATAS</string>
+    <string name="ads_and_other_creepy_things_blocked">Iklan dan perkara menyeramkan lain disekat</string>
+    <string name="if_this_site_appears_broken_try_shields_down">Jika laman ini kelihatan rosak, cuba Turunkan Perisai</string>
+    <string name="_0">0</string>
+    <string name="profile">Profil</string>
+    <string name="preference">Keutamaan</string>
+    <string name="unsubscribe_haram_channels">Berhenti Langgan Saluran Haram</string>
+    <string name="gender">Jantina</string>
+    <string name="religion_status">Status Agama</string>
+    <string name="save">Simpan</string>
+    <string name="allow">Benarkan</string>
+    <string name="refresh_again">Segarkan Semula</string>
+    <string name="unsubscribe">Berhenti Langgan</string>
+    <string name="haram_channels_found">%1$d Saluran Haram ditemui</string>
+
+    <string name="kahf_dns_up">Bersambung</string>
+    <string name="kahf_dns_down">Terputus</string>
+
+    <string name="safegaze_popup_report_title">Sila laporkan sebarang pepijat atau cadangan melalui borang ini</string>
+    <string name="safegaze_popup_support_title">Sokong projek ini</string>
+    <string name="safegaze_popup_woman_title">Saya Wanita</string>
+    <string name="safegaze_popup_man_title">Saya Lelaki</string>
+    <string name="safegaze_popup_comingsoon_title">Akan Datang</string>
+    <string name="safegaze_popup_gendermode_title">Mod Jantina</string>
+    <string name="safegaze_popup_sinfulacts_title">Perbuatan dosa dielakkan</string>
+    <string name="safegaze_popup_thispage_title">Laman Ini</string>
+    <string name="safegaze_popup_lifetime_title">Sepanjang Hayat</string>
+    <string name="safegaze_popup_alwayspurify_title">Sentiasa Bersih</string>
+    <string name="safegaze_popup_neverpurify_title">Jangan Bersihkan</string>
+    <string name="safegaze_popup_safegazeup_title">SafeGaze ATAS</string>
+    <string name="safegaze_popup_imageblur_title">Kecerahan Kabur Imej</string>
+    <string name="safegaze_popup_takecontrol_title">Tingkatkan pengalaman dalam talian anda dengan SafeGaze, pelanjutan Pembersih Imej kami yang melindungi pandangan anda daripada kandungan tidak sesuai.</string>
+    <string name="safegaze_popup_turnon_title">Hidupkan SafeGaze</string>
+
+    <!-- Custom Tab -->
+    <string name="openInDdgMenuItemTitle">Buka dalam Kahf</string>
+    <string name="runningInDdgMenuItemTitle">Sedang Berjalan dalam Kahf</string>
+
+    <!-- SSL Error -->
+    <string name="sslErrorTitle">Amaran: Laman ini mungkin tidak selamat</string>
+    <string name="sslErrorHeadline" instruction="Placeholder is domain with certificate issues">Sijil untuk laman ini tidak sah. Anda mungkin sedang menyambung ke pelayan yang menyamar sebagai %1$s yang boleh meletakkan maklumat sulit anda dalam risiko.</string>
+    <string name="sslErrorLeaveCTA">Tinggalkan Laman Ini</string>
+    <string name="sslErrorAdvancedCTA">Lanjutan</string>
+    <string name="sslErrorExpandedHeadline">Kahf memberi amaran apabila laman web mempunyai sijil yang tidak sah.</string>
+    <string name="sslErrorExpandedCTA"><![CDATA[<u>Terima Risiko dan Lawati Laman<u/>]]></string>
+    <string name="sslErrorExpiredMessage" instruction="Placeholder is domain with certificate issues">Sijil keselamatan untuk %1$s telah tamat tempoh. Mungkin laman web salah konfigurasi, penyerang menjejaskan sambungan anda, atau jam sistem anda salah.</string>
+    <string name="sslErrorWrongHostMessage" instruction="Placeholder is domain with certificate issues">Sijil keselamatan untuk %1$s tidak sepadan dengan *.%2$s. Mungkin laman web salah konfigurasi, penyerang menjejaskan sambungan anda, atau jam sistem anda salah.</string>
+    <string name="sslErrorUntrustedMessage" instruction="Placeholder is domain with certificate issues">Sijil keselamatan untuk %1$s tidak dipercayai oleh sistem operasi peranti anda. Mungkin laman web salah konfigurasi, penyerang menjejaskan sambungan anda, atau jam sistem anda salah.</string>
+
+    <!-- Onboarding Experiment-->
+    <string name="preOnboardingDaxDialog1Title"><![CDATA[Hai di sana.<br/><br/>Bersedia untuk internet yang lebih baik dan lebih peribadi?]]></string>
+    <string name="preOnboardingDaxDialog1Button">Mari lakukan!</string>
+    <string name="preOnboardingDaxDialog2Title">Perlindungan privasi diaktifkan!</string>
+    <string name="preOnboardingDaxDialog2Button">Pilih Pelayar Anda</string>
+    <string name="preOnboardingComparisonChartItem1">Cari secara peribadi secara lalai</string>
+    <string name="preOnboardingComparisonChartItem2">Sekat penjejak pihak ketiga</string>
+    <string name="preOnboardingComparisonChartItem3">Sekat pop timbul kuki</string>
+    <string name="preOnboardingComparisonChartItem4">Sekat iklan menyeramkan</string>
+    <string name="preOnboardingComparisonChartItem5">Padam data pelayaran dengan pantas</string>
+    <string name="preOnboardingDaxDialog3Title">Hebat! Selamat datang ke sisi bebek.</string>
+    <string name="preOnboardingDaxDialog3Button">Mula Melayari</string>
+    <string name="onboardingSearchDaxDialogTitle">Cuba carian!</string>
+    <string name="onboardingSearchDaxDialogDescription">Carian Kahf anda sentiasa tanpa nama.</string>
+    <string name="onboardingSearchDaxDialogOption1" instruction="translate 'duck' too.">cara mengatakan “bebek” dalam bahasa Inggeris</string>
+    <string name="onboardingSearchDaxDialogOption1English" instruction="translate 'duck' too. Don't add question mark">cara mengatakan “bebek” dalam bahasa Sepanyol</string>
+    <string name="onboardingSearchQueryOption1">cara mengatakan bebek dalam bahasa Inggeris</string>
+    <string name="onboardingSearchQueryOption1English">cara mengatakan bebek dalam bahasa Sepanyol</string>
+    <string name="onboardingSearchDaxDialogOption2">pelakon Avatar</string>
+    <string name="onboardingSearchDaxDialogOption2US">pelakon Mighty Ducks</string>
+    <string name="onboardingSearchDaxDialogOption3">cuaca tempatan</string>
+    <string name="onboardingSearchDaxDialogOption4">Kejutan!</string>
+    <string name="onboardingSearchQueryOption4">resipi makan malam</string>
+    <string name="onboardingSearchQueryOption4US">resipi biskut cip coklat</string>
+    <string name="onboardingSitesDaxDialogTitle">Cuba lawati laman!</string>
+    <string name="onboardingSitesDaxDialogDescription">Saya akan menyekat penjejak supaya mereka tidak memerhati anda.</string>
+    <string name="onboardingSitesDaxDialogOption1">espn.com</string>
+    <string name="onboardingSitesDaxDialogOption2">yahoo.com</string>
+    <string name="onboardingSitesDaxDialogOption3">ebay.com</string>
+    <string name="onboardingSitesDaxDialogOption4">Kejutan!</string>
+    <string name="onboardingSerpDaxDialogDescription">Itulah Carian Kahf. Peribadi. Pantas. Kurang iklan.</string>
+    <string name="onboardingSerpDaxDialogButton">Faham!</string>
+    <string name="onboardingSitesSuggestionsDaxDialogTitle">Seterusnya, cuba lawati laman!</string>
+    <plurals name="onboardingTrackersBlockedDialogDescription">
+        <item quantity="one"><![CDATA[&#160;dan <b>%1$d lain</b> cuba menjejaki anda di sini. Saya telah menyekat mereka!<br/><br/>☝️ Ketik perisai untuk maklumat lanjut.]]></item>
+        <item quantity="other"><![CDATA[&#160;dan <b>%1$d lain</b> cuba menjejaki anda di sini. Saya telah menyekat mereka!<br/><br/>☝️ Ketik perisai untuk maklumat lanjut.]]></item>
+    </plurals>
+    <plurals name="onboardingTrackersBlockedZeroDialogDescription" tools:ignore="ImpliedQuantity">
+        <item quantity="one"><![CDATA[&#160;cuba menjejaki anda di sini. Saya telah menyekat mereka!<br/><br/>☝️ Ketik perisai untuk maklumat lanjut.]]></item>
+        <item quantity="other"><![CDATA[&#160;cuba menjejaki anda di sini. Saya telah menyekat mereka!<br/><br/>☝️ Ketik perisai untuk maklumat lanjut.]]></item>
+    </plurals>
+    <string name="onboardingTrackersBlockedDaxDialogButton">Faham!</string>
+    <string name="onboardingFireButtonDaxDialogDescription"><![CDATA[Padam aktiviti pelayaran anda dengan segera menggunakan <b>Butang Api</b>.<br/><br/>Cuba sekarang! ☝️]]></string>
+    <string name="onboardingEndDaxDialogTitle">Anda boleh lakukannya!</string>
+    <string name="onboardingEndDaxDialogDescription">Ingat: setiap kali anda melayari dengan saya, iklan menyeramkan kehilangan sayapnya. 👌</string>
+    <string name="onboardingEndDaxDialogButton">Selesai!</string>
+
+    <string name="deleteBookmarkConfirmationDescription" instruction="Placeholder is the name of the bookmark">Adakah anda pasti mahu memadam penanda halaman untuk &lt;b;%1$s&lt;/b>?</string>
+    <string name="kahf_dns_not_protected_text">Anda tidak dilindungi daripada 5,906,168 laman Haram</string>
+    <string name="kahf_dns_protected_text">Anda dilindungi daripada 5,906,168 laman Haram</string>
+    <string name="verify_protection">Sahkan Perlindungan</string>
+    <string name="by_halalz_e_ticaret_ltd_ti">oleh Halalz e-ticaret Ltd Şti</string>
+    <string name="kahf_guard">KahfGuard</string>
+
+    <string name="bookmarksMenuTitle">Penanda Halaman</string>
+    <string name="bookmarksActivityTitle">Penanda Halaman</string>
+    <string name="noBookmarks">Tiada penanda halaman ditambah lagi</string>
+    <string name="exportBookmarksMenu">Eksport</string>
+    <string name="exportBookmarksEmpty">Tiada penanda halaman, tiada yang akan dieksport</string>
+    <string name="exportBookmarksError">Tiada penanda halaman dieksport, berlaku ralat</string>
+    <string name="exportBookmarksSuccess">Semua penanda halaman berjaya dieksport</string>
+    <string name="importBookmarksMenu">Import</string>
+    <string name="importBookmarksFileTitle">Pilih fail penanda halaman untuk diimport</string>
+    <string name="importBookmarksError">Tiada penanda halaman diimport, berlaku ralat</string>
+    <string name="importBookmarksEmpty">Fail tidak mengandungi penanda halaman untuk diimport</string>
+    <string name="importBookmarksSuccess">%1$d penanda halaman berjaya diimport</string>
+
+    <string name="savedSiteDialogTitleHint">Alamat</string>
+    <string name="savedSiteDialogUrlHint">URL</string>
+    <string name="savedSiteDialogTitleEdit">Sunting</string>
+    <string name="bookmarksSectionTitle">Penanda Halaman</string>
+    <string name="favoritesSectionTitle">Kegemaran</string>
+    <string name="bookmarksEmptyHint">Tiada penanda halaman ditambah lagi</string>
+    <string name="favoritesEmptyHint">Tiada kegemaran ditambah lagi</string>
+    <string name="bookmarkDialogTitleEdit">Sunting penanda halaman</string>
+    <string name="favoriteDialogTitleEdit">Sunting kegemaran</string>
+    <string name="locationLabel">laman</string>
+    <string name="folderLocationTitle">Pilih lokasi</string>
+    <string name="addFolder">Tambah folder</string>
+    <string name="editFolder">Sunting folder</string>
+    <string name="bookmarkFolderDeleteDialogTitle">Padam folder dan kandungannya?</string>
+    <string name="bookmarkFolderEmpty">Kosong</string>
+    <string name="bookmarkFolderDeleteDialogMessage">Adakah anda pasti mahu memadam</string>
+    <string name="deleteBookmarkConfirmationDialogTitle">Padam penanda halaman ini?</string>
+    <string name="deleteBookmarkConfirmationDialogDescription">Ini akan memadam penanda halaman anda untuk &lt;b;%1$s&lt;/b>.</string>
+    <string name="deleteFavoriteConfirmationDialogTitle">Padam kegemaran ini?</string>
+    <string name="deleteFavoriteConfirmationDialogDescription">Ini akan memadam kegemaran anda untuk &lt;b;%1$s&lt;/b>.</string>
+    <string name="deleteBookmarkFolderConfirmationDialogTitle">Padam folder penanda halaman ini?</string>
+    <string name="deleteSavedSiteConfirmationDialogCancel">Batal</string>
+    <string name="deleteSavedSiteConfirmationDialogDelete">Padam</string>
+    <string name="deleteBookmarkFolderConfirmationDialogDescription">Ini akan memadam folder penanda halaman &lt;b;%1$s&lt;/b>.</string>
+    <string name="bookmarkDeleteConfirmationMessage">&lt;b>%1$s&lt;/b> telah dipadam</string>
+    <string name="bookmarkOverflowContentDescription">Pilihan lain untuk penanda halaman %1$s</string>
+    <string name="searchBookmarks">Cari penanda halaman</string>
+    <string name="deleteFolder">Adakah anda mahu memadam folder \"%1$s\"?</string>
+    <string name="deleteBookmark">Padam penanda halaman \"%1$s\"?</string>
+    <string name="addToFavorites">Tambah ke kegemaran</string>
+    <string name="bookmarkAddedInBookmarks">Penanda halaman ditambah ke folder \"%1$s\"</string>
+    <string name="editBookmark">Sunting penanda halaman</string>
+    <string name="importBookmarksDescription">Jika penanda halaman anda disimpan dalam pelayar lain, anda boleh mengimportnya ke Kahf.</string>
+    <string name="importBookmarks">Import penanda halaman</string>
+    <string name="noResultsFor">Carian \"%1$s\" tidak menemui hasil</string>
+    <string name="removeFromFavorites">Keluarkan dari kegemaran</string>
+    <string name="addToFavoritesMenu">Tambah ke kegemaran</string>
+    <string name="not_implemented">Belum dilaksanakan</string>
+    <string name="clipboardYouCopied">Tampal dari papan klip</string>
+    <string name="kahf_menu">Menu</string>
+    <string name="kahf_safer_internet">Internet Selamat</string>
+    <string name="kahf_mode_desc_high">Carian selamat + YouTube mesra kanak-kanak. Sekat iklan + penjejak + laman berbahaya + kandungan dewasa</string>
+    <string name="kahf_mode_desc_medium">Laman Berbahaya + Sekat Iklan + Carian Selamat</string>
+    <string name="kahf_mode_desc_low">Laman Berbahaya + Sekat Iklan sahaja</string>
+    <string name="kahf_decent_internet">Internet Sopan</string>
+    <string name="kahf_cover_face">Tutup Muka</string>
+    <string name="kahf_autoplay_video">Main video automatik</string>
+    <string name="kahf_desc_blur_full_image">Sembunyikan imej tidak sesuai. Elakkan dosa besar. <font color="#FF2400">Kabur tidak 100% tepat.</font></string>
+    <string name="kahf_human_only">Manusia sahaja</string>
+    <string name="kahf_premium">(Premium)</string>
+    <string name="kahf_full_image">Imej Penuh</string>
+    <string name="kahf_free">(Percuma)</string>
+    <string name="kahf_harm_avoided">Bahaya Dielakkan</string>
+    <string name="kahf_harmful_sites">Laman Berbahaya</string>
+    <string name="kahf_indecent_pictures">Imej Tidak Sopan</string>
+    <string name="kahf_ads_trackers">Iklan + Penjejak</string>
+    <string name="kahf_share">Kongsi</string>
+    <string name="kahf_support">Sokong</string>
+    <string name="kahf_dark_mode">Mod Gelap</string>
+    <string name="kahf_high">TINGGI</string>
+    <string name="kahf_medium">SEDERHANA</string>
+    <string name="kahf_low">RENDAH</string>
+    <string name="kahf_off">Mati</string>
+
+    <string name="kahf_safegaze_lock">Kunci SafeGaze</string>
+    <string name="kahf_prevent_turning_off_safety_feature">Elakkan mematikan ciri keselamatan</string>
+    <string name="kahf_safegaze_lock_desc">Jika PIN, Corak atau Kata Laluan diaktifkan di peranti, anda akan diminta untuk mengesahkan semasa membuka tetapan SafeGaze.</string>
+    <string name="kahf_no_security_enabled">Tiada kunci selamat diaktifkan pada peranti</string>
+
+    <string name="kahf_onboarding_disclaimer">Dibina di atas pelayar DuckDuckGo yang prihatin privasi</string>
+    <string name="kahf_onboarding_get_what_you_want">Pelayaran Peribadi, Selamat dan Sopan -\nDikuasakan oleh AI</string>
+    <string name="kahf_onboarding_lets_go">Mari</string>
+    <string name="kahf_onboarding_skip">Langkau</string>
+    <string name="kahf_onboarding_subtitle">Alami internet lebih selamat dengan Pelayar Kahf. Dikuasakan oleh AI canggih, ia menapis imej tidak sopan dan kandungan berbahaya secara masa nyata, membolehkan anda melayari sambil kekal pada nilai moral anda.</string>
+    <string name="kahf_onboarding_title">Pelayaran Peribadi, Selamat dan Sopan -\nDikuasakan oleh AI</string>
+    <string name="kahf_onboarding_sg_title">Sembunyikan Imej Tidak Sopan</string>
+    <string name="kahf_onboarding_sg_subtitle">Menyembunyikan imej tidak sesuai.\nElakkan dosa besar\n\n<b>Ciri ini adalah eksperimen.\nMungkin tidak 100% tepat.</b></string>
+    <string name="kahf_onboarding_sg_enable">Aktifkan Kabur Imej</string>
+    <string name="kahf_onboarding_next">Seterusnya</string>
+    <string name="kahf_onboarding_skip_now">Langkau buat sementara</string>
+    <string name="kahf_onboarding_choose">Pilih\naplikasi yang\npaling kerap anda gunakan</string>
+    <string name="kahf_onboarding_choose_details">Pilih aplikasi kegemaran untuk memastikan ia mudah diakses di skrin utama anda</string>
+    <string name="kahf_onboarding_checking_compatibility">Memeriksa keserasian</string>
+    <string name="kahf_onboarding_compatible">Peranti serasi untuk menyembunyikan imej</string>
+    <string name="kahf_onboarding_incompatible">Peranti tidak serasi untuk menyembunyikan imej</string>
+    <string name="kahf_onboarding_slow">Peranti serasi.\nTetapi menyembunyikan imej akan menjadikan pelayar lebih perlahan</string>
+    <string name="kahf_running_prayer">Solat Berjalan</string>
+    <string name="kahf_running">Berjalan…</string>
+    <string name="kahf_fajr">Subuh</string>
+    <string name="kahf_sunrise">Terbit</string>
+    <string name="kahf_dhuhr">Zuhur</string>
+    <string name="kahf_asr">Asar</string>
+    <string name="kahf_tomorrow">Esok</string>
+    <string name="kahf_yesterday">Semalam</string>
+    <string name="kahf_next_prayer_time">Waktu Solat Seterusnya</string>
+    <string name="kahf_magrib">Maghrib</string>
+    <string name="kahf_hours">Jam</string>
+    <string name="kahf_hours_left">Jam Tersisa</string>
+    <string name="kahf_secs_left">Saat Tersisa</string>
+    <string name="kahf_hours_until">jam sehingga</string>
+    <string name="kahf_minutes_until">minit sehingga</string>
+    <string name="kahf_secs_until">saat sehingga</string>
+    <string name="kahf_isha">Isyak</string>
+    <string name="kahf_today">Hari ini</string>
+    <string name="kahf_alert">Amaran</string>
+    <string name="kahf_location_could_not_get">Kami tidak dapat mendapatkan maklumat lokasi anda. Sila pastikan ciri lokasi telefon anda dihidupkan.</string>
+    <string name="kahf_location_could_not_get_app_level">Anda mesti memberikan kebenaran lokasi dalam tetapan peranti untuk melihat halaman ini. Sila pergi ke kebenaran lokasi pada halaman yang dialihkan dan berikan kebenaran.</string>
+    <string name="kahf_ok">OK</string>
+    <string name="kahf_madhab_asr_time">Madhab / Waktu Asar</string>
+    <string name="kahf_calculation_method">Kaedah Pengiraan</string>
+    <string name="kahf_adhan">Azan</string>
+    <string name="kahf_notification">Pemberitahuan</string>
+    <string name="kahf_notification_message">Mesej Pemberitahuan (Bunyi Sahaja)</string>
+    <string name="kahf_full_adhan_notification">Azan &amp; Pemberitahuan Penuh</string>
+    <string name="kahf_silent">Senyap</string>
+    <string name="kahf_no_notification_adhan">Tiada Pemberitahuan</string>
+    <string name="kahf_adhan_and_notification">Azan &amp; Pemberitahuan</string>
+    <string name="kahf_update_location">Kemas kini lokasi</string>
+    <string name="kahf_location_updated">Lokasi dikemas kini</string>
+    <string name="kahf_on_off">Hidup / Mati</string>
+    <plurals name="bookmarkFolderDeleteMessage">
+        <item quantity="one">Adakah anda pasti mahu memadam folder ini dan %1$d item?</item>
+        <item quantity="other">Adakah anda pasti mahu memadam folder ini dan %1$d item?</item>
+    </plurals>
+
+    <string name="removeFromRecent">Keluarkan dari terkini</string>
+    <string name="clearAllRecent">Keluarkan semua</string>
+    <string name="kahf_pause_on_site">Jeda di laman ini</string>
+    <string name="kahf_resume_blurring">Sambung kaburkan</string>
+    <string name="inactivity_notification_title">Kami rindu anda!</string>
+    <string name="inactivity_notification_body">Sudah lama anda tidak menggunakan Kahf. Kami ingin mendengar pendapat anda - ketik untuk berkongsi maklum balas.</string>
+
+    <string name="kahf_restart_app">Kemas kini dimuat turun! Memulakan semula aplikasi…</string>
+    <string name="kahf_update_required">Kemas kini diperlukan untuk meneruskan!</string>
+    <string name="selectLanguage">Pilih Bahasa</string>
+
+
+</resources>

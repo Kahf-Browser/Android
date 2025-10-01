@@ -36,7 +36,10 @@ class LanguageSelectionBottomSheetDialogFragment: BottomSheetDialogFragment() {
     // Language list
     val supportedLanguages = listOf(
         Language("🇬🇧", "English", "en"),   // English
+        Language("🇧🇩", "বাংলা", "bn"),   // Bangla
         Language("🇸🇦", "العربية", "ar"),   // Arabic
+        Language("🇹🇷", "Türkçe", "tr")  ,   // Turkish
+        Language("🇲🇾", "Bahasa Melayu", "ms"), // Malay
         Language("🇧🇬", "Български", "bg"), // Bulgarian
         Language("🇨🇿", "Čeština", "cs"),   // Czech
         Language("🇩🇰", "Dansk", "da"),     // Danish
@@ -59,8 +62,7 @@ class LanguageSelectionBottomSheetDialogFragment: BottomSheetDialogFragment() {
         Language("🇷🇺", "Русский", "ru"),   // Russian
         Language("🇸🇰", "Slovenčina", "sk"),// Slovak
         Language("🇸🇮", "Slovenščina", "sl"),// Slovenian
-        Language("🇸🇪", "Svenska", "sv"),   // Swedish
-        Language("🇹🇷", "Türkçe", "tr")     // Turkish
+        Language("🇸🇪", "Svenska", "sv")   // Swedish
     )
 
 
