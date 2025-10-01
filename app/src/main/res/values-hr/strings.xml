@@ -138,6 +138,7 @@
     <string name="inactivity_notification_body">Prošlo je neko vrijeme otkako ste koristili Kahf. Voljeli bismo čuti vaše mišljenje – dodirnite za dijeljenje povratnih informacija.</string>
     <string name="kahf_restart_app">Ažuriranje preuzeto! Ponovno pokretanje aplikacije…</string>
     <string name="kahf_update_required">Za nastavak je potrebno ažuriranje!</string>
+    <string name="selectLanguage">Odaberite jezik</string>
 
 
 

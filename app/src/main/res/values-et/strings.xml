@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">On möödunud aega, kui kasutasite Kahf. Soovime teie tagasisidet – puudutage, et jagada oma arvamust.</string>
     <string name="kahf_restart_app">Uuendus allalaaditud! Rakendus taaskäivitub…</string>
     <string name="kahf_update_required">Jätkamiseks on vajalik uuendus!</string>
+    <string name="selectLanguage">Vali keel</string>
 
 
     <!-- Onboarding Activity -->

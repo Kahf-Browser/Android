@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">Že nekaj časa niste uporabili Kahf. Radi bi slišali vaše mnenje – tapnite za povratne informacije.</string>
     <string name="kahf_restart_app">Posodobitev prenesena! Ponovni zagon aplikacije…</string>
     <string name="kahf_update_required">Za nadaljevanje je potrebna posodobitev!</string>
+    <string name="selectLanguage">Izberite jezik</string>
 
 
     <!-- Onboarding Activity -->

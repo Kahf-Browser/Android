@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">A trecut ceva timp de când ai folosit Kahf. Ne-ar plăcea să auzim părerea ta – apasă pentru a trimite feedback.</string>
     <string name="kahf_restart_app">Actualizare descărcată! Repornire aplicație…</string>
     <string name="kahf_update_required">Este necesară actualizarea pentru a continua!</string>
+    <string name="selectLanguage">Selectați limba</string>
 
 
     <!-- Onboarding Activity -->

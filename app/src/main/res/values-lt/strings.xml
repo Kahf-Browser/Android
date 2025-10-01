@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">Jau kurį laiką nenaudojote Kahf. Norėtume išgirsti jūsų nuomonę – bakstelėkite, kad pasidalytumėte atsiliepimu.</string>
     <string name="kahf_restart_app">Atsisiųstas atnaujinimas! Paleidžiama programėlė iš naujo…</string>
     <string name="kahf_update_required">Norint tęsti reikia atnaujinti!</string>
+    <string name="selectLanguage">Pasirinkite kalbą</string>
 
 
     <!-- Onboarding Activity -->

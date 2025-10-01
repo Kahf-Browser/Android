@@ -156,6 +156,7 @@
     <string name="refresh">Aggiorna</string>
     <string name="back">Indietro</string>
     <string name="forward">Avanti</string>
+    <string name="selectLanguage">Seleziona lingua</string>
 
     <string name="omnibarInputHint">Cerca o inserisci URL</string>
     <string name="clearButtonContentDescription">Elimina input di ricerca</string>

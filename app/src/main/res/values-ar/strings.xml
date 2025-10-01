@@ -814,6 +814,8 @@
     <string name="kahf_low">منخفض</string>
     <string name="kahf_off">إيقاف</string>
     <string name="no_suggestions">لا توجد اقتراحات</string>
+    <string name="selectLanguage">اختر اللغة</string>
+
 
     <string name="kahf_safegaze_lock">قفل SafeGaze</string>
     <string name="kahf_prevent_turning_off_safety_feature">منع إيقاف ميزات الأمان</string>

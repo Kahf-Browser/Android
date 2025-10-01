@@ -970,4 +970,5 @@
     
     <string name="kahf_restart_app">Update downloaded! Restarting app…</string>
     <string name="kahf_update_required">Update is required to continue!</string>
+    <string name="selectLanguage">Select Language</string>
 </resources>

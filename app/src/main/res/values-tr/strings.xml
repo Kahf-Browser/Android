@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">Kahf’i kullanmayalı biraz zaman oldu. Görüşlerinizi duymak isteriz – geri bildirim paylaşmak için dokunun.</string>
     <string name="kahf_restart_app">Güncelleme indirildi! Uygulama yeniden başlatılıyor…</string>
     <string name="kahf_update_required">Devam etmek için güncelleme gerekli!</string>
+    <string name="selectLanguage">Dil seçin</string>
 
 
     <!-- Onboarding Activity -->

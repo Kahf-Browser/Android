@@ -137,6 +137,7 @@
     <string name="inactivity_notification_body">Már egy ideje nem használta a Kahfot. Szeretnénk hallani a véleményét – koppintson a visszajelzés megosztásához.</string>
     <string name="kahf_restart_app">Frissítés letöltve! Az alkalmazás újraindítása…</string>
     <string name="kahf_update_required">A folytatáshoz frissítés szükséges!</string>
+    <string name="selectLanguage">Válasszon nyelvet</string>
 
 
     <!-- Onboarding Activity -->

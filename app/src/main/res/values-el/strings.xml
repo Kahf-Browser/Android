@@ -139,6 +139,8 @@
     <string name="inactivity_notification_body">Έχει περάσει καιρός από τότε που χρησιμοποιήσατε τον Kahf. Θα θέλαμε να ακούσουμε τη γνώμη σας – πατήστε για να μοιραστείτε τα σχόλιά σας.</string>
     <string name="kahf_restart_app">Η ενημέρωση κατέβηκε! Επανεκκίνηση εφαρμογής…</string>
     <string name="kahf_update_required">Απαιτείται ενημέρωση για να συνεχίσετε!</string>
+    <string name="selectLanguage">Επιλέξτε γλώσσα</string>
+
 
 
     <!-- Onboarding Activity -->
