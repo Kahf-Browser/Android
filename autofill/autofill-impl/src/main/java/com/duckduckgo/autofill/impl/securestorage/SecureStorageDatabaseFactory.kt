@@ -23,15 +23,18 @@ import com.duckduckgo.securestorage.store.db.ALL_MIGRATIONS
 import com.duckduckgo.securestorage.store.db.SecureStorageDatabase
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
-import javax.inject.Inject
 import net.sqlcipher.database.SupportFactory
+import javax.inject.Inject
 
 interface SecureStorageDatabaseFactory {
     fun getDatabase(): SecureStorageDatabase?
 }
 
 @SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(
+    scope = AppScope::class,
+    boundType = SecureStorageDatabaseFactory::class,
+)
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,
     private val keyProvider: SecureStorageKeyProvider,
