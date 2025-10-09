@@ -31,6 +31,9 @@ import androidx.appcompat.widget.Toolbar
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -99,6 +102,24 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     ) {
         if (daggerInject) daggerInject()
         themeChangeReceiver = applyTheme(themingDataStore.theme)
+        // 1. Tell the window to draw behind the system bars
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // 2. Get the root view of the activity's content
+        val contentView = findViewById<View>(android.R.id.content)
+
+        // 3. Set a listener to handle insets
+        ViewCompat.setOnApplyWindowInsetsListener(contentView) { view, windowInsets ->
+            // Get the insets for the system bars (status bar, navigation bar)
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+
+            // Apply the insets as padding to the root view.
+            // This pushes your content down from the status bar and up from the navigation bar.
+            view.setPadding(insets.left, insets.top, insets.right, insets.bottom)
+
+            // Return the insets so that other views can also process them if needed.
+            windowInsets
+        }
         super.onCreate(savedInstanceState)
     }
 
