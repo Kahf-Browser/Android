@@ -99,7 +99,7 @@ class SafeGazeJsInterface(
 
     private fun addTaskToQueue(input: InputImage?) {
         if (input == null || isInvalidImageUrl(input.src)) {
-            Timber.d("imgLog: 1. imageId: ${input?.id}")
+            Timber.d("kLog imgLog: 1. imageId: ${input?.id}")
             onImageClassified("detectionResult", OutputImage(
                 result = "null",
                 id = input?.id ?: "",
@@ -192,7 +192,7 @@ class SafeGazeJsInterface(
                         is DownloadStatus.Failed -> {
                             // Download failed, remove from tracker
                             downloadTracker.remove(readyTask.id)
-                            // Timber.d("imgLog: 2. imageId: ${readyTask.id}")
+                            Timber.d("kLog imgLog: 2. imageId: ${readyTask.id}")
                             onImageClassified("detectionResult", OutputImage(
                                 result = "null",
                                 id = readyTask.id ?: "",
@@ -205,7 +205,7 @@ class SafeGazeJsInterface(
                         is DownloadStatus.Success -> {
                             // Small delay to avoid overwhelming the processor
                             delay(10)
-                            // Timber.d("imgLog: 3. imageId: ${readyTask.id}")
+                            Timber.d("kLog imgLog: 3. imageId: ${readyTask.id}")
                             var output = OutputImage(
                                 result = "null",
                                 id = readyTask.id ?: "",
@@ -221,7 +221,7 @@ class SafeGazeJsInterface(
                                 )
 
                                 if (cachedResult != null) {
-                                    // Timber.d("imgLog: 4. imageId: ${it.id}")
+                                    Timber.d("kLog imgLog: 4. imageId: ${it.id}")
                                     output = OutputImage(
                                         result = cachedResult.responseStr,
                                         id = it.id ?: "",
@@ -271,7 +271,7 @@ class SafeGazeJsInterface(
                                             imageDetector.downloadAndStore(readyTask.copy(imgBitmap = bmp)) { result ->
                                                 output = result
                                             }
-                                            // Timber.d("imgLog: 5. imageId: ${output.id}")
+                                            Timber.d("kLog imgLog: 5. imageId: ${output.id}")
                                         }
                                         Timber.d("kLog Segmentation inference time: $segmentationInf ms")
 
