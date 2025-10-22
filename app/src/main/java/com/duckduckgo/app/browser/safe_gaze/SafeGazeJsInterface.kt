@@ -206,13 +206,6 @@ class SafeGazeJsInterface(
                             // Small delay to avoid overwhelming the processor
                             delay(10)
                             Timber.d("kLog imgLog: 3. imageId: ${readyTask.id}")
-                            var output = OutputImage(
-                                result = "null",
-                                id = readyTask.id ?: "",
-                                width = readyTask.width ?: 0,
-                                height = readyTask.height ?: 0,
-                                from = "statusSuccess"
-                            )
 
                             readyTask.let {
                                 val maskType = getMaskType()
@@ -222,13 +215,13 @@ class SafeGazeJsInterface(
 
                                 if (cachedResult != null) {
                                     Timber.d("kLog imgLog: 4. imageId: ${it.id}")
-                                    output = OutputImage(
+                                    onImageClassified("detectionResult",OutputImage(
                                         result = cachedResult.responseStr,
                                         id = it.id ?: "",
                                         width = it.width ?: 0,
                                         height = it.height ?: 0,
                                         from = "cache"
-                                    )
+                                    ))
                                     Timber.d("kLog cache hit")
                                     downloadTracker.remove(it.id)
                                     return@let
@@ -244,10 +237,9 @@ class SafeGazeJsInterface(
                                     )
                                     waitingTimes.clear()
                                 }
+                                val bmp = downloadStatus.bitmap
 
                                 try {
-                                    val bmp = downloadStatus.bitmap
-
                                     Timber.d("kLog Using pre-downloaded bitmap: ${bmp.width}x${bmp.height}")
 
                                     val nsfwResult: NsfwPrediction?
@@ -258,32 +250,41 @@ class SafeGazeJsInterface(
                                     Timber.d("kLog NSFW - ${nsfwResult?.isSafe()?.not()}. Inference time: $nsfwInference ms")
 
                                     if (nsfwResult?.isSafe() == false) {
-                                        output = OutputImage(
+                                        onImageClassified("detectionResult",OutputImage(
                                             result = "nsfw",
                                             id = readyTask.id ?: "",
                                             width = readyTask.width ?: 0,
                                             height = readyTask.height ?: 0,
                                             isManipulated = true,
                                             from = "nsfw"
-                                        )
+                                        ))
                                     } else {
                                         val segmentationInf = measureTimeMillis {
                                             imageDetector.downloadAndStore(readyTask.copy(imgBitmap = bmp)) { result ->
-                                                output = result
+                                                onImageClassified("detectionResult",result)
+                                                kahfImageBlockedDao.insert(
+                                                    KahfImageBlocked(
+                                                        imageUrl = "${it.src?.md5()}_$maskType",
+                                                        responseStr = result.result,
+                                                        isIndecent = result.isManipulated,
+                                                        imageWidth = result.width.toFloat(),
+                                                        imageHeight = result.height.toFloat(),
+                                                        modifiedAt = System.currentTimeMillis(),
+                                                        maskType = maskType,
+                                                    ),
+                                                )
+                                                coreInferenceTimes.add(result.coreInferenceTime ?: 0L)
+                                                if (grayBlur) {
+                                                    maskingTimes.add(result.maskOrPixelationTime ?: 0L)
+                                                } else {
+                                                    pixelationTimes.add(result.maskOrPixelationTime ?: 0L)
+                                                }
+                                                Timber.d("kLog imgLog: 5. imageId: ${result.id}")
                                             }
-                                            Timber.d("kLog imgLog: 5. imageId: ${output.id}")
                                         }
-                                        Timber.d("kLog Segmentation inference time: $segmentationInf ms")
-
                                         val inferenceTime = nsfwInference + segmentationInf
                                         inferenceTimes.add(inferenceTime)
-                                        coreInferenceTimes.add(output.coreInferenceTime ?: 0L)
-                                        if (grayBlur) {
-                                            maskingTimes.add(output.maskOrPixelationTime ?: 0L)
-                                        } else {
-                                            pixelationTimes.add(output.maskOrPixelationTime ?: 0L)
-                                        }
-                                        inferenceTimes.add(inferenceTime)
+                                        Timber.d("kLog Segmentation inference time: $segmentationInf ms")
                                         Timber.d("kLog Total inference time: $inferenceTime ms, NSFW: $nsfwInference, seg: $segmentationInf")
                                     }
                                 } catch (e: Exception) {
@@ -342,20 +343,7 @@ class SafeGazeJsInterface(
                                     )
                                     inferenceTimes.clear()
                                 }
-
-                                kahfImageBlockedDao.insert(
-                                    KahfImageBlocked(
-                                        imageUrl = "${it.src?.md5()}_$maskType",
-                                        responseStr = output.result,
-                                        isIndecent = output.isManipulated,
-                                        imageWidth = output.width.toFloat(),
-                                        imageHeight = output.height.toFloat(),
-                                        modifiedAt = System.currentTimeMillis(),
-                                        maskType = maskType,
-                                    ),
-                                )
                             }
-                            onImageClassified("detectionResult", output)
                         }
                     }
                 }
