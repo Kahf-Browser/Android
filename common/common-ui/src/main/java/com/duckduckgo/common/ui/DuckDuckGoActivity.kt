@@ -115,7 +115,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
 
             // Apply the insets as padding to the root view.
             // This pushes your content down from the status bar and up from the navigation bar.
-            view.setPadding(insets.left, insets.top, insets.right, insets.bottom)
+            view.setPadding(insets.left, insets.top, insets.right, 0)
 
             // Return the insets so that other views can also process them if needed.
             windowInsets
