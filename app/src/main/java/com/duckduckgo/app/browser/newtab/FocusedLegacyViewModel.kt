@@ -103,14 +103,13 @@ class FocusedLegacyViewModel @Inject constructor(
                         Favorite(title = "Mahfil", url = "https://mahfil.net", id = "", lastModified = "", position = -1),
                         Favorite(title = "Kahf Kids", url = "https://kahfkids.com", id = "", lastModified = "", position = -1),
                         Favorite(title = "Muslims Day", url = "https://muslimsday.com/", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Al Quran", url = "https://quran.com/", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Hadith", url = "https://sunnah.com/", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Facebook", url = "https://facebook.com/", id = "", lastModified = "", position = -1),
+                        Favorite(title = "X", url = "https://x.com/", id = "", lastModified = "", position = -1)
                     )
                     // ✅ Favorites first, then history
-                    val mostVisited = buildMostVisitedSites(history)
-
-                    /*mostVisited.forEach {
-                        println("${it.domain} → ${it.topUrl} (${it.totalVisits} visits)")
-                    }*/
-                    sponsoredList + convertMostVisitedToToFavorites(mostVisited)
+                    sponsoredList /*+ convertMostVisitedToToFavorites(mostVisited)*/
                 }
                 .flowOn(dispatchers.io())
                 .onEach { combinedList ->
@@ -125,60 +124,7 @@ class FocusedLegacyViewModel @Inject constructor(
         }
     }
 
-    fun String.extractBaseDomain(): String {
-        // Defensive checks
-        if (this.isBlank()) return this
-
-        val parts = this.split(".")
-        if (parts.size <= 2) return this // e.g., google.com, facebook.com
-
-        // Handle typical subdomains like "m.facebook.com", "accounts.google.com"
-        // and keep only the last two parts ("facebook.com", "google.com")
-        return parts.takeLast(2).joinToString(".")
-    }
-
-    private fun buildMostVisitedSites(
-        historyList: List<HistoryEntry>,
-        maxItems: Int = 10
-    ): List<HistoryEntry.MostVisitedSite> {
-
-        // Step 1: Group entries by domain
-        val groupedByDomain = historyList.groupBy { it.url.host?.extractBaseDomain().orEmpty() }
-
-        // Step 2: For each domain, calculate total visits & most visited URL
-        val domainStats = groupedByDomain.mapNotNull { (domain, entries) ->
-            if (domain.isBlank()) return@mapNotNull null // skip invalid URLs
-
-            // Flatten URLs and count visits for each
-            val urlFrequency = entries.associateBy(
-                keySelector = { it.url },
-                valueTransform = { it.visits.size },
-            )
-
-            // Find the most visited URL for this domain
-            val topUrlEntry = urlFrequency.maxByOrNull { it.value } ?: return@mapNotNull null
-            val topUrl = topUrlEntry.key
-            val topVisits = topUrlEntry.value
-
-            // Find the entry corresponding to that URL (for title)
-            val topEntry = entries.firstOrNull { it.url == topUrl }
-
-            // Calculate total visits for the whole domain
-            val totalVisits = entries.sumOf { it.visits.size }
-
-            HistoryEntry.MostVisitedSite(
-                domain = domain,
-                topUrl = topUrl,
-                title = topEntry?.title ?: domain,
-                totalVisits = totalVisits,
-            )
-        }
-
-        // Step 3: Sort by total visits descending & take top N
-        return domainStats.sortedByDescending { it.totalVisits }.take(maxItems)
-    }
-
-    fun convertMostVisitedToToFavorites(mostVisited: List<HistoryEntry.MostVisitedSite>): List<SavedSite.Favorite> {
+    /*fun convertMostVisitedToToFavorites(mostVisited: List<HistoryEntry.MostVisitedSite>): List<SavedSite.Favorite> {
         val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
         val now = LocalDateTime.now().format(formatter)
 
@@ -192,7 +138,7 @@ class FocusedLegacyViewModel @Inject constructor(
                 deleted = null,
             )
         }
-    }
+    }*/
 
     private fun List<HistoryEntry>.convertToFavorites(): MutableList<Favorite> {
         val newList = mutableListOf<Favorite>()

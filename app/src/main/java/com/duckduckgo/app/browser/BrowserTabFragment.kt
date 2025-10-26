@@ -201,6 +201,7 @@ import com.duckduckgo.app.browser.ui.dialogs.LaunchInExternalAppOptions
 import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
+import com.duckduckgo.app.browser.utils.buildMostVisitedSites
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -4805,10 +4806,10 @@ class BrowserTabFragment :
             historyRepository.getHistoryFlow().flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
                 .onEach {
-                    val uniqueItems = it.distinctBy { history -> history.url.host }
-                    historyAdapter.submitList(uniqueItems)
-                    newBrowserTab.historyRecyclerView.isVisible = uniqueItems.isNotEmpty()
-                    Timber.d("History updated. Should update UI now. ${uniqueItems.size}")
+                    val mostVisited = buildMostVisitedSites(it)
+                    historyAdapter.submitList(mostVisited)
+                    newBrowserTab.historyRecyclerView.isVisible = mostVisited.isNotEmpty()
+                    Timber.d("History updated. Should update UI now. ${mostVisited.size}")
                 }
                 .launchIn(lifecycleScope)
 
