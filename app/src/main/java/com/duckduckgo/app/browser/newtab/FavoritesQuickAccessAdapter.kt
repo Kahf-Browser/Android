@@ -147,9 +147,11 @@ class FavoritesQuickAccessAdapter(
 
         private fun configureClickListeners(item: QuickAccessFavorite) {
             binding.root.setOnLongClickListener {
-                itemState = ItemState.LongPress
-                scaleUpFavicon()
-                showOverFlowMenu(inflater, binding.quickAccessFaviconCard, item)
+                if (item.favorite.position != -1) {
+                    itemState = ItemState.LongPress
+                    scaleUpFavicon()
+                    showOverFlowMenu(inflater, binding.quickAccessFaviconCard, item)
+                }
                 false
             }
             binding.root.setOnClickListener { onItemSelected(item) }
@@ -164,7 +166,7 @@ class FavoritesQuickAccessAdapter(
             val view = popupMenu.contentView
             popupMenu.apply {
                 // onMenuItemClicked(view.findViewById(R.id.edit)) { onEditClicked(item) }
-                onMenuItemClicked(view.findViewById(R.id.removeFromFavorites)) { onRemoveFavoriteClicked(item) }
+                // onMenuItemClicked(view.findViewById(R.id.removeFromFavorites)) { onRemoveFavoriteClicked(item) }
                 onMenuItemClicked(view.findViewById(R.id.delete)) { onDeleteClicked(item) }
             }
             popupMenu.showAnchoredToView(binding.root, anchor)

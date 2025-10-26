@@ -26,6 +26,7 @@ import androidx.fragment.app.findFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -80,6 +81,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -123,7 +125,7 @@ class FocusedLegacyView @JvmOverloads constructor(
     private val binding: ViewFocusedViewLegacyBinding by viewBinding()
 
     private lateinit var quickAccessAdapter: FavoritesQuickAccessAdapter
-    private lateinit var quickAccessItemTouchHelper: ItemTouchHelper
+    // private lateinit var quickAccessItemTouchHelper: ItemTouchHelper
 
     private val viewModel: FocusedLegacyViewModel by lazy {
         ViewModelProvider(findViewTreeViewModelStoreOwner()!!, viewModelFactory)[FocusedLegacyViewModel::class.java]
@@ -167,9 +169,9 @@ class FocusedLegacyView @JvmOverloads constructor(
         configureQuickAccessGridLayout(binding.quickAccessSuggestionsRecyclerView)
         quickAccessAdapter = createQuickAccessAdapter(originPixel = AppPixelName.FAVORITE_OMNIBAR_ITEM_PRESSED) { viewHolder ->
             binding.quickAccessSuggestionsRecyclerView.enableAnimation()
-            quickAccessItemTouchHelper.startDrag(viewHolder)
+            // quickAccessItemTouchHelper.startDrag(viewHolder)
         }
-        quickAccessItemTouchHelper = createQuickAccessItemHolder(binding.quickAccessSuggestionsRecyclerView, quickAccessAdapter)
+        // quickAccessItemTouchHelper = createQuickAccessItemHolder(binding.quickAccessSuggestionsRecyclerView, quickAccessAdapter)
         binding.quickAccessSuggestionsRecyclerView.adapter = quickAccessAdapter
         binding.quickAccessSuggestionsRecyclerView.disableAnimation()
     }
@@ -244,7 +246,9 @@ class FocusedLegacyView @JvmOverloads constructor(
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteFavoriteRequested(it.favorite) },
-            { viewModel.onDeleteSavedSiteRequested(it.favorite) },
+            {
+                viewModel.onDeleteSavedSiteRequested(it.favorite)
+            },
         )
     }
 

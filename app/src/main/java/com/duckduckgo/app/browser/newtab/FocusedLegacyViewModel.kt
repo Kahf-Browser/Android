@@ -17,6 +17,7 @@
 package com.duckduckgo.app.browser.newtab
 
 import android.annotation.SuppressLint
+import androidx.core.net.toUri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
@@ -53,6 +54,9 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.UUID
 import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
@@ -93,29 +97,100 @@ class FocusedLegacyViewModel @Inject constructor(
                     favorites.filter { it.id !in hiddenIds.favorites }
                 }
                 .combine(historyRepository.getHistoryFlow()) { favorites, history ->
-                    val uniqueHistory = history
-                        .distinctBy { it.url.host }
-                        .convertToFavorites()
 
                     val sponsoredList = listOf(
-                        Favorite(title = "Hikmah", url = "https://hikmah.net", id = "", lastModified = "", position = 0),
-                        Favorite(title = "Mahfil", url = "https://mahfil.net", id = "", lastModified = "", position = 0),
-                        Favorite(title = "Kahf Kids", url = "https://kahfkids.com", id = "", lastModified = "", position = 0),
-                        Favorite(title = "Muslims Day", url = "https://muslimsday.com/", id = "", lastModified = "", position = 0)
+                        Favorite(title = "Hikmah", url = "https://hikmah.net", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Mahfil", url = "https://mahfil.net", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Kahf Kids", url = "https://kahfkids.com", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Muslims Day", url = "https://muslimsday.com/", id = "", lastModified = "", position = -1),
                     )
                     // ✅ Favorites first, then history
-                    sponsoredList + favorites + uniqueHistory
+                    val mostVisited = buildMostVisitedSites(history)
+
+                    /*mostVisited.forEach {
+                        println("${it.domain} → ${it.topUrl} (${it.totalVisits} visits)")
+                    }*/
+                    sponsoredList + convertMostVisitedToToFavorites(mostVisited)
                 }
                 .flowOn(dispatchers.io())
                 .onEach { combinedList ->
                     combinedFavouriteWithHistory.addAll(combinedList)
                     _viewState.emit(
-                        viewState.value.copy(favourites = combinedList)
+                        viewState.value.copy(favourites = combinedList),
                     )
                     Timber.d("Updated UI with ${combinedList.size} items (favorites first)")
                 }
                 .flowOn(dispatchers.main())
                 .launchIn(viewModelScope)
+        }
+    }
+
+    fun String.extractBaseDomain(): String {
+        // Defensive checks
+        if (this.isBlank()) return this
+
+        val parts = this.split(".")
+        if (parts.size <= 2) return this // e.g., google.com, facebook.com
+
+        // Handle typical subdomains like "m.facebook.com", "accounts.google.com"
+        // and keep only the last two parts ("facebook.com", "google.com")
+        return parts.takeLast(2).joinToString(".")
+    }
+
+    private fun buildMostVisitedSites(
+        historyList: List<HistoryEntry>,
+        maxItems: Int = 10
+    ): List<HistoryEntry.MostVisitedSite> {
+
+        // Step 1: Group entries by domain
+        val groupedByDomain = historyList.groupBy { it.url.host?.extractBaseDomain().orEmpty() }
+
+        // Step 2: For each domain, calculate total visits & most visited URL
+        val domainStats = groupedByDomain.mapNotNull { (domain, entries) ->
+            if (domain.isBlank()) return@mapNotNull null // skip invalid URLs
+
+            // Flatten URLs and count visits for each
+            val urlFrequency = entries.associateBy(
+                keySelector = { it.url },
+                valueTransform = { it.visits.size },
+            )
+
+            // Find the most visited URL for this domain
+            val topUrlEntry = urlFrequency.maxByOrNull { it.value } ?: return@mapNotNull null
+            val topUrl = topUrlEntry.key
+            val topVisits = topUrlEntry.value
+
+            // Find the entry corresponding to that URL (for title)
+            val topEntry = entries.firstOrNull { it.url == topUrl }
+
+            // Calculate total visits for the whole domain
+            val totalVisits = entries.sumOf { it.visits.size }
+
+            HistoryEntry.MostVisitedSite(
+                domain = domain,
+                topUrl = topUrl,
+                title = topEntry?.title ?: domain,
+                totalVisits = totalVisits,
+            )
+        }
+
+        // Step 3: Sort by total visits descending & take top N
+        return domainStats.sortedByDescending { it.totalVisits }.take(maxItems)
+    }
+
+    fun convertMostVisitedToToFavorites(mostVisited: List<HistoryEntry.MostVisitedSite>): List<SavedSite.Favorite> {
+        val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
+        val now = LocalDateTime.now().format(formatter)
+
+        return mostVisited.mapIndexed { index, site ->
+            SavedSite.Favorite(
+                id = UUID.randomUUID().toString(),
+                title = site.title,
+                url = site.topUrl.toString(),
+                lastModified = now,
+                position = index, // position in sorted order
+                deleted = null,
+            )
         }
     }
 
@@ -257,6 +332,28 @@ class FocusedLegacyViewModel @Inject constructor(
     }
 
     fun onDeleteSavedSiteRequested(savedSite: SavedSite) {
+        viewModelScope.launch {
+            historyRepository.clearEntry(savedSite.toHistoryEntry())
+        }
         hide(savedSite, DeleteSavedSiteConfirmation(savedSite))
+    }
+
+    fun SavedSite.toHistoryEntry(): HistoryEntry {
+        val uri = url.toUri()
+
+        // Attempt to parse lastModified into LocalDateTime if possible
+        val visits = lastModified?.let {
+            try {
+                listOf(LocalDateTime.parse(it, DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+            } catch (e: Exception) {
+                listOf(LocalDateTime.now()) // fallback
+            }
+        } ?: listOf(LocalDateTime.now())
+
+        return HistoryEntry.VisitedPage(
+            url = uri,
+            title = title,
+            visits = visits,
+        )
     }
 }

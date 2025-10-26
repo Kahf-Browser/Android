@@ -55,4 +55,11 @@ sealed class HistoryEntry {
         val query: String,
         override val visits: List<LocalDateTime>,
     ) : HistoryEntry()
+
+    data class MostVisitedSite(
+        val domain: String,
+        val topUrl: Uri,
+        val title: String,
+        val totalVisits: Int
+    )
 }
