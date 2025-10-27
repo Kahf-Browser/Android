@@ -67,7 +67,7 @@ private class ViewChildrenRecursiveSequence(private val view: View) : Sequence<V
 
     private class RecursiveViewIterator(view: View) : Iterator<View> {
         private val sequences = arrayListOf(view.childrenSequence())
-        private var current = sequences.removeLast().iterator()
+        private var current = sequences.removeAt(sequences.lastIndex).iterator()
 
         override fun next(): View {
             if (!hasNext()) throw NoSuchElementException()
@@ -80,7 +80,7 @@ private class ViewChildrenRecursiveSequence(private val view: View) : Sequence<V
 
         override fun hasNext(): Boolean {
             if (!current.hasNext() && sequences.isNotEmpty()) {
-                current = sequences.removeLast().iterator()
+                current = sequences.removeAt(sequences.lastIndex).iterator()
             }
             return current.hasNext()
         }

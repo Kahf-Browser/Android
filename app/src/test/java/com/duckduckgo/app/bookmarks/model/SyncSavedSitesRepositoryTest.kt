@@ -213,7 +213,7 @@ class SyncSavedSitesRepositoryTest {
         savedSitesRelationsDao.insertList(relation)
 
         val removedEntities = entities.toMutableList()
-        val removedEntity = removedEntities.removeFirst()
+        val removedEntity = removedEntities.removeAt(0)
 
         val removedEntitiesIds = removedEntities.map { it.entityId }
         val childrenJSON = stringListAdapter.toJson(removedEntitiesIds)
