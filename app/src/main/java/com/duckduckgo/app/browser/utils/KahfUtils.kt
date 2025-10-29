@@ -22,6 +22,8 @@ import kotlin.collections.component2
 
 import android.net.Uri
 import java.time.LocalDateTime
+import android.content.Context
+import android.provider.Settings
 
 fun extractBaseDomain(host: String): String {
     if (host.isBlank()) return host
@@ -73,3 +75,21 @@ fun buildMostVisitedSites(
         // Extract HistoryEntry only
         .map { it.first }
 }
+
+fun getNavigationMode(context: Context): Int {
+    return try {
+        Settings.Secure.getInt(context.contentResolver, "navigation_mode")
+    } catch (e: Settings.SettingNotFoundException) {
+        0 // Default to 3-button navigation if setting not found
+    }
+}
+
+fun isGestureNavigation(context: Context): Boolean {
+    return getNavigationMode(context) == 2
+}
+
+fun getNavigationBarHeight(context: Context): Int {
+    val resId = context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
+    return if (resId > 0) context.resources.getDimensionPixelSize(resId) else 0
+}
+

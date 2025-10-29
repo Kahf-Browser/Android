@@ -21,6 +21,7 @@ import android.app.UiModeManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.graphics.Color
+import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
@@ -102,6 +103,7 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     ) {
         if (daggerInject) daggerInject()
         themeChangeReceiver = applyTheme(themingDataStore.theme)
+        super.onCreate(savedInstanceState)
         // 1. Tell the window to draw behind the system bars
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -120,7 +122,6 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
             // Return the insets so that other views can also process them if needed.
             windowInsets
         }
-        super.onCreate(savedInstanceState)
     }
 
     protected fun daggerInject() {

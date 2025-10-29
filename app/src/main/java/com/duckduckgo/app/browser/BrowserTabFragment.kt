@@ -202,6 +202,8 @@ import com.duckduckgo.app.browser.urlextraction.DOMUrlExtractor
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebView
 import com.duckduckgo.app.browser.urlextraction.UrlExtractingWebViewClient
 import com.duckduckgo.app.browser.utils.buildMostVisitedSites
+import com.duckduckgo.app.browser.utils.getNavigationBarHeight
+import com.duckduckgo.app.browser.utils.isGestureNavigation
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
@@ -1553,6 +1555,7 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newBrowserTab.newTabLayout.show()
+        adjustAdsHeightBasedOnNavigation()
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
@@ -1563,6 +1566,17 @@ class BrowserTabFragment :
         errorView.errorLayout.gone()
         sslErrorView.gone()
         setPrayerTimeVisibility(false)
+    }
+
+    private fun adjustAdsHeightBasedOnNavigation() {
+        if (isGestureNavigation(binding.root.context)) {
+            // Gesture navigation → no bottom padding needed
+            newBrowserTab.newTabLayout.setPadding(0, 0, 0, 0)
+        } else {
+            // Button navigation → add bottom padding for nav bar
+            val navBarHeight = getNavigationBarHeight(binding.root.context)
+            newBrowserTab.bottomContentContainer.setPadding(0, 0, 0, navBarHeight)
+        }
     }
 
     private fun showBrowser() {
