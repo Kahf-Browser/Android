@@ -18,6 +18,7 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ComponentCaller
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
@@ -92,6 +93,7 @@ import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.get
 import kotlinx.coroutines.CoroutineScope
@@ -217,6 +219,30 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         checkForAppUpdate()
         checkIfAppIsStillDefault()
+        /*FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val token = task.result
+                Timber.d("KahfLog: Device Token: $token")
+            }
+        }*/
+        handleNotificationIntent(intent = intent)
+    }
+
+    override fun onNewIntent(
+        intent: Intent,
+        caller: ComponentCaller
+    ) {
+        super.onNewIntent(intent, caller)
+        handleNotificationIntent(intent = intent)
+    }
+
+    private fun handleNotificationIntent(intent: Intent) {
+        lifecycleScope.launch {
+            val tabId = viewModel.onNewTabRequested()
+            val redirectUrl = intent.getStringExtra("redirectUrl")
+            openNewTab(tabId = tabId, url = redirectUrl, skipHome = false)
+            Timber.d("kahfLog: redirectUrlInActivity: ${intent.getStringExtra("redirectUrl")}")
+        }
     }
 
     private fun checkIfAppIsStillDefault() {
