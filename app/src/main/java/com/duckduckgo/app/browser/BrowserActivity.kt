@@ -96,6 +96,8 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.get
+import io.kahf.kahf_segmentation.ImageProcessor
+import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -126,6 +128,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var userEventsStore: UserEventsStore
+
+    @Inject
+    lateinit var imageProcessor: ImageProcessor
+
+    @Inject
+    lateinit var videoFrameProcessor: VideoFrameProcessor
 
     @Inject
     lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
@@ -377,6 +385,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(it)
             layoutListener = null
         }
+        imageProcessor.closePordaSegment()
+        videoFrameProcessor.close()
         super.onDestroy()
     }
 
