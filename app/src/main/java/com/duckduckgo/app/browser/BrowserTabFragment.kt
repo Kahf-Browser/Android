@@ -631,12 +631,6 @@ class BrowserTabFragment :
     @Inject
     lateinit var spProvider: SharedPreferencesProvider
 
-    @Inject
-    lateinit var imageProcessor: ImageProcessor
-
-    @Inject
-    lateinit var videoFrameProcessor: VideoFrameProcessor
-
     /**
      * We use this to monitor whether the user was seeing the in-context Email Protection signup prompt
      * This is needed because the activity stack will be cleared if an external link is opened in our browser
@@ -2857,8 +2851,8 @@ class BrowserTabFragment :
                 },
                 grayBlur = SafeGazeLevel.getCurrentLevel(sharedPreferences) == SafeGazeLevel.Blur,
                 shouldCoverFace = sharedPreferences.isFaceCoverEnabled(),
-                imageProcessor,
-                videoFrameProcessor,
+                (activity as BrowserActivity).imageProcessor,
+                (activity as BrowserActivity).videoFrameProcessor,
             )
 
             it.webViewClient = webViewClient
@@ -3675,7 +3669,7 @@ class BrowserTabFragment :
         automaticFireproofDialog?.dismiss()
         browserAutofill.removeJsInterface()
         destroyWebView()
-        safeGazeInterface.closePordaSegment()
+        // safeGazeInterface.closePordaSegment()
         super.onDestroy()
     }
 
