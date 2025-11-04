@@ -22,8 +22,8 @@ android {
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
-        versionCode 202510281
-        versionName "2.40.5"
+        versionCode 202511041
+        versionName "2.40.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "kahf_browser_${versionName}_${versionCode}"
         vectorDrawables.useSupportLibrary = true
@@ -505,7 +505,7 @@ dependencies {
     // Flipper
     internalImplementation "com.facebook.flipper:flipper:_"
     internalImplementation "com.facebook.soloader:soloader:_"
-    implementation "com.github.KahfAds:android:0.0.97-k1"
+    implementation "com.github.KahfAds:android:0.0.90-k1"
 
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator

@@ -35,7 +35,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-import com.kahfads.sdk.GoogleAdManagerConfig
+// import com.kahfads.sdk.GoogleAdManagerConfig
 import com.kahfads.sdk.KahfAdsSdk
 import com.kahfads.sdk.KahfAdsSdkConfig
 import com.posthog.android.PostHogAndroid
@@ -219,9 +219,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         KahfAdsSdk.initialize(
             config = KahfAdsSdkConfig(
                 fallbackPublisherId = FALLBACK_PUBLISHER_ID,
-                googleAdManagerConfig = GoogleAdManagerConfig(
+                /*googleAdManagerConfig = GoogleAdManagerConfig(
                     adUnitId = "/23318618088/Kahf_Browser_Android/Native"
-                )
+                )*/
             ),
             context = this
         )
