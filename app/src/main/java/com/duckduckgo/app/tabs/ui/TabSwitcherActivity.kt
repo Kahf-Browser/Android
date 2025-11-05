@@ -122,6 +122,7 @@ class TabSwitcherActivity : DuckDuckGoActivity(), TabSwitcherListener, Coroutine
         configureObservers()
         configureOnBackPressedListener()
         createPopupMenu()
+        adjustWindowInsets(top = 0)
     }
 
     private fun extractIntentExtras() {

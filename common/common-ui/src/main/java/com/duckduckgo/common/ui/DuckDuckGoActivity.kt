@@ -27,6 +27,7 @@ import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager.LayoutParams
 import androidx.appcompat.widget.Toolbar
 import androidx.biometric.BiometricManager
@@ -35,12 +36,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.duckduckgo.common.ui.DuckDuckGoTheme.DARK
 import com.duckduckgo.common.ui.DuckDuckGoTheme.LIGHT
 import com.duckduckgo.common.ui.store.ThemingDataStore
+import com.duckduckgo.common.ui.view.updateLayoutParams
 import com.duckduckgo.mobile.android.R
 import dagger.android.AndroidInjection
 import dagger.android.DaggerActivity
@@ -104,6 +107,10 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         if (daggerInject) daggerInject()
         themeChangeReceiver = applyTheme(themingDataStore.theme)
         super.onCreate(savedInstanceState)
+        adjustWindowInsets()
+    }
+
+    fun adjustWindowInsets(left: Int = -1, top: Int = -1, right: Int = -1, bottom: Int = -1) {
         // 1. Tell the window to draw behind the system bars
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -114,10 +121,15 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
         ViewCompat.setOnApplyWindowInsetsListener(contentView) { view, windowInsets ->
             // Get the insets for the system bars (status bar, navigation bar)
             val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeHeight = windowInsets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = imeHeight.coerceAtLeast(resources.getDimensionPixelSize(R.dimen.kahf_ad_bottom_margin_in_quick_access_page))
+            }
 
             // Apply the insets as padding to the root view.
             // This pushes your content down from the status bar and up from the navigation bar.
-            view.setPadding(insets.left, insets.top, insets.right, 0)
+            view.setPadding(if (left != -1) left else insets.left, if (top != -1) top else insets.top, if (right != -1) right else insets.right, 0)
 
             // Return the insets so that other views can also process them if needed.
             windowInsets
