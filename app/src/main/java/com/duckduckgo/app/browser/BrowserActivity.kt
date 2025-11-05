@@ -243,8 +243,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         lifecycleScope.launch {
             val tabId = viewModel.onNewTabRequested()
             val redirectUrl = intent.getStringExtra("redirectUrl")
-            openNewTab(tabId = tabId, url = redirectUrl, skipHome = false)
-            Timber.d("kahfLog: redirectUrlInActivity: ${intent.getStringExtra("redirectUrl")}")
+            if (redirectUrl != null) {
+                openNewTab(tabId = tabId, url = redirectUrl, skipHome = false, from = "handleNotificationIntent")
+                Timber.d("kahfLog: redirectUrlInActivity: ${intent.getStringExtra("redirectUrl")}")
+            }
         }
     }
 
@@ -418,8 +420,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
         tabId: String,
         url: String? = null,
         skipHome: Boolean,
+        from: String
     ): BrowserTabFragment {
-        Timber.i("Opening new tab, url: $url, tabId: $tabId")
+        Timber.i("kahfLog: Opening new tab, url: $url, tabId: $tabId, from: $from")
         val fragment = BrowserTabFragment.newInstance(tabId, url, skipHome)
         addOrReplaceNewTab(fragment, tabId)
         currentTab = fragment
@@ -455,7 +458,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         val fragment = supportFragmentManager.findFragmentByTag(tab.tabId) as? BrowserTabFragment
         if (fragment == null) {
-            openNewTab(tab.tabId, tab.url, tab.skipHome)
+            openNewTab(tab.tabId, tab.url, tab.skipHome, "selectTab")
             return
         }
         val transaction = supportFragmentManager.beginTransaction()
@@ -592,6 +595,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun removeOldTabs() {
+        Timber.d("kahfLog: removeOldTabs")
         val candidatesToRemove = lastActiveTabs.dropLast(MAX_ACTIVE_TABS)
         if (candidatesToRemove.isEmpty()) return
 
@@ -674,7 +678,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
     ) {
         openMessageInNewTabJob = lifecycleScope.launch {
             val tabId = viewModel.onNewTabRequested(sourceTabId = sourceTabId)
-            val fragment = openNewTab(tabId, null, false)
+            val fragment = openNewTab(tabId, null, false, "openMessageInNewTab")
             fragment.messageFromPreviousTab = message
         }
     }

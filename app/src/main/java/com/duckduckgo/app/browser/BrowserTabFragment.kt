@@ -932,7 +932,7 @@ class BrowserTabFragment :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Timber.d("onCreate called for tabId=$tabId")
+        Timber.d("kahfLog: BrowserTabFragment onCreate called for tabId=$tabId")
 
         removeDaxDialogFromActivity()
         renderer = BrowserTabFragmentRenderer()
@@ -1662,6 +1662,7 @@ class BrowserTabFragment :
         url: String,
         headers: Map<String, String>,
     ) {
+        Timber.d("kahfLog: navigate Url: $url")
         clientBrandHintProvider.setOn(webView?.settings, url)
         hideKeyboard()
         renderer.hideFindInPage()
@@ -2647,6 +2648,10 @@ class BrowserTabFragment :
                 (finalView as FocusedLegacyView).apply {
                     setOnClickAdListener { url ->
                         viewModel.onUserSubmittedQuery(url)
+                    }
+
+                    setOnClickQuickAccessItem { clickedUrl ->
+                        viewModel.onUserSubmittedQuery(clickedUrl)
                     }
                 }
             }.launchIn(lifecycleOwner.lifecycleScope)
@@ -3660,6 +3665,7 @@ class BrowserTabFragment :
     }
 
     override fun onDestroy() {
+        Timber.d("kahfLog: BrowserTabFragment onDestroy Tab id $tabId")
         viewModel.newTabShown = false // to generate new tab contents after the Activity recreated
         dismissAppLinkSnackBar()
         pulseAnimation.stop()

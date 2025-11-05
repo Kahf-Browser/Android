@@ -93,10 +93,16 @@ class FocusedLegacyView @JvmOverloads constructor(
 ) : LinearLayout(context, attrs, defStyle) {
 
     private var onClickAd: ((String) -> Unit)? = null
+    private var onClickQuickAccessItem: ((String) -> Unit)? = null
 
     fun setOnClickAdListener(listener: (String) -> Unit) {
         onClickAd = listener
         Timber.d("Setting onClickAd listener: $listener")
+    }
+
+    fun setOnClickQuickAccessItem(url: (String) -> Unit) {
+        onClickQuickAccessItem = url
+        Timber.d("quickAccessItemUrl: $url")
     }
 
     @Inject
@@ -242,7 +248,7 @@ class FocusedLegacyView @JvmOverloads constructor(
             onMoveListener,
             {
                 pixel.fire(originPixel)
-                submitUrl(it.favorite.url)
+                onClickQuickAccessItem?.invoke(it.favorite.url)
             },
             { viewModel.onEditSavedSiteRequested(it.favorite) },
             { viewModel.onDeleteFavoriteRequested(it.favorite) },
@@ -253,6 +259,7 @@ class FocusedLegacyView @JvmOverloads constructor(
     }
 
     private fun submitUrl(url: String) {
+        Timber.d("kahfLog: submitUrl: Url: $url")
         context.startActivity(browserNav.openInCurrentTab(context, url))
     }
 

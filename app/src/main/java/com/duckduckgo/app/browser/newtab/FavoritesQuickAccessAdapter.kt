@@ -198,7 +198,7 @@ class FavoritesQuickAccessAdapter(
 
         private fun loadFavicon(url: String) {
             lifecycleOwner.lifecycleScope.launch {
-                Timber.d("kahfLog: Loading favicon for url: $url")
+                // Timber.d("kahfLog: Loading favicon for url: $url")
                 faviconManager.getFaviconFromGlide(url.toUri())?.let { bitmap ->
                     binding.quickAccessFavicon.setImageBitmap(bitmap)
                 }
