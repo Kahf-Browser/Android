@@ -53,6 +53,7 @@ import com.duckduckgo.app.feedback.ui.common.FeedbackActivity
 import com.duckduckgo.app.fire.DataClearer
 import com.duckduckgo.app.fire.DataClearerForegroundAppRestartPixel
 import com.duckduckgo.app.global.ApplicationClearDataState
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.intentText
 import com.duckduckgo.app.global.rating.PromptCount
@@ -128,12 +129,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var userEventsStore: UserEventsStore
-
-    @Inject
-    lateinit var imageProcessor: ImageProcessor
-
-    @Inject
-    lateinit var videoFrameProcessor: VideoFrameProcessor
 
     @Inject
     lateinit var serviceWorkerClientCompat: ServiceWorkerClientCompat
@@ -385,8 +380,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(it)
             layoutListener = null
         }
-        imageProcessor.closePordaSegment()
-        videoFrameProcessor.close()
+        (application as DuckDuckGoApplication).imageProcessor.closePordaSegment()
+        (application as DuckDuckGoApplication).videoFrameProcessor.close()
         super.onDestroy()
     }
 

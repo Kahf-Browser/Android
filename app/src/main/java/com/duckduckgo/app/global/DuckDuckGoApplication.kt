@@ -42,6 +42,8 @@ import com.posthog.android.PostHogAndroid
 import com.posthog.android.PostHogAndroidConfig
 import dagger.android.AndroidInjector
 import dagger.android.HasDaggerInjector
+import io.kahf.kahf_segmentation.ImageProcessor
+import io.kahf.video_filter.VideoFrameProcessor
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
@@ -78,6 +80,12 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
+
+    @Inject
+    lateinit var imageProcessor: ImageProcessor
+
+    @Inject
+    lateinit var videoFrameProcessor: VideoFrameProcessor
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 

@@ -226,6 +226,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.dns.CustomDnsResolver
 import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteEntity
 import com.duckduckgo.app.fire.fireproofwebsite.data.website
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.global.GlobalData
 import com.duckduckgo.app.global.model.PrivacyShield.UNKNOWN
 import com.duckduckgo.app.global.model.orderedTrackerBlockedEntities
@@ -2851,8 +2852,8 @@ class BrowserTabFragment :
                 },
                 grayBlur = SafeGazeLevel.getCurrentLevel(sharedPreferences) == SafeGazeLevel.Blur,
                 shouldCoverFace = sharedPreferences.isFaceCoverEnabled(),
-                (activity as BrowserActivity).imageProcessor,
-                (activity as BrowserActivity).videoFrameProcessor,
+                (activity?.application as DuckDuckGoApplication).imageProcessor,
+                (activity?.application as DuckDuckGoApplication).videoFrameProcessor,
             )
 
             it.webViewClient = webViewClient
