@@ -97,10 +97,13 @@ import androidx.core.net.toUri
 import androidx.core.text.HtmlCompat
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.toSpannable
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.postDelayed
+import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commitNow
@@ -1013,6 +1016,7 @@ class BrowserTabFragment :
         configureNewTab()
         initPrivacyProtectionsPopup()
         configureBottomNav()
+        // adjustWindowInsets()
 
         if (tabDisplayedInCustomTabScreen) {
             configureCustomTab()
@@ -1078,6 +1082,21 @@ class BrowserTabFragment :
                 true
             }
         }
+    }
+
+    private fun adjustWindowInsets() {
+        val bottomBar = bottomNav.botNav
+        ViewCompat.setOnApplyWindowInsetsListener(bottomBar) { view, insets ->
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeVisible = insets.isVisible(WindowInsetsCompat.Type.ime())
+
+            view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                bottomMargin = if (imeVisible) imeInsets.bottom else 0
+            }
+            insets
+        }
+
     }
 
     @SuppressLint("InflateParams")
@@ -1550,7 +1569,7 @@ class BrowserTabFragment :
         dismissAppLinkSnackBar()
         errorSnackbar.dismiss()
         newBrowserTab.newTabLayout.show()
-        adjustAdsHeightBasedOnNavigation()
+        // adjustAdsHeightBasedOnNavigation()
         newBrowserTab.newTabContainerLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()

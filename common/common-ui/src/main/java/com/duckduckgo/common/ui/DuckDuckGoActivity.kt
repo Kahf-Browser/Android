@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
+import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -111,30 +112,50 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     }
 
     fun adjustWindowInsets(left: Int = -1, top: Int = -1, right: Int = -1, bottom: Int = -1) {
-        // 1. Tell the window to draw behind the system bars
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        // 2. Get the root view of the activity's content
         val contentView = findViewById<View>(android.R.id.content)
 
-        // 3. Set a listener to handle insets
         ViewCompat.setOnApplyWindowInsetsListener(contentView) { view, windowInsets ->
-            // Get the insets for the system bars (status bar, navigation bar)
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val imeHeight = windowInsets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeInsets = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
+            val imeVisible = windowInsets.isVisible(WindowInsetsCompat.Type.ime())
+
+            // If keyboard visible, set bottom margin to IME height
+            // If not, reset to your original bottom margin (e.g., ad space)
 
             view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                bottomMargin = imeHeight.coerceAtLeast(resources.getDimensionPixelSize(R.dimen.kahf_ad_bottom_margin_in_quick_access_page))
+                isDarkThemeEnabled()
+                bottomMargin = if (imeVisible) imeInsets.bottom else if (!isGestureNavigation(this@DuckDuckGoActivity)) resources.getDimensionPixelSize(
+                    R.dimen.tabBottomNavHeight
+                ) else 0
             }
 
-            // Apply the insets as padding to the root view.
-            // This pushes your content down from the status bar and up from the navigation bar.
-            view.setPadding(if (left != -1) left else insets.left, if (top != -1) top else insets.top, if (right != -1) right else insets.right, 0)
+            // Apply system bar insets as padding (avoid pushing up content manually)
+            view.setPadding(
+                if (left != -1) left else systemBars.left,
+                if (top != -1) top else systemBars.top,
+                if (right != -1) right else systemBars.right,
+                0
+            )
 
-            // Return the insets so that other views can also process them if needed.
-            windowInsets
+            // Return insets unconsumed
+            WindowInsetsCompat.CONSUMED
         }
     }
+
+    fun getNavigationMode(context: Context): Int {
+        return try {
+            Settings.Secure.getInt(context.contentResolver, "navigation_mode")
+        } catch (e: Settings.SettingNotFoundException) {
+            0 // Default to 3-button navigation if setting not found
+        }
+    }
+
+    fun isGestureNavigation(context: Context): Boolean {
+        return getNavigationMode(context) == 2
+    }
+
 
     protected fun daggerInject() {
         AndroidInjection.inject(this, bindingKey = DaggerActivity::class.java)

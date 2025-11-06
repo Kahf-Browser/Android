@@ -51,6 +51,7 @@
     <dimen name="buttonLargeSidePadding">24dp</dimen>
     <dimen name="buttonSmallTopPadding">8dp</dimen>
     <dimen name="buttonLargeTopPadding">14dp</dimen>
+    <dimen name="tabBottomNavHeight">48dp</dimen>
 
     <!-- List Items -->
     <dimen name="listItemImageContainerSize">40dp</dimen>
