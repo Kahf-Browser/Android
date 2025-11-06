@@ -606,9 +606,6 @@ class BrowserTabFragment :
     lateinit var dnsResolver: CustomDnsResolver
 
     @Inject
-    lateinit var nsfwDetector: NsfwDetector
-
-    @Inject
     lateinit var webTrackersBlockedDao: WebTrackersBlockedDao
 
     @Inject
@@ -2851,7 +2848,7 @@ class BrowserTabFragment :
 
         webView?.let {
             safeGazeInterface = SafeGazeJsInterface(
-                requireContext(), nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
+                requireContext(), (activity?.application as DuckDuckGoApplication).nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onImageClassified = { type, data ->
                     Timber.d("kLog: imgLog Send to WebView from Kotlin: type: $type, from: ${data?.from}, src: ${data?.result}")
                     webView?.post {
@@ -2863,8 +2860,8 @@ class BrowserTabFragment :
                         imageBlockCountDao.incrementCount()
                     }
 
-                    if (!globalData.modelInitializationTimeLogged && nsfwDetector.modelInitializationTime > 0) {
-                        val initializationTime = nsfwDetector.modelInitializationTime
+                    if (!globalData.modelInitializationTimeLogged && (activity?.application as DuckDuckGoApplication).nsfwDetector.modelInitializationTime > 0) {
+                        val initializationTime = (activity?.application as DuckDuckGoApplication).nsfwDetector.modelInitializationTime
                         analyticsService.logEvent(
                             AnalyticsEvent.ModelInitTime,
                             mapOf(AnalyticsParam.ModelInitTimeMS to initializationTime.toString()),

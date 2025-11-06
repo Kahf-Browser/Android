@@ -29,6 +29,7 @@ import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
+import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FALLBACK_PUBLISHER_ID
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -86,6 +87,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
 
     @Inject
     lateinit var videoFrameProcessor: VideoFrameProcessor
+
+    @Inject
+    lateinit var nsfwDetector: NsfwDetector
 
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
