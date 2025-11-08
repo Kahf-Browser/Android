@@ -46,6 +46,9 @@ class NsfwDetector(val context: Context) {
     var isInitialized = false
         private set
 
+    var numThreadsConfigured = 0
+        private set
+
     private var interpreter: Interpreter? = null
     private var gpuDelegate: GpuDelegate? = null
 
@@ -107,7 +110,7 @@ class NsfwDetector(val context: Context) {
 
                 Timber.d(
                     "kLog NSFW model initialized in ${modelInitializationTime}ms " +
-                        "(GPU: $isGpuEnabled, threads: ${if (isGpuEnabled) "GPU" else "4"})"
+                        "(GPU: $isGpuEnabled, CPU threads: $numThreadsConfigured)"
                 )
             } catch (e: Exception) {
                 isInitializing.set(false)
@@ -145,9 +148,13 @@ class NsfwDetector(val context: Context) {
 
             // ✅ OPTIMIZATION 4: CPU fallback with multi-threading
             try {
-                // Use 4 threads for CPU inference (30-50% speedup)
-                setNumThreads(4)
-                Timber.d("kLog Using CPU with 4 threads for NSFW model")
+                // Calculate optimal thread count: 25% of cores, min 1
+                val numCores = Runtime.getRuntime().availableProcessors()
+                val optimalThreads = maxOf(1, (numCores * 0.25).toInt())
+
+                setNumThreads(optimalThreads)
+                numThreadsConfigured = optimalThreads
+                Timber.d("kLog Using CPU with $optimalThreads threads (25% of $numCores cores) for NSFW model")
 
                 // Enable XNNPACK delegate for optimized CPU operations
                 setUseXNNPACK(true)
@@ -156,6 +163,7 @@ class NsfwDetector(val context: Context) {
                 Timber.w("kLog Failed to configure CPU optimizations: ${e.message}")
                 // Fallback to default single-threaded CPU
                 setNumThreads(1)
+                numThreadsConfigured = 1
             }
         }
     }
@@ -249,10 +257,13 @@ class NsfwDetector(val context: Context) {
      * Get current configuration info for debugging/analytics.
      */
     fun getConfigInfo(): Map<String, Any> {
+        val numCores = Runtime.getRuntime().availableProcessors()
         return mapOf(
             "initialized" to isInitialized,
             "gpuEnabled" to isGpuEnabled,
             "initializationTimeMs" to modelInitializationTime,
+            "numThreads" to numThreadsConfigured,
+            "cpuCores" to numCores,
             "inputSize" to inputImageSize,
             "numClasses" to numClasses
         )
