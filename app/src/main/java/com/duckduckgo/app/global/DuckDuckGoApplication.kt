@@ -116,6 +116,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             referralStateListener.initialiseReferralRetrieval()
         }
 
+        // ✅ OPTIMIZATION 3: Eagerly initialize NSFW model in background
+        // This eliminates the 100-300ms delay on first image detection
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("kLog Starting eager NSFW model initialization")
+                nsfwDetector.initializeEagerly()
+                Timber.d("kLog NSFW model eager initialization completed")
+            } catch (e: Exception) {
+                Timber.e("kLog Failed to eagerly initialize NSFW model: ${e.message}")
+            }
+        }
+
         scheduleTasks()
         configRemoteConfig()
 

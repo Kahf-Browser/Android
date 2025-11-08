@@ -466,6 +466,10 @@ dependencies {
     implementation 'com.google.ai.edge.litert:litert-metadata:1.4.0'
     implementation 'com.google.ai.edge.litert:litert:1.4.0'
 
+    // TensorFlow Lite GPU Delegate for model acceleration
+    implementation 'org.tensorflow:tensorflow-lite-gpu:2.14.0'
+    implementation 'org.tensorflow:tensorflow-lite-gpu-delegate-plugin:0.4.4'
+
     // Lottie
     implementation "com.airbnb.android:lottie:_"
 
