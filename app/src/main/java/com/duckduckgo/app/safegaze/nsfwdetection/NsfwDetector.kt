@@ -2,7 +2,6 @@ package com.duckduckgo.app.safegaze.nsfwdetection
 
 import android.content.Context
 import android.graphics.Bitmap
-import org.tensorflow.lite.DataType
 import org.tensorflow.lite.DataType.FLOAT32
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
@@ -120,9 +119,7 @@ class NsfwDetector(val context: Context) {
         }
     }
 
-    /**
-     * Create optimized interpreter options with GPU delegate and CPU fallback.
-     */
+
     private fun createOptimizedInterpreterOptions(): Interpreter.Options {
         return Interpreter.Options().apply {
             // ✅ OPTIMIZATION 1: Try GPU delegate first (2-4x speedup)
