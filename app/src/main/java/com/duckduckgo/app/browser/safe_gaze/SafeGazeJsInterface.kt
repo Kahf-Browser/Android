@@ -1,6 +1,7 @@
 package com.duckduckgo.app.browser.safe_gaze
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.webkit.JavascriptInterface
 import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsParam
@@ -25,6 +26,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.PriorityBlockingQueue
@@ -60,12 +63,13 @@ class SafeGazeJsInterface(
     private val downloadTracker = ConcurrentHashMap<String?, DownloadStatus>()
     private val downloadSemaphore = Semaphore(5)
 
+    // CRITICAL FIX: Track bitmaps for cleanup
+    private val activeBitmaps = ConcurrentHashMap<String?, Bitmap>()
+
     init {
         scope.launch {
             imageDetector.updateFaceCoverMode(shouldCoverFace)
             imageDetector.updateBlurMode(grayBlur)
-            // videoDetector.updateBlurMode(grayBlur)
-            // videoDetector.updateFaceCoverMode(shouldCoverFace)
         }
     }
 
@@ -115,7 +119,6 @@ class SafeGazeJsInterface(
         }
 
         startImageDownload(input)
-
         urlQueue.add(input)
         processQueue()
     }
@@ -123,33 +126,74 @@ class SafeGazeJsInterface(
     private fun startImageDownload(input: InputImage) {
         downloadTracker[input.id] = DownloadStatus.Pending
         var acquired = false
+
         scope.launch {
+            var downloadedBitmap: Bitmap? = null
             try {
                 downloadSemaphore.acquire()
                 acquired = true
 
                 val downloadTime = measureTimeMillis {
                     val startTime = System.currentTimeMillis()
-                    val bitmap = withTimeout(2000) {
-                        imageDownloader.downloadImageWithAspectRatio(
-                            context, input.src, input.baseImg, input.width, input.height
-                        )
-                    }
-                    val downloadTime = System.currentTimeMillis() - startTime
 
-                    if (bitmap != null) {
-                        downloadTracker[input.id] = DownloadStatus.Success(bitmap)
-                        Timber.d("kLog Downloaded in ${downloadTime}ms for ${input.id}: ${bitmap.width}x${bitmap.height}")
+                    try {
+                        // CRITICAL FIX: Properly handle timeout and exceptions
+                        downloadedBitmap = withTimeout(2000) {
+                            try {
+                                imageDownloader.downloadImageWithAspectRatio(
+                                    context, input.src, input.baseImg, input.width, input.height
+                                )
+                            } catch (e: OutOfMemoryError) {
+                                Timber.e("kLog OOM during download for ${input.id}")
+                                System.gc() // Suggest garbage collection
+                                null
+                            } catch (e: Exception) {
+                                Timber.e("kLog Download exception for ${input.id}: ${e.message}")
+                                null
+                            }
+                        }
+                    } catch (e: TimeoutCancellationException) {
+                        Timber.w("kLog Download timeout for ${input.id}")
+                        downloadedBitmap = null
+                    }
+
+                    val downloadDuration = System.currentTimeMillis() - startTime
+                    val newBitmap = downloadedBitmap
+
+                    if (newBitmap != null && !newBitmap.isRecycled) {
+                        // CRITICAL FIX: Convert to safe bitmap format immediately
+                        val safeBitmap = convertToSafeBitmap(newBitmap, input.id)
+
+                        if (safeBitmap != null) {
+                            // Clean up original if we made a copy
+                            if (safeBitmap !== newBitmap) {
+                                newBitmap.recycle()
+                            }
+
+                            activeBitmaps[input.id] = safeBitmap
+                            downloadTracker[input.id] = DownloadStatus.Success(safeBitmap)
+                            Timber.d("kLog Downloaded in ${downloadDuration}ms for ${input.id}: ${safeBitmap.width}x${safeBitmap.height}")
+                        } else {
+                            newBitmap.recycle()
+                            downloadTracker[input.id] = DownloadStatus.Failed
+                            Timber.w("kLog Failed to convert bitmap for ${input.id}")
+                        }
                     } else {
                         downloadTracker[input.id] = DownloadStatus.Failed
-                        Timber.d("kLog Download failed for ${input.id} - bitmap is null")
+                        Timber.d("kLog Download failed for ${input.id} - bitmap is null or recycled")
                     }
                 }
 
                 Timber.d("kLog Download time for ${input.id}: $downloadTime ms")
 
+            } catch (e: OutOfMemoryError) {
+                Timber.e("kLog OOM in download coroutine for ${input.id}")
+                downloadedBitmap?.recycle()
+                downloadTracker[input.id] = DownloadStatus.Failed
+                System.gc()
             } catch (e: Exception) {
-                Timber.e("kLog Image download failed for ${input.id}: ${e.message}")
+                Timber.e("kLog Image download failed for ${input.id}: ${e.message}", e)
+                downloadedBitmap?.recycle()
                 downloadTracker[input.id] = DownloadStatus.Failed
             } finally {
                 if (acquired) {
@@ -168,186 +212,323 @@ class SafeGazeJsInterface(
         }
     }
 
+
+    /**
+     * CRITICAL FIX: Convert any bitmap to a safe ARGB_8888 format
+     * This prevents OpenGL "no context" errors when processing hardware bitmaps
+     */
+    private fun convertToSafeBitmap(original: Bitmap, imageId: String?): Bitmap? {
+        try {
+            if (original.isRecycled) {
+                Timber.w("kLog convertToSafeBitmap: bitmap already recycled for $imageId")
+                return null
+            }
+
+            val config = original.config
+
+            // Check if it's already in a safe format
+            if (config == Bitmap.Config.ARGB_8888 && original.config != Bitmap.Config.HARDWARE) {
+                return original
+            }
+
+            Timber.d("kLog Converting bitmap from $config to ARGB_8888 for $imageId")
+
+            // CRITICAL: Create a software bitmap copy to avoid GL context issues
+            val safeBitmap = try {
+                // If it's a hardware bitmap, we MUST copy it to software
+                if (config == Bitmap.Config.HARDWARE) {
+                    Timber.d("kLog Converting hardware bitmap to software for $imageId")
+                    val software = original.copy(Bitmap.Config.ARGB_8888, false)
+                    software
+                } else {
+                    // For non-hardware bitmaps, just ensure ARGB_8888
+                    original.copy(Bitmap.Config.ARGB_8888, false)
+                }
+            } catch (e: IllegalArgumentException) {
+                Timber.e("kLog IllegalArgumentException copying bitmap for $imageId: ${e.message}")
+                null
+            } catch (e: OutOfMemoryError) {
+                Timber.e("kLog OOM copying bitmap for $imageId")
+                System.gc()
+                // Try one more time with lower quality
+                try {
+                    original.copy(Bitmap.Config.RGB_565, false)?.let { rgb565 ->
+                        rgb565.copy(Bitmap.Config.ARGB_8888, false).also {
+                            rgb565.recycle()
+                        }
+                    }
+                } catch (e2: Exception) {
+                    Timber.e("kLog Retry copy also failed for $imageId")
+                    null
+                }
+            } catch (e: Exception) {
+                Timber.e("kLog Unexpected error copying bitmap for $imageId: ${e.message}", e)
+                null
+            }
+
+            if (safeBitmap == null) {
+                Timber.w("kLog Failed to create safe bitmap for $imageId")
+                return null
+            }
+
+            // Verify the copy is valid
+            if (safeBitmap.isRecycled) {
+                Timber.w("kLog Safe bitmap was immediately recycled for $imageId")
+                return null
+            }
+
+            return safeBitmap
+
+        } catch (e: Exception) {
+            Timber.e("kLog convertToSafeBitmap: unexpected error for $imageId", e)
+            return null
+        }
+    }
+
     private fun processQueue() {
         if (!paused.get() && processingJob?.isActive != true) {
             processingJob = scope.launch {
                 while (urlQueue.isNotEmpty()) {
-                    // Find the first task that's ready to process (not pending)
-                    val readyTask = urlQueue.find { task ->
-                        val status = downloadTracker[task.id]
-                        status is DownloadStatus.Success || status is DownloadStatus.Failed
-                    }
+                    try {
+                        // Find the first task that's ready to process
+                        val readyTask = urlQueue.find { task ->
+                            val status = downloadTracker[task.id]
+                            status is DownloadStatus.Success || status is DownloadStatus.Failed
+                        }
 
-                    if (readyTask == null) {
-                        delay(50)
-                        continue
-                    }
-
-                    urlQueue.remove(readyTask)
-
-                    when (val downloadStatus = downloadTracker[readyTask.id]) {
-                        null, is DownloadStatus.Pending -> {
+                        if (readyTask == null) {
+                            delay(50)
                             continue
                         }
-                        is DownloadStatus.Failed -> {
-                            // Download failed, remove from tracker
-                            downloadTracker.remove(readyTask.id)
-                            Timber.d("kLog imgLog: 2. imageId: ${readyTask.id}")
-                            onImageClassified("detectionResult", OutputImage(
-                                result = "null",
-                                id = readyTask.id ?: "",
-                                width = readyTask.width ?: 0,
-                                height = readyTask.height ?: 0,
-                                from = "statusFailed"
-                            ))
-                            continue
-                        }
-                        is DownloadStatus.Success -> {
-                            // Small delay to avoid overwhelming the processor
-                            delay(10)
-                            Timber.d("kLog imgLog: 3. imageId: ${readyTask.id}")
 
-                            readyTask.let {
-                                val maskType = getMaskType()
-                                val cachedResult = kahfImageBlockedDao.findByUrl(
-                                    "${it.src?.md5()}_$maskType"
-                                )
+                        urlQueue.remove(readyTask)
 
-                                if (cachedResult != null) {
-                                    Timber.d("kLog imgLog: 4. imageId: ${it.id}")
-                                    onImageClassified("detectionResult",OutputImage(
-                                        result = cachedResult.responseStr,
-                                        id = it.id ?: "",
-                                        width = it.width ?: 0,
-                                        height = it.height ?: 0,
-                                        from = "cache"
-                                    ))
-                                    Timber.d("kLog cache hit")
-                                    downloadTracker.remove(it.id)
-                                    return@let
-                                }
+                        when (val downloadStatus = downloadTracker[readyTask.id]) {
+                            null, is DownloadStatus.Pending -> {
+                                continue
+                            }
+                            is DownloadStatus.Failed -> {
+                                // Clean up and notify
+                                cleanupBitmap(readyTask.id)
+                                downloadTracker.remove(readyTask.id)
+                                Timber.d("kLog imgLog: 2. imageId: ${readyTask.id}")
+                                onImageClassified("detectionResult", OutputImage(
+                                    result = "null",
+                                    id = readyTask.id ?: "",
+                                    width = readyTask.width ?: 0,
+                                    height = readyTask.height ?: 0,
+                                    from = "statusFailed"
+                                ))
+                                continue
+                            }
+                            is DownloadStatus.Success -> {
+                                delay(10)
+                                Timber.d("kLog imgLog: 3. imageId: ${readyTask.id}")
 
-                                val waitingTime = System.currentTimeMillis() - readyTask.insertedAt
-                                waitingTimes.add(waitingTime)
-                                if (waitingTimes.size >= 30) {
-                                    val avg = waitingTimes.average().toLong()
-                                    analytics.logEvent(
-                                        AnalyticsEvent.AvgQueueTime,
-                                        mapOf(AnalyticsParam.AvgQueueTimeMs to avg.toString()),
-                                    )
-                                    waitingTimes.clear()
-                                }
-                                val bmp = downloadStatus.bitmap
-
-                                try {
-                                    Timber.d("kLog Using pre-downloaded bitmap: ${bmp.width}x${bmp.height}")
-
-                                    val nsfwResult: NsfwPrediction?
-                                    val nsfwInference = measureTimeMillis {
-                                        nsfwResult = nsfwDetector.isNsfw(bmp)
-                                    }
-                                    nsfwProcessingTimes.add(nsfwInference)
-                                    Timber.d("kLog NSFW - ${nsfwResult?.isSafe()?.not()}. Inference time: $nsfwInference ms")
-
-                                    if (nsfwResult?.isSafe() == false) {
-                                        onImageClassified("detectionResult",OutputImage(
-                                            result = "nsfw",
-                                            id = readyTask.id ?: "",
-                                            width = readyTask.width ?: 0,
-                                            height = readyTask.height ?: 0,
-                                            isManipulated = true,
-                                            from = "nsfw"
-                                        ))
-                                    } else {
-                                        val segmentationInf = measureTimeMillis {
-                                            imageDetector.downloadAndStore(readyTask.copy(imgBitmap = bmp)) { result ->
-                                                onImageClassified("detectionResult",result)
-                                                kahfImageBlockedDao.insert(
-                                                    KahfImageBlocked(
-                                                        imageUrl = "${it.src?.md5()}_$maskType",
-                                                        responseStr = result.result,
-                                                        isIndecent = result.isManipulated,
-                                                        imageWidth = result.width.toFloat(),
-                                                        imageHeight = result.height.toFloat(),
-                                                        modifiedAt = System.currentTimeMillis(),
-                                                        maskType = maskType,
-                                                    ),
-                                                )
-                                                coreInferenceTimes.add(result.coreInferenceTime ?: 0L)
-                                                if (grayBlur) {
-                                                    maskingTimes.add(result.maskOrPixelationTime ?: 0L)
-                                                } else {
-                                                    pixelationTimes.add(result.maskOrPixelationTime ?: 0L)
-                                                }
-                                                Timber.d("kLog imgLog: 5. imageId: ${result.id}")
-                                            }
-                                        }
-                                        val inferenceTime = nsfwInference + segmentationInf
-                                        inferenceTimes.add(inferenceTime)
-                                        Timber.d("kLog Segmentation inference time: $segmentationInf ms")
-                                        Timber.d("kLog Total inference time: $inferenceTime ms, NSFW: $nsfwInference, seg: $segmentationInf")
-                                    }
-                                } catch (e: Exception) {
-                                    Timber.e("kLog Error processing image: ${e.message}")
-                                    return@let
-                                } finally {
-                                    downloadTracker.remove(readyTask.id)
-                                }
-
-                                if (nsfwProcessingTimes.size >= 30) {
-                                    val p90NSFW = nsfwProcessingTimes.sorted()[nsfwProcessingTimes.size * 90 / 100]
-                                    Timber.d("kLog p90NSFW: $p90NSFW")
-                                    analytics.logEvent(
-                                        AnalyticsEvent.P90NSFWProcessing,
-                                        mapOf(AnalyticsParam.NSFWProcessingTime to p90NSFW.toString()),
-                                    )
-                                    nsfwProcessingTimes.clear()
-                                }
-
-                                if (coreInferenceTimes.size >= 30) {
-                                    val p90CoreInference = coreInferenceTimes.sorted()[coreInferenceTimes.size * 90 / 100]
-                                    Timber.d("kLog p90CoreInference: $p90CoreInference")
-                                    analytics.logEvent(
-                                        AnalyticsEvent.P90CoreInference,
-                                        mapOf(AnalyticsParam.CoreInferenceTime to p90CoreInference.toString()),
-                                    )
-                                    coreInferenceTimes.clear()
-                                }
-
-                                if (maskingTimes.size >= 30) {
-                                    val p90Masking = maskingTimes.sorted()[maskingTimes.size * 90 / 100]
-                                    Timber.d("kLog p90Masking: $p90Masking")
-                                    analytics.logEvent(
-                                        AnalyticsEvent.P90ApplySolidMask,
-                                        mapOf(AnalyticsParam.ApplySolidMaskTime to p90Masking.toString()),
-                                    )
-                                    maskingTimes.clear()
-                                }
-
-                                if (pixelationTimes.size >= 30) {
-                                    val p90Pixelation = pixelationTimes.sorted()[pixelationTimes.size * 90 / 100]
-                                    Timber.d("kLog p90Pixelation: $p90Pixelation")
-                                    analytics.logEvent(
-                                        AnalyticsEvent.P90ApplyPixelationMask,
-                                        mapOf(AnalyticsParam.ApplyPixelationMaskTime to p90Pixelation.toString()),
-                                    )
-                                    pixelationTimes.clear()
-                                }
-
-                                if (inferenceTimes.size >= 30) {
-                                    val p90 = inferenceTimes.sorted()[inferenceTimes.size * 90 / 100]
-                                    // Timber.d("kLog p90Inference: $p90")
-                                    analytics.logEvent(
-                                        AnalyticsEvent.P90ImageProcessing,
-                                        mapOf(AnalyticsParam.ImageProcessingTime to p90.toString()),
-                                    )
-                                    inferenceTimes.clear()
-                                }
+                                processImageTask(readyTask, downloadStatus.bitmap)
                             }
                         }
+                    } catch (e: Exception) {
+                        Timber.e("kLog Error in processQueue loop: ${e.message}", e)
+                        delay(100) // Back off on errors
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun processImageTask(task: InputImage, bitmap: Bitmap) {
+        try {
+            // Verify bitmap is still valid
+            if (bitmap.isRecycled) {
+                Timber.w("kLog Bitmap already recycled for ${task.id}")
+                cleanupTask(task.id, "null", "bitmapRecycled")
+                return
+            }
+
+            val maskType = getMaskType()
+            val cacheKey = "${task.src?.md5()}_$maskType"
+
+            // Check cache
+            val cachedResult = kahfImageBlockedDao.findByUrl(cacheKey)
+            if (cachedResult != null) {
+                Timber.d("kLog imgLog: 4. imageId: ${task.id} - cache hit")
+                onImageClassified("detectionResult", OutputImage(
+                    result = cachedResult.responseStr,
+                    id = task.id ?: "",
+                    width = task.width ?: 0,
+                    height = task.height ?: 0,
+                    from = "cache"
+                ))
+                cleanupTask(task.id)
+                return
+            }
+
+            // Track waiting time
+            val waitingTime = System.currentTimeMillis() - task.insertedAt
+            waitingTimes.add(waitingTime)
+            if (waitingTimes.size >= 30) {
+                val avg = waitingTimes.average().toLong()
+                analytics.logEvent(
+                    AnalyticsEvent.AvgQueueTime,
+                    mapOf(AnalyticsParam.AvgQueueTimeMs to avg.toString())
+                )
+                waitingTimes.clear()
+            }
+
+            Timber.d("kLog Using bitmap: ${bitmap.width}x${bitmap.height}, config: ${bitmap.config}")
+
+            // NSFW Detection
+            val nsfwResult: NsfwPrediction?
+            val nsfwInference = measureTimeMillis {
+                nsfwResult = try {
+                    nsfwDetector.isNsfw(bitmap)
+                } catch (e: Exception) {
+                    Timber.e("kLog NSFW detection error for ${task.id}: ${e.message}", e)
+                    null
+                }
+            }
+
+            nsfwProcessingTimes.add(nsfwInference)
+            Timber.d("kLog NSFW - ${nsfwResult?.isSafe()?.not()}. Inference time: $nsfwInference ms")
+
+            if (nsfwResult?.isSafe() == false) {
+                onImageClassified("detectionResult", OutputImage(
+                    result = "nsfw",
+                    id = task.id ?: "",
+                    width = task.width ?: 0,
+                    height = task.height ?: 0,
+                    isManipulated = true,
+                    from = "nsfw"
+                ))
+                cleanupTask(task.id)
+            } else {
+                // Segmentation
+                val segmentationInf = measureTimeMillis {
+                    try {
+                        imageDetector.downloadAndStore(task.copy(imgBitmap = bitmap)) { result ->
+                            onImageClassified("detectionResult", result)
+
+                            kahfImageBlockedDao.insert(
+                                KahfImageBlocked(
+                                    imageUrl = cacheKey,
+                                    responseStr = result.result,
+                                    isIndecent = result.isManipulated,
+                                    imageWidth = result.width.toFloat(),
+                                    imageHeight = result.height.toFloat(),
+                                    modifiedAt = System.currentTimeMillis(),
+                                    maskType = maskType,
+                                )
+                            )
+
+                            coreInferenceTimes.add(result.coreInferenceTime ?: 0L)
+                            if (grayBlur) {
+                                maskingTimes.add(result.maskOrPixelationTime ?: 0L)
+                            } else {
+                                pixelationTimes.add(result.maskOrPixelationTime ?: 0L)
+                            }
+                            Timber.d("kLog imgLog: 5. imageId: ${result.id}")
+                        }
+                    } catch (e: Exception) {
+                        Timber.e("kLog Segmentation error for ${task.id}: ${e.message}", e)
+                    }
+                }
+
+                val inferenceTime = nsfwInference + segmentationInf
+                inferenceTimes.add(inferenceTime)
+                Timber.d("kLog Total inference: $inferenceTime ms (NSFW: $nsfwInference, Seg: $segmentationInf)")
+
+                cleanupTask(task.id)
+            }
+
+            // Log analytics
+            logAnalytics()
+
+        } catch (e: OutOfMemoryError) {
+            Timber.e("kLog OOM processing image ${task.id}")
+            cleanupTask(task.id, "null", "oom")
+            System.gc()
+        } catch (e: Exception) {
+            Timber.e("kLog Error processing image ${task.id}: ${e.message}", e)
+            cleanupTask(task.id, "null", "error")
+        }
+    }
+
+    private fun cleanupTask(taskId: String?, result: String? = null, from: String? = null) {
+        downloadTracker.remove(taskId)
+        cleanupBitmap(taskId)
+
+        if (result != null && taskId != null) {
+            // Notify failure
+            urlQueue.find { it.id == taskId }?.let { task ->
+                onImageClassified("detectionResult", OutputImage(
+                    result = result,
+                    id = taskId,
+                    width = task.width ?: 0,
+                    height = task.height ?: 0,
+                    from = from ?: "cleanup"
+                ))
+            }
+        }
+    }
+
+    private fun cleanupBitmap(imageId: String?) {
+        activeBitmaps.remove(imageId)?.let { bitmap ->
+            if (!bitmap.isRecycled) {
+                try {
+                    bitmap.recycle()
+                    Timber.d("kLog Recycled bitmap for $imageId")
+                } catch (e: Exception) {
+                    Timber.e("kLog Error recycling bitmap for $imageId: ${e.message}")
+                }
+            }
+        }
+    }
+
+    private fun logAnalytics() {
+        if (nsfwProcessingTimes.size >= 30) {
+            val p90NSFW = nsfwProcessingTimes.sorted()[nsfwProcessingTimes.size * 90 / 100]
+            analytics.logEvent(
+                AnalyticsEvent.P90NSFWProcessing,
+                mapOf(AnalyticsParam.NSFWProcessingTime to p90NSFW.toString())
+            )
+            nsfwProcessingTimes.clear()
+        }
+
+        if (coreInferenceTimes.size >= 30) {
+            val p90CoreInference = coreInferenceTimes.sorted()[coreInferenceTimes.size * 90 / 100]
+            analytics.logEvent(
+                AnalyticsEvent.P90CoreInference,
+                mapOf(AnalyticsParam.CoreInferenceTime to p90CoreInference.toString())
+            )
+            coreInferenceTimes.clear()
+        }
+
+        if (maskingTimes.size >= 30) {
+            val p90Masking = maskingTimes.sorted()[maskingTimes.size * 90 / 100]
+            analytics.logEvent(
+                AnalyticsEvent.P90ApplySolidMask,
+                mapOf(AnalyticsParam.ApplySolidMaskTime to p90Masking.toString())
+            )
+            maskingTimes.clear()
+        }
+
+        if (pixelationTimes.size >= 30) {
+            val p90Pixelation = pixelationTimes.sorted()[pixelationTimes.size * 90 / 100]
+            analytics.logEvent(
+                AnalyticsEvent.P90ApplyPixelationMask,
+                mapOf(AnalyticsParam.ApplyPixelationMaskTime to p90Pixelation.toString())
+            )
+            pixelationTimes.clear()
+        }
+
+        if (inferenceTimes.size >= 30) {
+            val p90 = inferenceTimes.sorted()[inferenceTimes.size * 90 / 100]
+            analytics.logEvent(
+                AnalyticsEvent.P90ImageProcessing,
+                mapOf(AnalyticsParam.ImageProcessingTime to p90.toString())
+            )
+            inferenceTimes.clear()
         }
     }
 
@@ -362,12 +543,25 @@ class SafeGazeJsInterface(
     fun resetProcessingQueue() {
         urlQueue.clear()
         downloadTracker.clear()
-        Timber.d("kLog cancel ongoing image processing")
+
+        // CRITICAL FIX: Clean up all active bitmaps
+        activeBitmaps.keys.toList().forEach { key ->
+            cleanupBitmap(key)
+        }
+
+        Timber.d("kLog Reset processing queue and cleaned up bitmaps")
     }
 
     fun cancelOngoingImageProcessing() {
         processingJob?.cancel()
+
+        // CRITICAL FIX: Clean up all bitmaps before canceling scope
+        activeBitmaps.keys.toList().forEach { key ->
+            cleanupBitmap(key)
+        }
+
         scope.cancel()
+        Timber.d("kLog Canceled image processing and cleaned up resources")
     }
 
     fun onTabPaused(tabId: String) {
@@ -392,6 +586,7 @@ class SafeGazeJsInterface(
                 insertedAt = System.currentTimeMillis()
             }
         } catch (e: JsonSyntaxException) {
+            Timber.e("kLog JSON parse error: ${e.message}")
             null
         }
     }
@@ -400,14 +595,20 @@ class SafeGazeJsInterface(
         if (url.isNullOrEmpty()) {
             return true
         }
-        return listOfEndsWith.any { url.endsWith(it, ignoreCase = true) } || listOfContains.any { url.contains(it) }
+        return listOfEndsWith.any { url.endsWith(it, ignoreCase = true) } ||
+            listOfContains.any { url.contains(it) }
     }
 
     fun closePordaSegment() {
+        // Clean up all bitmaps before closing
+        activeBitmaps.keys.toList().forEach { key ->
+            cleanupBitmap(key)
+        }
         imageDetector.closePordaSegment()
     }
 
-    private val listOfContains = listOf("image/gif", "image/svg", "/assets/thesun/images/teaser", "grey-placeholder")
+    private val listOfContains = listOf(
+        "image/gif", "image/svg", "/assets/thesun/images/teaser", "grey-placeholder"
+    )
     private val listOfEndsWith = listOf(".svg", ".gif")
 }
-
