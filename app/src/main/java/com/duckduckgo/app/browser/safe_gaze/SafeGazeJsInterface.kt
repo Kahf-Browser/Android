@@ -66,6 +66,10 @@ class SafeGazeJsInterface(
     // CRITICAL FIX: Track bitmaps for cleanup
     private val activeBitmaps = ConcurrentHashMap<String?, Bitmap>()
 
+    // CRITICAL FIX: Synchronize ImageDownloader access to prevent native crashes (SIGSEGV)
+    // ImageDownloader uses Glide's .submit().get() which is not thread-safe from multiple coroutines
+    private val downloaderLock = Any()
+
     init {
         scope.launch {
             imageDetector.updateFaceCoverMode(shouldCoverFace)
@@ -130,6 +134,13 @@ class SafeGazeJsInterface(
         scope.launch {
             var downloadedBitmap: Bitmap? = null
             try {
+                // CRITICAL FIX: Validate inputs before attempting download to prevent native crashes
+                if (!isValidDownloadInput(input)) {
+                    Timber.w("kLog Invalid download input for ${input.id}: src=${input.src}, width=${input.width}, height=${input.height}")
+                    downloadTracker[input.id] = DownloadStatus.Failed
+                    return@launch
+                }
+
                 downloadSemaphore.acquire()
                 acquired = true
 
@@ -140,12 +151,23 @@ class SafeGazeJsInterface(
                         // CRITICAL FIX: Properly handle timeout and exceptions
                         downloadedBitmap = withTimeout(2000) {
                             try {
-                                imageDownloader.downloadImageWithAspectRatio(
-                                    context, input.src, input.baseImg, input.width, input.height
-                                )
+                                // CRITICAL FIX: Synchronize access to ImageDownloader to prevent SIGSEGV
+                                // Multiple coroutines calling Glide's .submit().get() simultaneously
+                                // can cause native memory corruption and crashes
+                                synchronized(downloaderLock) {
+                                    imageDownloader.downloadImageWithAspectRatio(
+                                        context, input.src, input.baseImg, input.width, input.height
+                                    )
+                                }
                             } catch (e: OutOfMemoryError) {
                                 Timber.e("kLog OOM during download for ${input.id}")
                                 System.gc() // Suggest garbage collection
+                                null
+                            } catch (e: IllegalArgumentException) {
+                                Timber.e("kLog Invalid argument in Glide download for ${input.id}: ${e.message}")
+                                null
+                            } catch (e: NullPointerException) {
+                                Timber.e("kLog NPE in download for ${input.id}: ${e.message}")
                                 null
                             } catch (e: Exception) {
                                 Timber.e("kLog Download exception for ${input.id}: ${e.message}")
@@ -597,6 +619,50 @@ class SafeGazeJsInterface(
         }
         return listOfEndsWith.any { url.endsWith(it, ignoreCase = true) } ||
             listOfContains.any { url.contains(it) }
+    }
+
+    /**
+     * CRITICAL FIX: Validate download inputs to prevent native crashes (SIGSEGV)
+     * Ensures all parameters are valid before passing to Glide's native layer
+     */
+    private fun isValidDownloadInput(input: InputImage): Boolean {
+        // Validate dimensions
+        val width = input.width ?: 0
+        val height = input.height ?: 0
+        if (width < 1 || height < 1 || width > 10000 || height > 10000) {
+            Timber.w("kLog Invalid dimensions: ${width}x${height} for ${input.id}")
+            return false
+        }
+
+        // Validate source URL or base64
+        val hasValidUrl = !input.src.isNullOrBlank() && input.src!!.length < 10000
+        val hasValidBase64 = !input.baseImg.isNullOrBlank() &&
+                             input.baseImg != "none" &&
+                             input.baseImg!!.startsWith("data:image/")
+
+        if (!hasValidUrl && !hasValidBase64) {
+            Timber.w("kLog No valid image source for ${input.id}")
+            return false
+        }
+
+        // Validate URL format if using URL (not base64)
+        if (hasValidUrl && !hasValidBase64) {
+            val url = input.src ?: return false
+
+            // Check for common malformed URL patterns that cause "Error resolving host"
+            if (!url.matches(Regex("^(https?://|data:image/).*", RegexOption.IGNORE_CASE))) {
+                Timber.w("kLog Invalid URL scheme for ${input.id}: $url")
+                return false
+            }
+
+            // Check for invalid characters that could cause native crashes
+            if (url.contains('\u0000') || url.contains('\n') || url.contains('\r')) {
+                Timber.w("kLog URL contains invalid characters for ${input.id}")
+                return false
+            }
+        }
+
+        return true
     }
 
     fun closePordaSegment() {
