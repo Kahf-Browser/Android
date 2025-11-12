@@ -40,6 +40,8 @@
         android:fullBackupContent="@xml/backup_rules_android_11_and_older"
         android:theme="@style/Theme.DuckDuckGo.Light"
         android:requestLegacyExternalStorage="true"
+        android:largeHeap="true"
+        android:hardwareAccelerated="true"
         tools:ignore="GoogleAppIndexingWarning,UnusedAttribute">
 
         <meta-data

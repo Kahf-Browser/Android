@@ -19,3 +19,12 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep SafeGaze JS interface
+-keepclassmembers class com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+# Keep coroutines
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
