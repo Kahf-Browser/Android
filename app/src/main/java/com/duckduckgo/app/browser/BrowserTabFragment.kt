@@ -2860,7 +2860,7 @@ class BrowserTabFragment :
                         imageBlockCountDao.incrementCount()
                     }
 
-                    if (!globalData.modelInitializationTimeLogged && (activity?.application as DuckDuckGoApplication).nsfwDetector.modelInitializationTime > 0) {
+                    if (!globalData.modelInitializationTimeLogged && activity?.application != null && (activity?.application as DuckDuckGoApplication).nsfwDetector.modelInitializationTime > 0) {
                         val initializationTime = (activity?.application as DuckDuckGoApplication).nsfwDetector.modelInitializationTime
                         analyticsService.logEvent(
                             AnalyticsEvent.ModelInitTime,
