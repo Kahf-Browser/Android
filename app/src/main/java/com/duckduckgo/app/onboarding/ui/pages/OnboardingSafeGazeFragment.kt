@@ -115,6 +115,8 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
             Timber.e("kLog Error checking hardware compatibility")
 
             lifecycleScope.launch(dispatcher.main()) {
+                if (!isAdded) return@launch
+
                 binding.tvCompatibility.text = getString(R.string.kahf_onboarding_incompatible).also { text = it }
                 binding.progressLoader.visibility = View.GONE
                 binding.tvCompatibility.setTextColor(
@@ -128,7 +130,9 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
             // Wait for the View to be ready
             delay(500)
             isHardwareCompatible(requireContext(), nsfwDetector, imageProcessor) { result ->
-                CoroutineScope(dispatcher.main()).launch {
+                viewLifecycleOwner.lifecycleScope.launch(dispatcher.main()) {
+                    if (!isAdded) return@launch
+
                     binding.tvCompatibility.text = getString(
                         if (result) {
                             R.string.kahf_onboarding_compatible
