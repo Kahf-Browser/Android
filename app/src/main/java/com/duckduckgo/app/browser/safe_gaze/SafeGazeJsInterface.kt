@@ -122,9 +122,28 @@ class SafeGazeJsInterface(
             return
         }
 
-        startImageDownload(input)
-        urlQueue.add(input)
-        processQueue()
+        // CRITICAL FIX: Check cache BEFORE downloading to save bandwidth
+        scope.launch {
+            val maskType = getMaskType()
+            val cacheKey = "${input.src?.md5()}_$maskType"
+            val cachedResult = kahfImageBlockedDao.findByUrl(cacheKey)
+
+            if (cachedResult != null) {
+                Timber.d("kLog imgLog: Cache hit BEFORE download for ${input.id} - saved bandwidth!")
+                onImageClassified("detectionResult", OutputImage(
+                    result = cachedResult.responseStr,
+                    id = input.id ?: "",
+                    width = input.width ?: 0,
+                    height = input.height ?: 0,
+                    from = "cache-early"
+                ))
+            } else {
+                // Cache miss - proceed with download
+                startImageDownload(input)
+                urlQueue.add(input)
+                processQueue()
+            }
+        }
     }
 
     private fun startImageDownload(input: InputImage) {
