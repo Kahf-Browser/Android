@@ -429,6 +429,9 @@ class BrowserTabFragment :
     lateinit var webChromeClient: BrowserChromeClient
 
     @Inject
+    lateinit var safeBrowsingManager: com.duckduckgo.safebrowsing.api.SafeBrowsingManager
+
+    @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
     @Inject
@@ -1013,6 +1016,7 @@ class BrowserTabFragment :
         configureNewTab()
         initPrivacyProtectionsPopup()
         configureBottomNav()
+        configureSafeBrowsingBanner()
         // adjustWindowInsets()
 
         if (tabDisplayedInCustomTabScreen) {
@@ -1041,6 +1045,14 @@ class BrowserTabFragment :
                     }
                 }
             },
+        )
+
+        // Add Safe Browsing lifecycle observer
+        lifecycle.addObserver(
+            com.duckduckgo.safebrowsing.impl.SafeBrowsingLifecycleObserver(
+                safeBrowsingManager,
+                viewLifecycleOwner.lifecycleScope
+            )
         )
 
         childFragmentManager.findFragmentByTag(ADD_SAVED_SITE_FRAGMENT_TAG)?.let { dialog ->
@@ -1332,6 +1344,18 @@ class BrowserTabFragment :
         }
     }
 
+    private fun configureSafeBrowsingBanner() {
+        binding.safeBrowsingWarningBanner.apply {
+            onGoBackClicked = {
+                webView?.goBack()
+            }
+            onProceedAnywayClicked = {
+                // User acknowledged the risk - hide banner
+                viewModel.hideSafeBrowsingWarning()
+            }
+        }
+    }
+
     private fun getDaxDialogFromActivity(): Fragment? = activity?.supportFragmentManager?.findFragmentByTag(DAX_DIALOG_DIALOG_TAG)
 
     private fun removeDaxDialogFromActivity() {
@@ -1486,6 +1510,14 @@ class BrowserTabFragment :
 
         viewModel.pageUpdatedLiveData.observe(viewLifecycleOwner) {
             it?.let { safeGazeInterface.resetProcessingQueue() }
+        }
+
+        viewModel.safeBrowsingViewState.observe(viewLifecycleOwner) { state ->
+            if (state.visible && state.threatType != null) {
+                binding.safeBrowsingWarningBanner.show(state.threatType, state.url)
+            } else {
+                binding.safeBrowsingWarningBanner.hide()
+            }
         }
 
         addTabsObserver()

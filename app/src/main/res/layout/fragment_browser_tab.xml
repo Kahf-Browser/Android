@@ -23,6 +23,15 @@
 
     <include layout="@layout/include_omnibar_toolbar" />
 
+    <!-- Safe Browsing Warning Banner -->
+    <com.duckduckgo.app.browser.safebrowsing.SafeBrowsingWarningBanner
+        android:id="@+id/safeBrowsingWarningBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="?actionBarSize"
+        android:elevation="8dp"
+        android:visibility="gone" />
+
     <FrameLayout
         android:id="@+id/webViewFullScreenContainer"
         android:layout_width="match_parent"
