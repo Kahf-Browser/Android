@@ -186,6 +186,7 @@ import com.duckduckgo.app.browser.urlextraction.UrlExtractionListener
 import com.duckduckgo.app.browser.viewstate.AccessibilityViewState
 import com.duckduckgo.app.browser.viewstate.AutoCompleteViewState
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
+import com.duckduckgo.app.browser.safebrowsing.SafeBrowsingViewState
 import com.duckduckgo.app.browser.viewstate.CtaViewState
 import com.duckduckgo.app.browser.viewstate.FindInPageViewState
 import com.duckduckgo.app.browser.viewstate.GlobalLayoutViewState
@@ -432,6 +433,7 @@ class BrowserTabViewModel @Inject constructor(
     val findInPageViewState: MutableLiveData<FindInPageViewState> = MutableLiveData()
     val accessibilityViewState: MutableLiveData<AccessibilityViewState> = MutableLiveData()
     val ctaViewState: MutableLiveData<CtaViewState> = MutableLiveData()
+    val safeBrowsingViewState: MutableLiveData<SafeBrowsingViewState> = MutableLiveData()
     var siteLiveData: MutableLiveData<Site> = MutableLiveData()
     var pageUpdatedLiveData: MutableLiveData<Unit> = MutableLiveData()
     val privacyShieldViewState: MutableLiveData<PrivacyShieldViewState> = MutableLiveData()
@@ -3444,6 +3446,24 @@ class BrowserTabViewModel @Inject constructor(
             onDismissOnboardingDaxDialog(cta)
         }
     }
+
+    // Safe Browsing
+    override fun showSafeBrowsingThreatWarning(threatType: com.duckduckgo.safebrowsing.api.ThreatType, url: String) {
+        safeBrowsingViewState.postValue(
+            com.duckduckgo.app.browser.safebrowsing.SafeBrowsingViewState(
+                visible = true,
+                threatType = threatType,
+                url = url
+            )
+        )
+    }
+
+    override fun hideSafeBrowsingWarning() {
+        safeBrowsingViewState.postValue(
+            com.duckduckgo.app.browser.safebrowsing.SafeBrowsingViewState(visible = false)
+        )
+    }
+
     fun onUserDismissedAutoCompleteInAppMessage() {
         viewModelScope.launch(dispatchers.io()) {
             autoComplete.userDismissedHistoryInAutoCompleteIAM()

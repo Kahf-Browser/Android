@@ -57,6 +57,22 @@ android {
         } else {
             buildConfigField "boolean", "FORCE_DEFAULT_VARIANT", "false"
         }
+
+        // Safe Browsing API Key
+        def localPropertiesFile = project.rootProject.file('local.properties')
+        if (localPropertiesFile.exists()) {
+            def properties = new Properties()
+            localPropertiesFile.withInputStream { properties.load(it) }
+            def safeBrowsingApiKey = properties.getProperty('SAFE_BROWSING_API_KEY')
+            if (safeBrowsingApiKey != null) {
+                buildConfigField "String", "SAFE_BROWSING_API_KEY", "\"${safeBrowsingApiKey}\""
+            } else {
+                buildConfigField "String", "SAFE_BROWSING_API_KEY", "\"\""
+            }
+        } else {
+            buildConfigField "String", "SAFE_BROWSING_API_KEY", "\"\""
+        }
+
         namespace 'com.duckduckgo.app.browser'
     }
     buildFeatures {
@@ -226,6 +242,10 @@ dependencies {
 
     implementation project(path: ':vpn-network-api')
     implementation project(path: ':vpn-network-impl')
+
+    implementation project(':safe-browsing-api')
+    implementation project(':safe-browsing-impl')
+    implementation project(':safe-browsing-store')
 
     implementation project(':library-loader-api')
 

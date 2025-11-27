@@ -112,4 +112,8 @@ interface WebViewClientListener {
         errorResponse: SslErrorResponse,
     )
     fun onShouldOverride()
+
+    // Safe Browsing
+    fun showSafeBrowsingThreatWarning(threatType: com.duckduckgo.safebrowsing.api.ThreatType, url: String)
+    fun hideSafeBrowsingWarning()
 }

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2025 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <!-- Safe Browsing Warning Banner -->
+    <string name="safe_browsing_warning_title">⚠️ Warning: This site may be dangerous</string>
+    <string name="safe_browsing_warning_icon_description">Warning icon</string>
+    <string name="safe_browsing_close_description">Close warning</string>
+    <string name="safe_browsing_proceed_anyway">Proceed Anyway</string>
+    <string name="safe_browsing_go_back">Go Back</string>
+
+    <!-- Threat Type Descriptions -->
+    <string name="safe_browsing_threat_phishing">This site has been flagged as Phishing. It may attempt to steal your personal information.</string>
+    <string name="safe_browsing_threat_malware">This site has been flagged as Malware. It may harm your device or steal your data.</string>
+    <string name="safe_browsing_threat_unwanted_software">This site has been flagged for Unwanted Software.</string>
+    <string name="safe_browsing_threat_unknown">This site has been flagged as potentially dangerous.</string>
+
+    <!-- Settings -->
+    <string name="safe_browsing_settings_title">Safe Browsing Protection</string>
+    <string name="safe_browsing_settings_description">Warn about dangerous sites</string>
+    <string name="safe_browsing_statistics_title">Threats Blocked</string>
+    <string name="safe_browsing_statistics_count">%d sites blocked</string>
+    <string name="safe_browsing_learn_more">Learn more about Safe Browsing</string>
+</resources>

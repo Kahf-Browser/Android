@@ -133,6 +133,7 @@ class BrowserWebViewClient @Inject constructor(
     private val dnsResolver: CustomDnsResolver,
     private val sgWhitelistDao: SafeGazeWhitelistDao,
     private val ampDetector: AmpDetector,
+    private val safeBrowsingManager: com.duckduckgo.safebrowsing.api.SafeBrowsingManager,
     spProvider: SharedPreferencesProvider
 ) : WebViewClient() {
 
@@ -440,6 +441,9 @@ class BrowserWebViewClient @Inject constructor(
                 webView.loadUrl(safeSearchEnforcedUrl.toString())
                 return
             }
+
+            // Safe Browsing check
+            performSafeBrowsingCheck(it)
 
             loadPordaJs(webView, it)
 
@@ -769,6 +773,36 @@ class BrowserWebViewClient @Inject constructor(
             SAFE_BROWSING_THREAT_UNKNOWN -> "SAFE_BROWSING_THREAT_UNKNOWN"
             SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE -> "SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE"
             else -> "ERROR_OTHER"
+        }
+    }
+
+    /**
+     * Perform Safe Browsing check on the URL
+     */
+    private fun performSafeBrowsingCheck(url: String) {
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            try {
+                if (!safeBrowsingManager.isEnabled()) {
+                    return@launch
+                }
+
+                val result = safeBrowsingManager.checkUrl(url)
+                when (result) {
+                    is com.duckduckgo.safebrowsing.api.SafeBrowsingResult.Threat -> {
+                        withContext(dispatcherProvider.main()) {
+                            webViewClientListener?.showSafeBrowsingThreatWarning(result.threatType, url)
+                        }
+                    }
+                    is com.duckduckgo.safebrowsing.api.SafeBrowsingResult.Safe,
+                    is com.duckduckgo.safebrowsing.api.SafeBrowsingResult.Error -> {
+                        withContext(dispatcherProvider.main()) {
+                            webViewClientListener?.hideSafeBrowsingWarning()
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Error performing Safe Browsing check for $url")
+            }
         }
     }
 }
