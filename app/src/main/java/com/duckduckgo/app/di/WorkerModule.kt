@@ -49,8 +49,9 @@ object WorkerModule {
             val minimalConfig = Configuration.Builder()
                 .setWorkerFactory(workerFactory)
                 .setMinimumLoggingLevel(android.util.Log.ERROR)
+                .setMaxSchedulerLimit(20) // Limit concurrent work to prevent TooManyRequestsException
                 .build()
-            
+
             try {
                 WorkManager.initialize(context, minimalConfig)
                 Timber.d("Initialized minimal WorkManager in process: $processName")
@@ -60,13 +61,17 @@ object WorkerModule {
             }
         } else {
             // In the main process, initialize WorkManager with the full configuration
+            // Limit the maximum number of scheduled jobs to prevent ConnectivityManager.TooManyRequestsException
+            // This exception occurs when too many network callbacks are registered (Android limit is ~100-200)
             val config = Configuration.Builder()
                 .setWorkerFactory(workerFactory)
+                .setMaxSchedulerLimit(50) // Conservative limit to prevent network callback exhaustion
+                .setMinimumLoggingLevel(if (timber.log.Timber.treeCount > 0) android.util.Log.DEBUG else android.util.Log.INFO)
                 .build()
-            
+
             try {
                 WorkManager.initialize(context, config)
-                Timber.d("WorkManager initialized successfully in main process")
+                Timber.d("WorkManager initialized successfully in main process with maxSchedulerLimit=50")
             } catch (e: IllegalStateException) {
                 // This is expected if WorkManager is already initialized, so we can safely ignore it
                 Timber.d("WorkManager already initialized in main process (safe to ignore)")

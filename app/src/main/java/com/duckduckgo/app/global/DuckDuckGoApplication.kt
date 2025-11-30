@@ -177,31 +177,37 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     }
 
     private fun scheduleTasks() {
-        val workManager = WorkManager.getInstance(this)
-        workManager.cancelAllWorkByTag("jsDownloader")
-        workManager.cancelAllWorkByTag("com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker")
+        try {
+            val workManager = WorkManager.getInstance(this)
 
-        /*val jsDownloadWorkReq = OneTimeWorkRequest.Builder(JsDownloadWorker::class.java)
-            .addTag("jsDownloader")
-            .build()
+            // Cancel old work to prevent accumulation of network callbacks
+            workManager.cancelAllWorkByTag("jsDownloader")
+            workManager.cancelAllWorkByTag("com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker")
 
-        workManager.enqueueUniqueWork(
-            "jsDownloadWork",
-            androidx.work.ExistingWorkPolicy.REPLACE,
-            jsDownloadWorkReq,
-        )*/
+            /*val jsDownloadWorkReq = OneTimeWorkRequest.Builder(JsDownloadWorker::class.java)
+                .addTag("jsDownloader")
+                .build()
 
+            workManager.enqueueUniqueWork(
+                "jsDownloadWork",
+                androidx.work.ExistingWorkPolicy.REPLACE,
+                jsDownloadWorkReq,
+            )*/
 
-        val wallpaperDownloadWorkReq = OneTimeWorkRequest.Builder(WallpaperDownloadWorker::class.java)
-            .addTag("com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker")
-            .setInitialDelay(15, TimeUnit.SECONDS)
-            .build()
+            val wallpaperDownloadWorkReq = OneTimeWorkRequest.Builder(WallpaperDownloadWorker::class.java)
+                .addTag("com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker")
+                .setInitialDelay(15, TimeUnit.SECONDS)
+                .build()
 
-        workManager.enqueueUniqueWork(
-            "com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker",
-            androidx.work.ExistingWorkPolicy.REPLACE,
-            wallpaperDownloadWorkReq
-        )
+            workManager.enqueueUniqueWork(
+                "com.duckduckgo.app.browser.safe_gaze_and_host_blocker.SafeGazeBlockListAndWallpaperWorker",
+                androidx.work.ExistingWorkPolicy.REPLACE,
+                wallpaperDownloadWorkReq
+            )
+        } catch (e: Exception) {
+            // Catch any WorkManager exceptions to prevent app crash during initialization
+            Timber.e(e, "Failed to schedule tasks - WorkManager may have connectivity issues")
+        }
     }
 
     private fun configRemoteConfig() {

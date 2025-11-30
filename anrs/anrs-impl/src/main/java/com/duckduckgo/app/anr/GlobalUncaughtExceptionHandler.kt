@@ -59,10 +59,21 @@ class GlobalUncaughtExceptionHandler @Inject constructor(
      * In such cases, we don't need to alert about the exception as they are exceptions essentially signalling that work was interrupted.
      * Examples of this would be if the internet was lost during the sync,
      * or when two or more sync operations are scheduled to run at the same time; one would run and the rest would be interrupted.
+     *
+     * Additionally, we handle ConnectivityManager.TooManyRequestsException which can occur when WorkManager
+     * registers too many network callbacks. This is handled by configuration limits but we prevent crashes here.
      */
     private fun shouldRecordExceptionAndCrashApp(exception: Throwable?): Boolean {
-        return when (exception) {
-            is InterruptedException, is InterruptedIOException -> false
+        return when {
+            exception is InterruptedException || exception is InterruptedIOException -> false
+            exception?.javaClass?.name == "android.net.ConnectivityManager\$TooManyRequestsException" -> {
+                logcat(LogPriority.WARN) { "ConnectivityManager.TooManyRequestsException caught - too many network callbacks registered. This is logged but won't crash the app." }
+                false
+            }
+            exception?.cause?.javaClass?.name == "android.net.ConnectivityManager\$TooManyRequestsException" -> {
+                logcat(LogPriority.WARN) { "ConnectivityManager.TooManyRequestsException in cause chain - too many network callbacks registered. This is logged but won't crash the app." }
+                false
+            }
             else -> true
         }
     }
