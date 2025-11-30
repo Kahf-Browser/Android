@@ -21,7 +21,6 @@ import android.util.Base64
 import androidx.annotation.VisibleForTesting
 import androidx.work.CoroutineWorker
 import androidx.work.Data
-import androidx.work.Data.MAX_DATA_BYTES
 import androidx.work.WorkerParameters
 import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -70,7 +69,8 @@ private const val DIRECTORY = "DIRECTORY"
 
 @VisibleForTesting
 internal const val IS_URL_COMPRESSED = "IS_URL_COMPRESSED"
-private const val MAX_URL_DATA_BYTES = MAX_DATA_BYTES * 0.9
+private const val MAX_DATA_BYTES = 10 * 1024 // 10KB - androidx.work.Data.MAX_DATA_BYTES
+private const val MAX_URL_DATA_BYTES = (MAX_DATA_BYTES * 0.9).toInt()
 private const val BYTE_ARRAY_SIZE = 256
 
 fun FileDownloader.PendingFileDownload.toInputData(): Data {
