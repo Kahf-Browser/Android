@@ -54,14 +54,15 @@
                 tools:ignore="ContentDescription"/>
 
             <ImageButton
-                android:id="@+id/timeMenuItem"
+                android:id="@+id/socialMediaMenuItem"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 app:tint="?attr/kahfBottomNavIcon"
                 android:layout_weight="1"
                 android:background="@drawable/ripple_bottom_oval"
-                android:src="@drawable/ic_prayer_outlined"
+                android:src="@drawable/ic_social_media_24"
                 android:padding="16dp"
+                android:contentDescription="@string/social_media"
                 tools:ignore="ContentDescription"/>
 
             <ImageButton

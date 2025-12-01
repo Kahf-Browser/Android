@@ -196,6 +196,8 @@ import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiv
 import com.duckduckgo.app.browser.safe_gaze.DeviceLockAuthenticator
 import com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
+import com.duckduckgo.app.browser.socialmedia.SocialMediaDialog
+import com.duckduckgo.app.browser.socialmedia.SocialMediaManager
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewPersister
@@ -732,6 +734,10 @@ class BrowserTabFragment :
 
     private val gson = Gson()
 
+    // Social Media Integration
+    private val socialMediaManager = SocialMediaManager()
+    private var socialMediaDialog: SocialMediaDialog? = null
+
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
             EmailProtectionInContextSignUpScreenResult.SUCCESS -> {
@@ -1016,6 +1022,7 @@ class BrowserTabFragment :
         configureNewTab()
         initPrivacyProtectionsPopup()
         configureBottomNav()
+        configureSocialMediaTracking()
         configureSafeBrowsingBanner()
         // adjustWindowInsets()
 
@@ -2714,6 +2721,33 @@ class BrowserTabFragment :
                 omnibar.omniBarContainer.isPressed = false
             }
         }*/
+
+        // Configure social media icons in the top bar
+        try {
+            val socialMediaBar = newBrowserTab.socialMediaAndStatsBar
+
+            socialMediaBar?.facebookIcon?.setOnClickListener {
+                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.FACEBOOK)
+            }
+
+            socialMediaBar?.twitterIcon?.setOnClickListener {
+                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.TWITTER)
+            }
+
+            socialMediaBar?.instagramIcon?.setOnClickListener {
+                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.INSTAGRAM)
+            }
+
+            socialMediaBar?.youtubeIcon?.setOnClickListener {
+                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.YOUTUBE)
+            }
+
+            socialMediaBar?.linkedinIcon?.setOnClickListener {
+                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.LINKEDIN)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error configuring social media icons")
+        }
     }
 
     private fun renderBottomNavMenus(viewState: BrowserViewState) {
@@ -2722,7 +2756,7 @@ class BrowserTabFragment :
                 backMenuItem.visibility = VISIBLE
                 forwardMenuItem.visibility = VISIBLE
                 homeMenuItem.visibility = GONE
-                timeMenuItem.visibility = GONE
+                socialMediaMenuItem.visibility = GONE
 
                 backMenuItem.imageTintList = ColorStateList.valueOf(if (viewState.canGoBack) activeMenuColor else inactiveMenuColor)
                 forwardMenuItem.imageTintList = ColorStateList.valueOf(if (viewState.canGoForward) activeMenuColor else inactiveMenuColor)
@@ -2730,18 +2764,11 @@ class BrowserTabFragment :
                 backMenuItem.visibility = GONE
                 forwardMenuItem.visibility = GONE
                 homeMenuItem.visibility = VISIBLE
-                timeMenuItem.visibility = VISIBLE
-                timeMenuItem.setOnClickListener {
-                    if (!viewState.prayerTimeShowing) {
-                        viewModel.onPrayerTimeClicked()
-                    }
+                socialMediaMenuItem.visibility = VISIBLE
+                socialMediaMenuItem.setOnClickListener {
+                    showSocialMediaDialog()
                 }
             }
-
-            timeMenuItem.setImageResource(
-                if (viewState.prayerTimeShowing) com.duckduckgo.mobile.android.R.drawable.ic_prayer_filled
-                else com.duckduckgo.mobile.android.R.drawable.ic_prayer_outlined,
-            )
 
             // Icon and onClick action of new tab button
             newTabMenuItem.setOnClickListener {
@@ -2781,6 +2808,45 @@ class BrowserTabFragment :
 
             binding.prayerFragmentContainer.visibility = GONE
             omnibar.appBarLayout.visibility = VISIBLE
+        }
+    }
+
+    // Social Media Integration Methods
+    private fun showSocialMediaDialog() {
+        if (socialMediaDialog?.isShowing() == true) return
+
+        socialMediaDialog = SocialMediaDialog(requireContext()) { platform ->
+            handleSocialMediaNavigation(platform)
+        }
+        socialMediaDialog?.show()
+    }
+
+    private fun handleSocialMediaNavigation(platform: SocialMediaManager.SocialMediaPlatform) {
+        val existingTabId = socialMediaManager.getTabForPlatform(platform)
+
+        if (existingTabId != null && existingTabId != viewModel.getCurrentTabId()) {
+            // Tab with this social media platform already exists - switch to it
+            lifecycleScope.launch {
+                viewModel.switchToExistingTab(existingTabId)
+            }
+        } else {
+            // No existing tab or it's the current tab - load the URL in current tab
+            viewModel.onUserSubmittedQuery(platform.url)
+        }
+    }
+
+    private fun configureSocialMediaTracking() {
+        // Observe URL changes to track social media tabs
+        viewModel.siteLiveData.observe(viewLifecycleOwner) { site ->
+            site?.url?.let { currentUrl ->
+                val tabId = viewModel.getCurrentTabId()
+                if (socialMediaManager.isSocialMediaUrl(currentUrl)) {
+                    socialMediaManager.registerSocialMediaTab(currentUrl, tabId)
+                } else {
+                    // Unregister if navigating away from social media
+                    socialMediaManager.unregisterSocialMediaTab(tabId)
+                }
+            }
         }
     }
 
@@ -2865,7 +2931,21 @@ class BrowserTabFragment :
 
 
     private fun userEnteredQuery(query: String) {
-        viewModel.onUserSubmittedQuery(query)
+        // If the query is a valid URL and it's already open in another tab, switch to that tab
+        if (URLUtil.isValidUrl(query) || query.contains(".")) {
+            // Try to extract/clean the URL
+            val potentialUrl = if (!query.startsWith("http://") && !query.startsWith("https://")) {
+                "https://$query"
+            } else {
+                query
+            }
+
+            // Use the tab-aware navigation that will switch to existing tab if URL is already open
+            viewModel.navigateToUrlOrSwitchTab(potentialUrl)
+        } else {
+            // For search queries (not URLs), use the regular submission
+            viewModel.onUserSubmittedQuery(query)
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
@@ -3102,24 +3182,6 @@ class BrowserTabFragment :
             webView.isWebMessageListenerSupported(dispatchers, webViewVersionProvider) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)
     }
-
-    private fun readAssetFile(assetManager: AssetManager, fileName: String): String {
-        val stringBuilder = StringBuilder()
-        try {
-            val inputStream = assetManager.open(fileName)
-            val bufferedReader = BufferedReader(InputStreamReader(inputStream))
-
-            var line: String?
-            while (bufferedReader.readLine().also { line = it } != null) {
-                stringBuilder.append(line).append('\n')
-            }
-        } catch (e: IOException) {
-            println("Exception is -> ${e.localizedMessage}")
-            e.printStackTrace()
-        }
-        return stringBuilder.toString()
-    }
-
 
     private fun webShare(featureName: String, method: String, id: String, data: JSONObject) {
         webShareRequest.launch(JsCallbackData(data, featureName, method, id))
@@ -3725,6 +3787,11 @@ class BrowserTabFragment :
         browserAutofill.removeJsInterface()
         destroyWebView()
         // safeGazeInterface.closePordaSegment()
+
+        // Unregister social media tab when fragment is destroyed
+        socialMediaManager.unregisterSocialMediaTab(viewModel.getCurrentTabId())
+        socialMediaDialog?.dismiss()
+
         super.onDestroy()
     }
 
@@ -4826,19 +4893,19 @@ class BrowserTabFragment :
             imageBlockCountDao.getCount()
                 .flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
-                .onEach { newBrowserTab.imageBlockedCount.setFormattedCount(it) }
+                .onEach { newBrowserTab.socialMediaAndStatsBar?.imageBlockedCount?.setFormattedCount(it) }
                 .launchIn(lifecycleScope)
 
             lifecycleScope.launch {
                 webTrackersBlockedDao.getTotalTrackerCount().collect { count ->
-                    newBrowserTab.trackerBlockedCount.setFormattedCount(count)
+                    newBrowserTab.socialMediaAndStatsBar?.trackerBlockedCount?.setFormattedCount(count)
                 }
             }
 
             harmfulSiteBlockedDao.getTotalBlockCount()
                 .flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
-                .onEach { newBrowserTab.siteBlockCount.setFormattedCount(it) }
+                .onEach { newBrowserTab.socialMediaAndStatsBar?.siteBlockCount?.setFormattedCount(it) }
                 .launchIn(lifecycleScope)
 
             // Recent history section

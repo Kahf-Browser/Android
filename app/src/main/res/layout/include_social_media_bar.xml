@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/socialMediaAndStatsContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/kahf_new_tab_content_margin"
+    android:background="@drawable/social_media_bar_bg"
+    android:padding="12dp">
+
+    <!-- Left side: Social Media Icons -->
+    <LinearLayout
+        android:id="@+id/socialMediaIcons"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/statsContainer"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="1">
+
+        <ImageButton
+            android:id="@+id/facebookIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_facebook_24"
+            android:scaleType="fitCenter"
+            app:tint="@android:color/white"
+            android:contentDescription="@string/facebook"
+            android:padding="6dp"/>
+
+        <ImageButton
+            android:id="@+id/twitterIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_twitter_24"
+            android:scaleType="fitCenter"
+            app:tint="@android:color/white"
+            android:contentDescription="@string/twitter"
+            android:padding="6dp"/>
+
+        <ImageButton
+            android:id="@+id/instagramIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_instagram_24"
+            android:scaleType="fitCenter"
+            app:tint="@android:color/white"
+            android:contentDescription="@string/instagram"
+            android:padding="6dp"/>
+
+        <ImageButton
+            android:id="@+id/youtubeIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_youtube_24"
+            android:scaleType="fitCenter"
+            app:tint="@android:color/white"
+            android:contentDescription="@string/youtube"
+            android:padding="6dp"/>
+
+        <ImageButton
+            android:id="@+id/linkedinIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_linkedin_24"
+            android:scaleType="fitCenter"
+            app:tint="@android:color/white"
+            android:contentDescription="@string/linkedin"
+            android:padding="6dp"/>
+
+    </LinearLayout>
+
+    <!-- Right side: Statistics (smaller, compact) -->
+    <LinearLayout
+        android:id="@+id/statsContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end|center_vertical"
+        android:weightSum="3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/socialMediaIcons"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_weight="1">
+
+        <!-- Harmful Sites -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingHorizontal="4dp">
+
+            <TextView
+                android:id="@+id/siteBlockCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="12k" />
+
+            <TextView
+                android:id="@+id/siteBlockLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="@string/kahf_harmful_sites_short"
+                android:textColor="@android:color/white"
+                android:textSize="8sp"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <!-- Indecent Images -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingHorizontal="4dp">
+
+            <TextView
+                android:id="@+id/imageBlockedCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="514" />
+
+            <TextView
+                android:id="@+id/imageBlockedLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="@string/kahf_indecent_pictures_short"
+                android:textColor="@android:color/white"
+                android:textSize="8sp"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+        <!-- Trackers -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingHorizontal="4dp">
+
+            <TextView
+                android:id="@+id/trackerBlockedCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:textColor="@android:color/white"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="860" />
+
+            <TextView
+                android:id="@+id/trackerBlockedLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins"
+                android:text="@string/kahf_ads_trackers_short"
+                android:textColor="@android:color/white"
+                android:textSize="8sp"
+                android:gravity="center"
+                android:maxLines="1"
+                android:ellipsize="end" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

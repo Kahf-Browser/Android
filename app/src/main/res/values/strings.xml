@@ -892,6 +892,21 @@
     <string name="kahf_harmful_sites">Harmful Sites</string>
     <string name="kahf_indecent_pictures">Indecent Pictures</string>
     <string name="kahf_ads_trackers">Ads + Trackers</string>
+
+    <!-- Short versions for compact display -->
+    <string name="kahf_harmful_sites_short">Sites</string>
+    <string name="kahf_indecent_pictures_short">Images</string>
+    <string name="kahf_ads_trackers_short">Trackers</string>
+
+    <!-- Social Media -->
+    <string name="facebook">Facebook</string>
+    <string name="twitter">Twitter</string>
+    <string name="instagram">Instagram</string>
+    <string name="youtube">YouTube</string>
+    <string name="linkedin">LinkedIn</string>
+    <string name="social_media">Social Media</string>
+    <string name="select_social_media">Select Social Media</string>
+
     <string name="kahf_share">Share</string>
     <string name="kahf_support">Support</string>
     <string name="kahf_dark_mode">Dark Mode</string>

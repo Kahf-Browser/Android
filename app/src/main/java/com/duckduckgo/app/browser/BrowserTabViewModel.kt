@@ -1002,6 +1002,56 @@ class BrowserTabViewModel @Inject constructor(
             currentAutoCompleteViewState().copy(showSuggestions = false, showFavorites = false, searchResults = AutoCompleteResult("", emptyList()))
     }
 
+    /**
+     * Navigate to a URL, automatically switching to existing tab if the URL is already open
+     * If not found, loads the URL in the current tab instead of creating a new tab
+     */
+    fun navigateToUrlOrSwitchTab(url: String) {
+        viewModelScope.launch(dispatchers.io()) {
+            // Get all tabs and check if any has this URL
+            val allTabs = tabs.value ?: emptyList()
+            val existingTab = allTabs.find { tab ->
+                tab.url?.let { tabUrl ->
+                    normalizeUrl(tabUrl) == normalizeUrl(url)
+                } ?: false
+            }
+
+            if (existingTab != null && existingTab.tabId != getCurrentTabId()) {
+                // Tab exists and it's not the current tab - switch to it
+                tabRepository.select(existingTab.tabId)
+            } else {
+                // Tab doesn't exist or is the current tab - load URL in current tab
+                withContext(dispatchers.main()) {
+                    onUserSubmittedQuery(url)
+                }
+            }
+        }
+    }
+
+    /**
+     * Switch to an existing tab by its ID
+     */
+    suspend fun switchToExistingTab(tabId: String) {
+        withContext(dispatchers.io()) {
+            tabRepository.select(tabId)
+        }
+    }
+
+    /**
+     * Normalize URL for comparison (remove trailing slashes, convert to lowercase, ensure https)
+     */
+    private fun normalizeUrl(url: String): String {
+        var normalized = url.trim().lowercase()
+        if (!normalized.startsWith("http://") && !normalized.startsWith("https://")) {
+            normalized = "https://$normalized"
+        }
+        // Remove trailing slash
+        if (normalized.endsWith("/")) {
+            normalized = normalized.dropLast(1)
+        }
+        return normalized
+    }
+
     private fun getUrlHeaders(url: String?): Map<String, String> {
         url?.let {
             return gpc.getHeaders(url)
