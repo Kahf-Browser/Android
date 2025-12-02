@@ -1,0 +1,99 @@
+{
+  "version": "1.0.0",
+  "description": "YouTube ad-blocking URL patterns for native mobile network interception",
+  "patterns": {
+    "wildcard": [
+      "*://*.googlesyndication.com/*",
+      "*://*.doubleclick.net/*",
+      "*://googleads.g.doubleclick.net/*",
+      "*://static.doubleclick.net/*",
+      "*://youtube.com/api/stats/ads*",
+      "*://youtube.com/ptracking*",
+      "*://youtube.com/pagead/*",
+      "*://youtube.com/get_midroll_*",
+      "*://youtube.com/ad_*",
+      "*://youtube.com/adunit/*",
+      "*://*.youtube.com/api/stats/ads*",
+      "*://*.youtube.com/ptracking*",
+      "*://*.youtube.com/pagead/*",
+      "*://*.youtube.com/get_midroll_*",
+      "*://*.youtube.com/ad_*",
+      "*://youtube.com/youtubei/v1/player/ad_*",
+      "*://*.youtube.com/youtubei/v1/player/ad_*",
+      "*://youtube.com/api/stats/qoe*",
+      "*://*.youtube.com/api/stats/qoe*",
+      "*://googlevideo.com/videoplayback*&aclk=*",
+      "*://googlevideo.com/videoplayback*&ad=*",
+      "*://googlevideo.com/videoplayback*ad_*",
+      "*://googlevideo.com/pcs/activeview*",
+      "*://*.googlevideo.com/videoplayback*&aclk=*",
+      "*://*.googlevideo.com/videoplayback*&ad=*",
+      "*://*.googlevideo.com/videoplayback*ad_*",
+      "*://*.googlevideo.com/pcs/activeview*",
+      "*://youtube.com/api/stats/watchtime*",
+      "*://*.youtube.com/api/stats/watchtime*",
+      "*://google.com/pagead/*",
+      "*://*.google.com/pagead/*",
+      "*://youtube.com/pagead/interaction/*",
+      "*://*.youtube.com/pagead/interaction/*"
+    ],
+    "domains": [
+      "googlesyndication.com",
+      "doubleclick.net",
+      "googleads.g.doubleclick.net",
+      "static.doubleclick.net"
+    ],
+    "urlContains": [
+      "/api/stats/ads",
+      "/ptracking",
+      "/pagead/",
+      "/get_midroll_",
+      "/adunit/",
+      "/youtubei/v1/player/ad_",
+      "/api/stats/qoe",
+      "/pcs/activeview",
+      "/api/stats/watchtime",
+      "/pagead/interaction/"
+    ],
+    "urlParamsToBlock": [
+      "aclk",
+      "ad="
+    ]
+  },
+  "regex": {
+    "android": [
+      ".*\\.googlesyndication\\.com.*",
+      ".*\\.doubleclick\\.net.*",
+      ".*youtube\\.com.*/api/stats/ads.*",
+      ".*youtube\\.com.*/ptracking.*",
+      ".*youtube\\.com.*/pagead/.*",
+      ".*youtube\\.com.*/get_midroll_.*",
+      ".*youtube\\.com.*/ad_.*",
+      ".*youtube\\.com.*/adunit/.*",
+      ".*youtube\\.com.*/youtubei/v1/player/ad_.*",
+      ".*youtube\\.com.*/api/stats/qoe.*",
+      ".*googlevideo\\.com.*[&?]aclk=.*",
+      ".*googlevideo\\.com.*[&?]ad=.*",
+      ".*googlevideo\\.com.*/pcs/activeview.*",
+      ".*youtube\\.com.*/api/stats/watchtime.*",
+      ".*google\\.com.*/pagead/.*"
+    ],
+    "ios": [
+      ".*\\\\.googlesyndication\\\\.com.*",
+      ".*\\\\.doubleclick\\\\.net.*",
+      ".*youtube\\\\.com.*/api/stats/ads.*",
+      ".*youtube\\\\.com.*/ptracking.*",
+      ".*youtube\\\\.com.*/pagead/.*",
+      ".*youtube\\\\.com.*/get_midroll_.*",
+      ".*youtube\\\\.com.*/ad_.*",
+      ".*youtube\\\\.com.*/adunit/.*",
+      ".*youtube\\\\.com.*/youtubei/v1/player/ad_.*",
+      ".*youtube\\\\.com.*/api/stats/qoe.*",
+      ".*googlevideo\\\\.com.*[&?]aclk=.*",
+      ".*googlevideo\\\\.com.*[&?]ad=.*",
+      ".*googlevideo\\\\.com.*/pcs/activeview.*",
+      ".*youtube\\\\.com.*/api/stats/watchtime.*",
+      ".*google\\\\.com.*/pagead/.*"
+    ]
+  }
+}

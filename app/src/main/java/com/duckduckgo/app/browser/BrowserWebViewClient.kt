@@ -134,6 +134,7 @@ class BrowserWebViewClient @Inject constructor(
     private val sgWhitelistDao: SafeGazeWhitelistDao,
     private val ampDetector: AmpDetector,
     private val safeBrowsingManager: com.duckduckgo.safebrowsing.api.SafeBrowsingManager,
+    private val youtubeAdBlocker: com.duckduckgo.app.browser.youtube.YouTubeAdBlocker,
     spProvider: SharedPreferencesProvider
 ) : WebViewClient() {
 
@@ -398,6 +399,19 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    private fun loadYouTubeAdBlockerJs(webView: WebView, url: String?) {
+        if (youtubeAdBlocker.isYouTubeUrl(url)) {
+            Timber.v("YouTubeAdBlocker: Injecting ad blocker script for $url")
+
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                val script = youtubeAdBlocker.getAdBlockerScript()
+                withContext(dispatcherProvider.main()) {
+                    webView.evaluateJavascript(script, null)
+                }
+            }
+        }
+    }
+
     private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
@@ -447,6 +461,9 @@ class BrowserWebViewClient @Inject constructor(
 
             loadPordaJs(webView, it)
 
+            // Layer 1: Inject YouTube ad blocker script at page start
+            loadYouTubeAdBlockerJs(webView, it)
+
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != "about:blank" && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
@@ -492,6 +509,9 @@ class BrowserWebViewClient @Inject constructor(
             if (!sharedPreferences.isAutoPlayVideoEnabled()) {
                 loadAutoplayBlockerJs(webView)
             }
+
+            // Layer 3: Re-inject YouTube ad blocker script on page finish (backup for SPA navigation)
+            loadYouTubeAdBlockerJs(webView, url)
 
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
@@ -555,6 +575,17 @@ class BrowserWebViewClient @Inject constructor(
     ): WebResourceResponse? {
         var url = request.url.toString()
         if (request.url.host == KAHF_GUARD_BLOCKED_URL || url.isDataUri()) return null
+
+        // Layer 2: Block YouTube ad requests at network level
+        if (youtubeAdBlocker.shouldBlockRequest(url)) {
+            Timber.v("YouTubeAdBlocker: Blocked request to $url")
+            // Return empty response to block the request
+            return WebResourceResponse(
+                "text/plain",
+                "UTF-8",
+                java.io.ByteArrayInputStream(ByteArray(0))
+            )
+        }
         privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
         val privateDnsEnabled = privateDnsMode != PrivateDnsLevel.Off
         val isAmpUrl = ampDetector.isAmpUrl(url)
