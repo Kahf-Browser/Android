@@ -531,11 +531,16 @@ class BrowserWebViewClient @Inject constructor(
             url?.let {
                 if (url != ABOUT_BLANK) {
                     start?.let { safeStart ->
+                        // CRITICAL FIX: Use site.title from webViewClientListener instead of navigationList.currentItem?.title
+                        // The title is properly captured in BrowserChromeClient.onReceivedTitle() and stored in site.title
+                        // navigationList.currentItem?.title may be null/outdated, especially for sites that set title dynamically via JavaScript
+                        val pageTitle = webViewClientListener?.getSite()?.title
+
                         // TODO (cbarreiro - 22/05/2024): Extract to plugins
-                        pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
+                        pageLoadedHandler.onPageLoaded(it, pageTitle, safeStart, currentTimeProvider.elapsedRealtime())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
-                            navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
+                            navigationHistory.saveToHistory(url, pageTitle)
                         }
                         start = null
                     }
