@@ -2882,7 +2882,7 @@ class BrowserTabFragment :
             safeGazeInterface = SafeGazeJsInterface(
                 requireContext(), (activity?.application as DuckDuckGoApplication).nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onImageClassified = { type, data ->
-                    Timber.d("kLog: imgLog Send to WebView from Kotlin: type: $type, from: ${data?.from}, src: ${data?.result}")
+                    Timber.d("kLog: imgLog Send to WebView from Kotlin: type: $type, from: ${data?.from}, src: ${data?.result}, id: ${data?.id}")
                     webView?.post {
                         val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
                         webView?.evaluateJavascript(jsScript, null)

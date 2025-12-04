@@ -168,7 +168,7 @@ class SafeGazeJsInterface(
 
                     try {
                         // CRITICAL FIX: Properly handle timeout and exceptions
-                        downloadedBitmap = withTimeout(2000) {
+                        downloadedBitmap = withTimeout(5000) {
                             try {
                                 // CRITICAL FIX: Synchronize access to ImageDownloader to prevent SIGSEGV
                                 // Multiple coroutines calling Glide's .submit().get() simultaneously
