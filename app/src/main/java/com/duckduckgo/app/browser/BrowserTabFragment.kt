@@ -4958,24 +4958,34 @@ class BrowserTabFragment :
     ) {
         if (viewModel.isPrinting()) return
 
-        (activity?.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
-            webView?.createPrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
+        val currentActivity = activity
+        if (currentActivity == null || !isAdded || currentActivity.isFinishing) {
+            Timber.w("Cannot print: Fragment not properly attached to activity")
+            return
+        }
 
-                val printAdapter = if (singlePrintSafeguardFeature.self().isEnabled()) {
-                    PrintDocumentAdapterFactory.createPrintDocumentAdapter(
-                        webViewPrintDocumentAdapter,
-                        onStartCallback = { viewModel.onStartPrint() },
-                        onFinishCallback = { viewModel.onFinishPrint() },
+        try {
+            (currentActivity.getSystemService(Context.PRINT_SERVICE) as? PrintManager)?.let { printManager ->
+                webView?.createPrintDocumentAdapter(url)?.let { webViewPrintDocumentAdapter ->
+
+                    val printAdapter = if (singlePrintSafeguardFeature.self().isEnabled()) {
+                        PrintDocumentAdapterFactory.createPrintDocumentAdapter(
+                            webViewPrintDocumentAdapter,
+                            onStartCallback = { viewModel.onStartPrint() },
+                            onFinishCallback = { viewModel.onFinishPrint() },
+                        )
+                    } else {
+                        webViewPrintDocumentAdapter
+                    }
+                    printManager.print(
+                        url,
+                        printAdapter,
+                        PrintAttributes.Builder().setMediaSize(defaultMediaSize).build(),
                     )
-                } else {
-                    webViewPrintDocumentAdapter
                 }
-                printManager.print(
-                    url,
-                    printAdapter,
-                    PrintAttributes.Builder().setMediaSize(defaultMediaSize).build(),
-                )
             }
+        } catch (e: IllegalStateException) {
+            Timber.e(e, "Failed to launch print: ${e.message}")
         }
     }
 
