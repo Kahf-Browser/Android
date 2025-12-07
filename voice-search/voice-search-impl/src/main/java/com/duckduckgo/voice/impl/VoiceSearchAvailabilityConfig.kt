@@ -48,7 +48,7 @@ class DefaultVoiceSearchAvailabilityConfigProvider @Inject constructor(
         deviceManufacturer = appBuildConfig.manufacturer,
         sdkInt = appBuildConfig.sdkInt,
         languageTag = appBuildConfig.deviceLocale.toSanitizedLanguageTag(),
-        isOnDeviceSpeechRecognitionSupported = if (appBuildConfig.sdkInt >= VERSION_CODES.S) {
+        isOnDeviceSpeechRecognitionSupported = if (appBuildConfig.sdkInt >= VERSION_CODES.TIRAMISU) {
             SpeechRecognizer.isOnDeviceRecognitionAvailable(context)
         } else {
             false
