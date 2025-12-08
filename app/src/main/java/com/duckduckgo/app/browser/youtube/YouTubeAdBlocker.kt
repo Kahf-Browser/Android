@@ -59,6 +59,7 @@ interface YouTubeAdBlocker {
 @ContributesBinding(AppScope::class)
 class RealYouTubeAdBlocker @Inject constructor(
     private val context: Context,
+    private val updateManager: YoutubeAdblockUpdateManager,
 ) : YouTubeAdBlocker {
 
     private val cachedBlockedPatterns: List<Regex> by lazy {
@@ -83,13 +84,47 @@ class RealYouTubeAdBlocker @Inject constructor(
         }
     }
 
+    /**
+     * Load ad-blocker script with fallback mechanism
+     *
+     * Priority:
+     * 1. Try local remote-downloaded file first
+     * 2. Fall back to bundled asset file if remote unavailable
+     */
     private val cachedAdBlockerScript: String by lazy {
         try {
-            readAssetFile("youtube-ads-blocker.js").also {
-                Timber.d("YouTubeAdBlocker: Loaded ad blocker script (${it.length} chars)")
+            // Try loading from remote-downloaded local file first
+            val localFile = updateManager.getLocalScriptFile()
+            if (localFile.exists() && localFile.length() > 0) {
+                val script = localFile.readText(Charsets.UTF_8)
+                Timber.d(
+                    "YouTubeAdBlocker: Loaded REMOTE script from ${localFile.name} " +
+                        "(${script.length} chars)"
+                )
+                script
+            } else {
+                // Fall back to bundled asset
+                Timber.w("YouTubeAdBlocker: Remote file not found, using bundled asset")
+                loadFallbackAssetScript()
             }
         } catch (e: Exception) {
-            Timber.e(e, "YouTubeAdBlocker: Failed to load ad blocker script")
+            Timber.e(e, "YouTubeAdBlocker: Failed to load remote script, using bundled asset")
+            loadFallbackAssetScript()
+        }
+    }
+
+    /**
+     * Load the fallback script from assets
+     *
+     * Used when remote script is unavailable or fails to load
+     */
+    private fun loadFallbackAssetScript(): String {
+        return try {
+            readAssetFile("youtube-ads-blocker.js").also {
+                Timber.d("YouTubeAdBlocker: Loaded ASSET fallback script (${it.length} chars)")
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "YouTubeAdBlocker: Failed to load asset fallback script")
             ""
         }
     }
