@@ -64,7 +64,9 @@ sealed class AnalyticsEvent(val name: String) {
 
     // Kafh Ad
     data object BannerAdClicked : AnalyticsEvent("kahf_banner_ad_clicked")
-    data object BannerAdImpression : AnalyticsEvent("kahf_banner_ad_impression")
+    data object NewTabBannerAdImpression : AnalyticsEvent("new_tab_kahf_banner_ad_impression")
+    data object SearchAutoCompleteBannerAdImpression : AnalyticsEvent("search_auto_complete_kahf_banner_ad_impression")
+    data object QuickAccessPageBannerAdImpression : AnalyticsEvent("quick_access_page_kahf_banner_ad_impression")
     data object BannerAdLoadFailed : AnalyticsEvent("kahf_banner_ad_failed_to_load")
     data object AdNotFound : AnalyticsEvent("kahf_ad_not_found")
     data object AdServerError : AnalyticsEvent("kahf_ad_server_error")

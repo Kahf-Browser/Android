@@ -2637,7 +2637,7 @@ class BrowserTabFragment :
                         viewModel.pauseAdRefresh()
                     } else {
                         Timber.i("adLog onAdLoaded $tabId")
-                        analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                        analyticsService.logEvent(AnalyticsEvent.SearchAutoCompleteBannerAdImpression)
                     }
                 }
 
@@ -4765,7 +4765,7 @@ class BrowserTabFragment :
                             viewModel.pauseAdRefresh()
                         } else {
                             Timber.i("adLog onAdLoaded $tabId")
-                            analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                            analyticsService.logEvent(AnalyticsEvent.NewTabBannerAdImpression)
                         }
                     }
 
