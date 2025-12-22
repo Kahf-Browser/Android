@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.ColorStateList
 import android.os.Build
+import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
@@ -27,12 +28,10 @@ import androidx.core.view.isVisible
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
 import com.duckduckgo.app.isAutoPlayVideoEnabled
-import com.duckduckgo.app.isFaceCoverEnabled
 import com.duckduckgo.app.isSgLockEnabled
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.setAutoPlayVideoEnabled
-import com.duckduckgo.app.setFaceCoverMode
 import com.duckduckgo.app.setSgLockMode
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
@@ -53,13 +52,13 @@ class SafeGazePopupHandler(
     private val sgWhitelistDao: SafeGazeWhitelistDao,
     onDnsModeChanged: (mode: PrivateDnsLevel) -> Unit,
     onSafeGazeModeChanged: (mode: SafeGazeLevel) -> Unit,
+    onVideoBlurModeChanged: (mode: SafeGazeLevel) -> Unit,
     onShareClicked: () -> Unit,
     onSupportClicked: () -> Unit,
     onThemeChanged: () -> Unit,
     onBlurEffectChanged: (sgLevel: SafeGazeLevel) -> Unit,
     onSgWhitelistUpdated: (host: String, isWhitelisted: Boolean) -> Unit,
 ) {
-    private var onFaceCoverChanged: ((shouldCoverFace: Boolean) -> Unit)? = null
 
     init {
         var btnHigh: PopupButton? = null
@@ -67,7 +66,8 @@ class SafeGazePopupHandler(
         var btnLow: PopupButton? = null
 
         val preSelectedDns: PrivateDnsLevel = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
-        val preSelectedSG: SafeGazeLevel = SafeGazeLevel.getCurrentLevel(sharedPreferences)
+        val preSelectedSG: SafeGazeLevel = SafeGazeLevel.getImageBlurLevel(sharedPreferences)
+        val preSelectedVideoBlurLevel: SafeGazeLevel = SafeGazeLevel.getVideoBlurLevel(sharedPreferences, "init")
 
         btnHigh = PopupButton(
             binding.btnHigh,
@@ -113,21 +113,49 @@ class SafeGazePopupHandler(
 
         binding.switchKahdGuard.isChecked = preSelectedDns != PrivateDnsLevel.Off
         binding.switchSafeGaze.isChecked = preSelectedSG != SafeGazeLevel.Off
+        binding.switchVideoBlur.isChecked = preSelectedVideoBlurLevel != SafeGazeLevel.Off
         binding.privateDnsGroup.isVisible = preSelectedDns != PrivateDnsLevel.Off
 
         // Set initially selected image blur effect
-        binding.ivCheckGrey.isVisible = preSelectedSG == SafeGazeLevel.Blur
-        binding.ivCheckPixelation.isVisible = preSelectedSG == SafeGazeLevel.Pixelation
+        binding.ivCheckPixelationWithoutFaceBlur.isVisible = preSelectedSG == SafeGazeLevel.PixelationWithoutFaceBlur
+        binding.ivCheckPixelationWithoutHeadBlur.isVisible = preSelectedSG == SafeGazeLevel.PixelationWithoutHeadBlur
+        binding.ivCheckSolidWithFaceBlur.isVisible = preSelectedSG == SafeGazeLevel.SolidWithFaceBlur
+        binding.ivCheckSolidWithoutFaceBlur.isVisible = preSelectedSG == SafeGazeLevel.SolidWithoutFaceBlur
 
-        binding.ivBlurGreyContainer.setOnClickListener {
-            onBlurEffectChanged(SafeGazeLevel.Blur)
-            binding.ivCheckGrey.isVisible = true
-            binding.ivCheckPixelation.isVisible = false
+        binding.ivPixelationWithoutFaceBlur.setOnClickListener {
+            Log.d("SafeGazeLog", "click ivPixelationWithoutFaceBlur")
+            onBlurEffectChanged(SafeGazeLevel.PixelationWithoutFaceBlur)
+            binding.ivCheckPixelationWithoutFaceBlur.isVisible = true
+            binding.ivCheckPixelationWithoutHeadBlur.isVisible = false
+            binding.ivCheckSolidWithFaceBlur.isVisible = false
+            binding.ivCheckSolidWithoutFaceBlur.isVisible = false
         }
-        binding.ivBlurPixelationContainer.setOnClickListener {
-            onBlurEffectChanged(SafeGazeLevel.Pixelation)
-            binding.ivCheckGrey.isVisible = false
-            binding.ivCheckPixelation.isVisible = true
+
+        binding.ivPixelationWithoutHeadBlur.setOnClickListener {
+            Log.d("SafeGazeLog", "click ivPixelationWithoutHeadBlur")
+            onBlurEffectChanged(SafeGazeLevel.PixelationWithoutHeadBlur)
+            binding.ivCheckPixelationWithoutFaceBlur.isVisible = false
+            binding.ivCheckPixelationWithoutHeadBlur.isVisible = true
+            binding.ivCheckSolidWithFaceBlur.isVisible = false
+            binding.ivCheckSolidWithoutFaceBlur.isVisible = false
+        }
+
+        binding.ivSolidWithFaceBlur.setOnClickListener {
+            Log.d("SafeGazeLog", "click ivSolidWithFaceBlur")
+            onBlurEffectChanged(SafeGazeLevel.SolidWithFaceBlur)
+            binding.ivCheckSolidWithFaceBlur.isVisible = true
+            binding.ivCheckSolidWithoutFaceBlur.isVisible = false
+            binding.ivCheckPixelationWithoutFaceBlur.isVisible = false
+            binding.ivCheckPixelationWithoutHeadBlur.isVisible = false
+        }
+
+        binding.ivSolidWithoutFaceBlur.setOnClickListener {
+            Log.d("SafeGazeLog", "click ivSolidWithoutFaceBlur")
+            onBlurEffectChanged(SafeGazeLevel.SolidWithoutFaceBlur)
+            binding.ivCheckSolidWithFaceBlur.isVisible = false
+            binding.ivCheckSolidWithoutFaceBlur.isVisible = true
+            binding.ivCheckPixelationWithoutFaceBlur.isVisible = false
+            binding.ivCheckPixelationWithoutHeadBlur.isVisible = false
         }
 
         // Toggle private dns (Kahf Guard)
@@ -144,14 +172,21 @@ class SafeGazePopupHandler(
         // Toggle image blur (Safe Gaze)
         binding.switchSafeGaze.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                onSafeGazeModeChanged(SafeGazeLevel.Pixelation)
+                onSafeGazeModeChanged(SafeGazeLevel.PixelationWithoutFaceBlur)
             } else {
                 onSafeGazeModeChanged(SafeGazeLevel.Off)
             }
         }
+        binding.switchVideoBlur.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                onVideoBlurModeChanged(SafeGazeLevel.PixelationWithoutFaceBlur)
+            } else {
+                onVideoBlurModeChanged(SafeGazeLevel.Off)
+            }
+        }
 
 
-        binding.btnToggleSiteBlur.let { btn->
+        binding.btnPauseOnSite.let { btn->
             val host = currentUrl?.toUri()?.host ?: ""
             btn.isVisible = currentUrl != null && preSelectedSG != SafeGazeLevel.Off
 
@@ -182,25 +217,16 @@ class SafeGazePopupHandler(
         }
 
         //Autoplay video
-        binding.switchAutoplayVideo.apply {
+        binding.switchStopAutoplay.apply {
             isChecked = sharedPreferences.isAutoPlayVideoEnabled()
             setOnCheckedChangeListener { _, isChecked ->
                 sharedPreferences.setAutoPlayVideoEnabled(isChecked)
             }
         }
 
-        // Toggle face cover
-        binding.switchCoverFace.isChecked = sharedPreferences.isFaceCoverEnabled()
-        binding.switchCoverFace.setOnCheckedChangeListener { _, isChecked ->
-            sharedPreferences.setFaceCoverMode(isChecked)
-            onFaceCoverChanged?.invoke(isChecked)
-        }
-        binding.switchCoverFace.isVisible = preSelectedSG != SafeGazeLevel.Off
-        binding.tvCoverFace.isVisible = preSelectedSG != SafeGazeLevel.Off
-
         // Toggle biometric lock
-        binding.switchSgLock.isChecked = sharedPreferences.isSgLockEnabled()
-        binding.switchSgLock.setOnCheckedChangeListener { _, isChecked ->
+        binding.switchPreventTurningOff.isChecked = sharedPreferences.isSgLockEnabled()
+        binding.switchPreventTurningOff.setOnCheckedChangeListener { _, isChecked ->
             sharedPreferences.setSgLockMode(isChecked)
         }
 
@@ -234,16 +260,15 @@ class SafeGazePopupHandler(
 
             // SafeGaze
             tvDecent.scaleIndependentTextSize(18f)
-            tvCoverFace.scaleIndependentTextSize(18f)
-            blueIndecentPhotosText.scaleIndependentTextSize(14f)
-            btnToggleSiteBlur.scaleIndependentTextSize(12f)
+            tvDecentDescription.scaleIndependentTextSize(14f)
+            btnPauseOnSite.scaleIndependentTextSize(12f)
 
             // SafeGaze Lock
-            tvLock.scaleIndependentTextSize(18f)
-            tvLockDescription.scaleIndependentTextSize(14f)
+            tvPreventTurningOff.scaleIndependentTextSize(18f)
+            tvPreventDescription.scaleIndependentTextSize(14f)
 
             // Statistics
-            statTitle.scaleIndependentTextSize(20f)
+            tvHarmAvoided.scaleIndependentTextSize(20f)
             siteBlockedCount.scaleIndependentTextSize(24f)
             imageBlurCount.scaleIndependentTextSize(24f)
             trackerBlockedCount.scaleIndependentTextSize(24f)
@@ -302,9 +327,5 @@ class SafeGazePopupHandler(
 
             firstLine.takeIf { it.startsWith("// v") }?.substringAfter("// v") ?: "1.0.0"
         }
-    }
-
-    fun setOnFaceCoverChangeListener(listener: (shouldCoverFace: Boolean) -> Unit) {
-        onFaceCoverChanged = listener
     }
 }

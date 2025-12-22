@@ -1,23 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright (c) 2024 DuckDuckGo
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
-
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <ImageView
@@ -42,591 +27,659 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <ScrollView
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical"
-            android:scrollbarFadeDuration="60000">
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="10dp">
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/poppins_bold"
+                android:text="@string/kahf_safer_internet"
+                android:textColor="?attr/kahfPrimaryText"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginTop="10dp"
+                app:layout_constraintEnd_toStartOf="@+id/switch_kahd_guard"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_kahd_guard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:scaleX="0.75"
+                android:scaleY="0.75"
+                app:layout_constraintBottom_toBottomOf="@+id/title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/title"
+                app:thumbTint="?attr/kahfCardBackground"
+                app:track="@drawable/switch_track"
+                app:trackTint="@color/switch_track_color" />
+
+            <LinearLayout
+                android:id="@+id/button_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title">
+
+                <include
+                    android:id="@+id/btnHigh"
+                    layout="@layout/safegaze_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp" />
+
+                <include
+                    android:id="@+id/btnMedium"
+                    layout="@layout/safegaze_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="8dp" />
+
+                <include
+                    android:id="@+id/btnLow"
+                    layout="@layout/safegaze_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvDescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:padding="12dp"
+                android:background="@drawable/bg_tv_subtitle"
+                android:fontFamily="@font/lato"
+                android:text="@string/kahf_mode_desc_medium"
+                android:textColor="?attr/kahfPrimaryText"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/button_container" />
+
+            <androidx.constraintlayout.widget.Group
+                android:id="@+id/private_dns_group"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:constraint_referenced_ids="button_container,tvDescription"/>
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/divider1"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="?attr/kahfDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvDescription" />
+
+            <TextView
+                android:id="@+id/tvDecent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Decent Internet"
+                android:textColor="?attr/kahfPrimaryText"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/switch_safe_gaze"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider1" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switch_safe_gaze"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:scaleX="0.75"
+                android:scaleY="0.75"
+                app:layout_constraintBottom_toBottomOf="@+id/tvDecent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvDecent"
+                app:thumbTint="?attr/kahfCardBackground"
+                app:track="@drawable/switch_track"
+                app:trackTint="@color/switch_track_color" />
+
+            <TextView
+                android:id="@+id/tvDecentDescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="@font/lato"
+                android:text="@string/kahf_desc_blur_full_image"
+                android:textColor="?attr/kahfSecondaryText"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toStartOf="@+id/btnPauseOnSite"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvDecent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPauseOnSite"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lato"
+                android:text="@string/kahf_pause_on_site"
+                android:textSize="11sp"
+                android:textColor="?attr/kahfPrimaryText"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvDecentDescription" />
+
+            <LinearLayout
+                android:id="@+id/layoutBlurPreviews"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvDecentDescription">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivPixelationWithoutFaceBlur"
+                        android:layout_width="0dp"
+                        android:layout_height="80dp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:scaleType="centerCrop"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/pixelation_without_face_blur"
+                        app:shapeAppearanceOverlay="@style/roundedImageView" />
+                    <ImageView
+                        android:id="@+id/ivCheckPixelationWithoutFaceBlur"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom|center"
+                        android:layout_marginBottom="0dp"
+                        app:layout_constraintStart_toStartOf="@id/ivPixelationWithoutFaceBlur"
+                        app:layout_constraintEnd_toEndOf="@id/ivPixelationWithoutFaceBlur"
+                        app:layout_constraintBottom_toBottomOf="@id/ivPixelationWithoutFaceBlur"
+                        android:contentDescription="@string/checkbox_label_title"
+                        android:elevation="5dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_check_green"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivPixelationWithoutHeadBlur"
+                        android:layout_width="0dp"
+                        android:layout_height="80dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/pixelation_without_head_blur"
+                        app:shapeAppearanceOverlay="@style/roundedImageView" />
+
+                    <ImageView
+                        android:id="@+id/ivCheckPixelationWithoutHeadBlur"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom|center"
+                        android:layout_marginBottom="0dp"
+                        app:layout_constraintStart_toStartOf="@id/ivPixelationWithoutHeadBlur"
+                        app:layout_constraintEnd_toEndOf="@id/ivPixelationWithoutHeadBlur"
+                        app:layout_constraintBottom_toBottomOf="@id/ivPixelationWithoutHeadBlur"
+                        android:contentDescription="@string/checkbox_label_title"
+                        android:elevation="5dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_check_green"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivSolidWithFaceBlur"
+                        android:layout_width="0dp"
+                        android:layout_height="80dp"
+                        android:layout_marginHorizontal="4dp"
+                        android:layout_weight="1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/solid_with_face_blur"
+                        app:shapeAppearanceOverlay="@style/roundedImageView" />
+
+                    <ImageView
+                        android:id="@+id/ivCheckSolidWithFaceBlur"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom|center"
+                        android:layout_marginBottom="0dp"
+                        app:layout_constraintStart_toStartOf="@id/ivSolidWithFaceBlur"
+                        app:layout_constraintEnd_toEndOf="@id/ivSolidWithFaceBlur"
+                        app:layout_constraintBottom_toBottomOf="@id/ivSolidWithFaceBlur"
+                        android:contentDescription="@string/checkbox_label_title"
+                        android:elevation="5dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_check_green"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivSolidWithoutFaceBlur"
+                        android:layout_width="0dp"
+                        android:layout_height="80dp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:scaleType="centerCrop"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:src="@drawable/solid_without_face_blur"
+                        app:shapeAppearanceOverlay="@style/roundedImageView" />
+
+                    <ImageView
+                        android:id="@+id/ivCheckSolidWithoutFaceBlur"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom|center"
+                        android:layout_marginBottom="0dp"
+                        app:layout_constraintStart_toStartOf="@id/ivSolidWithoutFaceBlur"
+                        app:layout_constraintEnd_toEndOf="@id/ivSolidWithoutFaceBlur"
+                        app:layout_constraintBottom_toBottomOf="@id/ivSolidWithoutFaceBlur"
+                        android:contentDescription="@string/checkbox_label_title"
+                        android:elevation="5dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_check_green"
+                        android:visibility="gone"
+                        tools:visibility="visible"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/divider2"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="?attr/kahfDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layoutBlurPreviews" />
+
+            <TextView
+                android:id="@+id/tvVideoBlur"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Video Blur (Beta)"
+                android:textColor="?attr/kahfPrimaryText"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/switchVideoBlur"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider2" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchVideoBlur"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:scaleX="0.75"
+                android:scaleY="0.75"
+                app:layout_constraintBottom_toBottomOf="@+id/tvVideoBlur"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvVideoBlur"
+                app:thumbTint="?attr/kahfCardBackground"
+                app:track="@drawable/switch_track"
+                app:trackTint="@color/switch_track_color" />
+
+            <TextView
+                android:id="@+id/tvVideoBlurDescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/lato"
+                android:text="@string/kahf_video_blur_description"
+                android:textColor="?attr/kahfSecondaryText"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvVideoBlur" />
+
+            <TextView
+                android:id="@+id/tvVideoBlurWarning"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:fontFamily="@font/lato"
+                android:text="@string/kahf_warning_blurring_not_full_accurate"
+                android:textColor="#FF9800"
+                android:textSize="11sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvVideoBlurDescription" />
+
+            <TextView
+                android:id="@+id/tvStopVideoAutoplay"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Stop Video Autoplay"
+                android:textColor="?attr/kahfPrimaryText"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/switchStopAutoplay"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvVideoBlurWarning" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchStopAutoplay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:scaleX="0.75"
+                android:scaleY="0.75"
+                app:layout_constraintBottom_toBottomOf="@+id/tvStopVideoAutoplay"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvStopVideoAutoplay"
+                app:thumbTint="?attr/kahfCardBackground"
+                app:track="@drawable/switch_track"
+                app:trackTint="@color/switch_track_color" />
+
+            <TextView
+                android:id="@+id/tvHarmAvoided"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Harm Avoided"
+                android:textColor="?attr/kahfPrimaryText"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvStopVideoAutoplay" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
+                android:id="@+id/appStat"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="10dp">
+                android:layout_marginTop="12dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvHarmAvoided">
 
-                <androidx.constraintlayout.widget.Group
-                    android:id="@+id/private_dns_group"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:constraint_referenced_ids="button_container,tvDescription"/>
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_33"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.33" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guideline_66"
+                    android:layout_width="1dp"
+                    android:layout_height="1dp"
+                    android:orientation="vertical"
+                    app:layout_constraintGuide_percent="0.66" />
 
                 <TextView
-                    android:id="@+id/title"
+                    android:id="@+id/siteBlockedCount"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
                     android:fontFamily="@font/poppins_bold"
-                    android:text="@string/kahf_safer_internet"
-                    android:textColor="?attr/kahfPrimaryText"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/switch_kahd_guard"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="DeprecatedWidgetInXml" />
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switch_kahd_guard"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:track="@drawable/switch_track"
-                    app:trackTint="@color/switch_track_color"
-                    app:thumbTint="?attr/kahfCardBackground"
-                    android:checked="false"
-                    tools:checked="true"
-                    android:scaleX="0.75"
-                    android:scaleY="0.75"
-                    android:layout_marginEnd="-5dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-
-                <LinearLayout
-                    android:id="@+id/button_container"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="-10dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/title">
-
-                    <include
-                        android:id="@+id/btnHigh"
-                        layout="@layout/safegaze_button" />
-
-                    <include
-                        android:id="@+id/btnMedium"
-                        layout="@layout/safegaze_button" />
-
-                    <include
-                        android:id="@+id/btnLow"
-                        layout="@layout/safegaze_button" />
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tvDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/suggestion_bg_rounded"
-                    android:backgroundTint="@color/kahf_green"
-                    android:fontFamily="@font/lato"
-                    android:gravity="center_vertical"
-                    android:maxLines="3"
-                    android:minLines="3"
-                    android:paddingHorizontal="10dp"
-                    android:paddingVertical="5dp"
+                    tools:text="0"
                     android:textColor="?attr/kahfPrimaryText"
-                    android:textSize="14sp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/button_container"
-                    tools:ignore="DeprecatedWidgetInXml,InvalidColorAttribute"
-                    tools:text="@string/kahf_mode_desc_high" />
-
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:id="@+id/divider2"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
-                    android:background="?attr/kahfDivider"
-                    app:layout_constraintTop_toBottomOf="@id/tvDescription" />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/blurContainer"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/divider2">
-
-                    <TextView
-                        android:id="@+id/tvDecent"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:fontFamily="@font/poppins_bold"
-                        android:text="@string/kahf_decent_internet"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toStartOf="@id/switch_safe_gaze"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switch_safe_gaze"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:track="@drawable/switch_track"
-                        app:trackTint="@color/switch_track_color"
-                        app:thumbTint="?attr/kahfCardBackground"
-                        android:checked="false"
-                        tools:checked="true"
-                        android:scaleX="0.75"
-                        android:scaleY="0.75"
-                        android:layout_marginEnd="-5dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="@id/tvDecent"
-                        app:layout_constraintBottom_toBottomOf="@id/tvDecent"
-                        tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-                    <FrameLayout
-                        android:id="@+id/ivBlurGreyContainer"
-                        android:layout_width="85dp"
-                        android:layout_height="100dp"
-                        android:layout_marginTop="5dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/switch_safe_gaze">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/ivBlurGrey"
-                            android:layout_width="85dp"
-                            android:layout_height="85dp"
-                            android:src="@drawable/blur_grey"
-                            app:shapeAppearanceOverlay="@style/roundedImageView"/>
-
-                        <ImageView
-                            android:id="@+id/ivCheckGrey"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="bottom|center"
-                            android:layout_marginBottom="0dp"
-                            android:contentDescription="@string/checkbox_label_title"
-                            android:elevation="5dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_check_green"
-                            android:visibility="gone"
-                            tools:visibility="visible"/>
-                    </FrameLayout>
-
-                    <FrameLayout
-                        android:id="@+id/ivBlurPixelationContainer"
-                        android:layout_width="85dp"
-                        android:layout_height="100dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginEnd="5dp"
-                        app:layout_constraintEnd_toStartOf="@id/ivBlurGreyContainer"
-                        app:layout_constraintTop_toBottomOf="@id/switch_safe_gaze">
-
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/ivBlurPixelation"
-                            android:layout_width="85dp"
-                            android:layout_height="85dp"
-                            app:shapeAppearanceOverlay="@style/roundedImageView"
-                            android:src="@drawable/blur_pixelation"/>
-
-                        <ImageView
-                            android:id="@+id/ivCheckPixelation"
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:layout_gravity="bottom|center"
-                            android:layout_marginBottom="0dp"
-                            android:contentDescription="@string/checkbox_label_title"
-                            android:elevation="5dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_check_green"
-                            android:visibility="gone" />
-                    </FrameLayout>
-
-                    <TextView
-                        android:id="@+id/blueIndecentPhotosText"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:fontFamily="@font/lato"
-                        android:text="@string/kahf_desc_blur_full_image"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="14sp"
-                        android:layout_marginEnd="10dp"
-                        app:layout_constraintEnd_toStartOf="@id/ivBlurPixelationContainer"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/tvDecent"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnToggleSiteBlur"
-                        android:layout_width="wrap_content"
-                        android:layout_height="38dp"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="@font/lato"
-                        android:paddingHorizontal="12dp"
-                        android:visibility="gone"
-                        app:backgroundTint="@color/blue0_50"
-                        android:text="@string/kahf_pause_on_site"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="12sp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/ivBlurPixelationContainer" />
-
-                    <TextView
-                        android:id="@+id/tvCoverFace"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:fontFamily="@font/poppins_bold"
-                        android:text="@string/kahf_cover_face"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/btnToggleSiteBlur"
-                        app:layout_constraintEnd_toStartOf="@+id/switchCoverFace"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switchCoverFace"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:track="@drawable/switch_track"
-                        app:trackTint="@color/switch_track_color"
-                        app:thumbTint="?attr/kahfCardBackground"
-                        android:checked="false"
-                        tools:checked="true"
-                        android:scaleX="0.75"
-                        android:scaleY="0.75"
-                        android:layout_marginEnd="-5dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/btnToggleSiteBlur"
-                        tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-                    <TextView
-                        android:id="@+id/tvAutoPlayVideo"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:fontFamily="@font/poppins_bold"
-                        android:text="@string/kahf_autoplay_video"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/switchCoverFace"
-                        app:layout_constraintEnd_toStartOf="@+id/switchAutoplayVideo"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/switchAutoplayVideo"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:track="@drawable/switch_track"
-                        app:trackTint="@color/switch_track_color"
-                        app:thumbTint="?attr/kahfCardBackground"
-                        android:checked="false"
-                        tools:checked="true"
-                        android:scaleX="0.75"
-                        android:scaleY="0.75"
-                        android:layout_marginEnd="-5dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/switchCoverFace"
-                        tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:id="@+id/divider3"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?attr/kahfDivider"
-                    app:layout_constraintTop_toBottomOf="@id/blurContainer" />
-
-                <TextView
-                    android:id="@+id/statTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/kahf_harm_avoided"
-                    android:textColor="?attr/kahfPrimaryText"
-                    android:textSize="20sp"
+                    android:textSize="24sp"
                     android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_33"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/divider3"
-                    tools:ignore="DeprecatedWidgetInXml" />
-
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/appStat"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/statTitle">
-
-                    <androidx.constraintlayout.widget.Guideline
-                        android:id="@+id/guideline_33"
-                        android:layout_width="1dp"
-                        android:layout_height="1dp"
-                        android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.33" />
-
-                    <androidx.constraintlayout.widget.Guideline
-                        android:id="@+id/guideline_66"
-                        android:layout_width="1dp"
-                        android:layout_height="1dp"
-                        android:orientation="vertical"
-                        app:layout_constraintGuide_percent="0.66" />
-
-                    <com.duckduckgo.common.ui.view.divider.VerticalDivider
-                        android:id="@+id/divider4"
-                        android:layout_width="1dp"
-                        android:layout_height="0dp"
-                        android:background="?attr/kahfDivider"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="@id/guideline_33"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <com.duckduckgo.common.ui.view.divider.VerticalDivider
-                        android:id="@+id/divider5"
-                        android:layout_width="1dp"
-                        android:layout_height="0dp"
-                        android:background="?attr/kahfDivider"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="@id/guideline_66"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/siteBlockedCount"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_bold"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="5dp"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/divider4"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="DeprecatedWidgetInXml"
-                        tools:text="514" />
-
-                    <TextView
-                        android:id="@+id/adsBlockedLabel"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="5dp"
-                        android:text="@string/kahf_harmful_sites"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toStartOf="@id/divider4"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/siteBlockedCount"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                    <TextView
-                        android:id="@+id/imageBlurCount"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_bold"
-                        android:paddingHorizontal="5dp"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toStartOf="@id/divider5"
-                        app:layout_constraintStart_toEndOf="@id/divider4"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="DeprecatedWidgetInXml"
-                        tools:text="123" />
-
-                    <TextView
-                        android:id="@+id/imageBlurLabel"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato"
-                        android:paddingHorizontal="5dp"
-                        android:text="@string/kahf_indecent_pictures"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toStartOf="@id/divider5"
-                        app:layout_constraintStart_toEndOf="@id/divider4"
-                        app:layout_constraintTop_toBottomOf="@id/imageBlurCount"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                    <TextView
-                        android:id="@+id/trackerBlockedCount"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/poppins_bold"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="0dp"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toEndOf="@id/divider5"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="DeprecatedWidgetInXml"
-                        tools:text="860" />
-
-                    <TextView
-                        android:id="@+id/trackerBlockedLabel"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/lato"
-                        android:paddingStart="5dp"
-                        android:paddingEnd="0dp"
-                        android:text="@string/kahf_ads_trackers"
-                        android:textColor="?attr/kahfPrimaryText"
-                        android:textSize="14sp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="@id/divider5"
-                        app:layout_constraintTop_toBottomOf="@id/trackerBlockedCount"
-                        tools:ignore="DeprecatedWidgetInXml" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:id="@+id/divider7"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
-                    android:background="?attr/kahfDivider"
-                    app:layout_constraintTop_toBottomOf="@id/appStat" />
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/tvLock"
+                    android:id="@+id/adsBlockedLabel"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:fontFamily="@font/poppins_bold"
-                    android:text="@string/kahf_prevent_turning_off_safety_feature"
-                    android:textColor="?attr/kahfPrimaryText"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/switchSgLock"
-                    app:layout_constraintTop_toBottomOf="@id/divider7"
-                    tools:ignore="DeprecatedWidgetInXml" />
-
-                <androidx.appcompat.widget.SwitchCompat
-                    android:id="@+id/switchSgLock"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:track="@drawable/switch_track"
-                    app:trackTint="@color/switch_track_color"
-                    app:thumbTint="?attr/kahfCardBackground"
-                    android:checked="false"
-                    tools:checked="true"
-                    android:scaleX="0.6"
-                    android:scaleY="0.6"
-                    android:layout_marginEnd="-10dp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@id/tvLock"
-                    app:layout_constraintTop_toTopOf="@id/tvLock"
-                    tools:ignore="UseSwitchCompatOrMaterialXml" />
-
-                <TextView
-                    android:id="@+id/tvLockDescription"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:fontFamily="@font/lato"
-                    android:text="@string/kahf_safegaze_lock_desc"
-                    android:textColor="?attr/kahfPrimaryText"
-                    android:textSize="14sp"
                     android:gravity="center"
-                    android:layout_marginEnd="10dp"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tvLock"
-                    tools:ignore="DeprecatedWidgetInXml" />
-
-                <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                    android:id="@+id/divider6"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="10dp"
-                    android:background="?attr/kahfDivider"
-                    app:layout_constraintTop_toBottomOf="@id/tvLockDescription" />
-
-                <Button
-                    android:id="@+id/btnShare"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/app_bar_menu_share"
-                    android:drawableTop="@drawable/ic_share_kahf"
-                    android:drawablePadding="0dp"
-                    android:drawableTint="?attr/kahfPrimaryIcon"
-                    android:fontFamily="@font/lato"
-                    android:text="@string/kahf_share"
+                    android:text="@string/kahf_harmful_sites"
                     android:textColor="?attr/kahfSecondaryText"
-                    android:textSize="13sp"
-                    android:textStyle="normal"
-                    app:layout_constraintEnd_toStartOf="@id/btnSupport"
-                    app:layout_constraintTop_toBottomOf="@id/divider6"
-                    tools:ignore="DeprecatedWidgetInXml" />
-
-                <Button
-                    android:id="@+id/btnSupport"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/app_bar_menu_share"
-                    android:drawableTop="@drawable/ic_support"
-                    android:drawablePadding="0dp"
-                    android:drawableTint="?attr/kahfPrimaryIcon"
-                    android:fontFamily="@font/lato"
-                    android:text="@string/kahf_support"
-                    android:textColor="?attr/kahfSecondaryText"
-                    android:textSize="13sp"
-                    android:textStyle="normal"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/divider6"
-                    tools:ignore="DeprecatedWidgetInXml" />
-
-                <Button
-                    android:id="@+id/btnTheme"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/app_bar_menu_share"
-                    android:drawableTop="@drawable/ic_moon"
-                    android:drawablePadding="0dp"
-                    android:drawableTint="?attr/kahfPrimaryIcon"
-                    android:fontFamily="@font/lato"
-                    android:text="@string/kahf_dark_mode"
-                    android:textColor="?attr/kahfSecondaryText"
-                    android:textSize="13sp"
-                    android:textStyle="normal"
-                    app:layout_constraintStart_toEndOf="@id/btnSupport"
-                    app:layout_constraintTop_toBottomOf="@id/divider6"
-                    tools:ignore="DeprecatedWidgetInXml" />
-
-                <TextView
-                    android:id="@+id/tvBuildNumber"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/lato"
-                    android:paddingHorizontal="5dp"
-                    tools:text="Build Number"
-                    android:textColor="?attr/kahfPrimaryText"
                     android:textSize="11sp"
-                    android:gravity="center"
-                    app:layout_constraintTop_toBottomOf="@+id/btnTheme"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_33"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    tools:ignore="DeprecatedWidgetInXml" />
+                    app:layout_constraintTop_toBottomOf="@+id/siteBlockedCount" />
 
+                <TextView
+                    android:id="@+id/imageBlurCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold"
+                    android:gravity="center"
+                    tools:text="906"
+                    android:textColor="?attr/kahfPrimaryText"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_66"
+                    app:layout_constraintStart_toEndOf="@+id/guideline_33"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/imageBlurLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lato"
+                    android:gravity="center"
+                    android:text="@string/kahf_indecent_pictures"
+                    android:textColor="?attr/kahfSecondaryText"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toStartOf="@+id/guideline_66"
+                    app:layout_constraintStart_toEndOf="@+id/guideline_33"
+                    app:layout_constraintTop_toBottomOf="@+id/imageBlurCount" />
+
+                <TextView
+                    android:id="@+id/trackerBlockedCount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/poppins_bold"
+                    android:gravity="center"
+                    tools:text="1336"
+                    android:textColor="?attr/kahfPrimaryText"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/guideline_66"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/trackerBlockedLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/lato"
+                    android:gravity="center"
+                    android:text="@string/kahf_ads_trackers"
+                    android:textColor="?attr/kahfSecondaryText"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/guideline_66"
+                    app:layout_constraintTop_toBottomOf="@+id/trackerBlockedCount" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </ScrollView>
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/divider3"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="20dp"
+                android:background="?attr/kahfDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/appStat" />
 
+            <TextView
+                android:id="@+id/tvPreventTurningOff"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="Prevent turning off\nsafety features"
+                android:textColor="?attr/kahfPrimaryText"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/switchPreventTurningOff"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider3" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchPreventTurningOff"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:scaleX="0.75"
+                android:scaleY="0.75"
+                app:layout_constraintBottom_toBottomOf="@+id/tvPreventTurningOff"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvPreventTurningOff"
+                app:thumbTint="?attr/kahfCardBackground"
+                app:track="@drawable/switch_track"
+                app:trackTint="@color/switch_track_color" />
+
+            <TextView
+                android:id="@+id/tvPreventDescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="@font/lato"
+                android:text="If enabled, you'll be asked to provide PIN when opening safegaze settings."
+                android:textColor="?attr/kahfSecondaryText"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvPreventTurningOff" />
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/divider6"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:background="?attr/kahfDivider"
+                app:layout_constraintTop_toBottomOf="@id/tvPreventDescription" />
+
+            <Button
+                android:id="@+id/btnShare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/app_bar_menu_share"
+                android:drawableTop="@drawable/ic_share_kahf"
+                android:drawablePadding="0dp"
+                android:drawableTint="?attr/kahfPrimaryIcon"
+                android:fontFamily="@font/lato"
+                android:text="@string/kahf_share"
+                android:textColor="?attr/kahfSecondaryText"
+                android:textSize="13sp"
+                android:textStyle="normal"
+                app:layout_constraintEnd_toStartOf="@id/btnSupport"
+                app:layout_constraintTop_toBottomOf="@id/divider6"
+                tools:ignore="DeprecatedWidgetInXml" />
+
+            <Button
+                android:id="@+id/btnSupport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/app_bar_menu_share"
+                android:drawableTop="@drawable/ic_support"
+                android:drawablePadding="0dp"
+                android:drawableTint="?attr/kahfPrimaryIcon"
+                android:fontFamily="@font/lato"
+                android:text="@string/kahf_support"
+                android:textColor="?attr/kahfSecondaryText"
+                android:textSize="13sp"
+                android:textStyle="normal"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divider6"
+                tools:ignore="DeprecatedWidgetInXml" />
+
+            <Button
+                android:id="@+id/btnTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackgroundBorderless"
+                android:contentDescription="@string/app_bar_menu_share"
+                android:drawableTop="@drawable/ic_moon"
+                android:drawablePadding="0dp"
+                android:drawableTint="?attr/kahfPrimaryIcon"
+                android:fontFamily="@font/lato"
+                android:text="@string/kahf_dark_mode"
+                android:textColor="?attr/kahfSecondaryText"
+                android:textSize="13sp"
+                android:textStyle="normal"
+                app:layout_constraintStart_toEndOf="@id/btnSupport"
+                app:layout_constraintTop_toBottomOf="@id/divider6"
+                tools:ignore="DeprecatedWidgetInXml" />
+
+            <TextView
+                android:id="@+id/tvBuildNumber"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/lato"
+                android:paddingHorizontal="5dp"
+                tools:text="Build Number"
+                android:textColor="?attr/kahfPrimaryText"
+                android:textSize="11sp"
+                android:gravity="center"
+                app:layout_constraintTop_toBottomOf="@+id/btnTheme"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="DeprecatedWidgetInXml" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
     </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

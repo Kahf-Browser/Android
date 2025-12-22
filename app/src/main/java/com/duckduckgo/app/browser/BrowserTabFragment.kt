@@ -55,6 +55,7 @@ import android.text.SpannableString
 import android.text.Spanned
 import android.text.style.StyleSpan
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.ContextMenu
 import android.view.Gravity
 import android.view.KeyEvent
@@ -241,7 +242,6 @@ import com.duckduckgo.app.global.view.isImmersiveModeEnabled
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.global.view.toggleFullScreen
-import com.duckduckgo.app.isFaceCoverEnabled
 import com.duckduckgo.app.isSgLockEnabled
 import com.duckduckgo.app.isZikrTab
 import com.duckduckgo.app.location.data.LocationPermissionType
@@ -250,7 +250,6 @@ import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
-import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.app.safegaze.popup.SafeGazePopupHandler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -379,8 +378,6 @@ import com.kahfads.sdk.FallbackAdImpressionListener
 import com.kahfads.sdk.KahfAdsError
 import com.kahfads.sdk.KahfAdsViewConfig
 import com.kahfads.sdk.PlacementId
-import io.kahf.kahf_segmentation.ImageProcessor
-import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -1158,6 +1155,7 @@ class BrowserTabFragment :
                 },
                 onSafeGazeModeChanged = {
                     val updated = updateSafeGazeSettings(it)
+                    safeGazeInterface.updateSafeGazeMode(it)
                     if (it == SafeGazeLevel.Off) {
                         safeGazeInterface.updateBlurMode(false)
                         safeGazeInterface.updateFaceCoverMode(DEFAULT_FACE_COVER)
@@ -1173,12 +1171,87 @@ class BrowserTabFragment :
                         webView?.reload()
                     }
                 },
-                onBlurEffectChanged = {
-                    val updated = updateSafeGazeSettings(it)
-                    safeGazeInterface.updateBlurMode(it.name == SafeGazeLevel.Blur.name)
+                onVideoBlurModeChanged = {
+                    val updated = updateVideoBlurSettings(it)
                     if (updated) {
+                        Log.d("SafeGazeLog", "onVideoBlurModeChanged: ${updated}, selection: ${it}")
+                        // Update the SafeGazeJsInterface's videoBlurMode before reloading
+                        safeGazeInterface.updateVideoBlurMode(it)
+                        popupWindow.dismiss()
                         webView?.reload()
                     }
+                },
+                onBlurEffectChanged = { newSafeGazeLevel ->
+                    Log.d("SafeGazeLog", "onBlurEffectChanged: ${newSafeGazeLevel.name}")
+
+                    // CRITICAL FIX: Cancel any in-flight image processing tasks FIRST
+                    safeGazeInterface.cancelProcessingJob()
+                    Log.d("SafeGazeLog", "Cancelled in-flight processing tasks")
+
+                    // CRITICAL FIX: Reset the processing queue to clear any pending tasks
+                    safeGazeInterface.resetProcessingQueue()
+
+                    // CRITICAL FIX: Always update SharedPreferences for persistence
+                    updateSafeGazeSettings(newSafeGazeLevel)
+
+                    // CRITICAL FIX: Update the SafeGazeJsInterface's internal state FIRST
+                    // This ensures cache keys (getMaskType) reflect the new mode
+                    safeGazeInterface.updateSafeGazeMode(newSafeGazeLevel)
+
+                    // Update detector settings
+                    safeGazeInterface.apply {
+                        updateBlurMode(newSafeGazeLevel == SafeGazeLevel.SolidWithoutFaceBlur || newSafeGazeLevel == SafeGazeLevel.SolidWithFaceBlur)
+                        updateHeadShow(newSafeGazeLevel == SafeGazeLevel.PixelationWithoutHeadBlur)
+                        updateFaceCoverMode(newSafeGazeLevel == SafeGazeLevel.SolidWithFaceBlur)
+                    }
+
+                    // CRITICAL FIX: Clear database cache and WAIT for completion
+                    lifecycleScope.launch(dispatchers.io()) {
+                        try {
+                            Log.d("SafeGazeLog", "Starting cache clear and reload sequence...")
+
+                            // Clear ALL cache to guarantee no stale entries
+                            safeGazeInterface.clearAllDatabaseCache()
+
+                            // Small delay to ensure imageDetector settings are fully applied
+                            delay(100)
+
+                            withContext(dispatchers.main()) {
+                                webView?.let { view ->
+                                    // Tell JavaScript to clear ALL processed images
+                                    view.evaluateJavascript("javascript:if(typeof clearAllProcessedImages === 'function'){clearAllProcessedImages();}", null)
+
+                                    // Clear EVERYTHING
+                                    view.clearCache(true)
+                                    view.clearHistory()
+                                    view.clearFormData()
+                                    view.evaluateJavascript("javascript:localStorage.clear();sessionStorage.clear();", null)
+
+                                    Log.d("SafeGazeLog", "WebView: cleared all caches")
+
+                                    // Force HARD reload from network
+                                    val currentUrl = view.url
+                                    if (!currentUrl.isNullOrEmpty()) {
+                                        view.loadUrl(currentUrl)
+                                        Log.d("SafeGazeLog", "WebView reloaded with new blur mode: ${newSafeGazeLevel.name}")
+                                    } else {
+                                        view.reload()
+                                    }
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("SafeGazeLog", "Error during cache clearing: ${e.message}", e)
+                            withContext(dispatchers.main()) {
+                                webView?.let {
+                                    it.clearCache(true)
+                                    it.clearHistory()
+                                    val url = it.url
+                                    if (!url.isNullOrEmpty()) it.loadUrl(url) else it.reload()
+                                }
+                            }
+                        }
+                    }
+
                     popupWindow.dismiss()
                 },
                 onShareClicked = {
@@ -1199,13 +1272,7 @@ class BrowserTabFragment :
                     webView?.reload()
                     popupWindow.dismiss()
                 },
-            ).apply {
-                setOnFaceCoverChangeListener { shouldCoverFace ->
-                    safeGazeInterface.updateFaceCoverMode(shouldCoverFace)
-                    webView?.reload()
-                    popupWindow.dismiss()
-                }
-            }
+            )
 
             lifecycleScope.launch {
                 val count = imageBlockCountDao.getCount().first()
@@ -1249,12 +1316,24 @@ class BrowserTabFragment :
     }
 
     private fun updateSafeGazeSettings(selection: SafeGazeLevel): Boolean {
-        val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
+        val currentMode = SafeGazeLevel.getImageBlurLevel(sharedPreferences)
+        Log.d("SafeGazeLog", "currMode: $currentMode, selection: $selection")
         if (currentMode == selection) {
             return false
         }
 
-        SafeGazeLevel.updateLevel(spProvider.getKahfSharedPreferences(), selection)
+        SafeGazeLevel.updateImageBlurLevel(spProvider.getKahfSharedPreferences(), selection)
+        return true
+    }
+
+    private fun updateVideoBlurSettings(selection: SafeGazeLevel): Boolean {
+        val currentMode = SafeGazeLevel.getVideoBlurLevel(sharedPreferences, "updateVideoBlurSettings")
+        Log.d("SafeGazeLog", "currMode: $currentMode, selection: $selection")
+        if (currentMode == selection) {
+            return false
+        }
+
+        SafeGazeLevel.updateVideoBlurLevel(spProvider.getKahfSharedPreferences(), selection)
         return true
     }
 
@@ -2903,8 +2982,8 @@ class BrowserTabFragment :
                         Timber.d("Model initialization time: $initializationTime ms")
                     }
                 },
-                grayBlur = SafeGazeLevel.getCurrentLevel(sharedPreferences) == SafeGazeLevel.Blur,
-                shouldCoverFace = sharedPreferences.isFaceCoverEnabled(),
+                safeGazeMode = SafeGazeLevel.getImageBlurLevel(sharedPreferences),
+                videoBlurMode = SafeGazeLevel.getVideoBlurLevel(sharedPreferences, "configureWebView"),
                 (activity?.application as DuckDuckGoApplication).imageProcessor,
                 (activity?.application as DuckDuckGoApplication).videoFrameProcessor,
             )

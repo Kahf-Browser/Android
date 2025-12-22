@@ -26,6 +26,7 @@ import android.net.http.SslError.SSL_DATE_INVALID
 import android.net.http.SslError.SSL_EXPIRED
 import android.net.http.SslError.SSL_IDMISMATCH
 import android.net.http.SslError.SSL_UNTRUSTED
+import android.util.Log
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
@@ -78,7 +79,6 @@ import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
-import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
 import com.duckduckgo.common.utils.extensions.isDataUri
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -93,7 +93,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.BufferedReader
-import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URI
@@ -324,38 +323,6 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun handleSafeGaze(webView: WebView, url: String?) {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
-            val isUrlWhiteListed = sgWhitelistDao.isHostWhitelisted(url?.toUri()?.host ?: "")
-
-            if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
-                withContext(dispatcherProvider.main()) {
-                    webView.evaluateJavascript("window.solidColorEffect = ${currentMode == SafeGazeLevel.Blur}", null)
-                }
-
-                // Run SafeGaze script
-                try {
-                    val localJsFile = File("${context.filesDir}/${SAFE_GAZE_JS_FILENAME}")
-                    val jsCode = localJsFile.readText(Charsets.UTF_8)
-
-                    if (jsCode.endsWith("--eof--\n")) {
-                        withContext(dispatcherProvider.main()) {
-                            webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
-                        }
-                        Timber.d("SafeGazeJs: Injecting remote version")
-                    } else {
-                        loadLocalJs(webView)
-                        Timber.d("SafeGazeJs: Injecting local version. Because no --eof--")
-                    }
-                } catch (e: Exception) {
-                    loadLocalJs(webView)
-                    Timber.d("SafeGazeJs: Injecting local version. Because $e")
-                }
-            }
-        }
-    }
-
     @WorkerThread
     private suspend fun loadLocalJs(webView: WebView) {
         val jsCode = readAssetFile(context.assets, "safe_gaze_v2.js")
@@ -369,10 +336,14 @@ class BrowserWebViewClient @Inject constructor(
         url: String?
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
+            var blurMode = SafeGazeLevel.getImageBlurLevel(sharedPreferences)
+            if (blurMode == SafeGazeLevel.Off) {
+                blurMode = SafeGazeLevel.getVideoBlurLevel(sharedPreferences, "loadPordaJs")
+            }
+            Log.d("kLog", "imgLog Received blurMode: $blurMode")
             val isUrlWhiteListed = sgWhitelistDao.isHostWhitelisted(url?.toUri()?.host ?: "")
 
-            if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
+            if (SafeGazeLevel.isEnabled(blurMode.name) && !isUrlWhiteListed) {
                 val contentJs = readAssetFile(context.assets, "video_filter.js")
                 withContext(dispatcherProvider.main()) {
                     webView.evaluateJavascript("Android = true;", null)

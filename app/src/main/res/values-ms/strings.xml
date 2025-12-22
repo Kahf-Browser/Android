@@ -956,6 +956,8 @@
     <string name="kahf_restart_app">Kemas kini dimuat turun! Memulakan semula aplikasi…</string>
     <string name="kahf_update_required">Kemas kini diperlukan untuk meneruskan!</string>
     <string name="selectLanguage">Pilih Bahasa</string>
+    <string name="kahf_video_blur_description">If enabled, AI will try to cover inappropriate portions of the video.</string>
+    <string name="kahf_warning_blurring_not_full_accurate"><font color="#FF2400">Blurring is not 100% accurate.</font></string>
 
 
 </resources>

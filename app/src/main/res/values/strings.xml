@@ -883,7 +883,7 @@
     <string name="kahf_decent_internet">Decent Internet</string>
     <string name="kahf_cover_face">Cover Face</string>
     <string name="kahf_autoplay_video">Autoplay video</string>
-    <string name="kahf_desc_blur_full_image">Hide inappropriate images. Avoid major sins. <font color="#FF2400">Blurring is not 100% accurate.</font></string>
+    <string name="kahf_desc_blur_full_image">Hide inappropriate images. Avoid major sins.</string>
     <string name="kahf_human_only">Human only</string>
     <string name="kahf_premium">(Premium)</string>
     <string name="kahf_full_image">Full Image</string>
@@ -971,4 +971,6 @@
     <string name="kahf_restart_app">Update downloaded! Restarting app…</string>
     <string name="kahf_update_required">Update is required to continue!</string>
     <string name="selectLanguage">Select Language</string>
+    <string name="kahf_video_blur_description">If enabled, AI will try to cover inappropriate portions of the video.</string>
+    <string name="kahf_warning_blurring_not_full_accurate"><font color="#FF2400">Blurring is not 100% accurate.</font></string>
 </resources>

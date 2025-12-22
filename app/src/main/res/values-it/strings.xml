@@ -911,5 +911,7 @@
     <string name="onboardingEndDaxDialogTitle">"Ben fatto!"</string>
     <string name="onboardingEndDaxDialogDescription">Ricorda: quando navighi con me gli annunci inquietanti non possono seguirti. 👌</string>
     <string name="onboardingEndDaxDialogButton">Fatto!</string>
+    <string name="kahf_video_blur_description">If enabled, AI will try to cover inappropriate portions of the video.</string>
+    <string name="kahf_warning_blurring_not_full_accurate"><font color="#FF2400">Blurring is not 100% accurate.</font></string>
 
 </resources>

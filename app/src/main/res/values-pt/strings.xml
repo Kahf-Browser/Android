@@ -894,5 +894,7 @@
     <string name="onboardingEndDaxDialogTitle">"Tu consegues!"</string>
     <string name="onboardingEndDaxDialogDescription">Lembra-te: sempre que navegas comigo, um anúncio assustador perde as suas asas. 👌</string>
     <string name="onboardingEndDaxDialogButton">Já está!</string>
+    <string name="kahf_video_blur_description">If enabled, AI will try to cover inappropriate portions of the video.</string>
+    <string name="kahf_warning_blurring_not_full_accurate"><font color="#FF2400">Blurring is not 100% accurate.</font></string>
 
 </resources>
