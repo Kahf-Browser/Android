@@ -65,20 +65,81 @@ object WorkerModule {
             // This exception occurs when too many network callbacks are registered (Android limit is ~100-200)
             val config = Configuration.Builder()
                 .setWorkerFactory(workerFactory)
-                .setMaxSchedulerLimit(50) // Conservative limit to prevent network callback exhaustion
+                .setMaxSchedulerLimit(20) // Reduced from 50 to 20 to prevent TooManyRequestsException
                 .setMinimumLoggingLevel(if (timber.log.Timber.treeCount > 0) android.util.Log.DEBUG else android.util.Log.INFO)
                 .build()
 
             try {
                 WorkManager.initialize(context, config)
-                Timber.d("WorkManager initialized successfully in main process with maxSchedulerLimit=50")
+                Timber.d("WorkManager initialized successfully in main process with maxSchedulerLimit=20")
             } catch (e: IllegalStateException) {
                 // This is expected if WorkManager is already initialized, so we can safely ignore it
                 Timber.d("WorkManager already initialized in main process (safe to ignore)")
+            } catch (e: Exception) {
+                // Catch any other exceptions during initialization to prevent crashes
+                Timber.e(e, "Failed to initialize WorkManager with standard config")
             }
         }
 
-        return WorkManager.getInstance(context)
+        // Get WorkManager instance with comprehensive exception handling
+        return try {
+            val workManager = WorkManager.getInstance(context)
+
+            // Proactively prune completed work to prevent callback accumulation
+            try {
+                workManager.pruneWork()
+                Timber.d("Successfully pruned completed work to prevent callback buildup")
+            } catch (pruneException: Exception) {
+                Timber.w(pruneException, "Failed to prune work, but continuing")
+            }
+
+            workManager
+        } catch (e: RuntimeException) {
+            // Check if this is a TooManyRequestsException (android.net.ConnectivityManager$TooManyRequestsException)
+            // We check by class name because the exception class may not be available at compile time
+            val isTooManyRequestsException = e.javaClass.name.contains("TooManyRequestsException")
+
+            if (isTooManyRequestsException) {
+                // This happens when WorkManager tries to register too many network callbacks
+                // Android has a system limit of ~100-250 callbacks per UID depending on API level
+                Timber.e(e, "TooManyRequestsException: Network callback limit exceeded. Attempting recovery...")
+
+                // Recovery strategy: Clear all work and reinitialize with minimal configuration
+                try {
+                    // Force-clear the WorkManager database to remove all pending work
+                    val workManager = WorkManager.getInstance(context)
+                    workManager.cancelAllWork()
+                    workManager.pruneWork()
+                    Timber.d("Cleared all work to recover from TooManyRequestsException")
+                } catch (clearException: Exception) {
+                    Timber.e(clearException, "Failed to clear work during TooManyRequestsException recovery")
+
+                    // Last resort: Reinitialize with zero scheduled work limit
+                    try {
+                        val minimalConfig = Configuration.Builder()
+                            .setWorkerFactory(workerFactory)
+                            .setMaxSchedulerLimit(0) // Disable all scheduled work
+                            .setMinimumLoggingLevel(android.util.Log.ERROR)
+                            .build()
+
+                        WorkManager.initialize(context, minimalConfig)
+                        Timber.w("Reinitialized WorkManager with zero scheduled work limit as last resort")
+                    } catch (reinitException: Exception) {
+                        Timber.e(reinitException, "Failed to reinitialize WorkManager - app may have stability issues")
+                    }
+                }
+
+                // Return the WorkManager instance (may have reduced functionality)
+                WorkManager.getInstance(context)
+            } else {
+                // Re-throw if it's a different RuntimeException
+                throw e
+            }
+        } catch (e: Exception) {
+            // Catch any other unexpected exceptions to prevent app crash
+            Timber.e(e, "Unexpected exception while getting WorkManager instance")
+            WorkManager.getInstance(context)
+        }
     }
 
     /**

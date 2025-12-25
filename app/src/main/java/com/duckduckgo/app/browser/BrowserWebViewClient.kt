@@ -26,6 +26,7 @@ import android.net.http.SslError.SSL_DATE_INVALID
 import android.net.http.SslError.SSL_EXPIRED
 import android.net.http.SslError.SSL_IDMISMATCH
 import android.net.http.SslError.SSL_UNTRUSTED
+import android.util.Log
 import android.webkit.HttpAuthHandler
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
@@ -78,7 +79,6 @@ import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.KAHF_GUARD_BLOCKED_URL
-import com.duckduckgo.common.utils.SAFE_GAZE_JS_FILENAME
 import com.duckduckgo.common.utils.extensions.isDataUri
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.cookies.api.CookieManagerProvider
@@ -93,7 +93,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.BufferedReader
-import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URI
@@ -134,6 +133,7 @@ class BrowserWebViewClient @Inject constructor(
     private val sgWhitelistDao: SafeGazeWhitelistDao,
     private val ampDetector: AmpDetector,
     private val safeBrowsingManager: com.duckduckgo.safebrowsing.api.SafeBrowsingManager,
+    private val youtubeAdBlocker: com.duckduckgo.app.browser.youtube.YouTubeAdBlocker,
     spProvider: SharedPreferencesProvider
 ) : WebViewClient() {
 
@@ -323,38 +323,6 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    private fun handleSafeGaze(webView: WebView, url: String?) {
-        appCoroutineScope.launch(dispatcherProvider.io()) {
-            val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
-            val isUrlWhiteListed = sgWhitelistDao.isHostWhitelisted(url?.toUri()?.host ?: "")
-
-            if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
-                withContext(dispatcherProvider.main()) {
-                    webView.evaluateJavascript("window.solidColorEffect = ${currentMode == SafeGazeLevel.Blur}", null)
-                }
-
-                // Run SafeGaze script
-                try {
-                    val localJsFile = File("${context.filesDir}/${SAFE_GAZE_JS_FILENAME}")
-                    val jsCode = localJsFile.readText(Charsets.UTF_8)
-
-                    if (jsCode.endsWith("--eof--\n")) {
-                        withContext(dispatcherProvider.main()) {
-                            webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
-                        }
-                        Timber.d("SafeGazeJs: Injecting remote version")
-                    } else {
-                        loadLocalJs(webView)
-                        Timber.d("SafeGazeJs: Injecting local version. Because no --eof--")
-                    }
-                } catch (e: Exception) {
-                    loadLocalJs(webView)
-                    Timber.d("SafeGazeJs: Injecting local version. Because $e")
-                }
-            }
-        }
-    }
-
     @WorkerThread
     private suspend fun loadLocalJs(webView: WebView) {
         val jsCode = readAssetFile(context.assets, "safe_gaze_v2.js")
@@ -368,10 +336,14 @@ class BrowserWebViewClient @Inject constructor(
         url: String?
     ) {
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            val currentMode = SafeGazeLevel.getCurrentLevel(sharedPreferences)
+            var blurMode = SafeGazeLevel.getImageBlurLevel(sharedPreferences)
+            if (blurMode == SafeGazeLevel.Off) {
+                blurMode = SafeGazeLevel.getVideoBlurLevel(sharedPreferences, "loadPordaJs")
+            }
+            Log.d("kLog", "imgLog Received blurMode: $blurMode")
             val isUrlWhiteListed = sgWhitelistDao.isHostWhitelisted(url?.toUri()?.host ?: "")
 
-            if (SafeGazeLevel.isEnabled(currentMode.name) && !isUrlWhiteListed) {
+            if (SafeGazeLevel.isEnabled(blurMode.name) && !isUrlWhiteListed) {
                 val contentJs = readAssetFile(context.assets, "video_filter.js")
                 withContext(dispatcherProvider.main()) {
                     webView.evaluateJavascript("Android = true;", null)
@@ -391,6 +363,19 @@ class BrowserWebViewClient @Inject constructor(
 
             appCoroutineScope.launch(dispatcherProvider.io()) {
                 val script = readAssetFile(context.assets, "autoplay_blocker.js")
+                withContext(dispatcherProvider.main()) {
+                    webView.evaluateJavascript(script, null)
+                }
+            }
+        }
+    }
+
+    private fun loadYouTubeAdBlockerJs(webView: WebView, url: String?) {
+        if (youtubeAdBlocker.isYouTubeUrl(url)) {
+            Timber.v("YouTubeAdBlocker: Injecting ad blocker script for $url")
+
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                val script = youtubeAdBlocker.getAdBlockerScript()
                 withContext(dispatcherProvider.main()) {
                     webView.evaluateJavascript(script, null)
                 }
@@ -447,6 +432,9 @@ class BrowserWebViewClient @Inject constructor(
 
             loadPordaJs(webView, it)
 
+            // Layer 1: Inject YouTube ad blocker script at page start
+            loadYouTubeAdBlockerJs(webView, it)
+
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != "about:blank" && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
@@ -493,6 +481,9 @@ class BrowserWebViewClient @Inject constructor(
                 loadAutoplayBlockerJs(webView)
             }
 
+            // Layer 3: Re-inject YouTube ad blocker script on page finish (backup for SPA navigation)
+            loadYouTubeAdBlockerJs(webView, url)
+
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())
             }
@@ -511,11 +502,16 @@ class BrowserWebViewClient @Inject constructor(
             url?.let {
                 if (url != ABOUT_BLANK) {
                     start?.let { safeStart ->
+                        // CRITICAL FIX: Use site.title from webViewClientListener instead of navigationList.currentItem?.title
+                        // The title is properly captured in BrowserChromeClient.onReceivedTitle() and stored in site.title
+                        // navigationList.currentItem?.title may be null/outdated, especially for sites that set title dynamically via JavaScript
+                        val pageTitle = webViewClientListener?.getSite()?.title
+
                         // TODO (cbarreiro - 22/05/2024): Extract to plugins
-                        pageLoadedHandler.onPageLoaded(it, navigationList.currentItem?.title, safeStart, currentTimeProvider.elapsedRealtime())
+                        pageLoadedHandler.onPageLoaded(it, pageTitle, safeStart, currentTimeProvider.elapsedRealtime())
                         shouldSendPagePaintedPixel(webView = webView, url = it)
                         appCoroutineScope.launch(dispatcherProvider.io()) {
-                            navigationHistory.saveToHistory(url, navigationList.currentItem?.title)
+                            navigationHistory.saveToHistory(url, pageTitle)
                         }
                         start = null
                     }
@@ -555,6 +551,17 @@ class BrowserWebViewClient @Inject constructor(
     ): WebResourceResponse? {
         var url = request.url.toString()
         if (request.url.host == KAHF_GUARD_BLOCKED_URL || url.isDataUri()) return null
+
+        // Layer 2: Block YouTube ad requests at network level
+        if (youtubeAdBlocker.shouldBlockRequest(url)) {
+            Timber.v("YouTubeAdBlocker: Blocked request to $url")
+            // Return empty response to block the request
+            return WebResourceResponse(
+                "text/plain",
+                "UTF-8",
+                java.io.ByteArrayInputStream(ByteArray(0))
+            )
+        }
         privateDnsMode = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
         val privateDnsEnabled = privateDnsMode != PrivateDnsLevel.Off
         val isAmpUrl = ampDetector.isAmpUrl(url)

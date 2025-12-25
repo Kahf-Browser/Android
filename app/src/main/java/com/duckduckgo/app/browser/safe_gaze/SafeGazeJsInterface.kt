@@ -2,10 +2,12 @@ package com.duckduckgo.app.browser.safe_gaze
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import android.webkit.JavascriptInterface
 import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
+import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwPrediction
 import com.duckduckgo.app.trackerdetection.db.KahfImageBlocked
@@ -25,6 +27,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeoutOrNull
@@ -41,8 +44,8 @@ class SafeGazeJsInterface(
     private val dispatcher: DispatcherProvider,
     private val analytics: AnalyticsService,
     private val onImageClassified: (type: String, result: OutputImage?) -> Unit,
-    private var grayBlur: Boolean = false,
-    private var shouldCoverFace: Boolean = false,
+    private var safeGazeMode: SafeGazeLevel = SafeGazeLevel.SolidWithoutFaceBlur,
+    private var videoBlurMode: SafeGazeLevel = SafeGazeLevel.SolidWithoutFaceBlur,
     private val imageDetector: ImageProcessor,
     private val videoDetector: VideoFrameProcessor,
 ) {
@@ -72,27 +75,49 @@ class SafeGazeJsInterface(
 
     init {
         scope.launch {
-            imageDetector.updateFaceCoverMode(shouldCoverFace)
-            imageDetector.updateBlurMode(grayBlur)
+            Log.d("SafegazeLog", "passed Mode: $safeGazeMode")
+            imageDetector.updateFaceCoverMode(safeGazeMode == SafeGazeLevel.SolidWithFaceBlur)
+            imageDetector.updateBlurMode(safeGazeMode == SafeGazeLevel.SolidWithoutFaceBlur || safeGazeMode == SafeGazeLevel.SolidWithFaceBlur)
+            imageDetector.updateHeadShow(safeGazeMode == SafeGazeLevel.PixelationWithoutHeadBlur)
         }
     }
 
     fun updateBlurMode(boolean: Boolean) {
-        grayBlur = boolean
         imageDetector.updateBlurMode(boolean)
     }
 
+    fun updateHeadShow(boolean: Boolean) {
+        imageDetector.updateHeadShow(boolean)
+    }
+
     fun updateFaceCoverMode(boolean: Boolean) {
-        shouldCoverFace = boolean
         imageDetector.updateFaceCoverMode(boolean)
+    }
+
+    /**
+     * CRITICAL: Updates the SafeGazeMode and ensures getMaskType() returns correct values
+     * This must be called BEFORE any cache operations to ensure proper cache keys
+     */
+    fun updateSafeGazeMode(newMode: SafeGazeLevel) {
+        Log.d("SafegazeLog", "updateSafeGazeMode: $newMode (old: $safeGazeMode)")
+        safeGazeMode = newMode
+    }
+
+    /**
+     * Updates the video blur mode
+     * This must be called when the video blur setting changes
+     */
+    fun updateVideoBlurMode(newMode: SafeGazeLevel) {
+        Log.d("SafegazeLog", "updateVideoBlurMode: $newMode (old: $videoBlurMode)")
+        videoBlurMode = newMode
     }
 
     @JavascriptInterface
     fun sendMessageFromWebView(messageType: String, data: String) {
-        Timber.d("kLog: imgLog Received message from WebView: type: $messageType, data: ${gson.toJson(data)}")
+        Timber.d("safegazelog: imgLog Received message from WebView: imageBlurMode: $safeGazeMode, videoBlurMode: $videoBlurMode, type: $messageType, data: ${gson.toJson(data)}")
         when (messageType) {
             "detectImg" -> addTaskToQueue(parseImageInfo(data))
-            "detectVideoFrame" -> runVideoDetection(parseImageInfo(data))
+            "detectVideoFrame" -> if (videoBlurMode != SafeGazeLevel.Off) runVideoDetection(parseImageInfo(data))
         }
     }
 
@@ -106,7 +131,8 @@ class SafeGazeJsInterface(
     }
 
     private fun addTaskToQueue(input: InputImage?) {
-        if (input == null || isInvalidImageUrl(input.src)) {
+        Log.d("SafegazeLog", "safegazeMode: $safeGazeMode")
+        if (input == null || isInvalidImageUrl(input.src) || safeGazeMode == SafeGazeLevel.Off) {
             Timber.d("kLog imgLog: 1. imageId: ${input?.id}")
             onImageClassified("detectionResult", OutputImage(
                 result = "null",
@@ -168,7 +194,7 @@ class SafeGazeJsInterface(
 
                     try {
                         // CRITICAL FIX: Properly handle timeout and exceptions
-                        downloadedBitmap = withTimeout(2000) {
+                        downloadedBitmap = withTimeout(5000) {
                             try {
                                 // CRITICAL FIX: Synchronize access to ImageDownloader to prevent SIGSEGV
                                 // Multiple coroutines calling Glide's .submit().get() simultaneously
@@ -463,7 +489,7 @@ class SafeGazeJsInterface(
                             )
 
                             coreInferenceTimes.add(result.coreInferenceTime ?: 0L)
-                            if (grayBlur) {
+                            if (safeGazeMode == SafeGazeLevel.SolidWithoutFaceBlur || safeGazeMode == SafeGazeLevel.SolidWithFaceBlur) {
                                 maskingTimes.add(result.maskOrPixelationTime ?: 0L)
                             } else {
                                 pixelationTimes.add(result.maskOrPixelationTime ?: 0L)
@@ -574,10 +600,14 @@ class SafeGazeJsInterface(
     }
 
     private fun getMaskType(): Int {
-        return if (grayBlur) {
-            if (shouldCoverFace) 1 else 0
-        } else {
-            if (shouldCoverFace) 3 else 2
+        // CRITICAL FIX: Return unique mask type for each SafeGazeLevel
+        // This ensures each blur mode has separate cache entries
+        return when (safeGazeMode) {
+            SafeGazeLevel.SolidWithoutFaceBlur -> 0       // gray face open
+            SafeGazeLevel.SolidWithFaceBlur -> 1          // gray face covered
+            SafeGazeLevel.PixelationWithoutFaceBlur -> 2  // pixelation face open
+            SafeGazeLevel.PixelationWithoutHeadBlur -> 3  // pixelation face covered
+            SafeGazeLevel.Off -> 4
         }
     }
 
@@ -591,6 +621,50 @@ class SafeGazeJsInterface(
         }
 
         Timber.d("kLog Reset processing queue and cleaned up bitmaps")
+    }
+
+    /**
+     * Cancels the active processing job to stop in-flight image processing.
+     * Call this before changing SafeGaze modes to prevent tasks from completing
+     * with mismatched settings and cache keys.
+     */
+    fun cancelProcessingJob() {
+        processingJob?.cancel()
+        Timber.d("kLog Cancelled processing job")
+    }
+
+    /**
+     * Clears database cache entries that don't match the current SafeGazeMode.
+     * This ensures old cached results with different blur effects aren't reused.
+     * CRITICAL: This is a suspend function - caller MUST wait for it to complete
+     * before reloading WebView to prevent race conditions.
+     */
+    suspend fun clearDatabaseCacheForOldMaskTypes() {
+        withContext(dispatcher.io()) {
+            try {
+                val currentMaskType = getMaskType()
+                val deletedCount = kahfImageBlockedDao.deleteEntriesNotMatchingMaskType(currentMaskType)
+                Timber.d("kLog Cleared $deletedCount database cache entries with old mask types (keeping maskType=$currentMaskType)")
+            } catch (e: Exception) {
+                Timber.e("kLog Error clearing database cache: ${e.message}", e)
+            }
+        }
+    }
+
+    /**
+     * Clears ALL database cache entries.
+     * Use this as a nuclear option when cache consistency is critical.
+     * More aggressive than clearDatabaseCacheForOldMaskTypes but guarantees no stale cache.
+     */
+    suspend fun clearAllDatabaseCache() {
+        withContext(dispatcher.io()) {
+            try {
+                kahfImageBlockedDao.deleteAll()
+                Timber.d("kLog Cleared ALL database cache entries for complete cache reset")
+            } catch (e: Exception) {
+                Timber.e("kLog Error clearing all database cache: ${e.message}", e)
+            }
+        }
     }
 
     fun cancelOngoingImageProcessing() {

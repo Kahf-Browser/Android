@@ -23,7 +23,6 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import io.kahf.kahf_segmentation.ImageProcessor
 import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -66,7 +65,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
             if (hardwareCompatibilityChecked) {
                 analytics.logEvent(AnalyticsEvent.OnboardSkipDecentInternet)
                 // Turn off SafeGaze
-                SafeGazeLevel.updateLevel(spProvider.getKahfSharedPreferences(), SafeGazeLevel.Off)
+                SafeGazeLevel.updateImageBlurLevel(spProvider.getKahfSharedPreferences(), SafeGazeLevel.Off)
                 (requireActivity() as KahfOnboardingActivity).onContinueClicked()
             }
         }
@@ -171,7 +170,7 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
     }
 
     private fun onEnableSafeGazeClicked() {
-        SafeGazeLevel.updateLevel(spProvider.getKahfSharedPreferences(), SafeGazeLevel.Pixelation)
+        SafeGazeLevel.updateImageBlurLevel(spProvider.getKahfSharedPreferences(), SafeGazeLevel.PixelationWithoutFaceBlur)
         (requireActivity() as KahfOnboardingActivity).onContinueClicked()
     }
 

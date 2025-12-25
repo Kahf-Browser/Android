@@ -186,7 +186,7 @@ class FocusedLegacyView @JvmOverloads constructor(
         binding.kahfBannerAd.apply {
             configure(
                 config = KahfAdsViewConfig(
-                    screenName = "BrowserTabFragment",
+                    screenName = "QuickAccessPage",
                     placementId = PlacementId.Epom(EPOM_PLACEMENT_ID),
                     refreshIntervalInMillis = spProvider.getKahfSharedPreferences().getLong(AD_REFRESH_INTERVAL, 20_000L)
                 )
@@ -194,7 +194,7 @@ class FocusedLegacyView @JvmOverloads constructor(
 
             setEventsListener(object : AdImpressionListener() {
                 override fun onAdLoaded() {
-                    // analyticsService.logEvent(AnalyticsEvent.BannerAdImpression)
+                    analyticsService.logEvent(AnalyticsEvent.QuickAccessPageBannerAdImpression)
                 }
 
                 override fun onAdFailedToLoad(

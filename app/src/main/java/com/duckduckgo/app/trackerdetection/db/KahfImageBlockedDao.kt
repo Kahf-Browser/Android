@@ -45,6 +45,9 @@ interface KahfImageBlockedDao {
     @Query("SELECT * FROM kahf_image_blocked WHERE imageUrl = :urlMd5")
     fun findByUrl(urlMd5: String): KahfImageBlocked?
 
+    @Query("DELETE FROM kahf_image_blocked WHERE maskType != :currentMaskType")
+    fun deleteEntriesNotMatchingMaskType(currentMaskType: Int): Int
+
     fun deleteOlderImages(days: Long): Int {
         return deleteImagesOlderThan(Instant.now().minus(Duration.ofDays(days)).toEpochMilli())
     }

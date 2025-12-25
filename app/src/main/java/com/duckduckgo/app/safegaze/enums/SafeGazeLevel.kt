@@ -17,30 +17,47 @@
 package com.duckduckgo.app.safegaze.enums
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.duckduckgo.common.utils.SAFE_GAZE_DEFAULT
 import com.duckduckgo.common.utils.SAFE_GAZE_MODE
+import com.duckduckgo.common.utils.VIDEO_BLUR_MODE
 
 sealed class SafeGazeLevel(val name: String) {
-    data object Pixelation : SafeGazeLevel("Pixelation")
-    data object Blur : SafeGazeLevel("Blur")
+    data object PixelationWithoutFaceBlur : SafeGazeLevel("PixelationWithoutFaceBlur")
+    data object PixelationWithoutHeadBlur : SafeGazeLevel("PixelationWithoutHeadBlur")
+    data object SolidWithFaceBlur : SafeGazeLevel("SolidWithFaceBlur")
+    data object SolidWithoutFaceBlur : SafeGazeLevel("SolidWithoutFaceBlur")
     data object Off : SafeGazeLevel("Off")
 
     companion object {
         fun get(name: String) = when (name) {
-            "Pixelation" -> Pixelation
-            "Blur" -> Blur
+            "PixelationWithoutFaceBlur" -> PixelationWithoutFaceBlur
+            "PixelationWithoutHeadBlur" -> PixelationWithoutHeadBlur
+            "SolidWithFaceBlur" -> SolidWithFaceBlur
+            "SolidWithoutFaceBlur" -> SolidWithoutFaceBlur
             else -> Off
         }
 
         fun isEnabled(name: String) = get(name) != Off
 
-        fun getCurrentLevel(pref: SharedPreferences): SafeGazeLevel {
+        fun getImageBlurLevel(pref: SharedPreferences): SafeGazeLevel {
             val currentMode = pref.getString(SAFE_GAZE_MODE, SAFE_GAZE_DEFAULT) ?: SAFE_GAZE_DEFAULT
             return get(currentMode)
         }
 
-        fun updateLevel(pref: SharedPreferences, level: SafeGazeLevel) {
+        fun updateImageBlurLevel(pref: SharedPreferences, level: SafeGazeLevel) {
             pref.edit().putString(SAFE_GAZE_MODE, level.name).apply()
+        }
+
+        fun getVideoBlurLevel(pref: SharedPreferences, calledFrom: String): SafeGazeLevel {
+            val currentMode = pref.getString(VIDEO_BLUR_MODE, SAFE_GAZE_DEFAULT) ?: SAFE_GAZE_DEFAULT
+            Log.d("safegazelog", "get videoBlurMode: $currentMode calledFrom: $calledFrom")
+            return get(currentMode)
+        }
+
+        fun updateVideoBlurLevel(pref: SharedPreferences, level: SafeGazeLevel) {
+            Log.d("safegazelog", "imgLog Received set videoBlurMode: $level")
+            pref.edit().putString(VIDEO_BLUR_MODE, level.name).apply()
         }
     }
 }

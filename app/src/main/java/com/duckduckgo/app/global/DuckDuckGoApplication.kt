@@ -91,6 +91,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     @Inject
     lateinit var nsfwDetector: NsfwDetector
 
+    @Inject
+    lateinit var youtubeAdblockUpdateManager: com.duckduckgo.app.browser.youtube.YoutubeAdblockUpdateManager
+
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
     open lateinit var daggerAppComponent: AppComponent
@@ -125,6 +128,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 Timber.d("kLog NSFW model eager initialization completed")
             } catch (e: Exception) {
                 Timber.e("kLog Failed to eagerly initialize NSFW model: ${e.message}")
+            }
+        }
+
+        // Check for YouTube ad-blocker script updates on startup
+        // Only checks once every 12 hours, downloads on first run
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("YouTubeAdblock: Starting update check on app startup")
+                youtubeAdblockUpdateManager.checkForUpdates()
+                Timber.d("YouTubeAdblock: Update check completed")
+            } catch (e: Exception) {
+                Timber.e(e, "YouTubeAdblock: Failed to check for updates on startup")
             }
         }
 
