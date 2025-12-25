@@ -2800,33 +2800,6 @@ class BrowserTabFragment :
                 omnibar.omniBarContainer.isPressed = false
             }
         }*/
-
-        // Configure social media icons in the top bar
-        try {
-            val socialMediaBar = newBrowserTab.socialMediaAndStatsBar
-
-            socialMediaBar?.facebookIcon?.setOnClickListener {
-                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.FACEBOOK)
-            }
-
-            socialMediaBar?.twitterIcon?.setOnClickListener {
-                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.TWITTER)
-            }
-
-            socialMediaBar?.instagramIcon?.setOnClickListener {
-                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.INSTAGRAM)
-            }
-
-            socialMediaBar?.youtubeIcon?.setOnClickListener {
-                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.YOUTUBE)
-            }
-
-            socialMediaBar?.linkedinIcon?.setOnClickListener {
-                handleSocialMediaNavigation(SocialMediaManager.SocialMediaPlatform.LINKEDIN)
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Error configuring social media icons")
-        }
     }
 
     private fun renderBottomNavMenus(viewState: BrowserViewState) {
