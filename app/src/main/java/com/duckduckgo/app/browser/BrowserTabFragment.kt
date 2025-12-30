@@ -1420,11 +1420,9 @@ class BrowserTabFragment :
     private fun configureBottomNav() {
         bottomNav.apply {
             newTabMenuItem.setOnClickListener {
-                launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+                launch { viewModel.onHomeMenuItemClicked() }
             }
-            homeMenuItem.setOnClickListener {
-                viewModel.onHomeMenuItemClicked()
-            }
+
             backMenuItem.setOnClickListener { activity?.onBackPressed() }
             forwardMenuItem.setOnClickListener { viewModel.onUserPressedForward() }
         }
@@ -2807,7 +2805,7 @@ class BrowserTabFragment :
             if (viewState.browserShowing) {
                 backMenuItem.visibility = VISIBLE
                 forwardMenuItem.visibility = VISIBLE
-                homeMenuItem.visibility = GONE
+                timeMenuItem.visibility = GONE
                 socialMediaMenuItem.visibility = GONE
 
                 backMenuItem.imageTintList = ColorStateList.valueOf(if (viewState.canGoBack) activeMenuColor else inactiveMenuColor)
@@ -2815,11 +2813,22 @@ class BrowserTabFragment :
             } else {
                 backMenuItem.visibility = GONE
                 forwardMenuItem.visibility = GONE
-                homeMenuItem.visibility = VISIBLE
+                timeMenuItem.visibility = VISIBLE
                 socialMediaMenuItem.visibility = VISIBLE
                 socialMediaMenuItem.setOnClickListener {
                     showSocialMediaDialog()
                 }
+
+                timeMenuItem.setOnClickListener {
+                    if (!viewState.prayerTimeShowing) {
+                        viewModel.onPrayerTimeClicked()
+                    }
+                }
+
+                timeMenuItem.setImageResource(
+                    if (viewState.prayerTimeShowing) com.duckduckgo.mobile.android.R.drawable.ic_prayer_filled
+                    else com.duckduckgo.mobile.android.R.drawable.ic_prayer_outlined,
+                )
             }
 
             // Icon and onClick action of new tab button
@@ -2827,14 +2836,14 @@ class BrowserTabFragment :
                 if (viewState.prayerTimeShowing) {
                     viewModel.onPrayerTimeClicked()
                 } else if (viewState.browserShowing) {
-                    launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
+                    launch { viewModel.onHomeMenuItemClicked() }
                 }
             }
 
             if (viewState.prayerTimeShowing || viewState.browserShowing) {
-                newTabMenuItem.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_new_tab)
+                newTabMenuItem.setImageResource(R.drawable.ic_outline_home_24)
             } else {
-                newTabMenuItem.setImageResource(com.duckduckgo.mobile.android.R.drawable.ic_new_tab_filled)
+                newTabMenuItem.setImageResource(R.drawable.ic_outline_home_24)
             }
         }
     }

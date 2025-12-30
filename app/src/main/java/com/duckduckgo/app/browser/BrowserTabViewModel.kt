@@ -1248,7 +1248,7 @@ class BrowserTabViewModel @Inject constructor(
             return true
         } else if (!skipHome && !isCustomTab) {
             navigateHome()
-            command.value = ShowKeyboard
+            // command.value = ShowKeyboard
             return true
         }
 
@@ -1272,7 +1272,7 @@ class BrowserTabViewModel @Inject constructor(
         if (hasWebsiteLoaded) {
             // Navigate to home page in the same tab (do not create a new tab)
             navigateHome()
-            command.value = ShowKeyboard
+            // command.value = ShowKeyboard
         }
         // If no website is loaded, do nothing
     }
