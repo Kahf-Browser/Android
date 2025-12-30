@@ -1259,6 +1259,24 @@ class BrowserTabViewModel @Inject constructor(
         return false
     }
 
+    /**
+     * Handles Home menu item click - navigates to home page in the same tab
+     * Behaves like Chrome's Home button:
+     * - If a website is loaded: navigates to home page
+     * - If no website is loaded: does nothing
+     */
+    fun onHomeMenuItemClicked() {
+        // Check if a website is currently loaded
+        val hasWebsiteLoaded = !url.isNullOrBlank() && currentBrowserViewState().browserShowing
+
+        if (hasWebsiteLoaded) {
+            // Navigate to home page in the same tab (do not create a new tab)
+            navigateHome()
+            command.value = ShowKeyboard
+        }
+        // If no website is loaded, do nothing
+    }
+
     private fun navigateHome() {
         site = null
         onSiteChanged()

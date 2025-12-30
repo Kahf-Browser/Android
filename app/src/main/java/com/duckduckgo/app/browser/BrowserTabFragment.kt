@@ -1423,7 +1423,7 @@ class BrowserTabFragment :
                 launch { viewModel.userRequestedOpeningNewTab(longPress = true) }
             }
             homeMenuItem.setOnClickListener {
-                browserActivity?.launchBookmarks()
+                viewModel.onHomeMenuItemClicked()
             }
             backMenuItem.setOnClickListener { activity?.onBackPressed() }
             forwardMenuItem.setOnClickListener { viewModel.onUserPressedForward() }
