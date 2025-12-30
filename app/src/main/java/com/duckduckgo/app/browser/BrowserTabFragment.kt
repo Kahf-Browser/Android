@@ -2816,6 +2816,7 @@ class BrowserTabFragment :
                 timeMenuItem.visibility = VISIBLE
                 socialMediaMenuItem.visibility = VISIBLE
                 socialMediaMenuItem.setOnClickListener {
+                    analyticsService.logEvent(AnalyticsEvent.SocialMediaMenuOpened)
                     showSocialMediaDialog()
                 }
 
