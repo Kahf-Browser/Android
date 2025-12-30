@@ -35,9 +35,50 @@ fun buildMostVisitedSites(
     historyList: List<HistoryEntry>,
     maxItems: Int = 10
 ): List<HistoryEntry> {
+    // Define default social media sites
+    val now = LocalDateTime.now()
+    val defaultSites = listOf(
+        HistoryEntry.VisitedPage(
+            url = Uri.parse("https://www.facebook.com"),
+            title = "Facebook",
+            visits = List(5) { now.minusDays(it.toLong()) }
+        ),
+        HistoryEntry.VisitedPage(
+            url = Uri.parse("https://x.com"),
+            title = "X",
+            visits = List(4) { now.minusDays(it.toLong()) }
+        ),
+        HistoryEntry.VisitedPage(
+            url = Uri.parse("https://www.instagram.com"),
+            title = "Instagram",
+            visits = List(3) { now.minusDays(it.toLong()) }
+        ),
+        HistoryEntry.VisitedPage(
+            url = Uri.parse("https://www.youtube.com"),
+            title = "YouTube",
+            visits = List(2) { now.minusDays(it.toLong()) }
+        ),
+        HistoryEntry.VisitedPage(
+            url = Uri.parse("https://www.linkedin.com"),
+            title = "LinkedIn",
+            visits = List(1) { now.minusDays(it.toLong()) }
+        )
+    )
+
+    // Get existing domains from history
+    val existingDomains = historyList.map { extractBaseDomain(it.url.host.orEmpty()) }.toSet()
+
+    // Add default sites that don't exist in history yet
+    val defaultsToAdd = defaultSites.filter { defaultSite ->
+        val defaultDomain = extractBaseDomain(defaultSite.url.host.orEmpty())
+        defaultDomain !in existingDomains
+    }
+
+    // Merge history with default sites
+    val mergedHistory = historyList + defaultsToAdd
 
     // Group by base domain (merge subdomains)
-    val groupedByDomain = historyList.groupBy { extractBaseDomain(it.url.host.orEmpty()) }
+    val groupedByDomain = mergedHistory.groupBy { extractBaseDomain(it.url.host.orEmpty()) }
 
     return groupedByDomain.mapNotNull { (domain, entries) ->
         if (domain.isBlank()) return@mapNotNull null
