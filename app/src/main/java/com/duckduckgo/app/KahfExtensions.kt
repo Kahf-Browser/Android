@@ -8,9 +8,11 @@ import android.os.Build
 import androidx.core.content.edit
 import com.duckduckgo.common.utils.DEFAULT_AUTOPLAY_VIDEO
 import com.duckduckgo.common.utils.DEFAULT_FACE_COVER
+import com.duckduckgo.common.utils.DEFAULT_YOUTUBE_SHORTS_BLOCKER
 import com.duckduckgo.common.utils.SAFE_GAZE_AUTOPLAY_VIDEO
 import com.duckduckgo.common.utils.SAFE_GAZE_FACE_COVER
 import com.duckduckgo.common.utils.SAFE_GAZE_LOCK
+import com.duckduckgo.common.utils.YOUTUBE_SHORTS_BLOCKER
 
 fun SharedPreferences.isFaceCoverEnabled() = this.getBoolean(SAFE_GAZE_FACE_COVER, DEFAULT_FACE_COVER)
 
@@ -28,6 +30,12 @@ fun SharedPreferences.isSgLockEnabled() = this.getBoolean(SAFE_GAZE_LOCK, false)
 
 fun SharedPreferences.setSgLockMode(enabled: Boolean) {
     this.edit { putBoolean(SAFE_GAZE_LOCK, enabled) }
+}
+
+fun SharedPreferences.isYoutubeShortsBlockerEnabled() = this.getBoolean(YOUTUBE_SHORTS_BLOCKER, DEFAULT_YOUTUBE_SHORTS_BLOCKER)
+
+fun SharedPreferences.setYoutubeShortsBlockerEnabled(enabled: Boolean) {
+    this.edit { putBoolean(YOUTUBE_SHORTS_BLOCKER, enabled) }
 }
 
 fun isZikrTab(): Boolean {

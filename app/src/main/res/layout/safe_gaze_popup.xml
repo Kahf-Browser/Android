@@ -427,6 +427,57 @@
                 app:track="@drawable/switch_track"
                 app:trackTint="@color/switch_track_color" />
 
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:id="@+id/divider4"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="?attr/kahfDivider"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvStopVideoAutoplay" />
+
+            <TextView
+                android:id="@+id/tvYoutubeShortsBlocker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/poppins_bold"
+                android:text="YouTube Shorts Blocker"
+                android:textColor="?attr/kahfPrimaryText"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toStartOf="@+id/switchYoutubeShortsBlocker"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/divider4" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchYoutubeShortsBlocker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:scaleX="0.75"
+                android:scaleY="0.75"
+                app:layout_constraintBottom_toBottomOf="@+id/tvYoutubeShortsBlocker"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tvYoutubeShortsBlocker"
+                app:thumbTint="?attr/kahfCardBackground"
+                app:track="@drawable/switch_track"
+                app:trackTint="@color/switch_track_color" />
+
+            <TextView
+                android:id="@+id/tvYoutubeShortsBlockerDescription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/lato"
+                android:text="Automatically blocks YouTube Shorts by redirecting them to regular video format"
+                android:textColor="?attr/kahfSecondaryText"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvYoutubeShortsBlocker" />
+
             <TextView
                 android:id="@+id/tvHarmAvoided"
                 android:layout_width="0dp"
@@ -439,7 +490,7 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tvStopVideoAutoplay" />
+                app:layout_constraintTop_toBottomOf="@+id/tvYoutubeShortsBlockerDescription" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/appStat"

@@ -94,6 +94,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     @Inject
     lateinit var youtubeAdblockUpdateManager: com.duckduckgo.app.browser.youtube.YoutubeAdblockUpdateManager
 
+    @Inject
+    lateinit var youtubeShortsBlockerUpdateManager: com.duckduckgo.app.browser.youtube.YoutubeShortsBlockerUpdateManager
+
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
 
     open lateinit var daggerAppComponent: AppComponent
@@ -140,6 +143,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 Timber.d("YouTubeAdblock: Update check completed")
             } catch (e: Exception) {
                 Timber.e(e, "YouTubeAdblock: Failed to check for updates on startup")
+            }
+        }
+
+        // Check for YouTube shorts blocker script updates on startup
+        // Only checks once every 12 hours, downloads on first run
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("YouTubeShortsBlocker: Starting update check on app startup")
+                youtubeShortsBlockerUpdateManager.checkForUpdates()
+                Timber.d("YouTubeShortsBlocker: Update check completed")
+            } catch (e: Exception) {
+                Timber.e(e, "YouTubeShortsBlocker: Failed to check for updates on startup")
             }
         }
 

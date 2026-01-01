@@ -29,10 +29,12 @@ import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.SafeGazePopupBinding
 import com.duckduckgo.app.isAutoPlayVideoEnabled
 import com.duckduckgo.app.isSgLockEnabled
+import com.duckduckgo.app.isYoutubeShortsBlockerEnabled
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.setAutoPlayVideoEnabled
 import com.duckduckgo.app.setSgLockMode
+import com.duckduckgo.app.setYoutubeShortsBlockerEnabled
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistDao
 import com.duckduckgo.app.trackerdetection.db.SafeGazeWhitelistEntity
 import com.duckduckgo.common.ui.view.scaleIndependentTextSize
@@ -221,6 +223,14 @@ class SafeGazePopupHandler(
             isChecked = sharedPreferences.isAutoPlayVideoEnabled()
             setOnCheckedChangeListener { _, isChecked ->
                 sharedPreferences.setAutoPlayVideoEnabled(isChecked)
+            }
+        }
+
+        // YouTube Shorts Blocker
+        binding.switchYoutubeShortsBlocker.apply {
+            isChecked = sharedPreferences.isYoutubeShortsBlockerEnabled()
+            setOnCheckedChangeListener { _, isChecked ->
+                sharedPreferences.setYoutubeShortsBlockerEnabled(isChecked)
             }
         }
 

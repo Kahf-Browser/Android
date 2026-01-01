@@ -47,6 +47,7 @@ import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
 import com.duckduckgo.app.browser.SSLErrorType.GENERIC
 import com.duckduckgo.app.browser.SSLErrorType.UNTRUSTED_HOST
 import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
+import com.duckduckgo.app.isYoutubeShortsBlockerEnabled
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
@@ -134,6 +135,7 @@ class BrowserWebViewClient @Inject constructor(
     private val ampDetector: AmpDetector,
     private val safeBrowsingManager: com.duckduckgo.safebrowsing.api.SafeBrowsingManager,
     private val youtubeAdBlocker: com.duckduckgo.app.browser.youtube.YouTubeAdBlocker,
+    private val youtubeShortsBlocker: com.duckduckgo.app.browser.youtube.YouTubeShortsBlocker,
     spProvider: SharedPreferencesProvider
 ) : WebViewClient() {
 
@@ -383,6 +385,61 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
+    private fun loadYouTubeShortsBlockerJs(webView: WebView, url: String?) {
+        val isYouTubeUrl = youtubeShortsBlocker.isYouTubeUrl(url)
+        val isEnabled = sharedPreferences.isYoutubeShortsBlockerEnabled()
+
+        Timber.d("YouTubeShortsBlocker: Checking injection conditions - URL: $url, isYouTubeUrl: $isYouTubeUrl, isEnabled: $isEnabled")
+
+        // Only inject if the user has enabled the shorts blocker in settings
+        if (isYouTubeUrl && isEnabled) {
+            Timber.d("YouTubeShortsBlocker: ✓ Conditions met, injecting shorts blocker script for $url")
+
+            appCoroutineScope.launch(dispatcherProvider.io()) {
+                val script = youtubeShortsBlocker.getShortsBlockerScript()
+                Timber.d("YouTubeShortsBlocker: Script loaded, length: ${script.length} characters")
+                Timber.d("YouTubeShortsBlocker: Script starts with: ${script.take(200)}")
+                Timber.d("YouTubeShortsBlocker: Script ends with: ${script.takeLast(100)}")
+
+                withContext(dispatcherProvider.main()) {
+                    // Test console.log FIRST to verify it's working
+                    Timber.d("YouTubeShortsBlocker: Injecting test console.log")
+                    webView.evaluateJavascript(
+                        "console.log('[TEST] Console logging is working! Timestamp: ' + Date.now());",
+                        { result ->
+                            Timber.d("YouTubeShortsBlocker: Test console.log callback result: $result")
+                        }
+                    )
+
+                    // Small delay to ensure test log appears first
+                    webView.postDelayed({
+                        Timber.d("YouTubeShortsBlocker: Executing YouTube Shorts script injection")
+
+                        // Wrap script in try-catch - use string concatenation to avoid template issues
+                        val wrappedScript =
+                            "try {\n" +
+                            "  console.log('[WRAPPER] Starting script execution');\n" +
+                            "  " + script + "\n" +
+                            "  console.log('[WRAPPER] Script execution completed');\n" +
+                            "} catch (error) {\n" +
+                            "  console.error('[WRAPPER] ERROR: ' + error.message);\n" +
+                            "  console.error('[WRAPPER] Stack: ' + error.stack);\n" +
+                            "}"
+
+                        Timber.d("YouTubeShortsBlocker: Wrapped script length: ${wrappedScript.length} chars")
+
+                        webView.evaluateJavascript(wrappedScript) { result ->
+                            Timber.d("YouTubeShortsBlocker: Script callback invoked, result: $result")
+                        }
+                        Timber.d("YouTubeShortsBlocker: JavaScript injection call completed")
+                    }, 100)
+                }
+            }
+        } else {
+            Timber.d("YouTubeShortsBlocker: ✗ Conditions NOT met, skipping injection")
+        }
+    }
+
     private fun loadUrl(
         listener: WebViewClientListener,
         webView: WebView,
@@ -435,6 +492,9 @@ class BrowserWebViewClient @Inject constructor(
             // Layer 1: Inject YouTube ad blocker script at page start
             loadYouTubeAdBlockerJs(webView, it)
 
+            // Inject YouTube shorts blocker script at page start
+            loadYouTubeShortsBlockerJs(webView, it)
+
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != "about:blank" && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
@@ -483,6 +543,9 @@ class BrowserWebViewClient @Inject constructor(
 
             // Layer 3: Re-inject YouTube ad blocker script on page finish (backup for SPA navigation)
             loadYouTubeAdBlockerJs(webView, url)
+
+            // Re-inject YouTube shorts blocker script on page finish (backup for SPA navigation)
+            loadYouTubeShortsBlockerJs(webView, url)
 
             jsPlugins.getPlugins().forEach {
                 it.onPageFinished(webView, url, webViewClientListener?.getSite())

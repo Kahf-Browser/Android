@@ -30,7 +30,7 @@ import java.net.URL
 import javax.inject.Inject
 
 /**
- * Remote version metadata from GitHub
+ * Remote version metadata for YouTube Shorts Blocker
  *
  * @property version Semantic version string (e.g., "1.2.0")
  * @property scriptUrl URL to download the JavaScript file
@@ -39,7 +39,7 @@ import javax.inject.Inject
  * @property updatedAt ISO 8601 timestamp of last update
  * @property changelog Human-readable description of changes
  */
-data class AdBlockerVersionInfo(
+data class ShortsBlockerVersionInfo(
     val version: String,
     val scriptUrl: String,
     val sha256: String,
@@ -49,11 +49,11 @@ data class AdBlockerVersionInfo(
 )
 
 /**
- * Manages remote updates for YouTube ad-blocker script
+ * Manages remote updates for YouTube shorts blocker script
  *
  * Flow:
  * 1. Check if 12+ hours since last check (throttling)
- * 2. Fetch version.json from GitHub
+ * 2. Fetch version.json from GitLab
  * 3. Compare remote version with local version
  * 4. If newer, download script and validate SHA-256
  * 5. Save script locally and update preferences
@@ -61,7 +61,7 @@ data class AdBlockerVersionInfo(
  * First-run behavior:
  * - If no local script exists, always download regardless of time throttle
  */
-interface YoutubeAdblockUpdateManager {
+interface YoutubeShortsBlockerUpdateManager {
     /**
      * Check for and download updates if available
      *
@@ -73,25 +73,25 @@ interface YoutubeAdblockUpdateManager {
     /**
      * Get the local script file path
      *
-     * @return File path to the locally stored ad-blocker script
+     * @return File path to the locally stored shorts blocker script
      */
     fun getLocalScriptFile(): File
 }
 
 @ContributesBinding(AppScope::class)
-class RealYoutubeAdblockUpdateManager @Inject constructor(
+class RealYoutubeShortsBlockerUpdateManager @Inject constructor(
     private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     spProvider: SharedPreferencesProvider
-) : YoutubeAdblockUpdateManager {
+) : YoutubeShortsBlockerUpdateManager {
 
     companion object {
         // Remote version.json URL
         private const val VERSION_JSON_URL =
-            "https://raw.githubusercontent.com/AnisRafid/safegaze-yt-ads-blocker/main/version.json"
+            "https://gitlab.kahf.co.uk/kahf-browser-scripts/safegaze-scripts/-/raw/main/youtube-shorts-blocker/version.json"
 
         // Local filename for the downloaded script
-        private const val ADS_BLOCK_LOCAL_SCRIPT_FILENAME = "youtube-ads-blocker-remote.js"
+        private const val SHORTS_BLOCKER_LOCAL_SCRIPT_FILENAME = "youtube-shorts-blocker-remote.js"
 
         // HTTP connection timeout (10 seconds)
         private const val CONNECTION_TIMEOUT_MS = 10_000
@@ -100,7 +100,7 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
         private const val READ_TIMEOUT_MS = 15_000
     }
 
-    private val preferences = YoutubeAdblockPreferences(spProvider.getKahfSharedPreferences())
+    private val preferences = YoutubeShortsBlockerPreferences(spProvider.getKahfSharedPreferences())
 
     /**
      * Check for updates and download if necessary
@@ -111,21 +111,21 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
     override suspend fun checkForUpdates() {
         withContext(dispatcherProvider.io()) {
             try {
-                Timber.d("YouTubeAdblock: Checking for updates...")
+                Timber.d("YouTubeShortsBlocker: Checking for updates...")
 
                 // Check if we should run the update check
                 val isFirstRun = preferences.isFirstRun()
                 val shouldCheck = preferences.shouldCheckForUpdate()
 
                 if (!isFirstRun && !shouldCheck) {
-                    Timber.d("YouTubeAdblock: Skipping check (throttled)")
+                    Timber.d("YouTubeShortsBlocker: Skipping check (throttled)")
                     return@withContext
                 }
 
                 // Fetch remote version info
                 val versionInfo = fetchVersionInfo()
                 if (versionInfo == null) {
-                    Timber.w("YouTubeAdblock: Failed to fetch version info")
+                    Timber.w("YouTubeShortsBlocker: Failed to fetch version info")
                     return@withContext
                 }
 
@@ -136,31 +136,31 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
                 val currentVersion = preferences.getCurrentVersion()
                 val remoteVersion = versionInfo.version
 
-                Timber.d("YouTubeAdblock: Current: $currentVersion, Remote: $remoteVersion")
+                Timber.d("YouTubeShortsBlocker: Current: $currentVersion, Remote: $remoteVersion")
 
                 val needsUpdate = isFirstRun ||
                     VersionComparator.isGreaterThan(remoteVersion, currentVersion)
 
                 if (!needsUpdate) {
-                    Timber.d("YouTubeAdblock: Already up to date")
+                    Timber.d("YouTubeShortsBlocker: Already up to date")
                     return@withContext
                 }
 
                 // Download and validate the script
-                Timber.i("YouTubeAdblock: Downloading version $remoteVersion")
+                Timber.i("YouTubeShortsBlocker: Downloading version $remoteVersion")
                 val success = downloadAndValidateScript(versionInfo)
 
                 if (success) {
                     preferences.setCurrentVersion(remoteVersion)
                     Timber.i(
-                        "YouTubeAdblock: Successfully updated to $remoteVersion\n" +
+                        "YouTubeShortsBlocker: Successfully updated to $remoteVersion\n" +
                             "Changelog: ${versionInfo.changelog}"
                     )
                 } else {
-                    Timber.e("YouTubeAdblock: Failed to download or validate script")
+                    Timber.e("YouTubeShortsBlocker: Failed to download or validate script")
                 }
             } catch (e: Exception) {
-                Timber.e(e, "YouTubeAdblock: Error during update check")
+                Timber.e(e, "YouTubeShortsBlocker: Error during update check")
             }
         }
     }
@@ -171,15 +171,15 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
      * @return File object pointing to the local script storage
      */
     override fun getLocalScriptFile(): File {
-        return File(context.filesDir, ADS_BLOCK_LOCAL_SCRIPT_FILENAME)
+        return File(context.filesDir, SHORTS_BLOCKER_LOCAL_SCRIPT_FILENAME)
     }
 
     /**
-     * Fetch version.json from GitHub
+     * Fetch version.json from GitLab
      *
      * @return Parsed version info, or null on failure
      */
-    private fun fetchVersionInfo(): AdBlockerVersionInfo? {
+    private fun fetchVersionInfo(): ShortsBlockerVersionInfo? {
         return try {
             val url = URL(VERSION_JSON_URL)
             val connection = url.openConnection() as HttpURLConnection
@@ -193,7 +193,7 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
 
             val responseCode = connection.responseCode
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                Timber.w("YouTubeAdblock: HTTP $responseCode from version.json")
+                Timber.w("YouTubeShortsBlocker: HTTP $responseCode from version.json")
                 return null
             }
 
@@ -202,22 +202,22 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
 
             parseVersionInfo(jsonString)
         } catch (e: Exception) {
-            Timber.e(e, "YouTubeAdblock: Failed to fetch version info")
+            Timber.e(e, "YouTubeShortsBlocker: Failed to fetch version info")
             null
         }
     }
 
     /**
-     * Parse version.json string into AdBlockerVersionInfo
+     * Parse version.json string into ShortsBlockerVersionInfo
      *
      * @param jsonString Raw JSON string
      * @return Parsed version info, or null if parsing fails
      */
-    private fun parseVersionInfo(jsonString: String): AdBlockerVersionInfo? {
+    private fun parseVersionInfo(jsonString: String): ShortsBlockerVersionInfo? {
         return try {
             val json = JSONObject(jsonString)
 
-            AdBlockerVersionInfo(
+            ShortsBlockerVersionInfo(
                 version = json.getString("version"),
                 scriptUrl = json.getString("scriptUrl"),
                 sha256 = json.getString("sha256"),
@@ -226,7 +226,7 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
                 changelog = json.optString("changelog", "No changelog provided")
             )
         } catch (e: Exception) {
-            Timber.e(e, "YouTubeAdblock: Failed to parse version.json")
+            Timber.e(e, "YouTubeShortsBlocker: Failed to parse version.json")
             null
         }
     }
@@ -237,12 +237,12 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
      * @param versionInfo Version metadata containing script URL and expected hash
      * @return true if download and validation successful
      */
-    private fun downloadAndValidateScript(versionInfo: AdBlockerVersionInfo): Boolean {
+    private fun downloadAndValidateScript(versionInfo: ShortsBlockerVersionInfo): Boolean {
         return try {
             // Download the script
             val scriptContent = downloadScript(versionInfo.scriptUrl)
             if (scriptContent == null) {
-                Timber.e("YouTubeAdblock: Failed to download script")
+                Timber.e("YouTubeShortsBlocker: Failed to download script")
                 return false
             }
 
@@ -251,13 +251,13 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
             localFile.writeText(scriptContent, Charsets.UTF_8)
 
             Timber.d(
-                "YouTubeAdblock: Script saved to ${localFile.absolutePath} " +
+                "YouTubeShortsBlocker: Script saved to ${localFile.absolutePath} " +
                     "(${scriptContent.length} bytes)"
             )
 
             true
         } catch (e: Exception) {
-            Timber.e(e, "YouTubeAdblock: Error downloading/validating script")
+            Timber.e(e, "YouTubeShortsBlocker: Error downloading/validating script")
             false
         }
     }
@@ -282,7 +282,7 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
 
             val responseCode = connection.responseCode
             if (responseCode != HttpURLConnection.HTTP_OK) {
-                Timber.w("YouTubeAdblock: HTTP $responseCode from script URL")
+                Timber.w("YouTubeShortsBlocker: HTTP $responseCode from script URL")
                 return null
             }
 
@@ -291,7 +291,7 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
 
             content
         } catch (e: Exception) {
-            Timber.e(e, "YouTubeAdblock: Failed to download script from $scriptUrl")
+            Timber.e(e, "YouTubeShortsBlocker: Failed to download script from $scriptUrl")
             null
         }
     }

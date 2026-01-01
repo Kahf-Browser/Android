@@ -59,7 +59,20 @@ class BrowserChromeClient @Inject constructor(
 
 
     override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
-        Timber.tag("WebViewConsole").d(consoleMessage.message() + " at " + consoleMessage.sourceId() + ":" + consoleMessage.lineNumber())
+        val level = when (consoleMessage.messageLevel()) {
+            ConsoleMessage.MessageLevel.ERROR -> "ERROR"
+            ConsoleMessage.MessageLevel.WARNING -> "WARNING"
+            ConsoleMessage.MessageLevel.LOG -> "LOG"
+            ConsoleMessage.MessageLevel.DEBUG -> "DEBUG"
+            ConsoleMessage.MessageLevel.TIP -> "TIP"
+            else -> "UNKNOWN"
+        }
+
+        val logMessage = "JS [$level] ${consoleMessage.message()} (${consoleMessage.sourceId()}:${consoleMessage.lineNumber()})"
+
+        // Use YouTubeShortsBlocker tag for easier filtering
+        Timber.tag("YouTubeShortsBlocker").i(logMessage)
+
         return true
     }
 
