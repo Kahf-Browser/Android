@@ -63,11 +63,13 @@ sealed class AnalyticsEvent(val name: String) {
     data object SearchResultLinkClick : AnalyticsEvent("search_result_link_click")
     data object ExtSearchRedirect : AnalyticsEvent("external_search_redirect")
 
-    // Kafh Ad
-    data object BannerAdClicked : AnalyticsEvent("kahf_banner_ad_clicked")
     data object NewTabBannerAdImpression : AnalyticsEvent("new_tab_kahf_banner_ad_impression")
+    data object NewTabBannerAdClicked : AnalyticsEvent("new_tab_kahf_banner_ad_clicked")
+    // Kafh Ad
+    data object SearchAutocompleteBannerAdClicked : AnalyticsEvent("search_auto_complete_kahf_banner_ad_clicked")
     data object SearchAutoCompleteBannerAdImpression : AnalyticsEvent("search_auto_complete_kahf_banner_ad_impression")
     data object QuickAccessPageBannerAdImpression : AnalyticsEvent("quick_access_page_kahf_banner_ad_impression")
+    data object QuickAccessPageBannerAdClicked : AnalyticsEvent("quick_access_page_kahf_banner_ad_clicked")
     data object BannerAdLoadFailed : AnalyticsEvent("kahf_banner_ad_failed_to_load")
     data object AdNotFound : AnalyticsEvent("kahf_ad_not_found")
     data object AdServerError : AnalyticsEvent("kahf_ad_server_error")

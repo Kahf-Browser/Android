@@ -2751,7 +2751,7 @@ class BrowserTabFragment :
                 override fun onAdClicked(urlToLoad: String): Boolean {
                     Timber.i("adLog onAdClicked: $urlToLoad")
                     viewModel.onUserSubmittedQuery(urlToLoad)
-                    analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                    analyticsService.logEvent(AnalyticsEvent.SearchAutocompleteBannerAdClicked)
                     return true
                 }
             })
@@ -2759,8 +2759,16 @@ class BrowserTabFragment :
             setFallbackEventsListener(object : FallbackAdImpressionListener() {
                 override fun onFallbackAdClicked(urlToLoad: String): Boolean {
                     Timber.i("adLog onFallbackAdClicked: $urlToLoad")
+                    analyticsService.logEvent(AnalyticsEvent.SearchAutocompleteBannerAdClicked)
                     viewModel.onUserSubmittedQuery(urlToLoad)
                     return true
+                }
+
+                override fun onFallbackAdLoaded(
+                    primaryAdError: KahfAdsError?,
+                    headline: String
+                ) {
+                    analyticsService.logEvent(AnalyticsEvent.SearchAutoCompleteBannerAdImpression)
                 }
             })
         }
@@ -4924,7 +4932,7 @@ class BrowserTabFragment :
                     override fun onAdClicked(urlToLoad: String): Boolean {
                         viewModel.onUserSubmittedQuery(urlToLoad)
                         Timber.i("adLog onAdClicked")
-                        analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                        analyticsService.logEvent(AnalyticsEvent.NewTabBannerAdClicked)
                         return true
                     }
                 })
@@ -4932,21 +4940,15 @@ class BrowserTabFragment :
                 setFallbackEventsListener(object : FallbackAdImpressionListener() {
                     override fun onFallbackAdClicked(urlToLoad: String): Boolean {
                         viewModel.onUserSubmittedQuery(urlToLoad)
+                        analyticsService.logEvent(AnalyticsEvent.NewTabBannerAdClicked)
                         return true
-                    }
-
-                    override fun onFallbackAdFailedToLoad(
-                        message: String,
-                        cause: KahfAdsError?
-                    ) {
-                        super.onFallbackAdFailedToLoad(message, cause)
                     }
 
                     override fun onFallbackAdLoaded(
                         primaryAdError: KahfAdsError?,
                         headline: String
                     ) {
-                        super.onFallbackAdLoaded(primaryAdError, headline)
+                        analyticsService.logEvent(AnalyticsEvent.NewTabBannerAdImpression)
                     }
                 })
             }

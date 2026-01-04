@@ -223,7 +223,7 @@ class FocusedLegacyView @JvmOverloads constructor(
                 override fun onAdClicked(urlToLoad: String): Boolean {
                     Timber.i("adLog onAdClicked: $urlToLoad")
                     onClickAd?.invoke(urlToLoad)
-                    analyticsService.logEvent(AnalyticsEvent.BannerAdClicked)
+                    analyticsService.logEvent(AnalyticsEvent.QuickAccessPageBannerAdClicked)
                     return true
                 }
             })
@@ -231,8 +231,16 @@ class FocusedLegacyView @JvmOverloads constructor(
             setFallbackEventsListener(object : FallbackAdImpressionListener() {
                 override fun onFallbackAdClicked(urlToLoad: String): Boolean {
                     Timber.i("adLog onFallbackAdClicked: $urlToLoad, onClickAd: $onClickAd")
+                    analyticsService.logEvent(AnalyticsEvent.QuickAccessPageBannerAdClicked)
                     onClickAd?.invoke(urlToLoad)
                     return true
+                }
+
+                override fun onFallbackAdLoaded(
+                    primaryAdError: KahfAdsError?,
+                    headline: String
+                ) {
+                    analyticsService.logEvent(AnalyticsEvent.QuickAccessPageBannerAdImpression)
                 }
             })
         }
