@@ -343,7 +343,14 @@ class BrowserWebViewClient @Inject constructor(
             Log.d("kLog", "imgLog Received blurMode: $blurMode")
             val isUrlWhiteListed = sgWhitelistDao.isHostWhitelisted(url?.toUri()?.host ?: "")
 
+            val currentPrivateDns = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
+            val saferInternetStatus = if (currentPrivateDns != PrivateDnsLevel.Off) "ON" else "OFF"
+            val decentInternetStatus = if (SafeGazeLevel.isEnabled(blurMode.name)) "ON" else "OFF"
+
+            Log.d("LoadTimeLog", "SAFE_GAZE_CHECK | URL: $url | SaferInternet: $saferInternetStatus | DecentInternet: $decentInternetStatus | BlurMode: $blurMode | Whitelisted: $isUrlWhiteListed")
+
             if (SafeGazeLevel.isEnabled(blurMode.name) && !isUrlWhiteListed) {
+                Log.d("LoadTimeLog", "SAFE_GAZE_INJECT | URL: $url | SaferInternet: $saferInternetStatus | DecentInternet: $decentInternetStatus | Injecting video_filter.js")
                 val contentJs = readAssetFile(context.assets, "video_filter.js")
                 withContext(dispatcherProvider.main()) {
                     webView.evaluateJavascript("Android = true;", null)
@@ -404,8 +411,16 @@ class BrowserWebViewClient @Inject constructor(
         }
         Timber.d("asLog ipLog $result || lookup time ${System.currentTimeMillis() - exeTime}ms || ${uri.host}")
 
+        val currentPrivateDns = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
+        val currentSafeGaze = SafeGazeLevel.getImageBlurLevel(sharedPreferences)
+        val saferInternetStatus = if (currentPrivateDns != PrivateDnsLevel.Off) "ON" else "OFF"
+        val decentInternetStatus = if (currentSafeGaze != SafeGazeLevel.Off) "ON" else "OFF"
+
+        Log.d("LoadTimeLog", "DNS_RESOLVE | URL: $uri | SaferInternet: $saferInternetStatus | DecentInternet: $decentInternetStatus | Result: $result | LookupTime: ${exeTime}ms")
+
         if (result?.second == KAHF_GUARD_BLOCKED_URL) {
             Timber.d("asLog Blocking URL: $uri")
+            Log.d("LoadTimeLog", "DNS_BLOCKED | URL: $uri | SaferInternet: $saferInternetStatus | DecentInternet: $decentInternetStatus")
             withContext(dispatcherProvider.main()) {
                 webViewClientListener?.onUrlBlocked(uri.toString())
             }
@@ -438,6 +453,13 @@ class BrowserWebViewClient @Inject constructor(
             // See https://app.asana.com/0/0/1206159443951489/f (WebView limitations)
             if (it != "about:blank" && start == null) {
                 start = currentTimeProvider.elapsedRealtime()
+
+                // Log page load start with current settings
+                val currentPrivateDns = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
+                val currentSafeGaze = SafeGazeLevel.getImageBlurLevel(sharedPreferences)
+                val saferInternetStatus = if (currentPrivateDns != PrivateDnsLevel.Off) "ON" else "OFF"
+                val decentInternetStatus = if (currentSafeGaze != SafeGazeLevel.Off) "ON" else "OFF"
+                Log.d("LoadTimeLog", "PAGE_LOAD_START | URL: $it | SaferInternet: $saferInternetStatus | DecentInternet: $decentInternetStatus | Timestamp: $start")
             }
             handleMediaPlayback(webView, it)
             autoconsent.injectAutoconsent(webView, url)
@@ -506,6 +528,17 @@ class BrowserWebViewClient @Inject constructor(
                         // The title is properly captured in BrowserChromeClient.onReceivedTitle() and stored in site.title
                         // navigationList.currentItem?.title may be null/outdated, especially for sites that set title dynamically via JavaScript
                         val pageTitle = webViewClientListener?.getSite()?.title
+
+                        // Calculate load time and log with current settings
+                        val endTime = currentTimeProvider.elapsedRealtime()
+                        val loadTimeMs = endTime - safeStart
+
+                        val currentPrivateDns = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
+                        val currentSafeGaze = SafeGazeLevel.getImageBlurLevel(sharedPreferences)
+                        val saferInternetStatus = if (currentPrivateDns != PrivateDnsLevel.Off) "ON" else "OFF"
+                        val decentInternetStatus = if (currentSafeGaze != SafeGazeLevel.Off) "ON" else "OFF"
+
+                        Log.d("LoadTimeLog", "PAGE_LOAD_FINISHED | URL: $it | SaferInternet: $saferInternetStatus | DecentInternet: $decentInternetStatus | LoadTime: ${loadTimeMs}ms | StartTime: $safeStart | EndTime: $endTime")
 
                         // TODO (cbarreiro - 22/05/2024): Extract to plugins
                         pageLoadedHandler.onPageLoaded(it, pageTitle, safeStart, currentTimeProvider.elapsedRealtime())

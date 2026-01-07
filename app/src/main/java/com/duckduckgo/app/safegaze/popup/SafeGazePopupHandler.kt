@@ -79,6 +79,7 @@ class SafeGazePopupHandler(
             btnLow?.updateState(false)
             updateDescription(binding, PrivateDnsLevel.High)
             onDnsModeChanged(PrivateDnsLevel.High)
+            Log.d("LoadTimeLog", "SETTINGS_CHANGE | SaferInternet: ON (High) | DecentInternet: ${if (preSelectedSG != SafeGazeLevel.Off) "ON" else "OFF"}")
         }
         btnMed = PopupButton(
             binding.btnMedium,
@@ -90,6 +91,7 @@ class SafeGazePopupHandler(
             btnLow?.updateState(false)
             updateDescription(binding, PrivateDnsLevel.Medium)
             onDnsModeChanged(PrivateDnsLevel.Medium)
+            Log.d("LoadTimeLog", "SETTINGS_CHANGE | SaferInternet: ON (Medium) | DecentInternet: ${if (preSelectedSG != SafeGazeLevel.Off) "ON" else "OFF"}")
         }
 
         btnLow = PopupButton(
@@ -102,6 +104,7 @@ class SafeGazePopupHandler(
             btnLow?.updateState(true)
             updateDescription(binding, PrivateDnsLevel.Low)
             onDnsModeChanged(PrivateDnsLevel.Low)
+            Log.d("LoadTimeLog", "SETTINGS_CHANGE | SaferInternet: ON (Low) | DecentInternet: ${if (preSelectedSG != SafeGazeLevel.Off) "ON" else "OFF"}")
         }
 
         // set initially selected item
@@ -163,18 +166,23 @@ class SafeGazePopupHandler(
             if (!isChecked) {
                 binding.privateDnsGroup.isVisible = false
                 onDnsModeChanged(PrivateDnsLevel.Off)
+                Log.d("LoadTimeLog", "SETTINGS_CHANGE | SaferInternet: OFF | DecentInternet: ${if (preSelectedSG != SafeGazeLevel.Off) "ON" else "OFF"}")
             } else {
                 binding.privateDnsGroup.isVisible = true
                 btnMed.performClick()
+                Log.d("LoadTimeLog", "SETTINGS_CHANGE | SaferInternet: ON | DecentInternet: ${if (preSelectedSG != SafeGazeLevel.Off) "ON" else "OFF"}")
             }
         }
 
         // Toggle image blur (Safe Gaze)
         binding.switchSafeGaze.setOnCheckedChangeListener { _, isChecked ->
+            val currentDns = PrivateDnsLevel.getCurrentLevel(sharedPreferences)
             if (isChecked) {
                 onSafeGazeModeChanged(SafeGazeLevel.PixelationWithoutFaceBlur)
+                Log.d("LoadTimeLog", "SETTINGS_CHANGE | SaferInternet: ${if (currentDns != PrivateDnsLevel.Off) "ON" else "OFF"} | DecentInternet: ON")
             } else {
                 onSafeGazeModeChanged(SafeGazeLevel.Off)
+                Log.d("LoadTimeLog", "SETTINGS_CHANGE | SaferInternet: ${if (currentDns != PrivateDnsLevel.Off) "ON" else "OFF"} | DecentInternet: OFF")
             }
         }
         binding.switchVideoBlur.setOnCheckedChangeListener { _, isChecked ->
