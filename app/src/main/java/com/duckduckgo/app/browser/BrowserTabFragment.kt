@@ -2759,7 +2759,7 @@ class BrowserTabFragment :
             setFallbackEventsListener(object : FallbackAdImpressionListener() {
                 override fun onFallbackAdClicked(urlToLoad: String): Boolean {
                     Timber.i("adLog onFallbackAdClicked: $urlToLoad")
-                    analyticsService.logEvent(AnalyticsEvent.SearchAutocompleteBannerAdClicked)
+                    // analyticsService.logEvent(AnalyticsEvent.SearchAutocompleteBannerAdClicked)
                     viewModel.onUserSubmittedQuery(urlToLoad)
                     return true
                 }
@@ -2768,7 +2768,7 @@ class BrowserTabFragment :
                     primaryAdError: KahfAdsError?,
                     headline: String
                 ) {
-                    analyticsService.logEvent(AnalyticsEvent.SearchAutoCompleteBannerAdImpression)
+                    // analyticsService.logEvent(AnalyticsEvent.SearchAutoCompleteBannerAdImpression)
                 }
             })
         }
@@ -4940,7 +4940,7 @@ class BrowserTabFragment :
                 setFallbackEventsListener(object : FallbackAdImpressionListener() {
                     override fun onFallbackAdClicked(urlToLoad: String): Boolean {
                         viewModel.onUserSubmittedQuery(urlToLoad)
-                        analyticsService.logEvent(AnalyticsEvent.NewTabBannerAdClicked)
+                        // analyticsService.logEvent(AnalyticsEvent.NewTabBannerAdClicked)
                         return true
                     }
 
@@ -4948,7 +4948,7 @@ class BrowserTabFragment :
                         primaryAdError: KahfAdsError?,
                         headline: String
                     ) {
-                        analyticsService.logEvent(AnalyticsEvent.NewTabBannerAdImpression)
+                        // analyticsService.logEvent(AnalyticsEvent.NewTabBannerAdImpression)
                     }
                 })
             }
