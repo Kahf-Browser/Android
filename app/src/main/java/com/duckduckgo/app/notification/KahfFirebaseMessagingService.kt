@@ -28,9 +28,16 @@ import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class KahfFirebaseMessagingService : FirebaseMessagingService() {
+
+    private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
@@ -47,41 +54,64 @@ class KahfFirebaseMessagingService : FirebaseMessagingService() {
 
         Timber.d("kahfLog: notificationTitle: $title, notificationBody: $body, redirectUrl: $url")
 
+        // Fixed: Move notification creation to background thread to prevent ANR
         if (title != null && body != null) {
-            sendNotification(title = title, messageBody = body, redirectUrl = url)
+            serviceScope.launch {
+                sendNotification(title = title, messageBody = body, redirectUrl = url)
+            }
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // Cancel coroutine scope when service is destroyed
+        serviceScope.cancel()
+    }
+
     private fun sendNotification(title: String, messageBody: String, redirectUrl: String?) {
-        val intent = Intent(this, BrowserActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            Timber.d("kahfLog: redirectUrl: $redirectUrl")
-            putExtra("redirectUrl", redirectUrl ?: "")
+        try {
+            val intent = Intent(this, BrowserActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                Timber.d("kahfLog: redirectUrl: $redirectUrl")
+                putExtra("redirectUrl", redirectUrl ?: "")
+            }
+            val pendingIntent = PendingIntent.getActivity(
+                this, 0, intent,
+                PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+            )
+
+            val channelId = "default_channel_id"
+            val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+
+            val notificationBuilder = NotificationCompat.Builder(this, channelId)
+                .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.kahf_browser_logo_only)
+                .setContentTitle(title)
+                .setContentText(messageBody)
+                .setAutoCancel(true)
+                .setSound(defaultSoundUri)
+                .setContentIntent(pendingIntent)
+
+            // Fixed: Add null check for NotificationManager
+            val notificationManager =
+                getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+
+            if (notificationManager == null) {
+                Timber.e("kahfLog: NotificationManager is null, cannot show notification")
+                return
+            }
+
+            // Fixed: Create channel only once by checking if it exists
+            if (notificationManager.getNotificationChannel(channelId) == null) {
+                val channel = NotificationChannel(
+                    channelId, "Default Channel", NotificationManager.IMPORTANCE_DEFAULT
+                )
+                notificationManager.createNotificationChannel(channel)
+            }
+
+            notificationManager.notify(0, notificationBuilder.build())
+        } catch (e: Exception) {
+            // Fixed: Catch and log any exceptions to prevent crashes
+            Timber.e(e, "kahfLog: Error showing notification")
         }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val channelId = "default_channel_id"
-        val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.kahf_browser_logo_only)
-            .setContentTitle(title)
-            .setContentText(messageBody)
-            .setAutoCancel(true)
-            .setSound(defaultSoundUri)
-            .setContentIntent(pendingIntent)
-
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        val channel = NotificationChannel(
-            channelId, "Default Channel", NotificationManager.IMPORTANCE_DEFAULT
-        )
-        notificationManager.createNotificationChannel(channel)
-
-        notificationManager.notify(0, notificationBuilder.build())
     }
 }

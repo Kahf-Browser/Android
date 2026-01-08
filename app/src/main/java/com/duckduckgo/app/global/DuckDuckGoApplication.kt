@@ -143,6 +143,19 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             }
         }
 
+        // Prune completed WorkManager work asynchronously to prevent ANR
+        // This prevents accumulation of completed work items and network callbacks
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("WorkManager: Starting async prune of completed work")
+                val workManager = WorkManager.getInstance(this@DuckDuckGoApplication)
+                workManager.pruneWork()
+                Timber.d("WorkManager: Successfully pruned completed work")
+            } catch (e: Exception) {
+                Timber.w(e, "WorkManager: Failed to prune work, but continuing")
+            }
+        }
+
         scheduleTasks()
         configRemoteConfig()
 

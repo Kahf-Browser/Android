@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.analytics
 
+import android.util.Log
 import com.posthog.PostHog
 
 class PostHogAnalyticsService(): AnalyticsService {
@@ -24,6 +25,9 @@ class PostHogAnalyticsService(): AnalyticsService {
         event: AnalyticsEvent,
         params: Map<AnalyticsParam, String>?
     ) {
+        /*if (event == AnalyticsEvent.QuickAccessPageBannerAdImpression || event == AnalyticsEvent.SearchAutoCompleteBannerAdImpression || event == AnalyticsEvent.NewTabBannerAdImpression) {
+            Log.d("PostHogAnalyticsService", "Loggedk event $event")
+        }*/
         PostHog.capture(
             event = event.name,
             properties = params?.mapKeys { it.key.name }?.mapValues {

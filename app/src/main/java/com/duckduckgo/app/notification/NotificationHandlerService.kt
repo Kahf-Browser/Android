@@ -44,6 +44,12 @@ class NotificationHandlerService : IntentService("NotificationHandlerService") {
     public override fun onHandleIntent(intent: Intent?) {
         if (intent == null) return
         val notificationJavaClass = intent.type ?: return
+
+        // Fixed: Add null check for lateinit property to prevent UninitializedPropertyAccessException
+        if (!this::schedulableNotificationPluginPoint.isInitialized) {
+            return
+        }
+
         val notificationPlugin = schedulableNotificationPluginPoint.getPlugins().firstOrNull {
             notificationJavaClass == it.getSchedulableNotification().javaClass.simpleName
         }
