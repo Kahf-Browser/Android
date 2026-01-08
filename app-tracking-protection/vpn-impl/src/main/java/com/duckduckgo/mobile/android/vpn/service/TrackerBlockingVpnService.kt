@@ -227,11 +227,23 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     ): Int {
         fun Intent?.alwaysOnTriggered(): Boolean {
             return runCatching {
-                (this == null || this.component == null || this.component!!.packageName != packageName)
+                // Fixed: Use safe call instead of !! to prevent NPE
+                val component = this?.component
+                (this == null || component == null || component.packageName != packageName)
             }.getOrElse { false }
         }
 
         logcat { "VPN log: onStartCommand: ${intent?.action}" }
+
+        // Check if lateinit properties are initialized to prevent UninitializedPropertyAccessException
+        if (!this::deviceShieldPixels.isInitialized ||
+            !this::vpnServiceCallbacksPluginPoint.isInitialized ||
+            !this::vpnEnabledNotificationContentPluginPoint.isInitialized) {
+            logcat(ERROR) { "VPN log: Service dependencies not initialized, deferring start" }
+            // Retry after a short delay by returning START_STICKY
+            // Android will restart the service and onCreate will reinitialize dependencies
+            return Service.START_STICKY
+        }
 
         when (val action = intent?.action) {
             null, ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
@@ -255,7 +267,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 synchronized(this) {
                     launch(serviceDispatcher) {
                         async {
-                            val snoozeTriggerAtMillisExtra = intent.getLongExtra(ACTION_SNOOZE_VPN_EXTRA, 0L)
+                            val snoozeTriggerAtMillisExtra = intent?.getLongExtra(ACTION_SNOOZE_VPN_EXTRA, 0L) ?: 0L
                             stopVpn(VpnStopReason.SELF_STOP(snoozeTriggerAtMillisExtra))
                         }.await()
                     }
@@ -678,14 +690,22 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     private fun notifyVpnStart(): Boolean {
         val emptyNotification = VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent.EMPTY
         var vpnNotification: VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent = emptyNotification
-        for (retries in 1..20) {
+
+        // Fixed: Reduced retry count from 20 to 5 to prevent ANR on main thread
+        // Added small delay between retries to allow dependency injection to complete
+        for (retries in 1..5) {
             vpnNotification =
                 vpnEnabledNotificationContentPluginPoint.getHighestPriorityPlugin()?.getInitialContent()
                     ?: emptyNotification
 
             if (vpnNotification != emptyNotification) {
-                logcat { "Notification in retry: $retries" }
+                logcat { "Notification ready in retry: $retries" }
                 break
+            }
+
+            // Fixed: Add small delay between retries instead of busy waiting
+            if (retries < 5) {
+                Thread.sleep(10) // 10ms delay, total max 40ms for 4 retries
             }
         }
 
@@ -696,8 +716,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 VpnEnabledNotificationBuilder.buildVpnEnabledNotification(applicationContext, vpnNotification),
                 FOREGROUND_SERVICE_TYPE_SPECIAL_USE,
             )
-        } catch (_: Throwable) {
-            // signal the error
+        } catch (e: Throwable) {
+            // Fixed: Log the exception for debugging
+            logcat(ERROR) { "VPN log: Failed to start foreground service: ${e.asLog()}" }
+            crashLogger.logCrash(Crash("vpn_start_foreground_failed", e))
             return false
         }
 
