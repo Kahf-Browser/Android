@@ -30,6 +30,7 @@ sealed class AnalyticsEvent(val name: String) {
     data object PrivateDnsMedium : AnalyticsEvent("private_dns_medium")
     data object PrivateDnsLow : AnalyticsEvent("private_dns_low")
     data object AvgDnsResolutionTime : AnalyticsEvent("avg_dns_resolution_time")
+    data object DnsLookupTime : AnalyticsEvent("bottleneck_dns_lookup_time")
     data object AvgKahfGuardResponseTime : AnalyticsEvent("avg_kahf_guard_response_time")
     data object DnsTimeoutError : AnalyticsEvent("dns_timeout_error")
     data object DnsErrorLog : AnalyticsEvent("dns_error_log")
@@ -99,6 +100,7 @@ sealed class AnalyticsParam(val name: String) {
     data object DnsResolver : AnalyticsParam("dns_resolver")
     data object ModelInitTimeMS : AnalyticsParam("model_initialization_time_ms")
     data object AvgResolutionTimeMs : AnalyticsParam("avg_resolution_time_ms")
+    data object DnsLookupTimeMs : AnalyticsParam("bottleneck_dns_lookup_time_ms")
     data object AvgKahfGuardTimeMs : AnalyticsParam("avg_kahf_guard_time_ms")
 
     data object NSFWProcessingTime : AnalyticsParam("nsfw_processing_time_ms")
