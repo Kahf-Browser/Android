@@ -137,7 +137,6 @@ class BrowserWebViewClient @Inject constructor(
     private val ampDetector: AmpDetector,
     private val safeBrowsingManager: com.duckduckgo.safebrowsing.api.SafeBrowsingManager,
     private val youtubeAdBlocker: com.duckduckgo.app.browser.youtube.YouTubeAdBlocker,
-    private val postHogAnalyticsService: PostHogAnalyticsService,
     spProvider: SharedPreferencesProvider
 ) : WebViewClient() {
 
@@ -421,13 +420,13 @@ class BrowserWebViewClient @Inject constructor(
         val decentInternetStatus = if (currentSafeGaze != SafeGazeLevel.Off) "ON" else "OFF"
 
         Log.d("LoadTimeLog", "DNS_RESOLVE | URL: $uri | SaferInternet: $saferInternetStatus | DecentInternet: $decentInternetStatus | Result: $result | LookupTime: ${exeTime}ms")
-        postHogAnalyticsService.logEvent(AnalyticsEvent.PageBlocked)
+/*        postHogAnalyticsService.logEvent(AnalyticsEvent.PageBlocked)
         postHogAnalyticsService.logEvent(
             AnalyticsEvent.DnsLookupTime,
             mapOf(
                 AnalyticsParam.DnsLookupTimeMs to exeTime.toString()
             )
-        )
+        )*/
 
         if (result?.second == KAHF_GUARD_BLOCKED_URL) {
             Timber.d("asLog Blocking URL: $uri")
