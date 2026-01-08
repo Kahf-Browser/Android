@@ -82,18 +82,10 @@ object WorkerModule {
         }
 
         // Get WorkManager instance with comprehensive exception handling
+        // NOTE: Do NOT call pruneWork() synchronously here as it blocks the main thread and causes ANR
+        // Pruning should be done asynchronously in the Application.onCreate() method instead
         return try {
-            val workManager = WorkManager.getInstance(context)
-
-            // Proactively prune completed work to prevent callback accumulation
-            try {
-                workManager.pruneWork()
-                Timber.d("Successfully pruned completed work to prevent callback buildup")
-            } catch (pruneException: Exception) {
-                Timber.w(pruneException, "Failed to prune work, but continuing")
-            }
-
-            workManager
+            WorkManager.getInstance(context)
         } catch (e: RuntimeException) {
             // Check if this is a TooManyRequestsException (android.net.ConnectivityManager$TooManyRequestsException)
             // We check by class name because the exception class may not be available at compile time
