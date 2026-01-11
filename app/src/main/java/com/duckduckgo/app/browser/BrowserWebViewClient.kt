@@ -143,6 +143,10 @@ class BrowserWebViewClient @Inject constructor(
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
     private var lastPageStarted: String? = null
+
+    // Cached document URL to avoid blocking main thread access in shouldInterceptRequest
+    @Volatile
+    private var cachedDocumentUrl: String? = null
     lateinit var activity: FragmentActivity
     private var start: Long? = null
     private var sharedPreferences = spProvider.getKahfSharedPreferences()
@@ -485,6 +489,8 @@ class BrowserWebViewClient @Inject constructor(
             webViewClientListener?.pageRefreshed(url)
         }
         lastPageStarted = url
+        // Cache URL for shouldInterceptRequest to avoid main thread access
+        cachedDocumentUrl = url
         browserAutofillConfigurator.configureAutofillForCurrentPage(webView, url)
         jsPlugins.getPlugins().forEach {
             it.onPageStarted(webView, url, webViewClientListener?.getSite())
@@ -627,19 +633,23 @@ class BrowserWebViewClient @Inject constructor(
             }
         }
 
-        return runBlocking {
-            withContext(dispatcherProvider.io()) {
-                try {
+        // PERFORMANCE FIX: Queue login detection asynchronously to avoid blocking main thread
+        // This is safe because login detection works via JavaScript interface callback, not synchronous return
+        appCoroutineScope.launch(dispatcherProvider.main()) {
+            loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
+        }
 
-                    val documentUrl = withContext(dispatcherProvider.main()) { webView.url }
-                    withContext(dispatcherProvider.main()) {
-                        loginDetector.onEvent(WebNavigationEvent.ShouldInterceptRequest(webView, request))
-                    }
-                    Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
-                    requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener, privateDnsEnabled)
-                } catch (e: Exception) {
-                    null
-                }
+        // Use cached document URL to avoid blocking main thread access
+        val documentUrl = cachedDocumentUrl
+
+        Timber.v("Intercepting resource ${request.url} type:${request.method} on page $documentUrl")
+
+        // Still need runBlocking for suspend function return value, but now runs entirely on IO thread
+        return runBlocking(dispatcherProvider.io()) {
+            try {
+                requestInterceptor.shouldIntercept(request, webView, documentUrl?.toUri(), webViewClientListener, privateDnsEnabled)
+            } catch (e: Exception) {
+                null
             }
         }
     }

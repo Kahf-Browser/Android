@@ -382,8 +382,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
             window.decorView.viewTreeObserver.removeOnGlobalLayoutListener(it)
             layoutListener = null
         }
-        (application as DuckDuckGoApplication).imageProcessor.closePordaSegment()
-        (application as DuckDuckGoApplication).videoFrameProcessor.close()
+        // PERFORMANCE FIX: Use safe cleanup methods to avoid initializing processors if never used
+        (application as DuckDuckGoApplication).closeImageProcessorIfInitialized()
+        (application as DuckDuckGoApplication).closeVideoFrameProcessorIfInitialized()
         super.onDestroy()
     }
 

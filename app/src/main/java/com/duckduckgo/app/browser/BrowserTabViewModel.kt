@@ -46,6 +46,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.webkit.JavaScriptReplyProxy
@@ -570,10 +571,23 @@ class BrowserTabViewModel @Inject constructor(
         configureAutoComplete()
         logVoiceSearchAvailability()
 
-        fireproofWebsiteState.observeForever(fireproofWebsitesObserver)
-        fireproofDialogsEventHandler.event.observeForever(fireproofDialogEventObserver)
-        navigationAwareLoginDetector.loginEventLiveData.observeForever(loginDetectionObserver)
-        showPulseAnimation.observeForever(fireButtonAnimation)
+        // PERFORMANCE FIX: Use Flow instead of observeForever for lifecycle-safe observation
+        // launchIn(viewModelScope) automatically cancels when ViewModel is cleared
+        fireproofWebsiteState.asFlow()
+            .onEach { fireproofWebsitesObserver.onChanged(it) }
+            .launchIn(viewModelScope)
+
+        fireproofDialogsEventHandler.event.asFlow()
+            .onEach { fireproofDialogEventObserver.onChanged(it) }
+            .launchIn(viewModelScope)
+
+        navigationAwareLoginDetector.loginEventLiveData.asFlow()
+            .onEach { loginDetectionObserver.onChanged(it) }
+            .launchIn(viewModelScope)
+
+        showPulseAnimation.asFlow()
+            .onEach { fireButtonAnimation.onChanged(it) }
+            .launchIn(viewModelScope)
 
         tabRepository.childClosedTabs.onEach { closedTab ->
             if (this@BrowserTabViewModel::tabId.isInitialized && tabId == closedTab) {
@@ -751,10 +765,8 @@ class BrowserTabViewModel @Inject constructor(
         buildingSiteFactoryJob?.cancel()
         autoCompleteDisposable?.dispose()
         autoCompleteDisposable = null
-        fireproofWebsiteState.removeObserver(fireproofWebsitesObserver)
-        navigationAwareLoginDetector.loginEventLiveData.removeObserver(loginDetectionObserver)
-        fireproofDialogsEventHandler.event.removeObserver(fireproofDialogEventObserver)
-        showPulseAnimation.removeObserver(fireButtonAnimation)
+        // PERFORMANCE FIX: Removed manual observer cleanup - Flow-based observation via
+        // launchIn(viewModelScope) is automatically cancelled when ViewModel is cleared
         super.onCleared()
     }
 

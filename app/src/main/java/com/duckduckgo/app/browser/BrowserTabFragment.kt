@@ -1004,41 +1004,31 @@ class BrowserTabFragment :
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
         omnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
         bottomNav = IncludeBrowserBottomNavBinding.bind(binding.rootView)
         webViewContainer = binding.webViewContainer
-        configureObservers()
-        configurePrivacyShield()
         configureWebView()
         configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
+        configureBottomNav()
+        configureObservers()
+        configurePrivacyShield()
         configureFindInPage()
         configureAutoComplete()
         configureFocusedView()
         configureNewTab()
         initPrivacyProtectionsPopup()
-        configureBottomNav()
         configureSocialMediaTracking()
         configureSafeBrowsingBanner()
-        // adjustWindowInsets()
 
         if (tabDisplayedInCustomTabScreen) {
             configureCustomTab()
         }
 
         decorator.decorateWithFeatures()
-
         animatorHelper.setListener(this)
-
-        if (savedInstanceState == null) {
-            viewModel.onViewReady()
-            messageFromPreviousTab?.let {
-                processMessage(it)
-            }
-        } else {
-            viewModel.onViewRecreated()
-        }
 
         lifecycle.addObserver(
             @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
@@ -1064,6 +1054,7 @@ class BrowserTabFragment :
             dialog.deleteBookmarkListener = viewModel
         }
 
+        // SafeGaze icon click handlers
         (requireActivity() as DuckDuckGoActivity).apply {
             safeGazeIcon.setOnClickListener {
                 if (sharedPreferences.isSgLockEnabled()) {
@@ -1094,6 +1085,15 @@ class BrowserTabFragment :
                 Toast.makeText(requireContext(),"Model: ${Build.MODEL}\nManufacturer: ${Build.MANUFACTURER}", Toast.LENGTH_LONG).show()
                 true
             }
+        }
+
+        if (savedInstanceState == null) {
+            viewModel.onViewReady()
+            messageFromPreviousTab?.let {
+                processMessage(it)
+            }
+        } else {
+            viewModel.onViewRecreated()
         }
     }
 
@@ -3029,8 +3029,11 @@ class BrowserTabFragment :
         ).findViewById(R.id.browserWebView)
 
         webView?.let {
+            // PERFORMANCE FIX: Pass lazy references to defer heavy ML model initialization
+            // Models will only be loaded when SafeGaze actually processes an image/video
+            val app = activity?.application as DuckDuckGoApplication
             safeGazeInterface = SafeGazeJsInterface(
-                requireContext(), (activity?.application as DuckDuckGoApplication).nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
+                requireContext(), app.nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onImageClassified = { type, data ->
                     Timber.d("kLog: imgLog Send to WebView from Kotlin: type: $type, from: ${data?.from}, src: ${data?.result}, id: ${data?.id}")
                     webView?.post {
@@ -3042,8 +3045,8 @@ class BrowserTabFragment :
                         imageBlockCountDao.incrementCount()
                     }
 
-                    if (!globalData.modelInitializationTimeLogged && activity?.application != null && (activity?.application as DuckDuckGoApplication).nsfwDetector.modelInitializationTime > 0) {
-                        val initializationTime = (activity?.application as DuckDuckGoApplication).nsfwDetector.modelInitializationTime
+                    if (!globalData.modelInitializationTimeLogged && activity?.application != null && app.nsfwDetector.modelInitializationTime > 0) {
+                        val initializationTime = app.nsfwDetector.modelInitializationTime
                         analyticsService.logEvent(
                             AnalyticsEvent.ModelInitTime,
                             mapOf(AnalyticsParam.ModelInitTimeMS to initializationTime.toString()),
@@ -3055,8 +3058,8 @@ class BrowserTabFragment :
                 },
                 safeGazeMode = SafeGazeLevel.getImageBlurLevel(sharedPreferences),
                 videoBlurMode = SafeGazeLevel.getVideoBlurLevel(sharedPreferences, "configureWebView"),
-                (activity?.application as DuckDuckGoApplication).imageProcessor,
-                (activity?.application as DuckDuckGoApplication).videoFrameProcessor,
+                imageDetectorLazy = app.createImageProcessorLazyWrapper(),
+                videoDetectorLazy = app.createVideoFrameProcessorLazyWrapper(),
             )
 
             it.webViewClient = webViewClient

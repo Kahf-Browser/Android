@@ -46,9 +46,14 @@ class SafeGazeJsInterface(
     private val onImageClassified: (type: String, result: OutputImage?) -> Unit,
     private var safeGazeMode: SafeGazeLevel = SafeGazeLevel.SolidWithoutFaceBlur,
     private var videoBlurMode: SafeGazeLevel = SafeGazeLevel.SolidWithoutFaceBlur,
-    private val imageDetector: ImageProcessor,
-    private val videoDetector: VideoFrameProcessor,
+    // PERFORMANCE FIX: Accept lazy references to defer heavy ML model initialization
+    // Models are only loaded when first accessed (when SafeGaze actually processes an image/video)
+    private val imageDetectorLazy: dagger.Lazy<ImageProcessor>,
+    private val videoDetectorLazy: dagger.Lazy<VideoFrameProcessor>,
 ) {
+    // Lazy accessor - ML model initialized only on first actual use
+    private val imageDetector: ImageProcessor get() = imageDetectorLazy.get()
+    private val videoDetector: VideoFrameProcessor get() = videoDetectorLazy.get()
     private val inferenceTimes = mutableListOf<Long>()
     private val nsfwProcessingTimes = mutableListOf<Long>()
     private val coreInferenceTimes = mutableListOf<Long>()

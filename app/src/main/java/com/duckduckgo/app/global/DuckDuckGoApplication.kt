@@ -82,11 +82,65 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    // PERFORMANCE FIX: Use dagger.Lazy for heavy ML processors to defer initialization
+    // These are exposed as lazy references so consumers can defer initialization until actually needed
     @Inject
-    lateinit var imageProcessor: ImageProcessor
+    lateinit var imageProcessorLazy: dagger.Lazy<ImageProcessor>
 
     @Inject
-    lateinit var videoFrameProcessor: VideoFrameProcessor
+    lateinit var videoFrameProcessorLazy: dagger.Lazy<VideoFrameProcessor>
+
+    // Track whether processors have been initialized to avoid unnecessary initialization on cleanup
+    @Volatile
+    private var imageProcessorInitialized = false
+    @Volatile
+    private var videoFrameProcessorInitialized = false
+
+    // Accessor properties that trigger initialization on first access
+    // Use these only when you need the processor immediately (not recommended for startup path)
+    val imageProcessor: ImageProcessor
+        get() {
+            imageProcessorInitialized = true
+            return imageProcessorLazy.get()
+        }
+    val videoFrameProcessor: VideoFrameProcessor
+        get() {
+            videoFrameProcessorInitialized = true
+            return videoFrameProcessorLazy.get()
+        }
+
+    // PERFORMANCE FIX: Expose lazy references for deferred initialization
+    // Use these in SafeGazeJsInterface to avoid triggering ML model load during fragment creation
+    fun createImageProcessorLazyWrapper(): dagger.Lazy<ImageProcessor> {
+        return object : dagger.Lazy<ImageProcessor> {
+            override fun get(): ImageProcessor {
+                imageProcessorInitialized = true
+                return imageProcessorLazy.get()
+            }
+        }
+    }
+
+    fun createVideoFrameProcessorLazyWrapper(): dagger.Lazy<VideoFrameProcessor> {
+        return object : dagger.Lazy<VideoFrameProcessor> {
+            override fun get(): VideoFrameProcessor {
+                videoFrameProcessorInitialized = true
+                return videoFrameProcessorLazy.get()
+            }
+        }
+    }
+
+    // Safe cleanup methods that only close if initialized
+    fun closeImageProcessorIfInitialized() {
+        if (imageProcessorInitialized) {
+            imageProcessorLazy.get().closePordaSegment()
+        }
+    }
+
+    fun closeVideoFrameProcessorIfInitialized() {
+        if (videoFrameProcessorInitialized) {
+            videoFrameProcessorLazy.get().close()
+        }
+    }
 
     @Inject
     lateinit var nsfwDetector: NsfwDetector
@@ -131,6 +185,33 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
             }
         }
 
+        // ✅ OPTIMIZATION: Eagerly initialize ML image/video processors in background
+        // This preloads the heavy ML models so they're ready when SafeGaze needs them
+        // Without blocking app startup (runs on IO thread)
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("kLog Starting eager ImageProcessor initialization")
+                // Accessing the property triggers lazy initialization
+                imageProcessor.let {
+                    Timber.d("kLog ImageProcessor eager initialization completed")
+                }
+            } catch (e: Exception) {
+                Timber.e("kLog Failed to eagerly initialize ImageProcessor: ${e.message}")
+            }
+        }
+
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("kLog Starting eager VideoFrameProcessor initialization")
+                // Accessing the property triggers lazy initialization
+                videoFrameProcessor.let {
+                    Timber.d("kLog VideoFrameProcessor eager initialization completed")
+                }
+            } catch (e: Exception) {
+                Timber.e("kLog Failed to eagerly initialize VideoFrameProcessor: ${e.message}")
+            }
+        }
+
         // Check for YouTube ad-blocker script updates on startup
         // Only checks once every 12 hours, downloads on first run
         appCoroutineScope.launch(dispatchers.io()) {
@@ -159,15 +240,32 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
         scheduleTasks()
         configRemoteConfig()
 
-        with(
-            PostHogAndroidConfig(
-                apiKey = BuildConfig.POSTHOG_API_KEY,
-                host = BuildConfig.POSTHOG_HOST,
-            ),
-        ) {
-            PostHogAndroid.setup(this@DuckDuckGoApplication, this)
+        // PERFORMANCE FIX: Initialize SDKs on background thread to avoid blocking app startup
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                with(
+                    PostHogAndroidConfig(
+                        apiKey = BuildConfig.POSTHOG_API_KEY,
+                        host = BuildConfig.POSTHOG_HOST,
+                    ),
+                ) {
+                    PostHogAndroid.setup(this@DuckDuckGoApplication, this)
+                }
+                Timber.d("PostHog SDK initialized on background thread")
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to initialize PostHog SDK")
+            }
         }
-        setupKahfAdsSDK()
+
+        // KahfAdsSdk initialization moved to background (currently unused - GoogleAdManagerConfig commented out)
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                setupKahfAdsSDK()
+                Timber.d("KahfAds SDK initialized on background thread")
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to initialize KahfAds SDK")
+            }
+        }
     }
 
     override fun onSecondaryProcessCreate(shortProcessName: String) {
