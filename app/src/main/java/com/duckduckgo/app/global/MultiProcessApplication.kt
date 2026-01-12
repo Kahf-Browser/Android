@@ -31,7 +31,12 @@ abstract class MultiProcessApplication : Application() {
 
     final override fun onCreate() {
         super.onCreate()
-        FirebaseApp.initializeApp(this)
+        // PERFORMANCE FIX: Defer Firebase initialization to background thread to prevent ANR
+        // Firebase SDK initialization can involve I/O operations that block the main thread
+        // FirebaseApp has built-in thread safety, so this is safe to do on a background thread
+        Thread {
+            FirebaseApp.initializeApp(this@MultiProcessApplication)
+        }.start()
         if (isMainProcessCached) {
             onMainProcessCreate()
         } else {

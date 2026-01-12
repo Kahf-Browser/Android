@@ -35,6 +35,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FALLBACK_PUBLISHER_ID
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
+import com.facebook.FacebookSdk
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 // import com.kahfads.sdk.GoogleAdManagerConfig
@@ -246,7 +247,16 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         }
 
         scheduleTasks()
-        configRemoteConfig()
+        // PERFORMANCE FIX: Move Firebase Remote Config initialization to background thread
+        // This must run on IO thread since Firebase initialization is also deferred
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                configRemoteConfig()
+                Timber.d("Firebase Remote Config initialized on background thread")
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to initialize Firebase Remote Config")
+            }
+        }
 
         // PERFORMANCE FIX: Initialize SDKs on background thread to avoid blocking app startup
         appCoroutineScope.launch(dispatchers.io()) {
@@ -380,6 +390,13 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
     }
 
     private fun setupKahfAdsSDK() {
+        // PERFORMANCE FIX: Manually initialize Facebook SDK on background thread
+        // This is required because we disabled auto-initialization to prevent ANR during app startup
+        // Facebook SDK is used by KahfAds SDK and must be initialized before KahfAds
+        FacebookSdk.setAutoInitEnabled(false)
+        FacebookSdk.fullyInitialize()
+        Timber.d("Facebook SDK manually initialized on background thread")
+
         KahfAdsSdk.initialize(
             config = KahfAdsSdkConfig(
                 fallbackPublisherId = FALLBACK_PUBLISHER_ID,
