@@ -2103,11 +2103,13 @@ class BrowserTabViewModel @Inject constructor(
         hasQueryChanged: Boolean,
         browserShowing: Boolean = currentBrowserViewState().browserShowing|| query.isBlank()
     ) {
+        val currentState = currentAutoCompleteViewState()
+
         // determine if empty list to be shown, or existing search results
         val autoCompleteSearchResults = if (query.isBlank() || !hasFocus) {
             AutoCompleteResult(query, emptyList())
         } else {
-            currentAutoCompleteViewState().searchResults
+            currentState.searchResults
         }
 
         val autoCompleteSuggestionsEnabled = appSettingsPreferencesStore.autoCompleteSuggestionsEnabled
@@ -2115,19 +2117,24 @@ class BrowserTabViewModel @Inject constructor(
         val showFavoritesAsSuggestions = if (!showAutoCompleteSuggestions) {
             val urlFocused = hasFocus && query.isNotBlank() && !hasQueryChanged && UriString.isWebUrl(query)
             val emptyQueryBrowsing = query.isBlank() && browserShowing
-            val favoritesAvailable = currentAutoCompleteViewState().favorites.isNotEmpty()
+            val favoritesAvailable = currentState.favorites.isNotEmpty()
             val returnValue = hasFocus && (urlFocused || emptyQueryBrowsing) && favoritesAvailable
             returnValue
         } else {
             false
         }
 
-        autoCompleteViewState.value = currentAutoCompleteViewState()
-            .copy(
-                showSuggestions = showAutoCompleteSuggestions,
-                showFavorites = showFavoritesAsSuggestions,
-                searchResults = autoCompleteSearchResults,
-            )
+        // Only update view state if values actually changed to avoid unnecessary UI updates
+        if (currentState.showSuggestions != showAutoCompleteSuggestions ||
+            currentState.showFavorites != showFavoritesAsSuggestions ||
+            currentState.searchResults != autoCompleteSearchResults) {
+            autoCompleteViewState.value = currentState
+                .copy(
+                    showSuggestions = showAutoCompleteSuggestions,
+                    showFavorites = showFavoritesAsSuggestions,
+                    searchResults = autoCompleteSearchResults,
+                )
+        }
 
         if (hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompletePublishSubject.accept(query.trim())
@@ -2144,27 +2151,46 @@ class BrowserTabViewModel @Inject constructor(
         val showPrivacyShield = !hasFocus
         val showSearchIcon = hasFocus
 
-        omnibarViewState.value = currentOmnibarViewState().copy(
-            isEditing = hasFocus,
-            forceExpand = true,
-        )
+        // Only update omnibarViewState if values actually changed
+        val currentOmnibar = currentOmnibarViewState()
+        if (currentOmnibar.isEditing != hasFocus) {
+            omnibarViewState.value = currentOmnibar.copy(
+                isEditing = hasFocus,
+                forceExpand = true,
+            )
+        }
 
-        val currentBrowserViewState = currentBrowserViewState()
-        browserViewState.value = currentBrowserViewState.copy(
-            showPrivacyShield = HighlightableButton.Visible(enabled = showPrivacyShield),
-            showSearchIcon = showSearchIcon,
-            showTabsButton = showControls,
-            fireButton = HighlightableButton.Visible(highlighted = showPulseAnimation.value ?: false),
-            showMenuButton = HighlightableButton.Visible(),
-            showClearButton = showClearButton,
-            showVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
-                hasFocus = hasFocus,
-                query = query,
-                hasQueryChanged = hasQueryChanged,
-                urlLoaded = url ?: "",
-            ),
-            showDaxIcon = shouldShowDaxIcon(url, showPrivacyShield),
+        // Calculate new browser view state values
+        val currentBrowser = currentBrowserViewState()
+        val newShowVoiceSearch = voiceSearchAvailability.shouldShowVoiceSearch(
+            hasFocus = hasFocus,
+            query = query,
+            hasQueryChanged = hasQueryChanged,
+            urlLoaded = url ?: "",
         )
+        val newShowDaxIcon = shouldShowDaxIcon(url, showPrivacyShield)
+        val newFireButtonHighlighted = showPulseAnimation.value ?: false
+
+        // Only update browserViewState if values actually changed
+        if (currentBrowser.showPrivacyShield.isEnabled() != showPrivacyShield ||
+            currentBrowser.showSearchIcon != showSearchIcon ||
+            currentBrowser.showTabsButton != showControls ||
+            currentBrowser.showClearButton != showClearButton ||
+            currentBrowser.showVoiceSearch != newShowVoiceSearch ||
+            currentBrowser.showDaxIcon != newShowDaxIcon ||
+            (currentBrowser.fireButton as? HighlightableButton.Visible)?.highlighted != newFireButtonHighlighted) {
+
+            browserViewState.value = currentBrowser.copy(
+                showPrivacyShield = HighlightableButton.Visible(enabled = showPrivacyShield),
+                showSearchIcon = showSearchIcon,
+                showTabsButton = showControls,
+                fireButton = HighlightableButton.Visible(highlighted = newFireButtonHighlighted),
+                showMenuButton = HighlightableButton.Visible(),
+                showClearButton = showClearButton,
+                showVoiceSearch = newShowVoiceSearch,
+                showDaxIcon = newShowDaxIcon,
+            )
+        }
 
         Timber.d("showPrivacyShield=$showPrivacyShield, showSearchIcon=$showSearchIcon, showClearButton=$showClearButton")
     }

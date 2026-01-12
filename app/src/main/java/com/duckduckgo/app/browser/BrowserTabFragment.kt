@@ -731,6 +731,12 @@ class BrowserTabFragment :
 
     private val gson = Gson()
 
+    // Cached clipboard content to avoid blocking main thread during autocomplete rendering
+    private var cachedClipboardData: ClipData? = null
+
+    // Debounce job for omnibar text input to avoid excessive view state updates
+    private var omnibarTextInputJob: Job? = null
+
     // Social Media Integration
     private val socialMediaManager = SocialMediaManager()
     private var socialMediaDialog: SocialMediaDialog? = null
@@ -767,8 +773,18 @@ class BrowserTabFragment :
 
     private val omnibarInputTextWatcher = object : TextChangedWatcher() {
         override fun afterTextChanged(editable: Editable) {
-            viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
-            viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), omnibar.omnibarTextInput.hasFocus(), true)
+            val query = omnibar.omnibarTextInput.text.toString()
+            val hasFocus = omnibar.omnibarTextInput.hasFocus()
+
+            // Trigger autocomplete immediately (it has internal debouncing for API calls)
+            viewModel.triggerAutocomplete(query, hasFocus, true)
+
+            // Debounce the UI state updates to avoid excessive LiveData updates on every keystroke
+            omnibarTextInputJob?.cancel()
+            omnibarTextInputJob = viewLifecycleOwner.lifecycleScope.launch {
+                delay(OMNIBAR_INPUT_DEBOUNCE_MS)
+                viewModel.onOmnibarInputStateChanged(query, hasFocus, true)
+            }
         }
     }
 
@@ -2947,12 +2963,22 @@ class BrowserTabFragment :
                 viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 if (hasFocus) {
+                    // Pre-cache clipboard content to avoid blocking main thread during autocomplete
+                    cachedClipboardData = try {
+                        clipboardManager.primaryClip
+                    } catch (e: Exception) {
+                        null
+                    }
+
                     // show the full url
                     omnibar.omnibarTextInput.setText(viewModel.omnibarViewState.value?.omnibarText ?: "")
 
                     cancelPendingAutofillRequestsToChooseCredentials()
                     omnibar.omniBarContainer.isPressed = true
                 } else {
+                    // Clear cached clipboard when focus is lost
+                    cachedClipboardData = null
+
                     bottomNav.botNav.show()
                     omnibar.omnibarTextInput.hideKeyboard()
                     binding.focusDummy.requestFocus()
@@ -4149,6 +4175,7 @@ class BrowserTabFragment :
 
         const val ADD_SAVED_SITE_FRAGMENT_TAG = "ADD_SAVED_SITE"
         private const val KEYBOARD_DELAY = 200L
+        private const val OMNIBAR_INPUT_DEBOUNCE_MS = 50L
 
         private const val REQUEST_CODE_CHOOSE_FILE = 100
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
@@ -4456,12 +4483,9 @@ class BrowserTabFragment :
 
                         binding.focusedViewContainerLayout.gone()
 
+                        // Use cached clipboard data to avoid blocking main thread
                         val suggestionsWithClipboardContent = viewModel.appendClipboardUrlToSuggestions(
-                            try {
-                                clipboardManager.primaryClip
-                            } catch (e: Exception) {
-                                null
-                            },
+                            cachedClipboardData,
                             viewState.searchResults.suggestions,
                         )
                         autoCompleteSuggestionsAdapter.updateData(viewState.searchResults.query, suggestionsWithClipboardContent)

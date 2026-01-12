@@ -35,20 +35,49 @@ class RealVoiceSearchAvailability @Inject constructor(
 ) : VoiceSearchAvailability {
     companion object {
         private const val URL_DDG_SERP = "https://duckduckgo.com/?"
+        private const val CACHE_DURATION_MS = 5000L // Cache for 5 seconds
     }
 
+    // Cache for isVoiceSearchSupported to avoid recalculating on every keystroke
+    private var cachedIsVoiceSearchSupported: Boolean? = null
+    private var lastSupportedCheckTime: Long = 0
+
+    // Cache for isVoiceSearchAvailable
+    private var cachedIsVoiceSearchAvailable: Boolean? = null
+    private var lastAvailableCheckTime: Long = 0
+
     override val isVoiceSearchSupported: Boolean
-        get() = configProvider.get().run {
-            voiceSearchFeature.self().isEnabled() &&
-                hasValidVersion(sdkInt) &&
-                isOnDeviceSpeechRecognitionSupported &&
-                languageSupportChecker.isLanguageSupported() &&
-                hasValidLocale(languageTag) &&
-                voiceSearchFeatureRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
+        get() {
+            val now = System.currentTimeMillis()
+            val cached = cachedIsVoiceSearchSupported
+            if (cached != null && (now - lastSupportedCheckTime) < CACHE_DURATION_MS) {
+                return cached
+            }
+            val result = configProvider.get().run {
+                voiceSearchFeature.self().isEnabled() &&
+                    hasValidVersion(sdkInt) &&
+                    isOnDeviceSpeechRecognitionSupported &&
+                    languageSupportChecker.isLanguageSupported() &&
+                    hasValidLocale(languageTag) &&
+                    voiceSearchFeatureRepository.manufacturerExceptions.none { it.name == deviceManufacturer }
+            }
+            cachedIsVoiceSearchSupported = result
+            lastSupportedCheckTime = now
+            return result
         }
 
     override val isVoiceSearchAvailable: Boolean
-        get() = isVoiceSearchSupported && voiceSearchRepository.isVoiceSearchUserEnabled(voiceSearchRepository.getHasAcceptedRationaleDialog())
+        get() {
+            val now = System.currentTimeMillis()
+            val cached = cachedIsVoiceSearchAvailable
+            if (cached != null && (now - lastAvailableCheckTime) < CACHE_DURATION_MS) {
+                return cached
+            }
+            val result = isVoiceSearchSupported && voiceSearchRepository.isVoiceSearchUserEnabled(voiceSearchRepository.getHasAcceptedRationaleDialog())
+            cachedIsVoiceSearchAvailable = result
+            lastAvailableCheckTime = now
+            return result
+        }
 
     private fun hasValidVersion(sdkInt: Int) = voiceSearchFeatureRepository.minVersion?.let { minVersion ->
         sdkInt >= minVersion
