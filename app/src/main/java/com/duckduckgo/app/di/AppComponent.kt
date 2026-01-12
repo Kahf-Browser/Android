@@ -17,6 +17,7 @@
 package com.duckduckgo.app.di
 
 import android.app.Application
+import androidx.work.Configuration
 import com.duckduckgo.app.browser.certificates.CertificateTrustedStoreModule
 import com.duckduckgo.app.browser.di.BrowserModule
 import com.duckduckgo.app.browser.favicon.FaviconModule
@@ -94,4 +95,11 @@ interface AppComponent : AndroidInjector<DuckDuckGoApplication> {
     // accessor to Retrofit instance for test only only for test
     @Named("api")
     fun retrofit(): Retrofit
+
+    /**
+     * Exposes WorkManager Configuration for on-demand initialization.
+     * This is called by DuckDuckGoApplication.getWorkManagerConfiguration() which may be
+     * invoked before @Inject fields are populated, so we access it directly from the component.
+     */
+    fun workManagerConfiguration(): Configuration
 }

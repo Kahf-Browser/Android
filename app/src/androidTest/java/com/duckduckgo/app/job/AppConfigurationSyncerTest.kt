@@ -25,6 +25,7 @@ import androidx.work.testing.WorkManagerTestInitHelper
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder
 import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder.Companion.APP_CONFIG_SYNC_WORK_TAG
 import com.duckduckgo.app.global.job.AppConfigurationWorker
+import dagger.Lazy
 import io.reactivex.Completable
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -44,7 +45,9 @@ class AppConfigurationSyncerTest {
     fun setup() {
         initializeWorkManager()
         whenever(mockDownloader.downloadTask()).thenReturn(Completable.complete())
-        testee = AppConfigurationSyncer(AppConfigurationSyncWorkRequestBuilder(), workManager, mockDownloader)
+        // Wrap WorkManager in a Lazy to match the updated constructor signature
+        val workManagerLazy = Lazy { workManager }
+        testee = AppConfigurationSyncer(AppConfigurationSyncWorkRequestBuilder(), workManagerLazy, mockDownloader)
     }
 
     @Test

@@ -32,6 +32,7 @@ import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.squareup.anvil.annotations.ContributesTo
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -45,16 +46,20 @@ import timber.log.Timber
 @ContributesTo(AppScope::class)
 class TrackersDbCleanerSchedulerModule {
 
+    /**
+     * Uses Lazy<WorkManager> to defer WorkManager initialization until after DI is complete.
+     * This prevents ANR during app startup caused by NetworkStateTracker initialization on the main thread.
+     */
     @Provides
     @IntoSet
     fun provideDeviceShieldNotificationScheduler(
-        workManager: WorkManager,
+        workManager: Lazy<WorkManager>,
     ): MainProcessLifecycleObserver {
         return TrackersDbCleanerScheduler(workManager)
     }
 }
 
-class TrackersDbCleanerScheduler(private val workManager: WorkManager) : MainProcessLifecycleObserver {
+class TrackersDbCleanerScheduler(private val workManagerLazy: Lazy<WorkManager>) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
         Timber.v("Scheduling Trackers Blocked DB cleaner")
@@ -62,7 +67,7 @@ class TrackersDbCleanerScheduler(private val workManager: WorkManager) : MainPro
             .addTag(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.MINUTES)
             .build()
-        workManager.enqueueUniquePeriodicWork(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG, ExistingPeriodicWorkPolicy.KEEP, dbCleanerWorkRequest)
+        workManagerLazy.get().enqueueUniquePeriodicWork(WORKER_TRACKERS_BLOCKED_DB_CLEANER_TAG, ExistingPeriodicWorkPolicy.KEEP, dbCleanerWorkRequest)
     }
 
     companion object {

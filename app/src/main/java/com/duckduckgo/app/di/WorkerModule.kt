@@ -17,7 +17,6 @@
 package com.duckduckgo.app.di
 
 import android.content.Context
-import android.os.Process
 import androidx.work.Configuration
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
@@ -32,119 +31,43 @@ import timber.log.Timber
 @Module
 object WorkerModule {
 
+    /**
+     * Provides WorkManager instance using on-demand initialization.
+     *
+     * IMPORTANT: This provider does NOT call WorkManager.initialize() directly.
+     * Instead, the Application class implements Configuration.Provider to provide
+     * the configuration when WorkManager is first accessed. This defers the heavy
+     * initialization (NetworkStateTracker, etc.) off the main thread startup path.
+     *
+     * The actual initialization happens lazily when WorkManager.getInstance() is called,
+     * and the Application provides the Configuration via getWorkManagerConfiguration().
+     */
     @Provides
     @SingleInstanceIn(AppScope::class)
-    fun workManager(
-        context: Context,
-        workerFactory: WorkerFactory,
-    ): WorkManager {
-        val processName = getCurrentProcessName(context)
-        val isMainProcess = processName == context.packageName
-
-        Timber.d("WorkManager initialization requested in process: $processName (isMain=$isMainProcess)")
-
-        if (!isMainProcess) {
-            // In non-main processes, initialize WorkManager with a minimal configuration
-            // This avoids registering unnecessary network callbacks
-            val minimalConfig = Configuration.Builder()
-                .setWorkerFactory(workerFactory)
-                .setMinimumLoggingLevel(android.util.Log.ERROR)
-                .setMaxSchedulerLimit(20) // Limit concurrent work to prevent TooManyRequestsException
-                .build()
-
-            try {
-                WorkManager.initialize(context, minimalConfig)
-                Timber.d("Initialized minimal WorkManager in process: $processName")
-            } catch (ignored: IllegalStateException) {
-                // WorkManager might already be initialized by another thread, which is safe to ignore
-                Timber.d("WorkManager already initialized in process: $processName")
-            }
-        } else {
-            // In the main process, initialize WorkManager with the full configuration
-            // Limit the maximum number of scheduled jobs to prevent ConnectivityManager.TooManyRequestsException
-            // This exception occurs when too many network callbacks are registered (Android limit is ~100-200)
-            val config = Configuration.Builder()
-                .setWorkerFactory(workerFactory)
-                .setMaxSchedulerLimit(20) // Reduced from 50 to 20 to prevent TooManyRequestsException
-                .setMinimumLoggingLevel(if (timber.log.Timber.treeCount > 0) android.util.Log.DEBUG else android.util.Log.INFO)
-                .build()
-
-            try {
-                WorkManager.initialize(context, config)
-                Timber.d("WorkManager initialized successfully in main process with maxSchedulerLimit=20")
-            } catch (e: IllegalStateException) {
-                // This is expected if WorkManager is already initialized, so we can safely ignore it
-                Timber.d("WorkManager already initialized in main process (safe to ignore)")
-            } catch (e: Exception) {
-                // Catch any other exceptions during initialization to prevent crashes
-                Timber.e(e, "Failed to initialize WorkManager with standard config")
-            }
-        }
-
-        // Get WorkManager instance with comprehensive exception handling
-        // NOTE: Do NOT call pruneWork() synchronously here as it blocks the main thread and causes ANR
-        // Pruning should be done asynchronously in the Application.onCreate() method instead
-        return try {
-            WorkManager.getInstance(context)
-        } catch (e: RuntimeException) {
-            // Check if this is a TooManyRequestsException (android.net.ConnectivityManager$TooManyRequestsException)
-            // We check by class name because the exception class may not be available at compile time
-            val isTooManyRequestsException = e.javaClass.name.contains("TooManyRequestsException")
-
-            if (isTooManyRequestsException) {
-                // This happens when WorkManager tries to register too many network callbacks
-                // Android has a system limit of ~100-250 callbacks per UID depending on API level
-                Timber.e(e, "TooManyRequestsException: Network callback limit exceeded. Attempting recovery...")
-
-                // Recovery strategy: Clear all work and reinitialize with minimal configuration
-                try {
-                    // Force-clear the WorkManager database to remove all pending work
-                    val workManager = WorkManager.getInstance(context)
-                    workManager.cancelAllWork()
-                    workManager.pruneWork()
-                    Timber.d("Cleared all work to recover from TooManyRequestsException")
-                } catch (clearException: Exception) {
-                    Timber.e(clearException, "Failed to clear work during TooManyRequestsException recovery")
-
-                    // Last resort: Reinitialize with zero scheduled work limit
-                    try {
-                        val minimalConfig = Configuration.Builder()
-                            .setWorkerFactory(workerFactory)
-                            .setMaxSchedulerLimit(0) // Disable all scheduled work
-                            .setMinimumLoggingLevel(android.util.Log.ERROR)
-                            .build()
-
-                        WorkManager.initialize(context, minimalConfig)
-                        Timber.w("Reinitialized WorkManager with zero scheduled work limit as last resort")
-                    } catch (reinitException: Exception) {
-                        Timber.e(reinitException, "Failed to reinitialize WorkManager - app may have stability issues")
-                    }
-                }
-
-                // Return the WorkManager instance (may have reduced functionality)
-                WorkManager.getInstance(context)
-            } else {
-                // Re-throw if it's a different RuntimeException
-                throw e
-            }
-        } catch (e: Exception) {
-            // Catch any other unexpected exceptions to prevent app crash
-            Timber.e(e, "Unexpected exception while getting WorkManager instance")
-            WorkManager.getInstance(context)
-        }
+    fun workManager(context: Context): WorkManager {
+        Timber.d("WorkManager: Providing lazy instance (on-demand initialization)")
+        // WorkManager will use on-demand initialization via Configuration.Provider
+        // implemented in DuckDuckGoApplication
+        return WorkManager.getInstance(context)
     }
 
     /**
-     * Get current process name safely across all Android versions
+     * Provides the WorkManager Configuration.
+     * This is used by DuckDuckGoApplication's getWorkManagerConfiguration() method
+     * for on-demand initialization.
      */
-    private fun getCurrentProcessName(context: Context): String {
-        return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
-            android.app.Application.getProcessName()
-        } else {
-            // Fallback for older Android versions
-            val am = context.getSystemService(Context.ACTIVITY_SERVICE) as android.app.ActivityManager
-            am.runningAppProcesses?.find { it.pid == Process.myPid() }?.processName ?: context.packageName
-        }
+    @Provides
+    @SingleInstanceIn(AppScope::class)
+    fun workManagerConfiguration(workerFactory: WorkerFactory): Configuration {
+        Timber.d("WorkManager: Creating configuration with custom WorkerFactory")
+        return Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .setMaxSchedulerLimit(20) // Limit concurrent work to prevent TooManyRequestsException
+            .setMinimumLoggingLevel(
+                if (timber.log.Timber.treeCount > 0) android.util.Log.DEBUG
+                else android.util.Log.INFO
+            )
+            .build()
     }
 
     @Provides

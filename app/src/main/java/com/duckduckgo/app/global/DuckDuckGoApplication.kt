@@ -19,6 +19,7 @@ package com.duckduckgo.app.global
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.duckduckgo.app.browser.BuildConfig
@@ -55,7 +56,14 @@ import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
 
-open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() {
+/**
+ * Main application class that implements Configuration.Provider for on-demand WorkManager initialization.
+ *
+ * WorkManager initialization is deferred using on-demand initialization to prevent ANR during app startup.
+ * The heavy NetworkStateTracker initialization happens lazily when WorkManager is first accessed,
+ * rather than blocking the main thread during Application.onCreate().
+ */
+open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(), Configuration.Provider {
 
     @Inject
     lateinit var uncaughtExceptionHandler: Thread.UncaughtExceptionHandler
@@ -444,4 +452,28 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication() 
                 """.trimIndent(),
             )
     }
+
+    /**
+     * Implementation of [Configuration.Provider] for on-demand WorkManager initialization.
+     *
+     * This method is called by WorkManager when getInstance() is called and WorkManager
+     * hasn't been initialized yet. By implementing this interface, we enable on-demand
+     * initialization which defers the heavy NetworkStateTracker initialization until
+     * WorkManager is actually needed, preventing ANR during app startup.
+     *
+     * IMPORTANT: We access the configuration directly from daggerAppComponent instead of
+     * using @Inject because this method may be called DURING Dagger injection (before
+     * @Inject fields are populated). The daggerAppComponent is created before inject()
+     * is called, so it's safe to access here.
+     *
+     * The configuration includes:
+     * - Custom WorkerFactory for dependency injection in Workers
+     * - MaxSchedulerLimit of 20 to prevent TooManyRequestsException
+     * - Appropriate logging level based on debug/release build
+     */
+    override val workManagerConfiguration: Configuration
+        get() {
+            Timber.d("WorkManager: On-demand initialization triggered via Configuration.Provider")
+            return daggerAppComponent.workManagerConfiguration()
+        }
 }

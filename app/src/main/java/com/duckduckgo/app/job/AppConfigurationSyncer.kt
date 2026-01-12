@@ -28,6 +28,7 @@ import com.duckduckgo.app.global.job.AppConfigurationSyncWorkRequestBuilder.Comp
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import com.squareup.anvil.annotations.ContributesTo
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.SingleInstanceIn
@@ -39,22 +40,38 @@ import timber.log.Timber
 @Module
 @ContributesTo(AppScope::class)
 class AppConfigurationSyncerModule {
+    /**
+     * Provides AppConfigurationSyncer with lazy WorkManager injection.
+     *
+     * IMPORTANT: We use Lazy<WorkManager> to defer WorkManager initialization until after
+     * Dagger DI is complete. This prevents ANR during app startup caused by
+     * NetworkStateTracker initialization on the main thread.
+     *
+     * The WorkManager is only accessed in onCreate() lifecycle callback, which happens
+     * after DI is fully complete, allowing the on-demand initialization to work correctly.
+     */
     @Provides
     @SingleInstanceIn(AppScope::class)
     @IntoSet
     fun provideAppConfigurationSyncer(
         appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
-        workManager: WorkManager,
+        workManager: Lazy<WorkManager>,
         appConfigurationDownloader: ConfigurationDownloader,
     ): MainProcessLifecycleObserver {
         return AppConfigurationSyncer(appConfigurationSyncWorkRequestBuilder, workManager, appConfigurationDownloader)
     }
 }
 
+/**
+ * Lifecycle observer that handles app configuration synchronization.
+ *
+ * Uses lazy WorkManager injection to defer initialization until after DI is complete,
+ * preventing ANR during app startup.
+ */
 @VisibleForTesting
 class AppConfigurationSyncer(
     private val appConfigurationSyncWorkRequestBuilder: AppConfigurationSyncWorkRequestBuilder,
-    private val workManager: WorkManager,
+    private val workManagerLazy: Lazy<WorkManager>,
     private val appConfigurationDownloader: ConfigurationDownloader,
 ) : MainProcessLifecycleObserver {
 
@@ -78,6 +95,7 @@ class AppConfigurationSyncer(
     fun scheduleRegularSync() {
         Timber.i("Scheduling regular sync")
         val workRequest = appConfigurationSyncWorkRequestBuilder.appConfigurationWork()
-        workManager.enqueueUniquePeriodicWork(APP_CONFIG_SYNC_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
+        // Access lazy WorkManager here - after DI is complete, so on-demand initialization works
+        workManagerLazy.get().enqueueUniquePeriodicWork(APP_CONFIG_SYNC_WORK_TAG, ExistingPeriodicWorkPolicy.KEEP, workRequest)
     }
 }
