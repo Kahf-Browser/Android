@@ -20,6 +20,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.safebrowsing.api.SafeBrowsingManager
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -44,7 +45,8 @@ class SafeBrowsingLifecycleObserver(
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
         Timber.d("$TAG: Lifecycle onResume - initializing Safe Browsing")
-        coroutineScope.launch {
+        // PERFORMANCE FIX: Use IO dispatcher to avoid blocking main thread during SafetyNet init
+        coroutineScope.launch(Dispatchers.IO) {
             safeBrowsingManager.initialize()
         }
     }
@@ -52,7 +54,8 @@ class SafeBrowsingLifecycleObserver(
     override fun onPause(owner: LifecycleOwner) {
         super.onPause(owner)
         Timber.d("$TAG: Lifecycle onPause - shutting down Safe Browsing")
-        coroutineScope.launch {
+        // PERFORMANCE FIX: Use IO dispatcher to avoid blocking main thread during SafetyNet shutdown
+        coroutineScope.launch(Dispatchers.IO) {
             safeBrowsingManager.shutdown()
         }
     }

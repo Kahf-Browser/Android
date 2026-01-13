@@ -250,60 +250,70 @@ open class BrowserActivity : DuckDuckGoActivity() {
         }
     }
 
+    // PERFORMANCE FIX: Run default browser check on IO thread to avoid blocking main thread during startup
     private fun checkIfAppIsStillDefault() {
-        val prefs = spProvider.getKahfSharedPreferences()
-        val lastCheckTime = prefs.getLong(LAST_DEFAULT_APP_CHECK_TIME, 0L)
-        val currentTime = System.currentTimeMillis()
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            val prefs = spProvider.getKahfSharedPreferences()
+            val lastCheckTime = prefs.getLong(LAST_DEFAULT_APP_CHECK_TIME, 0L)
+            val currentTime = System.currentTimeMillis()
 
-        // Check on first run or after 7 days.
-        if (lastCheckTime == 0L || currentTime - lastCheckTime > 7.Days()) {
-            if (isMyBrowserDefault(packageManager = packageManager, myPackageName = packageName)) {
-                analyticsService.logEvent(AnalyticsEvent.DefaultBrowserCheck)
+            // Check on first run or after 7 days.
+            if (lastCheckTime == 0L || currentTime - lastCheckTime > 7.Days()) {
+                if (isMyBrowserDefault(packageManager = packageManager, myPackageName = packageName)) {
+                    analyticsService.logEvent(AnalyticsEvent.DefaultBrowserCheck)
+                }
+                // Always update the timestamp after a check to avoid re-checking on every launch.
+                prefs.edit { putLong(LAST_DEFAULT_APP_CHECK_TIME, currentTime) }
             }
-            // Always update the timestamp after a check to avoid re-checking on every launch.
-            prefs.edit { putLong(LAST_DEFAULT_APP_CHECK_TIME, currentTime) }
         }
     }
 
 
+    // PERFORMANCE FIX: Defer Firebase Remote Config check to avoid blocking main thread during startup
+    // FirebaseRemoteConfig.getInstance() can do initialization work that blocks
     private fun checkForAppUpdate() {
-        FirebaseRemoteConfig.getInstance().let { rc ->
-            rc.fetchAndActivate().addOnSuccessListener { fetchedFromRemote->
-                val minimumRequiredVersionCode: Long = try {
-                    rc[MIN_VERSION].asLong()
-                } catch (e: Exception) {
-                    0L
-                }
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            // Small delay to let UI render first
+            kotlinx.coroutines.delay(500)
 
-                val adRefreshInterval: Long = try {
-                    rc[AD_REFRESH_INTERVAL].asLong()
-                } catch (e: Exception) {
-                    Timber.e(e, "Failed to get ad_refresh_interval from remote config")
-                    20_000L
-                }
-                spProvider.getKahfSharedPreferences().edit {
-                    putLong(AD_REFRESH_INTERVAL, adRefreshInterval)
-                }
+            FirebaseRemoteConfig.getInstance().let { rc ->
+                rc.fetchAndActivate().addOnSuccessListener { fetchedFromRemote->
+                    val minimumRequiredVersionCode: Long = try {
+                        rc[MIN_VERSION].asLong()
+                    } catch (e: Exception) {
+                        0L
+                    }
 
-                val updateType = if (minimumRequiredVersionCode > BuildConfig.VERSION_CODE) {
-                    AppUpdateType.IMMEDIATE
-                } else {
-                    AppUpdateType.FLEXIBLE
-                }
+                    val adRefreshInterval: Long = try {
+                        rc[AD_REFRESH_INTERVAL].asLong()
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to get ad_refresh_interval from remote config")
+                        20_000L
+                    }
+                    spProvider.getKahfSharedPreferences().edit {
+                        putLong(AD_REFRESH_INTERVAL, adRefreshInterval)
+                    }
 
-                Timber.d(
-                    "rcLog Fetched from remote: $fetchedFromRemote. " +
-                        "MinRequiredVersion: $minimumRequiredVersionCode. " +
-                        "UpdateType: ${if (updateType == AppUpdateType.IMMEDIATE) "IMMEDIATE" else "FLEXIBLE"}, adRefreshInterval: $adRefreshInterval",
-                )
+                    val updateType = if (minimumRequiredVersionCode > BuildConfig.VERSION_CODE) {
+                        AppUpdateType.IMMEDIATE
+                    } else {
+                        AppUpdateType.FLEXIBLE
+                    }
 
-                appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
-                    if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
-                        appUpdateInfo.isUpdateTypeAllowed(updateType)
-                    ) {
-                        when (updateType) {
-                            AppUpdateType.IMMEDIATE -> startImmediateUpdate(appUpdateInfo)
-                            AppUpdateType.FLEXIBLE -> startFlexibleUpdate(appUpdateInfo)
+                    Timber.d(
+                        "rcLog Fetched from remote: $fetchedFromRemote. " +
+                            "MinRequiredVersion: $minimumRequiredVersionCode. " +
+                            "UpdateType: ${if (updateType == AppUpdateType.IMMEDIATE) "IMMEDIATE" else "FLEXIBLE"}, adRefreshInterval: $adRefreshInterval",
+                    )
+
+                    appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+                        if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE &&
+                            appUpdateInfo.isUpdateTypeAllowed(updateType)
+                        ) {
+                            when (updateType) {
+                                AppUpdateType.IMMEDIATE -> startImmediateUpdate(appUpdateInfo)
+                                AppUpdateType.FLEXIBLE -> startFlexibleUpdate(appUpdateInfo)
+                            }
                         }
                     }
                 }
@@ -407,12 +417,18 @@ open class BrowserActivity : DuckDuckGoActivity() {
         viewModel.launchFromThirdParty()
     }
 
+    // PERFORMANCE FIX: Defer ServiceWorker initialization to avoid blocking main thread during startup
+    // ServiceWorkerControllerCompat.getInstance() may trigger WebView initialization which is slow
     private fun initializeServiceWorker() {
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
-            try {
-                ServiceWorkerControllerCompat.getInstance().setServiceWorkerClient(serviceWorkerClientCompat)
-            } catch (e: Throwable) {
-                Timber.w(e.localizedMessage)
+        lifecycleScope.launch(dispatcherProvider.io()) {
+            // Small delay to let UI render first
+            kotlinx.coroutines.delay(100)
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
+                try {
+                    ServiceWorkerControllerCompat.getInstance().setServiceWorkerClient(serviceWorkerClientCompat)
+                } catch (e: Throwable) {
+                    Timber.w(e.localizedMessage)
+                }
             }
         }
     }

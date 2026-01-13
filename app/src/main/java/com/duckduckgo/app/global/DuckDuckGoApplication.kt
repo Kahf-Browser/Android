@@ -36,6 +36,7 @@ import com.duckduckgo.common.utils.FALLBACK_PUBLISHER_ID
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
 import com.facebook.FacebookSdk
+import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 // import com.kahfads.sdk.GoogleAdManagerConfig
@@ -170,21 +171,57 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         setupActivityLifecycleCallbacks()
         configureUncaughtExceptionHandler()
 
-        // Deprecated, we need to move all these into AppLifecycleEventObserver
-        ProcessLifecycleOwner.get().lifecycle.apply {
-            primaryLifecycleObserverPluginPoint.getPlugins().forEach {
-                Timber.d("Registering application lifecycle observer: ${it.javaClass.canonicalName}")
-                addObserver(it)
-            }
-        }
+        // PERFORMANCE FIX: Stagger lifecycle observer registration to reduce main thread blocking
+        // Critical observers (TrackerDataLoader, AppConfigurationSyncer) are registered first
+        // Non-critical observers are registered in batches with small delays
+        registerLifecycleObserversStaggered()
 
         appCoroutineScope.launch(dispatchers.io()) {
             referralStateListener.initialiseReferralRetrieval()
         }
 
-        // ✅ OPTIMIZATION 3: Eagerly initialize NSFW model in background
-        // This eliminates the 100-300ms delay on first image detection
+        // PERFORMANCE FIX: Stagger all heavy background work to prevent CPU/GPU resource contention
+        // Each operation is delayed to avoid all of them starting at once
+        initializeBackgroundServicesStaggered()
+    }
+
+    /**
+     * PERFORMANCE FIX: Initialize background services with staggered delays.
+     *
+     * Problem: When all background tasks start at once, they compete for:
+     * - CPU cores (context switching overhead)
+     * - GPU resources (ML model loading)
+     * - Memory bandwidth (loading large files)
+     *
+     * Solution: Stagger the initialization with delays to reduce contention.
+     * Priority order:
+     * 1. Firebase (needed for remote config, messaging) - immediate
+     * 2. NSFW detector (critical for SafeGaze) - 100ms delay
+     * 3. Image/Video processors (SafeGaze ML) - 500ms delay
+     * 4. Other SDKs and services - 1000ms+ delay
+     */
+    private fun initializeBackgroundServicesStaggered() {
+        // Priority 1: Firebase initialization (immediate, needed by other services)
+        // PERFORMANCE FIX: Manually initialize Firebase since we disabled auto-init to save ~276ms
         appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("Firebase: Starting manual initialization")
+                FirebaseApp.initializeApp(this@DuckDuckGoApplication)
+                Timber.d("Firebase: Manual initialization completed")
+                // Now safe to initialize Remote Config
+                configRemoteConfig()
+                Timber.d("Firebase Remote Config initialized")
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to initialize Firebase")
+            }
+        }
+
+        // PERFORMANCE FIX: Priority 2: NSFW detector - delay of 1200ms
+        // The TensorFlow Lite model takes ~4.5 seconds to load and was competing for CPU/memory
+        // resources during the critical UI rendering window. Delaying by 1.2 seconds balances
+        // startup smoothness with having SafeGaze ready quickly for browsing.
+        appCoroutineScope.launch(dispatchers.io()) {
+            delay(1200)
             try {
                 Timber.d("kLog Starting eager NSFW model initialization")
                 nsfwDetector.initializeEagerly()
@@ -194,13 +231,11 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
             }
         }
 
-        // ✅ OPTIMIZATION: Eagerly initialize ML image/video processors in background
-        // This preloads the heavy ML models so they're ready when SafeGaze needs them
-        // Without blocking app startup (runs on IO thread)
+        // Priority 3: ML Image/Video processors (2000ms delay to let NSFW start first)
         appCoroutineScope.launch(dispatchers.io()) {
+            delay(2000)
             try {
                 Timber.d("kLog Starting eager ImageProcessor initialization")
-                // Accessing the property triggers lazy initialization
                 imageProcessor.let {
                     Timber.d("kLog ImageProcessor eager initialization completed")
                 }
@@ -210,9 +245,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         }
 
         appCoroutineScope.launch(dispatchers.io()) {
+            delay(2200) // Stagger video processor after image processor
             try {
                 Timber.d("kLog Starting eager VideoFrameProcessor initialization")
-                // Accessing the property triggers lazy initialization
                 videoFrameProcessor.let {
                     Timber.d("kLog VideoFrameProcessor eager initialization completed")
                 }
@@ -221,9 +256,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
             }
         }
 
-        // Check for YouTube ad-blocker script updates on startup
-        // Only checks once every 12 hours, downloads on first run
+        // Priority 4: Non-critical services (3000ms+ delay)
         appCoroutineScope.launch(dispatchers.io()) {
+            delay(3000)
             try {
                 Timber.d("YouTubeAdblock: Starting update check on app startup")
                 youtubeAdblockUpdateManager.checkForUpdates()
@@ -233,9 +268,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
             }
         }
 
-        // Prune completed WorkManager work asynchronously to prevent ANR
-        // This prevents accumulation of completed work items and network callbacks
+        // WorkManager prune (3200ms delay)
         appCoroutineScope.launch(dispatchers.io()) {
+            delay(3200)
             try {
                 Timber.d("WorkManager: Starting async prune of completed work")
                 val workManager = WorkManager.getInstance(this@DuckDuckGoApplication)
@@ -246,20 +281,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
             }
         }
 
-        scheduleTasks()
-        // PERFORMANCE FIX: Move Firebase Remote Config initialization to background thread
-        // This must run on IO thread since Firebase initialization is also deferred
+        // Schedule tasks after a small delay to not block lifecycle observer registration
         appCoroutineScope.launch(dispatchers.io()) {
-            try {
-                configRemoteConfig()
-                Timber.d("Firebase Remote Config initialized on background thread")
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to initialize Firebase Remote Config")
-            }
+            delay(200)
+            scheduleTasks()
         }
 
-        // PERFORMANCE FIX: Initialize SDKs on background thread to avoid blocking app startup
+        // PostHog SDK (1500ms delay - analytics can wait)
         appCoroutineScope.launch(dispatchers.io()) {
+            delay(1500)
             try {
                 with(
                     PostHogAndroidConfig(
@@ -275,8 +305,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
             }
         }
 
-        // KahfAdsSdk initialization moved to background (currently unused - GoogleAdManagerConfig commented out)
+        // KahfAdsSdk (2000ms delay - ads can wait until UI is fully ready)
         appCoroutineScope.launch(dispatchers.io()) {
+            delay(2000)
             try {
                 setupKahfAdsSDK()
                 Timber.d("KahfAds SDK initialized on background thread")
@@ -307,6 +338,70 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
 
     private fun setupActivityLifecycleCallbacks() {
         activityLifecycleCallbacks.getPlugins().forEach { registerActivityLifecycleCallbacks(it) }
+    }
+
+    /**
+     * PERFORMANCE FIX: Register lifecycle observers with deferred non-critical registration.
+     *
+     * Problem: Registering 68+ lifecycle observers during onCreate() blocks the main thread
+     * and causes frame skips. Small delays between batches actually make it WORSE because
+     * the registration then overlaps with UI rendering.
+     *
+     * Solution:
+     * 1. Register CRITICAL observers immediately (these must run before UI shows)
+     * 2. Defer ALL non-critical observers until 2 seconds AFTER app start
+     *    This ensures the first UI frame renders smoothly, then we do the heavy work
+     *
+     * The 2-second delay ensures:
+     * - First activity is fully rendered
+     * - Splash screen animation completes
+     * - User sees responsive UI immediately
+     * - Non-critical observers run after UI is stable
+     */
+    private fun registerLifecycleObserversStaggered() {
+        val lifecycle = ProcessLifecycleOwner.get().lifecycle
+        val allObservers = primaryLifecycleObserverPluginPoint.getPlugins().toList()
+
+        // Critical observer class names that must be registered immediately
+        // These are needed for core browser functionality before any page loads
+        val criticalObserverNames = setOf(
+            "TrackerDataLoader",        // Must have tracker data ready
+            "AppConfigurationSyncer",   // Must sync config
+            "ResourceSurrogateLoader",  // Must have surrogates ready
+            "MigrationLifecycleObserver" // Must run migrations first
+        )
+
+        // Partition observers into critical and non-critical
+        val (critical, nonCritical) = allObservers.partition { observer ->
+            criticalObserverNames.any { name ->
+                observer.javaClass.simpleName.contains(name)
+            }
+        }
+
+        // Register critical observers immediately (synchronously)
+        critical.forEach { observer ->
+            Timber.d("Registering CRITICAL lifecycle observer: ${observer.javaClass.canonicalName}")
+            lifecycle.addObserver(observer)
+        }
+
+        // Defer ALL non-critical observers until AFTER first UI frame renders
+        // Using 2000ms delay to ensure UI is completely stable before heavy work
+        if (nonCritical.isNotEmpty()) {
+            appCoroutineScope.launch(dispatchers.main()) {
+                // Wait for UI to be fully rendered and interactive
+                delay(2000)
+
+                Timber.d("Starting deferred registration of ${nonCritical.size} non-critical observers")
+
+                // Register all non-critical observers quickly in one batch
+                // The UI is already stable, so we can do this without frame drops
+                nonCritical.forEach { observer ->
+                    lifecycle.addObserver(observer)
+                }
+
+                Timber.d("All ${allObservers.size} lifecycle observers registered")
+            }
+        }
     }
 
     private fun configureUncaughtExceptionHandler() {

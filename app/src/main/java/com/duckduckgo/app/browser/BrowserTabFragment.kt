@@ -388,6 +388,7 @@ import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -667,6 +668,9 @@ class BrowserTabFragment :
     lateinit var autofillFragmentResultListeners: PluginPoint<AutofillFragmentResultsPlugin>
 
     private var isActiveTab: Boolean = false
+
+    // PERFORMANCE FIX: Lazy initialization flag for autocomplete
+    private var isAutoCompleteConfigured: Boolean = false
 
     private val downloadMessagesJob = ConflatedJob()
 
@@ -1024,20 +1028,18 @@ class BrowserTabFragment :
         omnibar = IncludeOmnibarToolbarBinding.bind(binding.rootView)
         bottomNav = IncludeBrowserBottomNavBinding.bind(binding.rootView)
         webViewContainer = binding.webViewContainer
+
+        // PERFORMANCE FIX: Critical configurations that must run immediately
         configureWebView()
         configureSwipeRefresh()
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureOmnibarTextInput()
         configureBottomNav()
+        initPrivacyProtectionsPopup() // Must run before configureObservers() - renderBrowserViewState depends on it
         configureObservers()
         configurePrivacyShield()
-        configureFindInPage()
-        configureAutoComplete()
-        configureFocusedView()
+        // NOTE: configureAutoComplete() removed - now lazy-init on first omnibar focus
         configureNewTab()
-        initPrivacyProtectionsPopup()
-        configureSocialMediaTracking()
-        configureSafeBrowsingBanner()
 
         if (tabDisplayedInCustomTabScreen) {
             configureCustomTab()
@@ -1045,6 +1047,15 @@ class BrowserTabFragment :
 
         decorator.decorateWithFeatures()
         animatorHelper.setListener(this)
+
+        // PERFORMANCE FIX: Defer non-critical configurations to run after first frame renders
+        // This reduces main thread blocking during tab creation and improves frame rate
+        binding.root.post {
+            configureFindInPage()
+            configureFocusedView() // Deferred - only visible on new tab home screen
+            configureSocialMediaTracking()
+            configureSafeBrowsingBanner()
+        }
 
         lifecycle.addObserver(
             @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
@@ -2963,6 +2974,13 @@ class BrowserTabFragment :
                 viewModel.onOmnibarInputStateChanged(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 viewModel.triggerAutocomplete(omnibar.omnibarTextInput.text.toString(), hasFocus, false)
                 if (hasFocus) {
+                    // PERFORMANCE FIX: Lazy-init autocomplete on first omnibar focus
+                    // This defers RecyclerView and ad banner setup until actually needed
+                    if (!isAutoCompleteConfigured) {
+                        configureAutoComplete()
+                        isAutoCompleteConfigured = true
+                    }
+
                     // Pre-cache clipboard content to avoid blocking main thread during autocomplete
                     cachedClipboardData = try {
                         clipboardManager.primaryClip
@@ -4882,6 +4900,12 @@ class BrowserTabFragment :
         fun showNewTab(newBrowserTab: IncludeNewBrowserTabBinding) {
             Timber.d("New Tab: showNewTab")
 
+            // PERFORMANCE FIX: Show container immediately for instant visual feedback
+            viewModel.newTabShown = true
+            newBrowserTab.browserBackground.show()
+            newBrowserTab.newTabContainerLayout.show()
+            newBrowserTab.newTabLayout.show()
+
             // Wallpaper and text
             newBrowserTab.apply {
                 lifecycleScope.launch(dispatchers.io()) {
@@ -5024,21 +5048,23 @@ class BrowserTabFragment :
                 rv.adapter = historyAdapter
             }
 
+            // PERFORMANCE FIX: Process history on IO thread, only update UI on main
             historyRepository.getHistoryFlow().flowWithLifecycle(lifecycle)
                 .distinctUntilChanged()
-                .onEach {
-                    val mostVisited = buildMostVisitedSites(it)
+                .map { historyList ->
+                    // CPU-intensive grouping/sorting runs on background thread
+                    withContext(dispatchers.io()) {
+                        buildMostVisitedSites(historyList)
+                    }
+                }
+                .onEach { mostVisited ->
+                    // UI updates on main thread
                     historyAdapter.submitList(mostVisited)
                     newBrowserTab.historyRecyclerView.isVisible = mostVisited.isNotEmpty()
                     Timber.d("History updated. Should update UI now. ${mostVisited.size}")
                 }
                 .launchIn(lifecycleScope)
 
-            newBrowserTab.browserBackground.show()
-            newBrowserTab.newTabContainerLayout.show()
-            newBrowserTab.newTabLayout.show()
-
-            viewModel.newTabShown = true
             viewModel.resumeAdRefresh()
         }
 

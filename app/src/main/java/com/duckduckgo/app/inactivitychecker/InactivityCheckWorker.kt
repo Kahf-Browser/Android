@@ -65,12 +65,19 @@ class InactivityCheckWorker(
     }
 }
 
+/**
+ * Schedules periodic inactivity checks using WorkManager.
+ *
+ * PERFORMANCE FIX: Uses Lazy<WorkManager> to defer WorkManager initialization until after
+ * DI is complete. This prevents ANR during app startup caused by NetworkStateTracker
+ * initialization on the main thread.
+ */
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class
 )
 class InactivityCheckScheduler @Inject constructor(
-    private val workManager: WorkManager
+    private val workManagerLazy: dagger.Lazy<WorkManager>
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -81,6 +88,7 @@ class InactivityCheckScheduler @Inject constructor(
     private fun scheduleInactivityCheck() {
         Timber.d("iuLog Scheduling inactivity check worker")
 
+        val workManager = workManagerLazy.get()
         workManager.cancelUniqueWork(WORK_NAME)
 
         val workRequest = PeriodicWorkRequestBuilder<InactivityCheckWorker>(

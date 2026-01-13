@@ -70,6 +70,30 @@
         <meta-data android:name="com.facebook.sdk.AutoLogAppEventsEnabled" android:value="false" tools:replace="android:value"/>
         <meta-data android:name="com.facebook.sdk.AdvertiserIDCollectionEnabled" android:value="false" tools:replace="android:value"/>
 
+        <!-- PERFORMANCE FIX: Disable Firebase auto-initialization to prevent 200-300ms ANR during app startup -->
+        <!-- Firebase will be initialized manually on a background thread in DuckDuckGoApplication -->
+        <meta-data android:name="firebase_messaging_auto_init_enabled" android:value="false" tools:replace="android:value"/>
+        <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" tools:replace="android:value"/>
+        <!-- Disable Crashlytics auto-collection (triggers Firebase init) -->
+        <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" tools:replace="android:value"/>
+        <!-- Disable Firebase Performance Monitoring auto-init -->
+        <meta-data android:name="firebase_performance_collection_enabled" android:value="false" tools:replace="android:value"/>
+        <!-- Disable Firebase InitProvider which runs before Application.onCreate() and blocks for ~276ms -->
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            android:exported="false"
+            tools:node="remove" />
+
+        <!-- PERFORMANCE FIX: Disable Crashlytics ContentProvider auto-initialization -->
+        <!-- Crashlytics has its own ContentProvider that initializes before Application.onCreate() -->
+        <!-- This saves ~100-200ms during cold start by deferring to manual init -->
+        <provider
+            android:name="com.google.firebase.crashlytics.CrashlyticsInitProvider"
+            android:authorities="${applicationId}.crashlyticsinitprovider"
+            android:exported="false"
+            tools:node="remove" />
+
         <meta-data
             android:name="android.webkit.WebView.MetricsOptOut"
             android:value="true" />

@@ -102,15 +102,23 @@ class SafeGazeWhitelistDownloadWorker(
 }
 
 
-// The following annotation automatically includes SafeGazeWhitelistDownloadWorkerScheduler in the lifecycle observers.
-// [DuckDuckGoApplication::onMainProcessCreate] handles all lifecycle observers with
-// ProcessLifecycleOwner.get().lifecycle.primaryLifecycleObserverPluginPoint.addObservers()
+/**
+ * Schedules periodic SafeGaze whitelist downloads using WorkManager.
+ *
+ * PERFORMANCE FIX: Uses Lazy<WorkManager> to defer WorkManager initialization until after
+ * DI is complete. This prevents ANR during app startup caused by NetworkStateTracker
+ * initialization on the main thread.
+ *
+ * The following annotation automatically includes SafeGazeWhitelistDownloadWorkerScheduler in the lifecycle observers.
+ * [DuckDuckGoApplication::onMainProcessCreate] handles all lifecycle observers with
+ * ProcessLifecycleOwner.get().lifecycle.primaryLifecycleObserverPluginPoint.addObservers()
+ */
 @ContributesMultibinding(
     scope = AppScope::class,
     boundType = MainProcessLifecycleObserver::class,
 )
 class SafeGazeWhitelistDownloadWorkerScheduler @Inject constructor(
-    private val workManager: WorkManager,
+    private val workManagerLazy: dagger.Lazy<WorkManager>,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -128,6 +136,7 @@ class SafeGazeWhitelistDownloadWorkerScheduler @Inject constructor(
             .setConstraints(constraints)
             .build()
 
+        val workManager = workManagerLazy.get()
         workManager.cancelUniqueWork(WHITELIST_DOWNLOAD_WORKER_TAG)
 
         workManager.enqueueUniquePeriodicWork(
