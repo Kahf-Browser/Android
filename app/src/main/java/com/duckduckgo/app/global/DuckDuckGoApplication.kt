@@ -16,12 +16,19 @@
 
 package com.duckduckgo.app.global
 
+import android.app.Activity
+import android.app.Application
+import android.content.Intent
+import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsParam
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.BuildConfig
 import com.duckduckgo.app.browser.safe_gaze_and_host_blocker.WallpaperDownloadWorker
 import com.duckduckgo.app.di.AppComponent
@@ -54,6 +61,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 private const val VPN_PROCESS_NAME = "vpn"
@@ -158,11 +166,37 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
     @Inject
     lateinit var youtubeAdblockUpdateManager: com.duckduckgo.app.browser.youtube.YoutubeAdblockUpdateManager
 
+    @Inject
+    lateinit var analyticsService: AnalyticsService
+
     private val applicationCoroutineScope = CoroutineScope(SupervisorJob())
+
+    // INTENT-AWARE MODEL LOADING: Track cold start timing and launch type
+    @Volatile
+    private var appStartTime: Long = 0L
+
+    // Track whether this is a link launch (aggressive loading) or icon launch (conservative loading)
+    private val isLinkLaunch = AtomicBoolean(false)
+    private val hasDetectedLaunchType = AtomicBoolean(false)
+
+    // Track model initialization completion for ColdStartToModelInitTime analytics
+    @Volatile
+    private var nsfwModelInitCompleteTime: Long = 0L
+    @Volatile
+    private var imageProcessorInitCompleteTime: Long = 0L
+    @Volatile
+    private var videoFrameProcessorInitCompleteTime: Long = 0L
+    private val nsfwModelInitialized = AtomicBoolean(false)
+    private val imageProcessorModelInitialized = AtomicBoolean(false)
+    private val videoFrameProcessorModelInitialized = AtomicBoolean(false)
+    private val coldStartAnalyticsLogged = AtomicBoolean(false)
 
     open lateinit var daggerAppComponent: AppComponent
 
     override fun onMainProcessCreate() {
+        // INTENT-AWARE MODEL LOADING: Record app start time for cold start analytics
+        appStartTime = System.currentTimeMillis()
+
         configureLogging()
         Timber.d("onMainProcessCreate $currentProcessName with pid=${android.os.Process.myPid()}")
 
@@ -170,6 +204,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         configureDependencyInjection()
         setupActivityLifecycleCallbacks()
         configureUncaughtExceptionHandler()
+
+        // INTENT-AWARE MODEL LOADING: Register callback to detect link launches early
+        registerLaunchTypeDetectionCallback()
 
         // PERFORMANCE FIX: Stagger lifecycle observer registration to reduce main thread blocking
         // Critical observers (TrackerDataLoader, AppConfigurationSyncer) are registered first
@@ -183,6 +220,165 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         // PERFORMANCE FIX: Stagger all heavy background work to prevent CPU/GPU resource contention
         // Each operation is delayed to avoid all of them starting at once
         initializeBackgroundServicesStaggered()
+    }
+
+    /**
+     * INTENT-AWARE MODEL LOADING: Register a callback to detect whether the app was launched
+     * via a link click (ACTION_VIEW with data) or via icon click.
+     *
+     * For link launches, we use aggressive model loading (no delays) because:
+     * - User is about to browse external content immediately
+     * - SafeGaze needs to be ready ASAP to process images on the target page
+     *
+     * For icon launches, we use conservative loading (with delays) because:
+     * - User sees the home screen first and may not browse immediately
+     * - We prioritize smooth UI rendering over model readiness
+     */
+    private fun registerLaunchTypeDetectionCallback() {
+        registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+            override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+                // Only detect on the first activity launch
+                if (hasDetectedLaunchType.compareAndSet(false, true)) {
+                    val intent = activity.intent
+                    val hasData = intent?.data != null
+                    val isViewAction = intent?.action == Intent.ACTION_VIEW
+
+                    val detectedAsLinkLaunch = hasData || isViewAction
+
+                    isLinkLaunch.set(detectedAsLinkLaunch)
+
+                    val launchType = if (detectedAsLinkLaunch) "link" else "icon"
+                    Timber.d("kLog Launch type detected: $launchType (data=${intent?.data}, action=${intent?.action})")
+
+                    // If link launch detected, trigger immediate model loading
+                    if (detectedAsLinkLaunch) {
+                        triggerAggressiveModelLoading()
+                    }
+                }
+            }
+
+            override fun onActivityStarted(activity: Activity) {}
+            override fun onActivityResumed(activity: Activity) {}
+            override fun onActivityPaused(activity: Activity) {}
+            override fun onActivityStopped(activity: Activity) {}
+            override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+            override fun onActivityDestroyed(activity: Activity) {}
+        })
+    }
+
+    /**
+     * INTENT-AWARE MODEL LOADING: For link launches, start model loading immediately
+     * without any delays. This is called when a link launch is detected.
+     */
+    private fun triggerAggressiveModelLoading() {
+        Timber.d("kLog Aggressive model loading triggered for link launch")
+
+        // Start NSFW detector immediately (no 1200ms delay)
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("kLog [AGGRESSIVE] Starting immediate NSFW model initialization")
+                nsfwDetector.initializeEagerly()
+                onNsfwModelInitialized()
+                Timber.d("kLog [AGGRESSIVE] NSFW model initialization completed")
+            } catch (e: Exception) {
+                Timber.e("kLog [AGGRESSIVE] Failed to initialize NSFW model: ${e.message}")
+            }
+        }
+
+        // Start ImageProcessor immediately (no 2000ms delay)
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("kLog [AGGRESSIVE] Starting immediate ImageProcessor initialization")
+                imageProcessor.let {
+                    onImageProcessorInitialized()
+                    Timber.d("kLog [AGGRESSIVE] ImageProcessor initialization completed")
+                }
+            } catch (e: Exception) {
+                Timber.e("kLog [AGGRESSIVE] Failed to initialize ImageProcessor: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Called when NSFW model initialization completes.
+     * Tracks completion time and logs analytics if both models are ready.
+     */
+    private fun onNsfwModelInitialized() {
+        if (nsfwModelInitialized.compareAndSet(false, true)) {
+            nsfwModelInitCompleteTime = System.currentTimeMillis()
+            Timber.d("kLog NSFW model initialized at ${nsfwModelInitCompleteTime - appStartTime}ms after app start")
+            logColdStartToModelInitTimeIfReady()
+        }
+    }
+
+    /**
+     * Called when ImageProcessor initialization completes.
+     * Tracks completion time and logs analytics if all models are ready.
+     */
+    private fun onImageProcessorInitialized() {
+        if (imageProcessorModelInitialized.compareAndSet(false, true)) {
+            imageProcessorInitCompleteTime = System.currentTimeMillis()
+            Timber.d("kLog ImageProcessor initialized at ${imageProcessorInitCompleteTime - appStartTime}ms after app start")
+            logColdStartToModelInitTimeIfReady()
+        }
+    }
+
+    /**
+     * Called when VideoFrameProcessor initialization completes.
+     * Tracks completion time and logs VideoFrameProcessor-specific analytics.
+     * Note: VideoFrameProcessor is tracked separately from NSFW/ImageProcessor.
+     */
+    private fun onVideoFrameProcessorInitialized() {
+        if (videoFrameProcessorModelInitialized.compareAndSet(false, true)) {
+            videoFrameProcessorInitCompleteTime = System.currentTimeMillis()
+            val initTimeMs = videoFrameProcessorInitCompleteTime - appStartTime
+            val launchType = if (isLinkLaunch.get()) "link" else "icon"
+
+            Timber.d("kLog VideoFrameProcessor initialized at ${initTimeMs}ms after app start (launchType: $launchType)")
+
+            // Log VideoFrameProcessor-specific analytics
+            try {
+                analyticsService.logEvent(
+                    AnalyticsEvent.VideoFrameProcessorInitTime,
+                    mapOf(
+                        AnalyticsParam.VideoFrameProcessorInitTimeMs to initTimeMs.toString(),
+                        AnalyticsParam.LaunchType to launchType
+                    )
+                )
+            } catch (e: Exception) {
+                Timber.e("kLog Failed to log VideoFrameProcessorInitTime analytics: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Logs the ColdStartToModelInitTime analytics event when both NSFW and ImageProcessor
+     * models have completed initialization.
+     * Note: VideoFrameProcessor is tracked separately via VideoFrameProcessorInitTime event.
+     */
+    private fun logColdStartToModelInitTimeIfReady() {
+        if (nsfwModelInitialized.get() && imageProcessorModelInitialized.get()) {
+            if (coldStartAnalyticsLogged.compareAndSet(false, true)) {
+                // Use the later of the two completion times as the "all models ready" time
+                val allModelsReadyTime = maxOf(nsfwModelInitCompleteTime, imageProcessorInitCompleteTime)
+                val coldStartToModelInitTime = allModelsReadyTime - appStartTime
+                val launchType = if (isLinkLaunch.get()) "link" else "icon"
+
+                Timber.d("kLog ColdStartToModelInitTime: ${coldStartToModelInitTime}ms (launchType: $launchType)")
+
+                try {
+                    analyticsService.logEvent(
+                        AnalyticsEvent.ColdStartToModelInitTime,
+                        mapOf(
+                            AnalyticsParam.ColdStartToModelInitTimeMs to coldStartToModelInitTime.toString(),
+                            AnalyticsParam.LaunchType to launchType
+                        )
+                    )
+                } catch (e: Exception) {
+                    Timber.e("kLog Failed to log ColdStartToModelInitTime analytics: ${e.message}")
+                }
+            }
+        }
     }
 
     /**
@@ -216,43 +412,64 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
             }
         }
 
-        // PERFORMANCE FIX: Priority 2: NSFW detector - delay of 1200ms
+        // INTENT-AWARE MODEL LOADING: Priority 2: NSFW detector
+        // For icon launches (conservative): delay 1200ms to balance UI smoothness with SafeGaze readiness
+        // For link launches (aggressive): this is skipped - triggerAggressiveModelLoading() handles it immediately
         // The TensorFlow Lite model takes ~4.5 seconds to load and was competing for CPU/memory
-        // resources during the critical UI rendering window. Delaying by 1.2 seconds balances
-        // startup smoothness with having SafeGaze ready quickly for browsing.
+        // resources during the critical UI rendering window.
         appCoroutineScope.launch(dispatchers.io()) {
             delay(1200)
+            // Skip if already initialized by aggressive loading (link launch)
+            if (nsfwModelInitialized.get()) {
+                Timber.d("kLog [CONSERVATIVE] NSFW model already initialized by aggressive loading, skipping")
+                return@launch
+            }
             try {
-                Timber.d("kLog Starting eager NSFW model initialization")
+                Timber.d("kLog [CONSERVATIVE] Starting eager NSFW model initialization")
                 nsfwDetector.initializeEagerly()
-                Timber.d("kLog NSFW model eager initialization completed")
+                onNsfwModelInitialized()
+                Timber.d("kLog [CONSERVATIVE] NSFW model eager initialization completed")
             } catch (e: Exception) {
-                Timber.e("kLog Failed to eagerly initialize NSFW model: ${e.message}")
+                Timber.e("kLog [CONSERVATIVE] Failed to eagerly initialize NSFW model: ${e.message}")
             }
         }
 
-        // Priority 3: ML Image/Video processors (2000ms delay to let NSFW start first)
+        // INTENT-AWARE MODEL LOADING: Priority 3: ML Image/Video processors
+        // For icon launches (conservative): delay 2000ms to let NSFW start first
+        // For link launches (aggressive): this is skipped - triggerAggressiveModelLoading() handles it immediately
         appCoroutineScope.launch(dispatchers.io()) {
             delay(2000)
+            // Skip if already initialized by aggressive loading (link launch)
+            if (imageProcessorModelInitialized.get()) {
+                Timber.d("kLog [CONSERVATIVE] ImageProcessor already initialized by aggressive loading, skipping")
+                return@launch
+            }
             try {
-                Timber.d("kLog Starting eager ImageProcessor initialization")
+                Timber.d("kLog [CONSERVATIVE] Starting eager ImageProcessor initialization")
                 imageProcessor.let {
-                    Timber.d("kLog ImageProcessor eager initialization completed")
+                    onImageProcessorInitialized()
+                    Timber.d("kLog [CONSERVATIVE] ImageProcessor eager initialization completed")
                 }
             } catch (e: Exception) {
-                Timber.e("kLog Failed to eagerly initialize ImageProcessor: ${e.message}")
+                Timber.e("kLog [CONSERVATIVE] Failed to eagerly initialize ImageProcessor: ${e.message}")
             }
         }
 
         appCoroutineScope.launch(dispatchers.io()) {
             delay(2200) // Stagger video processor after image processor
+            // Skip if already initialized by aggressive loading (link launch)
+            if (videoFrameProcessorModelInitialized.get()) {
+                Timber.d("kLog [CONSERVATIVE] VideoFrameProcessor already initialized by aggressive loading, skipping")
+                return@launch
+            }
             try {
-                Timber.d("kLog Starting eager VideoFrameProcessor initialization")
+                Timber.d("kLog [CONSERVATIVE] Starting eager VideoFrameProcessor initialization")
                 videoFrameProcessor.let {
-                    Timber.d("kLog VideoFrameProcessor eager initialization completed")
+                    onVideoFrameProcessorInitialized()
+                    Timber.d("kLog [CONSERVATIVE] VideoFrameProcessor eager initialization completed")
                 }
             } catch (e: Exception) {
-                Timber.e("kLog Failed to eagerly initialize VideoFrameProcessor: ${e.message}")
+                Timber.e("kLog [CONSERVATIVE] Failed to eagerly initialize VideoFrameProcessor: ${e.message}")
             }
         }
 

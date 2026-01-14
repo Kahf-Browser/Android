@@ -49,6 +49,8 @@ sealed class AnalyticsEvent(val name: String) {
     data object P90CoreInference: AnalyticsEvent("p90_core_inference")
     data object P90ApplySolidMask: AnalyticsEvent("p90_apply_solid_mask")
     data object P90ApplyPixelationMask: AnalyticsEvent("p90_apply_pixelation_mask")
+    data object ColdStartToModelInitTime: AnalyticsEvent("cold_start_to_model_init_time")
+    data object VideoFrameProcessorInitTime: AnalyticsEvent("video_frame_processor_init_time")
 
     // Onboarding
     data object OnboardSetAsDefaultBrowser : AnalyticsEvent("onboard_set_as_default_browser")
@@ -107,6 +109,9 @@ sealed class AnalyticsParam(val name: String) {
     data object CoreInferenceTime : AnalyticsParam("core_inference_time_ms")
     data object ApplySolidMaskTime : AnalyticsParam("apply_solid_mask_time_ms")
     data object ApplyPixelationMaskTime : AnalyticsParam("apply_pixelation_mask_time_ms")
+    data object ColdStartToModelInitTimeMs : AnalyticsParam("cold_start_to_model_init_time_ms")
+    data object VideoFrameProcessorInitTimeMs : AnalyticsParam("video_frame_processor_init_time_ms")
+    data object LaunchType : AnalyticsParam("launch_type")
 
     // Search
     data object SuggestionSearchEngine : AnalyticsParam("autosuggestion_search_engine")
