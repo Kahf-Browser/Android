@@ -80,6 +80,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.AD_REFRESH_INTERVAL
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.KAHF_FEEDBACK_FORM
 import com.duckduckgo.common.utils.LAST_DEFAULT_APP_CHECK_TIME
 import com.duckduckgo.common.utils.MIN_VERSION
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils
@@ -912,7 +913,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onUserSelectedToGiveFeedback(promptCount)
+                        // viewModel.onUserSelectedToGiveFeedback(promptCount)
+                        currentTab?.submitQuery(KAHF_FEEDBACK_FORM, true)
                     }
 
                     override fun onNegativeButtonClicked() {
