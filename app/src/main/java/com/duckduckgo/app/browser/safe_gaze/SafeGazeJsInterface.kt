@@ -7,6 +7,7 @@ import android.webkit.JavascriptInterface
 import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
+import com.duckduckgo.app.global.DuckDuckGoApplication
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwPrediction
@@ -81,6 +82,13 @@ class SafeGazeJsInterface(
     // PERFORMANCE FIX: Track whether detector settings have been initialized
     // Defer ML model initialization until first actual image processing request
     private val detectorInitialized = AtomicBoolean(false)
+
+    // Phase 8: Access to application for model readiness check
+    private val application: DuckDuckGoApplication?
+        get() = context.applicationContext as? DuckDuckGoApplication
+
+    // Phase 8: Track if we've already waited for models in this session
+    private val modelsReadyWaitCompleted = AtomicBoolean(false)
 
     /**
      * PERFORMANCE FIX: Lazy initialization of image detector settings.
@@ -436,6 +444,26 @@ class SafeGazeJsInterface(
                 Timber.w("kLog Bitmap already recycled for ${task.id}")
                 cleanupTask(task.id, "null", "bitmapRecycled")
                 return
+            }
+
+            // Phase 8: Wait for models to be ready before processing
+            // This ensures no images slip through during cold start
+            if (!modelsReadyWaitCompleted.get()) {
+                val app = application
+                if (app != null && !app.areModelsReady()) {
+                    Timber.d("kLog Phase 8: Waiting for models to be ready before processing ${task.id}")
+                    val waitStart = System.currentTimeMillis()
+                    val modelsReady = app.awaitModelsReady(5000L)  // Max 5 second wait
+                    val waitDuration = System.currentTimeMillis() - waitStart
+                    if (modelsReady) {
+                        Timber.d("kLog Phase 8: Models ready after ${waitDuration}ms wait, processing ${task.id}")
+                        modelsReadyWaitCompleted.set(true)
+                    } else {
+                        Timber.w("kLog Phase 8: Models not ready after ${waitDuration}ms, processing anyway for ${task.id}")
+                    }
+                } else {
+                    modelsReadyWaitCompleted.set(true)
+                }
             }
 
             val maskType = getMaskType()

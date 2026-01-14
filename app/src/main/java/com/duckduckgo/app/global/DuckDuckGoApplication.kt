@@ -191,6 +191,37 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
     private val videoFrameProcessorModelInitialized = AtomicBoolean(false)
     private val coldStartAnalyticsLogged = AtomicBoolean(false)
 
+    // Phase 8: CompletableDeferred for model readiness - allows SafeGaze to await model initialization
+    // This prevents images from slipping through unprocessed during cold start
+    private val modelsReadyDeferred = kotlinx.coroutines.CompletableDeferred<Unit>()
+
+    /**
+     * Phase 8: Await for SafeGaze models to be ready.
+     * Call this before processing images to ensure models are initialized.
+     * Returns immediately if models are already ready.
+     *
+     * @param timeoutMs Maximum time to wait for models (default 10 seconds)
+     * @return true if models are ready, false if timeout occurred
+     */
+    suspend fun awaitModelsReady(timeoutMs: Long = 10000L): Boolean {
+        return try {
+            kotlinx.coroutines.withTimeoutOrNull(timeoutMs) {
+                modelsReadyDeferred.await()
+                true
+            } ?: false
+        } catch (e: Exception) {
+            Timber.w("kLog awaitModelsReady exception: ${e.message}")
+            false
+        }
+    }
+
+    /**
+     * Phase 8: Check if SafeGaze models are ready without blocking.
+     */
+    fun areModelsReady(): Boolean {
+        return nsfwModelInitialized.get() && imageProcessorModelInitialized.get()
+    }
+
     open lateinit var daggerAppComponent: AppComponent
 
     override fun onMainProcessCreate() {
@@ -269,12 +300,15 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
     /**
      * INTENT-AWARE MODEL LOADING: For link launches, start model loading immediately
      * without any delays. This is called when a link launch is detected.
+     * Phase 8: Uses slightly elevated priority (not highest) to balance speed with UI smoothness.
      */
     private fun triggerAggressiveModelLoading() {
         Timber.d("kLog Aggressive model loading triggered for link launch")
 
-        // Start NSFW detector immediately (no 1200ms delay)
+        // Start NSFW detector immediately (no delay for link launches)
         appCoroutineScope.launch(dispatchers.io()) {
+            // Use default priority - higher than background but lower than UI
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DEFAULT)
             try {
                 Timber.d("kLog [AGGRESSIVE] Starting immediate NSFW model initialization")
                 nsfwDetector.initializeEagerly()
@@ -285,8 +319,10 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
             }
         }
 
-        // Start ImageProcessor immediately (no 2000ms delay)
+        // Start ImageProcessor immediately (no delay for link launches)
         appCoroutineScope.launch(dispatchers.io()) {
+            // Use default priority - higher than background but lower than UI
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DEFAULT)
             try {
                 Timber.d("kLog [AGGRESSIVE] Starting immediate ImageProcessor initialization")
                 imageProcessor.let {
@@ -358,6 +394,12 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
      */
     private fun logColdStartToModelInitTimeIfReady() {
         if (nsfwModelInitialized.get() && imageProcessorModelInitialized.get()) {
+            // Phase 8: Signal that models are ready for SafeGaze to process images
+            if (!modelsReadyDeferred.isCompleted) {
+                modelsReadyDeferred.complete(Unit)
+                Timber.d("kLog Phase 8: Models ready deferred completed - SafeGaze can now process images")
+            }
+
             if (coldStartAnalyticsLogged.compareAndSet(false, true)) {
                 // Use the later of the two completion times as the "all models ready" time
                 val allModelsReadyTime = maxOf(nsfwModelInitCompleteTime, imageProcessorInitCompleteTime)
@@ -413,12 +455,14 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         }
 
         // INTENT-AWARE MODEL LOADING: Priority 2: NSFW detector
-        // For icon launches (conservative): delay 1200ms to balance UI smoothness with SafeGaze readiness
+        // Phase 8 UPDATE: Balanced delays - smooth startup + fast model readiness
+        // Strategy: Wait for critical UI to render (500ms), then load with low priority
+        // The await mechanism in SafeGazeJsInterface handles early site visits
         // For link launches (aggressive): this is skipped - triggerAggressiveModelLoading() handles it immediately
-        // The TensorFlow Lite model takes ~4.5 seconds to load and was competing for CPU/memory
-        // resources during the critical UI rendering window.
         appCoroutineScope.launch(dispatchers.io()) {
-            delay(1200)
+            delay(500)  // Phase 8: Balanced delay - let UI render first frame smoothly
+            // Lower thread priority to avoid competing with UI thread
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND)
             // Skip if already initialized by aggressive loading (link launch)
             if (nsfwModelInitialized.get()) {
                 Timber.d("kLog [CONSERVATIVE] NSFW model already initialized by aggressive loading, skipping")
@@ -435,10 +479,13 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         }
 
         // INTENT-AWARE MODEL LOADING: Priority 3: ML Image/Video processors
-        // For icon launches (conservative): delay 2000ms to let NSFW start first
+        // Phase 8 UPDATE: Balanced delays - smooth startup + fast model readiness
+        // Slightly staggered from NSFW to spread CPU load
         // For link launches (aggressive): this is skipped - triggerAggressiveModelLoading() handles it immediately
         appCoroutineScope.launch(dispatchers.io()) {
-            delay(2000)
+            delay(600)  // Phase 8: Balanced delay - staggered after NSFW
+            // Lower thread priority to avoid competing with UI thread
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND)
             // Skip if already initialized by aggressive loading (link launch)
             if (imageProcessorModelInitialized.get()) {
                 Timber.d("kLog [CONSERVATIVE] ImageProcessor already initialized by aggressive loading, skipping")
@@ -456,7 +503,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         }
 
         appCoroutineScope.launch(dispatchers.io()) {
-            delay(2200) // Stagger video processor after image processor
+            delay(800)  // Phase 8: Balanced delay - stagger after image processor
+            // Lower thread priority to avoid competing with UI thread
+            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND)
             // Skip if already initialized by aggressive loading (link launch)
             if (videoFrameProcessorModelInitialized.get()) {
                 Timber.d("kLog [CONSERVATIVE] VideoFrameProcessor already initialized by aggressive loading, skipping")
