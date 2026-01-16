@@ -58,6 +58,7 @@ import io.kahf.video_filter.VideoFrameProcessor
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.*
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -397,6 +398,23 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
      * 4. Other SDKs and services - 1000ms+ delay
      */
     private fun initializeBackgroundServicesStaggered() {
+        // Priority 0: Pre-warm OkHttp's PublicSuffixDatabase (immediate)
+        // This prevents ANR/crashes when topPrivateDomain() is called on the main thread.
+        // The database is a gzipped file that OkHttp reads synchronously on first access.
+        // By pre-warming it on a background thread, we ensure it's cached before the UI needs it.
+        appCoroutineScope.launch(dispatchers.io()) {
+            try {
+                Timber.d("PublicSuffixDatabase: Pre-warming on background thread")
+                // Trigger PublicSuffixDatabase initialization by calling topPrivateDomain()
+                // This reads the gzipped public suffix list and caches it for future calls
+                "https://example.com".toHttpUrlOrNull()?.topPrivateDomain()
+                Timber.d("PublicSuffixDatabase: Pre-warming completed successfully")
+            } catch (e: Exception) {
+                // Log but don't crash - the URL detector has fallback handling
+                Timber.w(e, "PublicSuffixDatabase: Pre-warming failed, URL detection may be slower")
+            }
+        }
+
         // Priority 1: Firebase initialization (immediate, needed by other services)
         // PERFORMANCE FIX: Manually initialize Firebase since we disabled auto-init to save ~276ms
         appCoroutineScope.launch(dispatchers.io()) {

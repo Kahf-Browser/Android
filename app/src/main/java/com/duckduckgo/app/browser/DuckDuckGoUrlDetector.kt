@@ -34,7 +34,23 @@ class DuckDuckGoUrlDetectorImpl @Inject constructor() : DuckDuckGoUrlDetector {
     }
 
     override fun isDuckDuckGoUrl(url: String): Boolean {
-        return runCatching { AppUrl.Url.HOST == url.toHttpUrl().topPrivateDomain() }.getOrElse { false }
+        // Primary check using OkHttp's PublicSuffixDatabase for accurate domain matching
+        // runCatching handles exceptions from invalid URLs or database read failures
+        val okhttpResult = runCatching {
+            AppUrl.Url.HOST == url.toHttpUrl().topPrivateDomain()
+        }.getOrNull()
+
+        // If OkHttp check succeeded, use its result
+        if (okhttpResult != null) {
+            return okhttpResult
+        }
+
+        // Fallback: Simple host check when OkHttp fails (e.g., database not yet loaded)
+        // This is less accurate but prevents crashes and provides basic functionality
+        return runCatching {
+            val host = url.toUri().host?.lowercase() ?: return@runCatching false
+            host == AppUrl.Url.HOST || host.endsWith(".${AppUrl.Url.HOST}")
+        }.getOrElse { false }
     }
 
     override fun isDuckDuckGoQueryUrl(uri: String): Boolean {
