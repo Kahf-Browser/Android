@@ -1051,6 +1051,10 @@ class BrowserTabFragment :
         // PERFORMANCE FIX: Defer non-critical configurations to run after first frame renders
         // This reduces main thread blocking during tab creation and improves frame rate
         binding.root.post {
+            // Guard against view being destroyed before this runnable executes
+            // Prevents IllegalStateException when accessing viewLifecycleOwner after onDestroyView()
+            if (view == null || !isAdded) return@post
+
             configureFindInPage()
             configureFocusedView() // Deferred - only visible on new tab home screen
             configureSocialMediaTracking()
