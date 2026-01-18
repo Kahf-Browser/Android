@@ -201,6 +201,7 @@ class FocusedLegacyView @JvmOverloads constructor(
                     message: String,
                     cause: KahfAdsError?
                 ) {
+                    analyticsService.logEvent(AnalyticsEvent.EpomAdLoadFailed)
                     when(cause) {
                         is KahfAdsError.TimeoutError -> {
                             analyticsService.logEvent(AnalyticsEvent.AdTimeout)
@@ -241,6 +242,13 @@ class FocusedLegacyView @JvmOverloads constructor(
                     headline: String
                 ) {
                     // analyticsService.logEvent(AnalyticsEvent.QuickAccessPageBannerAdImpression)
+                }
+
+                override fun onFallbackAdFailedToLoad(
+                    message: String,
+                    cause: KahfAdsError?
+                ) {
+                    analyticsService.logEvent(AnalyticsEvent.InHouseAdLoadFailed)
                 }
             })
         }

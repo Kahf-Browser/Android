@@ -2760,6 +2760,7 @@ class BrowserTabFragment :
                     message: String,
                     cause: KahfAdsError?
                 ) {
+                    analyticsService.logEvent(AnalyticsEvent.EpomAdLoadFailed)
                     when(cause) {
                         is KahfAdsError.TimeoutError -> {
                             analyticsService.logEvent(AnalyticsEvent.AdTimeout)
@@ -2800,6 +2801,13 @@ class BrowserTabFragment :
                     headline: String
                 ) {
                     // analyticsService.logEvent(AnalyticsEvent.SearchAutoCompleteBannerAdImpression)
+                }
+
+                override fun onFallbackAdFailedToLoad(
+                    message: String,
+                    cause: KahfAdsError?
+                ) {
+                    analyticsService.logEvent(AnalyticsEvent.InHouseAdLoadFailed)
                 }
             })
         }
@@ -4965,6 +4973,7 @@ class BrowserTabFragment :
                         message: String,
                         cause: KahfAdsError?
                     ) {
+                        analyticsService.logEvent(AnalyticsEvent.EpomAdLoadFailed)
                         when(cause) {
                             is KahfAdsError.TimeoutError -> {
                                 analyticsService.logEvent(AnalyticsEvent.AdTimeout)
@@ -5004,6 +5013,13 @@ class BrowserTabFragment :
                         headline: String
                     ) {
                         // analyticsService.logEvent(AnalyticsEvent.NewTabBannerAdImpression)
+                    }
+
+                    override fun onFallbackAdFailedToLoad(
+                        message: String,
+                        cause: KahfAdsError?
+                    ) {
+                        analyticsService.logEvent(AnalyticsEvent.InHouseAdLoadFailed)
                     }
                 })
             }
