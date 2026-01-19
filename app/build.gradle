@@ -524,7 +524,7 @@ dependencies {
     implementation("com.google.firebase:firebase-messaging")
 
     // posthog
-    implementation("com.posthog:posthog-android:3.15.0")
+    implementation("com.posthog:posthog-android:3.28.1")
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
     implementation 'androidx.core:core-splashscreen:1.0.1'
 
