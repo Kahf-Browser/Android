@@ -132,12 +132,11 @@ class OnboardingBookmarkFragment: DuckDuckGoFragment(R.layout.fragment_onboardin
             rvAdapter.getItems().filter { it.selected }
         else emptyList()
 
-        selectedBookmarks.toMutableList().let {
-            it.add(PredefinedBookmark(R.drawable.ic_youtube,"Islam QA", "https://islamqa.info/en"))
-
-            it.forEach { bookmark ->
-                savedSitesRepository.insertFavorite(url = bookmark.url, title = bookmark.title)
-            }
+        // Only add user-selected bookmarks from onboarding
+        // Predefined bookmarks (Islam QA, Kahf Kids, etc.) are now handled by
+        // PredefinedBookmarksInitializer which runs on app startup for all users
+        selectedBookmarks.forEach { bookmark ->
+            savedSitesRepository.insertFavorite(url = bookmark.url, title = bookmark.title)
         }
     }
 
