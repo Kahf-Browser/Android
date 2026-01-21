@@ -167,7 +167,7 @@ class FocusedLegacyView @JvmOverloads constructor(
 
     private fun configureViews() {
         configureHomeTabQuickAccessGrid()
-        configureAdView()
+        /*configureAdView()*/
         setOnClickListener(null)
     }
 
@@ -182,7 +182,7 @@ class FocusedLegacyView @JvmOverloads constructor(
         binding.quickAccessSuggestionsRecyclerView.disableAnimation()
     }
 
-    private fun configureAdView() {
+    /*private fun configureAdView() {
         binding.kahfBannerAd.apply {
             configure(
                 config = KahfAdsViewConfig(
@@ -252,7 +252,7 @@ class FocusedLegacyView @JvmOverloads constructor(
                 }
             })
         }
-    }
+    }*/
 
     private fun createQuickAccessAdapter(
         originPixel: AppPixelName,
