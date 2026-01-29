@@ -21,6 +21,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
+import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
@@ -128,7 +129,9 @@ sealed class BookmarkScreenViewHolders(itemView: View) : RecyclerView.ViewHolder
 
         private fun loadFavicon(url: String, image: ImageView) {
             lifecycleOwner.lifecycleScope.launch {
-                faviconManager.loadToViewMaybeFromRemoteWithPlaceholder(url = url, view = image)
+                faviconManager.getFaviconFromGlide(url.toUri())?.let { bitmap ->
+                    image.setImageBitmap(bitmap)
+                }
             }
         }
 
