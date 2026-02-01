@@ -39,6 +39,16 @@ fun buildMostVisitedSites(
     val now = LocalDateTime.now()
     val defaultSites = listOf(
         HistoryEntry.VisitedPage(
+            url = Uri.parse("https://www.hikmah.net"),
+            title = "Hikmah",
+            visits = List(7) { now.minusDays(it.toLong()) }
+        ),
+        HistoryEntry.VisitedPage(
+            url = Uri.parse("https://www.mahfil.net"),
+            title = "Mahfil",
+            visits = List(6) { now.minusDays(it.toLong()) }
+        ),
+        HistoryEntry.VisitedPage(
             url = Uri.parse("https://www.facebook.com"),
             title = "Facebook",
             visits = List(5) { now.minusDays(it.toLong()) }
