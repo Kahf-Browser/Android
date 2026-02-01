@@ -919,5 +919,7 @@
     <string name="onboardingEndDaxDialogButton">Wszystko gotowe!</string>
     <string name="kahf_video_blur_description">If enabled, AI will try to cover inappropriate portions of the video.</string>
     <string name="kahf_warning_blurring_not_full_accurate"><font color="#FF2400">Blurring is not 100% accurate.</font></string>
+    <string name="kahf_harms_blocked">Harms Blocked</string>
+    <string name="kahf_socials">Socials</string>
 
 </resources>
