@@ -27,8 +27,10 @@ import retrofit2.Call
 
 interface UrlFileDownloadCallManager {
     fun add(downloadId: Long, call: Call<ResponseBody>)
-
     fun remove(downloadId: Long)
+    fun pause(downloadId: Long)
+    fun resume(downloadId: Long)
+    fun isPaused(downloadId: Long): Boolean
 }
 
 @ContributesBinding(
@@ -38,23 +40,31 @@ interface UrlFileDownloadCallManager {
 @SingleInstanceIn(AppScope::class)
 class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCallManager {
     private val callsMap = ConcurrentHashMap<Long, Call<ResponseBody>>()
+    private val pausedSet = ConcurrentHashMap.newKeySet<Long>()
 
-    /**
-     * Call this method to cancel and remove an ongoing download, or to clean up the [downloadId] from the list of downloads.
-     * It is safe to call this method multiple times with the same [downloadId].
-     */
     override fun remove(downloadId: Long) {
         logcat { "Removing download $downloadId" }
         callsMap[downloadId]?.cancel()
         callsMap.remove(downloadId)
+        pausedSet.remove(downloadId)
     }
 
-    /**
-     * Call this method to add the ongoing download to the list of downloads.
-     * The ongoing download is identified by its [downloadId] and the network [call].
-     */
     override fun add(downloadId: Long, call: Call<ResponseBody>) {
         logcat { "Adding download $downloadId" }
         callsMap[downloadId] = call
+    }
+
+    override fun pause(downloadId: Long) {
+        logcat { "Pausing download $downloadId" }
+        pausedSet.add(downloadId)
+    }
+
+    override fun resume(downloadId: Long) {
+        logcat { "Resuming download $downloadId" }
+        pausedSet.remove(downloadId)
+    }
+
+    override fun isPaused(downloadId: Long): Boolean {
+        return pausedSet.contains(downloadId)
     }
 }

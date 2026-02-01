@@ -34,4 +34,14 @@
 
     <string name="downloadConfirmationContinue">Save to Downloads</string>
     <string name="downloadConfirmationSubtitle" instruction="Placeholder is the address of a website">From: %1$s</string>
+
+    <string name="downloadLocationDefault">Downloads</string>
+    <string name="downloadLocationLabel" instruction="Placeholder is a folder name">Save to: %1$s</string>
+    <string name="downloadRememberSelection">Remember selection</string>
+    <string name="downloadsPause">Pause</string>
+    <string name="downloadsResume">Resume</string>
+    <string name="downloadsPaused">Paused</string>
+    <string name="settingsDownloadLocation">Download location</string>
+    <string name="settingsDownloadLocationSubtitle" instruction="Placeholder is the current download folder">Currently: %1$s</string>
+    <string name="downloadLocationPickerTitle">Choose download location</string>
 </resources>

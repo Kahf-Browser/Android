@@ -35,6 +35,7 @@ import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.anvil.annotations.ContributesMultibinding
 import dagger.SingleInstanceIn
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
@@ -58,63 +59,109 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : FileDownloadNotificationManager, BrowserLifecycleObserver {
 
-    // Group notifications are not automatically cleared when the last notification in the group is removed. So we need to do this manually.
     private val groupNotificationsCounter = AtomicReference<Map<Long, String>>(mapOf())
-
-    // This is not great but didn't find any other way to do it. When the user closes the app all the downloads are cancelled
-    // but the in progress notifications are not dismissed however they should.
-    // This will flag when the application is closing so that we don't post any more notifications.
     private val applicationClosing = AtomicBoolean(false)
+    private val pausedDownloads = AtomicReference<Set<Long>>(setOf())
+    private val cancelledDownloads = AtomicReference<Set<Long>>(setOf())
+    private val lastKnownProgress = AtomicReference<Map<Long, Int>>(mapOf())
+    private val notificationLocks = ConcurrentHashMap<Long, Any>()
 
     @AnyThread
     override fun showDownloadInProgressNotification(downloadId: Long, filename: String, progress: Int) {
-        val pendingIntent = PendingIntent.getBroadcast(
-            applicationContext,
-            downloadId.toInt(),
-            FileDownloadNotificationActionReceiver.cancelDownloadIntent(downloadId),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
-        val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
-            .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
-            .setContentTitle(applicationContext.getString(R.string.downloadInProgress))
-            .setContentText("$filename ($progress%).")
-            .setShowWhen(false)
-            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-            .setProgress(100, progress, progress == 0)
-            .setOngoing(true)
-            .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
-            .addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsCancel), pendingIntent)
-            .build()
+        // If download was cancelled, don't post/re-post notification
+        if (cancelledDownloads.get().contains(downloadId)) return
 
-        val summary = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
-            .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
-            .setShowWhen(false)
-            .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-            .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
-            .setGroupSummary(true)
-            .build()
+        // Per-download lock ensures state-read + notify is atomic,
+        // preventing a stale progress callback from overwriting a pause/resume refresh.
+        val lock = notificationLocks.getOrPut(downloadId) { Any() }
+        synchronized(lock) {
+            val isPaused = pausedDownloads.get().contains(downloadId)
 
-        // we don't want to post any notification while the DDG application is closing
-        if (applicationClosing.get()) {
-            cancelDownloadFileNotification(downloadId)
-            return
-        }
+            // Track last known progress; when paused and caller passes default 0, use stored value
+            val effectiveProgress = if (progress > 0) {
+                lastKnownProgress.atomicUpdateAndGet { it.plus(downloadId to progress) }
+                progress
+            } else {
+                lastKnownProgress.get()[downloadId] ?: 0
+            }
 
-        notificationManager.apply {
-            checkPermissionAndNotify(applicationContext, downloadId.toInt(), notification)
-            checkPermissionAndNotify(applicationContext, SUMMARY_ID, summary)
-            groupNotificationsCounter.atomicUpdateAndGet { it.plus(downloadId to filename) }
+            val pauseResumeIntent = if (isPaused) {
+                FileDownloadNotificationActionReceiver.resumeDownloadIntent(downloadId)
+            } else {
+                FileDownloadNotificationActionReceiver.pauseDownloadIntent(downloadId)
+            }
+            pauseResumeIntent.`package` = applicationContext.packageName
+
+            val pauseResumePendingIntent = PendingIntent.getBroadcast(
+                applicationContext,
+                downloadId.toInt(),
+                pauseResumeIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+
+            val cancelIntent = FileDownloadNotificationActionReceiver.cancelDownloadIntent(downloadId)
+            cancelIntent.`package` = applicationContext.packageName
+            val cancelPendingIntent = PendingIntent.getBroadcast(
+                applicationContext,
+                downloadId.toInt(),
+                cancelIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
+
+            val pauseResumeLabel = if (isPaused) {
+                applicationContext.getString(R.string.downloadsResume)
+            } else {
+                applicationContext.getString(R.string.downloadsPause)
+            }
+            val pauseResumeIcon = if (isPaused) R.drawable.ic_play_24 else R.drawable.ic_pause_24
+
+            val contentTitle = if (isPaused) {
+                applicationContext.getString(R.string.downloadsPaused)
+            } else {
+                applicationContext.getString(R.string.downloadInProgress)
+            }
+
+            val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
+                .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
+                .setContentTitle(contentTitle)
+                .setContentText("$filename ($effectiveProgress%).")
+                .setShowWhen(false)
+                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+                .setProgress(100, effectiveProgress, effectiveProgress == 0 && !isPaused)
+                .setOngoing(true)
+                .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
+                .addAction(pauseResumeIcon, pauseResumeLabel, pauseResumePendingIntent)
+                .addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsCancel), cancelPendingIntent)
+                .build()
+
+            val summary = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADING.id)
+                .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
+                .setShowWhen(false)
+                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+                .setGroup(DOWNLOAD_IN_PROGRESS_GROUP)
+                .setGroupSummary(true)
+                .build()
+
+            if (applicationClosing.get()) {
+                cancelDownloadFileNotification(downloadId)
+                return
+            }
+
+            notificationManager.apply {
+                checkPermissionAndNotify(applicationContext, downloadId.toInt(), notification)
+                checkPermissionAndNotify(applicationContext, SUMMARY_ID, summary)
+                groupNotificationsCounter.atomicUpdateAndGet { it.plus(downloadId to filename) }
+            }
         }
     }
 
     @AnyThread
     override fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?) {
         val filename = file.name
-
         val intent = createIntentToOpenFile(applicationContext, file)
-
         val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
+        // Completed notification: no pause/resume/cancel actions
         val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
             .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
             .setShowWhen(false)
@@ -126,8 +173,11 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .build()
 
         cancelDownloadFileNotification(downloadId)
+        pausedDownloads.atomicUpdateAndGet { it - downloadId }
+        cancelledDownloads.atomicUpdateAndGet { it - downloadId }
+        lastKnownProgress.atomicUpdateAndGet { it - downloadId }
+        notificationLocks.remove(downloadId)
 
-        // we don't want to post any notification while the DDG application is closing
         if (applicationClosing.get()) return
         notificationManager.checkPermissionAndNotify(applicationContext, downloadId.toInt(), notification)
     }
@@ -141,10 +191,12 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
             .apply {
                 url?.let { fileUrl ->
+                    val retryIntent = FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl)
+                    retryIntent.`package` = applicationContext.packageName
                     val pendingIntent = PendingIntent.getBroadcast(
                         applicationContext,
                         downloadId.toInt(),
-                        FileDownloadNotificationActionReceiver.retryDownloadIntent(downloadId, fileUrl),
+                        retryIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                     )
                     addAction(R.drawable.ic_file_download_white_24dp, applicationContext.getString(R.string.downloadsRetry), pendingIntent)
@@ -156,8 +208,11 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .build()
 
         cancelDownloadFileNotification(downloadId)
+        pausedDownloads.atomicUpdateAndGet { it - downloadId }
+        cancelledDownloads.atomicUpdateAndGet { it - downloadId }
+        lastKnownProgress.atomicUpdateAndGet { it - downloadId }
+        notificationLocks.remove(downloadId)
 
-        // we don't want to post any notification while the DDG application is closing
         if (applicationClosing.get()) return
         notificationManager.checkPermissionAndNotify(applicationContext, downloadId.toInt(), notification)
     }
@@ -172,8 +227,33 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         notificationManager.cancel(downloadId.toInt())
     }
 
+    fun markDownloadPaused(downloadId: Long) {
+        val lock = notificationLocks.getOrPut(downloadId) { Any() }
+        synchronized(lock) {
+            pausedDownloads.atomicUpdateAndGet { it + downloadId }
+            // Cancel first to bypass Android notification rate-limiting,
+            // forcing the system to render the updated paused state immediately.
+            notificationManager.cancel(downloadId.toInt())
+            val filename = groupNotificationsCounter.get()[downloadId] ?: return
+            showDownloadInProgressNotification(downloadId, filename)
+        }
+    }
+
+    fun markDownloadResumed(downloadId: Long) {
+        val lock = notificationLocks.getOrPut(downloadId) { Any() }
+        synchronized(lock) {
+            pausedDownloads.atomicUpdateAndGet { it - downloadId }
+            notificationManager.cancel(downloadId.toInt())
+            val filename = groupNotificationsCounter.get()[downloadId] ?: return
+            showDownloadInProgressNotification(downloadId, filename)
+        }
+    }
+
+    fun markDownloadCancelled(downloadId: Long) {
+        cancelledDownloads.atomicUpdateAndGet { it + downloadId }
+    }
+
     override fun onOpen(isFreshLaunch: Boolean) {
-        // because this is a singleton in AppScope, we want to make sure this state doesn't persist across app launches.
         applicationClosing.set(false)
     }
 
@@ -184,20 +264,15 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             downloadIds.forEach { cancelDownloadFileNotification(it) }
             groupNotificationsCounter.set(mapOf())
         }
-        // we can't detect the app swipe closed event reliably because the app lifecycle behaves differently when the AppTP (process) is enabled
-        // or disabled. Eg. Swipe closing the app when AppTP (process) is enabled doens't really kill the app as it happens when AppTP is disabled
-        // The only way I found is the postDelayed below. If the Runnable is executed, it means the app is still alive, so we want in progress
-        // notifications to continue appearing
         Handler(Looper.getMainLooper()).postDelayed({ applicationClosing.set(false) }, 250)
     }
 
-    // We could have used [AtomicReference#getAndUpdate] but it's not available in Android API level 24.
-    private fun AtomicReference<Map<Long, String>>.atomicUpdateAndGet(updateFunction: UpdateInProgress): Map<Long, String> {
-        var prev: Map<Long, String>
-        var next: Map<Long, String>
+    private fun <T> AtomicReference<T>.atomicUpdateAndGet(updateFunction: (T) -> T): T {
+        var prev: T
+        var next: T
         do {
             prev = get()
-            next = updateFunction.update(prev)
+            next = updateFunction(prev)
         } while (!compareAndSet(prev, next))
         return next
     }
@@ -213,9 +288,5 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
 
     private fun getFilePathUri(context: Context, file: File): Uri {
         return FileProvider.getUriForFile(context, "${appBuildConfig.applicationId}.provider", file)
-    }
-
-    private fun interface UpdateInProgress {
-        fun update(current: Map<Long, String>): Map<Long, String>
     }
 }

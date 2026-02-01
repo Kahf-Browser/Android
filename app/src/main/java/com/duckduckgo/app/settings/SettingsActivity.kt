@@ -28,6 +28,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
 import com.duckduckgo.anvil.annotations.InjectWith
+import android.app.Activity
+import androidx.activity.result.contract.ActivityResultContracts
 import com.duckduckgo.app.about.AboutScreenNoParams
 import com.duckduckgo.app.accessibility.AccessibilityScreens
 import com.duckduckgo.app.appearance.AppearanceScreenNoParams
@@ -66,6 +68,7 @@ import com.duckduckgo.internal.features.api.InternalFeaturePlugin
 import com.duckduckgo.macos.api.MacOsScreenWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerActivityWithEmptyParams
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
+import com.duckduckgo.downloads.api.DownloadLocationPreferences
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.ProSettingsPlugin
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
@@ -99,6 +102,9 @@ class SettingsActivity : DuckDuckGoActivity() {
     lateinit var globalActivityStarter: GlobalActivityStarter
 
     @Inject
+    lateinit var downloadLocationPreferences: DownloadLocationPreferences
+
+    @Inject
     lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
     private val proSettingsPlugin by lazy {
         _proSettingsPlugin.getPlugins()
@@ -112,6 +118,23 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     // private val viewsMore
     //     get() = binding.includeSettings.contentSettingsMore
+
+    private val downloadLocationPicker = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+                )
+                getPathFromTreeUri(uri)?.let { path ->
+                    downloadLocationPreferences.setDownloadDirectory(path)
+                    updateDownloadLocationSubtitle()
+                }
+            }
+        }
+    }
 
     private val viewsInternal
         get() = binding.includeSettings.contentSettingsInternal
@@ -155,6 +178,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             autofillLoginsSetting.setClickListener { viewModel.onAutofillSettingsClick() }
             privateSearchSetting.setClickListener { viewModel.onPrivateSearchSettingClicked() }
             languageSetting.setClickListener { showLanguageSelectionBottomSheet() }
+            downloadLocationSetting.setClickListener { viewModel.onDownloadLocationSettingClicked() }
             // syncSetting.setClickListener { viewModel.onSyncSettingClicked() }
             // fireButtonSetting.setClickListener { viewModel.onFireButtonSettingClicked() }
             permissionsSetting.setClickListener { viewModel.onPermissionsSettingClicked() }
@@ -234,6 +258,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                     // updateSyncSetting(visible = it.showSyncSetting)
                     updateAutoconsent(it.isAutoconsentEnabled)
                     updatePrivacyPro(it.isPrivacyProEnabled)
+                    updateDownloadLocationSubtitle()
                 }
             }.launchIn(lifecycleScope)
 
@@ -307,6 +332,7 @@ class SettingsActivity : DuckDuckGoActivity() {
             is Command.LaunchPermissionsScreen -> launchPermissionsScreen()
             is Command.LaunchAppearanceScreen -> launchAppearanceScreen()
             is Command.LaunchAboutScreen -> launchAboutScreen()
+            is Command.LaunchDownloadLocationPicker -> launchDownloadLocationPicker()
             null -> TODO()
         }
     }
@@ -436,6 +462,32 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun launchAboutScreen() {
         val options = ActivityOptions.makeSceneTransitionAnimation(this).toBundle()
         globalActivityStarter.start(this, AboutScreenNoParams, options)
+    }
+
+    private fun launchDownloadLocationPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+        downloadLocationPicker.launch(intent)
+    }
+
+    private fun updateDownloadLocationSubtitle() {
+        val dirName = java.io.File(downloadLocationPreferences.getDownloadDirectoryPath()).name
+        viewsSettings.downloadLocationSetting.setSecondaryText(dirName)
+    }
+
+    private fun getPathFromTreeUri(uri: android.net.Uri): String? {
+        val docId = uri.lastPathSegment ?: return null
+        val split = docId.split(":")
+        return if (split.size >= 2) {
+            val storageType = split[0]
+            val relativePath = split[1]
+            if (storageType == "primary" || storageType.endsWith("primary")) {
+                java.io.File(android.os.Environment.getExternalStorageDirectory(), relativePath).absolutePath
+            } else {
+                java.io.File("/storage/$storageType", relativePath).absolutePath
+            }
+        } else {
+            null
+        }
     }
 
     companion object {

@@ -573,6 +573,9 @@ class BrowserTabFragment :
     lateinit var downloadConfirmation: DownloadConfirmation
 
     @Inject
+    lateinit var downloadLocationPreferences: com.duckduckgo.downloads.api.DownloadLocationPreferences
+
+    @Inject
     lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
 
     @Inject
@@ -3972,10 +3975,14 @@ class BrowserTabFragment :
             contentDisposition = contentDisposition,
             mimeType = mimeType,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
+            directory = downloadLocationPreferences.getDownloadDirectory(),
         )
 
         if (hasWriteStoragePermission()) {
-            downloadFile(requestUserConfirmation && !URLUtil.isDataUrl(url))
+            // Skip confirmation if user chose to remember location, unless it's a data URL
+            val shouldConfirm = requestUserConfirmation && !URLUtil.isDataUrl(url)
+            val skipDialog = shouldConfirm && downloadLocationPreferences.shouldRememberLocation()
+            downloadFile(requestUserConfirmation = shouldConfirm && !skipDialog)
         } else {
             requestWriteStoragePermission()
         }
@@ -3988,10 +3995,12 @@ class BrowserTabFragment :
         pendingFileDownload = PendingFileDownload(
             url = url,
             subfolder = Environment.DIRECTORY_DOWNLOADS,
+            directory = downloadLocationPreferences.getDownloadDirectory(),
         )
 
         if (hasWriteStoragePermission()) {
-            downloadFile(requestUserConfirmation)
+            val skipDialog = requestUserConfirmation && downloadLocationPreferences.shouldRememberLocation()
+            downloadFile(requestUserConfirmation && !skipDialog)
         } else {
             requestWriteStoragePermission()
         }

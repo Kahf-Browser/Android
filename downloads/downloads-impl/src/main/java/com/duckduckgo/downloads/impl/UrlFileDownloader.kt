@@ -126,6 +126,10 @@ class UrlFileDownloader @Inject constructor(
         val success = try {
             var progressSteps = 0.0
             while (!source.exhausted()) {
+                // Block while paused, yielding the thread
+                while (urlFileDownloadCallManager.isPaused(downloadId)) {
+                    Thread.sleep(PAUSE_CHECK_INTERVAL_MS)
+                }
                 val didRead = source.read(buffer, READ_SIZE_BYTES)
                 totalRead += didRead
                 sink.write(buffer, didRead)
@@ -167,5 +171,6 @@ class UrlFileDownloader @Inject constructor(
 
     companion object {
         const val READ_SIZE_BYTES = 1024L * 100
+        private const val PAUSE_CHECK_INTERVAL_MS = 200L
     }
 }
