@@ -168,6 +168,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
             selectedDirectory = File(path)
             // Save preference and start download immediately after folder selection
             downloadLocationPreferences.setDownloadDirectory(path)
+            downloadLocationPreferences.setDownloadDirectoryTreeUri(uri.toString())
             view?.let { rootView ->
                 val binding = DownloadConfirmationBinding.bind(rootView)
                 val remember = binding.rememberLocationCheckbox.isChecked

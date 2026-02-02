@@ -18,13 +18,16 @@ package com.duckduckgo.downloads.impl
 
 import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.annotation.WorkerThread
+import androidx.documentfile.provider.DocumentFile
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.api.DownloadFailReason.ConnectionRefused
 import com.duckduckgo.downloads.api.DownloadFailReason.Other
+import com.duckduckgo.downloads.api.DownloadLocationPreferences
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.duckduckgo.downloads.store.DownloadStatus.STARTED
@@ -44,6 +47,7 @@ class UrlFileDownloader @Inject constructor(
     private val downloadFileService: DownloadFileService,
     private val urlFileDownloadCallManager: UrlFileDownloadCallManager,
     private val cookieManagerWrapper: CookieManagerWrapper,
+    private val downloadLocationPreferences: DownloadLocationPreferences,
 ) {
 
     @WorkerThread
@@ -183,16 +187,39 @@ class UrlFileDownloader @Inject constructor(
 
     private fun copyViaMediaStore(cachedFile: File, fileName: String, targetDir: File, mimeType: String?): File {
         val externalRoot = Environment.getExternalStorageDirectory().absolutePath
-        val relativePath = if (targetDir.absolutePath.startsWith(externalRoot)) {
+        val isWithinDownloads = if (targetDir.absolutePath.startsWith(externalRoot)) {
             val subPath = targetDir.absolutePath.removePrefix(externalRoot).removePrefix(File.separator)
             val downloadsDir = Environment.DIRECTORY_DOWNLOADS
-            // MediaStore.Downloads only allows "Download" or its subdirs as RELATIVE_PATH.
-            // For any other directory, fall back to Download.
-            if (subPath.isEmpty() || subPath == downloadsDir || subPath.startsWith(downloadsDir + File.separator)) {
-                subPath.ifEmpty { downloadsDir }
-            } else {
-                downloadsDir
+            subPath.isEmpty() || subPath == downloadsDir || subPath.startsWith(downloadsDir + File.separator)
+        } else {
+            false
+        }
+
+        // For custom directories outside Downloads, use SAF (DocumentFile) via the persisted tree URI
+        if (!isWithinDownloads) {
+            val treeUriString = downloadLocationPreferences.getDownloadDirectoryTreeUri()
+            if (treeUriString != null) {
+                val treeUri = Uri.parse(treeUriString)
+                val documentFile = DocumentFile.fromTreeUri(context, treeUri)
+                if (documentFile != null && documentFile.canWrite()) {
+                    val newFile = documentFile.createFile(mimeType ?: "application/octet-stream", fileName)
+                    if (newFile != null) {
+                        context.contentResolver.openOutputStream(newFile.uri)?.use { outputStream ->
+                            cachedFile.inputStream().use { inputStream ->
+                                inputStream.copyTo(outputStream)
+                            }
+                        } ?: throw java.io.IOException("Failed to open output stream for SAF file $fileName")
+                        return File(targetDir, fileName)
+                    }
+                }
             }
+            // If SAF fails, fall through to MediaStore with Downloads as fallback
+            logcat { "SAF write failed for custom directory, falling back to MediaStore Downloads" }
+        }
+
+        val relativePath = if (targetDir.absolutePath.startsWith(externalRoot)) {
+            val subPath = targetDir.absolutePath.removePrefix(externalRoot).removePrefix(File.separator)
+            subPath.ifEmpty { Environment.DIRECTORY_DOWNLOADS }
         } else {
             Environment.DIRECTORY_DOWNLOADS
         }
@@ -219,7 +246,6 @@ class UrlFileDownloader @Inject constructor(
         }
         resolver.update(uri, clearPending, null, null)
 
-        // Return the actual file path where MediaStore placed the file
         val actualDir = Environment.getExternalStoragePublicDirectory(relativePath)
         return File(actualDir, fileName)
     }

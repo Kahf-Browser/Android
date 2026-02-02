@@ -67,9 +67,18 @@ class DownloadLocationPreferencesImpl @Inject constructor(
             ?: Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath
     }
 
+    override fun getDownloadDirectoryTreeUri(): String? {
+        return prefs.getString(KEY_DOWNLOAD_DIRECTORY_TREE_URI, null)
+    }
+
+    override fun setDownloadDirectoryTreeUri(uri: String?) {
+        prefs.edit { putString(KEY_DOWNLOAD_DIRECTORY_TREE_URI, uri) }
+    }
+
     companion object {
         private const val PREFS_NAME = "com.duckduckgo.downloads.location"
         private const val KEY_DOWNLOAD_DIRECTORY = "download_directory"
         private const val KEY_REMEMBER_LOCATION = "remember_location"
+        private const val KEY_DOWNLOAD_DIRECTORY_TREE_URI = "download_directory_tree_uri"
     }
 }
