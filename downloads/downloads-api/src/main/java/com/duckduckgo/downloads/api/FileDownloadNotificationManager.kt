@@ -16,6 +16,7 @@
 
 package com.duckduckgo.downloads.api
 
+import android.net.Uri
 import androidx.annotation.AnyThread
 import java.io.File
 
@@ -34,7 +35,7 @@ interface FileDownloadNotificationManager {
      * Safe to call from any thread.
      */
     @AnyThread
-    fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?)
+    fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?, contentUri: Uri? = null)
 
     /**
      * Call this method to show the "download failed" notification.

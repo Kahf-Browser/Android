@@ -156,7 +156,7 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     }
 
     @AnyThread
-    override fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?) {
+    override fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?, contentUri: Uri?) {
         val filename = file.name
         val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
@@ -169,7 +169,11 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
 
         runCatching {
-            val intent = createIntentToOpenFile(applicationContext, file)
+            val intent = if (contentUri != null) {
+                createIntentToOpenContentUri(contentUri, mimeType)
+            } else {
+                createIntentToOpenFile(applicationContext, file)
+            }
             builder.setContentIntent(PendingIntent.getActivity(applicationContext, downloadId.toInt(), intent, pendingIntentFlags))
         }
 
@@ -284,6 +288,15 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
         val fileUri = getFilePathUri(applicationContext, file)
         return Intent().apply {
             setDataAndType(fileUri, applicationContext.contentResolver?.getType(fileUri))
+            action = Intent.ACTION_VIEW
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+    }
+
+    private fun createIntentToOpenContentUri(contentUri: Uri, mimeType: String?): Intent {
+        val resolvedMimeType = mimeType ?: applicationContext.contentResolver?.getType(contentUri)
+        return Intent().apply {
+            setDataAndType(contentUri, resolvedMimeType)
             action = Intent.ACTION_VIEW
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
         }

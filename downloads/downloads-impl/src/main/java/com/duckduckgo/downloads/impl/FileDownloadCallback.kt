@@ -16,6 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
+import android.net.Uri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -58,7 +59,7 @@ interface DownloadCallback {
      * Called when a download done using the DownloadManager finishes with success. Takes as parameters the [downloadId] and [contentLength]
      * provided by the DownloadManager.
      */
-    fun onSuccess(downloadId: Long, contentLength: Long, file: File, mimeType: String?)
+    fun onSuccess(downloadId: Long, contentLength: Long, file: File, mimeType: String?, contentUri: Uri? = null)
 
     /**
      * Called when a download done without using the DownloadManager finishes with success. Takes as parameters the [file]
@@ -117,13 +118,14 @@ class FileDownloadCallback @Inject constructor(
         fileDownloadNotificationManager.showDownloadInProgressNotification(downloadId, filename, progress)
     }
 
-    override fun onSuccess(downloadId: Long, contentLength: Long, file: File, mimeType: String?) {
-        logcat { "Download succeeded for file ${file.name} / $mimeType / $contentLength" }
+    override fun onSuccess(downloadId: Long, contentLength: Long, file: File, mimeType: String?, contentUri: Uri?) {
+        logcat { "Download succeeded for file ${file.name} / $mimeType / $contentLength / contentUri=$contentUri" }
         pixel.fire(DOWNLOAD_REQUEST_SUCCEEDED)
         fileDownloadNotificationManager.showDownloadFinishedNotification(
             downloadId = downloadId,
             file = file,
             mimeType = mimeType,
+            contentUri = contentUri,
         )
         appCoroutineScope.launch(dispatchers.io()) {
             downloadsRepository.update(downloadId = downloadId, downloadStatus = FINISHED, contentLength = contentLength)
@@ -134,6 +136,7 @@ class FileDownloadCallback @Inject constructor(
                         messageId = string.downloadsDownloadFinishedMessage,
                         fileName = it.fileName,
                         filePath = it.filePath,
+                        contentUri = contentUri,
                     ),
                 )
             }

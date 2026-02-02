@@ -40,7 +40,7 @@ class DownloadLocationPreferencesImpl @Inject constructor(
     override fun getDownloadDirectory(): File {
         val customPath = prefs.getString(KEY_DOWNLOAD_DIRECTORY, null)
         return if (customPath != null) {
-            File(customPath).also { if (!it.exists()) it.mkdirs() }
+            File(customPath)
         } else {
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         }

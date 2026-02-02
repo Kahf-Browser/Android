@@ -76,7 +76,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), eq(filename), eq(100))
-        verify(downloadCallback).onSuccess(any(), eq("success".length.toLong()), eq(File(pendingFileDownload.directory, filename)), anyOrNull())
+        verify(downloadCallback).onSuccess(any(), eq("success".length.toLong()), eq(File(pendingFileDownload.directory, filename)), anyOrNull(), anyOrNull())
     }
 
     @Test
@@ -94,7 +94,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull(), anyOrNull())
         verify(downloadCallback, never()).onError(any(), any(), any())
 
         verify(downloadCallback).onCancel(any())
@@ -115,7 +115,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull(), anyOrNull())
         verify(downloadCallback, never()).onCancel(any())
 
         verify(downloadCallback).onError(any(), any(), eq(DownloadFailReason.Other))
@@ -133,7 +133,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback, never()).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull(), anyOrNull())
         verify(downloadCallback, never()).onCancel(any())
 
         verify(downloadCallback).onError(any(), any(), any())
@@ -154,7 +154,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull(), anyOrNull())
 
         verify(downloadCallback).onCancel(any())
         verify(downloadCallback, never()).onError(any(), any(), any())
@@ -175,7 +175,7 @@ class UrlFileDownloaderTest {
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), any(), any())
-        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull())
+        verify(downloadCallback, never()).onSuccess(any(), any(), any(), anyOrNull(), anyOrNull())
 
         verify(downloadCallback, never()).onCancel(any())
         verify(downloadCallback, never()).onError(eq(pendingFileDownload.url), any(), eq(DownloadFailReason.ConnectionRefused))

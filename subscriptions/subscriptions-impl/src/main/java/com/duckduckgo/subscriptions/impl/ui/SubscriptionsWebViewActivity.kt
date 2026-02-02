@@ -313,7 +313,12 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         )
             .apply {
                 this.setAction(string.downloadsDownloadFinishedActionName) {
-                    val result = downloadsFileActions.openFile(context, File(command.filePath))
+                    val uri = command.contentUri
+                    val result = if (uri != null) {
+                        downloadsFileActions.openFile(context, uri, command.mimeType)
+                    } else {
+                        downloadsFileActions.openFile(context, File(command.filePath))
+                    }
                     if (!result) {
                         view.makeSnackbarWithNoBottomInset(getString(string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG).show()
                     }

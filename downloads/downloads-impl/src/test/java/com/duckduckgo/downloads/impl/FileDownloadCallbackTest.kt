@@ -104,7 +104,7 @@ class FileDownloadCallbackTest {
             downloadStatus = FINISHED,
             contentLength = updatedContentLength,
         )
-        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(item.downloadId, file, "type")
+        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(eq(item.downloadId), eq(file), eq("type"), anyOrNull())
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadSuccessMessage)
@@ -129,7 +129,7 @@ class FileDownloadCallbackTest {
             downloadStatus = FINISHED,
             contentLength = file.length(),
         )
-        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(0, file, mimeType)
+        verify(mockFileDownloadNotificationManager).showDownloadFinishedNotification(eq(0L), eq(file), eq(mimeType), anyOrNull())
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadSuccessMessage)
@@ -183,7 +183,7 @@ class FileDownloadCallbackTest {
         callback.onError(url = "url", reason = failReason)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
-        verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(any(), any(), anyOrNull())
+        verify(mockFileDownloadNotificationManager, never()).showDownloadFinishedNotification(any(), any(), anyOrNull(), anyOrNull())
         callback.commands().test {
             val actualItem = awaitItem()
             assertTrue(actualItem is ShowDownloadFailedMessage)

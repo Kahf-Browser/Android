@@ -48,6 +48,23 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
             ?: false
     }
 
+    override fun openFile(applicationContext: Context, contentUri: Uri, mimeType: String?): Boolean {
+        val resolvedMimeType = mimeType ?: applicationContext.contentResolver?.getType(contentUri)
+        val intent = Intent().apply {
+            setDataAndType(contentUri, resolvedMimeType)
+            action = Intent.ACTION_VIEW
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+        return applicationContext.packageManager?.let { packageManager ->
+            if (intent.resolveActivity(packageManager) != null) {
+                startActivity(applicationContext, intent)
+            } else {
+                Timber.e("Failed to resolve activity for content URI")
+                false
+            }
+        } ?: false
+    }
+
     override fun shareFile(applicationContext: Context, file: File): Boolean {
         val intent = createShareIntent(applicationContext, file)
         return if (intent != null) startActivity(applicationContext, intent) else false

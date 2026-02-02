@@ -50,6 +50,11 @@ class UrlFileDownloader @Inject constructor(
     private val downloadLocationPreferences: DownloadLocationPreferences,
 ) {
 
+    private sealed class CopyResult {
+        data class WithFile(val file: File) : CopyResult()
+        data class WithUri(val file: File, val contentUri: Uri) : CopyResult()
+    }
+
     @WorkerThread
     fun downloadFile(
         pendingFileDownload: FileDownloader.PendingFileDownload,
@@ -89,10 +94,18 @@ class UrlFileDownloader @Inject constructor(
                     if (writeStreamingResponseBodyToDisk(downloadId, fileName, cacheDir, it, downloadCallback)) {
                         val cachedFile = File(cacheDir, fileName)
                         val contentLength = cachedFile.length()
-                        val finalFile = copyToTargetDirectory(cachedFile, fileName, directory, pendingFileDownload.mimeType)
+                        val copyResult = copyToTargetDirectory(cachedFile, fileName, directory, pendingFileDownload.mimeType)
                         cachedFile.delete()
-                        if (finalFile != null) {
-                            downloadCallback.onSuccess(downloadId, contentLength, finalFile, pendingFileDownload.mimeType)
+                        if (copyResult != null) {
+                            val finalFile = when (copyResult) {
+                                is CopyResult.WithFile -> copyResult.file
+                                is CopyResult.WithUri -> copyResult.file
+                            }
+                            val contentUri = when (copyResult) {
+                                is CopyResult.WithFile -> null
+                                is CopyResult.WithUri -> copyResult.contentUri
+                            }
+                            downloadCallback.onSuccess(downloadId, contentLength, finalFile, pendingFileDownload.mimeType, contentUri)
                         } else {
                             downloadCallback.onError(url = url, downloadId = downloadId, reason = Other)
                         }
@@ -172,12 +185,12 @@ class UrlFileDownloader @Inject constructor(
      * Copies a cached file to the target directory. On Android Q+ uses MediaStore for public
      * directories; otherwise falls back to direct file operations.
      */
-    private fun copyToTargetDirectory(cachedFile: File, fileName: String, targetDir: File, mimeType: String?): File? {
+    private fun copyToTargetDirectory(cachedFile: File, fileName: String, targetDir: File, mimeType: String?): CopyResult? {
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 copyViaMediaStore(cachedFile, fileName, targetDir, mimeType)
             } else {
-                copyDirectly(cachedFile, fileName, targetDir)
+                CopyResult.WithFile(copyDirectly(cachedFile, fileName, targetDir))
             }
         } catch (e: Exception) {
             logcat { "Failed to copy file to target directory: ${e.asLog()}" }
@@ -185,7 +198,7 @@ class UrlFileDownloader @Inject constructor(
         }
     }
 
-    private fun copyViaMediaStore(cachedFile: File, fileName: String, targetDir: File, mimeType: String?): File {
+    private fun copyViaMediaStore(cachedFile: File, fileName: String, targetDir: File, mimeType: String?): CopyResult {
         val externalRoot = Environment.getExternalStorageDirectory().absolutePath
         val isWithinDownloads = if (targetDir.absolutePath.startsWith(externalRoot)) {
             val subPath = targetDir.absolutePath.removePrefix(externalRoot).removePrefix(File.separator)
@@ -209,7 +222,7 @@ class UrlFileDownloader @Inject constructor(
                                 inputStream.copyTo(outputStream)
                             }
                         } ?: throw java.io.IOException("Failed to open output stream for SAF file $fileName")
-                        return File(targetDir, fileName)
+                        return CopyResult.WithUri(File(targetDir, fileName), newFile.uri)
                     }
                 }
             }
@@ -247,7 +260,7 @@ class UrlFileDownloader @Inject constructor(
         resolver.update(uri, clearPending, null, null)
 
         val actualDir = Environment.getExternalStoragePublicDirectory(relativePath)
-        return File(actualDir, fileName)
+        return CopyResult.WithUri(File(actualDir, fileName), uri)
     }
 
     private fun copyDirectly(cachedFile: File, fileName: String, targetDir: File): File {

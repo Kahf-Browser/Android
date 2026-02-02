@@ -1663,7 +1663,12 @@ class BrowserTabFragment :
         val downloadSucceededSnackbar = view?.makeSnackbarWithNoBottomInset(getString(command.messageId, command.fileName), Snackbar.LENGTH_LONG, showOverBottomNav = true)
             ?.apply {
                 this.setAction(R.string.downloadsDownloadFinishedActionName) {
-                    val result = downloadsFileActions.openFile(requireActivity(), File(command.filePath))
+                    val uri = command.contentUri
+                    val result = if (uri != null) {
+                        downloadsFileActions.openFile(requireActivity(), uri, command.mimeType)
+                    } else {
+                        downloadsFileActions.openFile(requireActivity(), File(command.filePath))
+                    }
                     if (!result) {
                         view.makeSnackbarWithNoBottomInset(getString(R.string.downloadsCannotOpenFileErrorMessage), Snackbar.LENGTH_LONG, showOverBottomNav = true).show()
                     }
