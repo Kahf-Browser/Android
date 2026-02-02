@@ -158,19 +158,22 @@ class DefaultFileDownloadNotificationManager @Inject constructor(
     @AnyThread
     override fun showDownloadFinishedNotification(downloadId: Long, file: File, mimeType: String?) {
         val filename = file.name
-        val intent = createIntentToOpenFile(applicationContext, file)
         val pendingIntentFlags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
 
-        // Completed notification: no pause/resume/cancel actions
-        val notification = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
+        val builder = NotificationCompat.Builder(applicationContext, FileDownloadNotificationChannelType.FILE_DOWNLOADED.id)
             .setPriority(FileDownloadNotificationChannelType.FILE_DOWNLOADING.priority)
             .setShowWhen(false)
             .setContentTitle(filename)
             .setContentText(applicationContext.getString(R.string.notificationDownloadComplete))
-            .setContentIntent(PendingIntent.getActivity(applicationContext, downloadId.toInt(), intent, pendingIntentFlags))
             .setAutoCancel(true)
             .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-            .build()
+
+        runCatching {
+            val intent = createIntentToOpenFile(applicationContext, file)
+            builder.setContentIntent(PendingIntent.getActivity(applicationContext, downloadId.toInt(), intent, pendingIntentFlags))
+        }
+
+        val notification = builder.build()
 
         cancelDownloadFileNotification(downloadId)
         pausedDownloads.atomicUpdateAndGet { it - downloadId }

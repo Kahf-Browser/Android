@@ -117,6 +117,9 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
         logcat { "Received retry download intent for download id $downloadId" }
         pixel.fire(DOWNLOAD_REQUEST_RETRIED)
 
+        // Cancel the failed notification before enqueuing the retry
+        fileDownloadNotificationManager.cancelDownloadFileNotification(downloadId)
+
         val url = intent.getStringExtra(URL_EXTRA) ?: return
         PendingFileDownload(
             url = url,

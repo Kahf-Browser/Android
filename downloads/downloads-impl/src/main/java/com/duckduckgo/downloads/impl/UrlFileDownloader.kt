@@ -16,6 +16,11 @@
 
 package com.duckduckgo.downloads.impl
 
+import android.content.ContentValues
+import android.content.Context
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import androidx.annotation.WorkerThread
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.api.DownloadFailReason.ConnectionRefused
@@ -35,6 +40,7 @@ import okio.Buffer
 import okio.sink
 
 class UrlFileDownloader @Inject constructor(
+    private val context: Context,
     private val downloadFileService: DownloadFileService,
     private val urlFileDownloadCallManager: UrlFileDownloadCallManager,
     private val cookieManagerWrapper: CookieManagerWrapper,
@@ -68,16 +74,24 @@ class UrlFileDownloader @Inject constructor(
 
         )
 
+        // Use app cache as temp directory to avoid scoped storage restrictions
+        val cacheDir = File(context.cacheDir, "downloads").also { it.mkdirs() }
+
         runCatching {
             val response = call.execute()
 
             if (response.isSuccessful) {
                 response.body()?.let {
-                    if (writeStreamingResponseBodyToDisk(downloadId, fileName, directory, it, downloadCallback)) {
-                        val file = directory.getOrCreate(fileName)
-                        // for file length we don't use body.contentLength() as it is not reliable. Eg. when downloading image from DDG search
-                        // as the link is a re-direct, contentLength() will be -1
-                        downloadCallback.onSuccess(downloadId, file.length(), file, pendingFileDownload.mimeType)
+                    if (writeStreamingResponseBodyToDisk(downloadId, fileName, cacheDir, it, downloadCallback)) {
+                        val cachedFile = File(cacheDir, fileName)
+                        val contentLength = cachedFile.length()
+                        val finalFile = copyToTargetDirectory(cachedFile, fileName, directory, pendingFileDownload.mimeType)
+                        cachedFile.delete()
+                        if (finalFile != null) {
+                            downloadCallback.onSuccess(downloadId, contentLength, finalFile, pendingFileDownload.mimeType)
+                        } else {
+                            downloadCallback.onError(url = url, downloadId = downloadId, reason = Other)
+                        }
                     } else {
                         if (call.isCanceled) {
                             logcat { "Download $fileName cancelled" }
@@ -87,7 +101,7 @@ class UrlFileDownloader @Inject constructor(
                             downloadCallback.onError(url = url, downloadId = downloadId, reason = Other)
                         }
                         // clean up
-                        directory.getOrCreate(fileName).delete()
+                        File(cacheDir, fileName).delete()
                     }
                 }
             } else {
@@ -102,7 +116,7 @@ class UrlFileDownloader @Inject constructor(
                 downloadCallback.onError(url = url, downloadId = downloadId, reason = ConnectionRefused)
             }
             // clean up
-            directory.getOrCreate(fileName).delete()
+            File(cacheDir, fileName).delete()
         }
     }
 
@@ -151,11 +165,74 @@ class UrlFileDownloader @Inject constructor(
     }
 
     /**
-     * Returns a file in the given directory, creating it if it doesn't exist.
+     * Copies a cached file to the target directory. On Android Q+ uses MediaStore for public
+     * directories; otherwise falls back to direct file operations.
      */
+    private fun copyToTargetDirectory(cachedFile: File, fileName: String, targetDir: File, mimeType: String?): File? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                copyViaMediaStore(cachedFile, fileName, targetDir, mimeType)
+            } else {
+                copyDirectly(cachedFile, fileName, targetDir)
+            }
+        } catch (e: Exception) {
+            logcat { "Failed to copy file to target directory: ${e.asLog()}" }
+            null
+        }
+    }
+
+    private fun copyViaMediaStore(cachedFile: File, fileName: String, targetDir: File, mimeType: String?): File {
+        val externalRoot = Environment.getExternalStorageDirectory().absolutePath
+        val relativePath = if (targetDir.absolutePath.startsWith(externalRoot)) {
+            val subPath = targetDir.absolutePath.removePrefix(externalRoot).removePrefix(File.separator)
+            val downloadsDir = Environment.DIRECTORY_DOWNLOADS
+            // MediaStore.Downloads only allows "Download" or its subdirs as RELATIVE_PATH.
+            // For any other directory, fall back to Download.
+            if (subPath.isEmpty() || subPath == downloadsDir || subPath.startsWith(downloadsDir + File.separator)) {
+                subPath.ifEmpty { downloadsDir }
+            } else {
+                downloadsDir
+            }
+        } else {
+            Environment.DIRECTORY_DOWNLOADS
+        }
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+            put(MediaStore.Downloads.RELATIVE_PATH, relativePath)
+            if (mimeType != null) put(MediaStore.Downloads.MIME_TYPE, mimeType)
+            put(MediaStore.Downloads.IS_PENDING, 1)
+        }
+
+        val resolver = context.contentResolver
+        val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            ?: throw java.io.IOException("Failed to create MediaStore entry for $fileName")
+
+        resolver.openOutputStream(uri)!!.use { outputStream ->
+            cachedFile.inputStream().use { inputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
+
+        val clearPending = ContentValues().apply {
+            put(MediaStore.Downloads.IS_PENDING, 0)
+        }
+        resolver.update(uri, clearPending, null, null)
+
+        // Return the actual file path where MediaStore placed the file
+        val actualDir = Environment.getExternalStoragePublicDirectory(relativePath)
+        return File(actualDir, fileName)
+    }
+
+    private fun copyDirectly(cachedFile: File, fileName: String, targetDir: File): File {
+        if (!targetDir.exists()) targetDir.mkdirs()
+        val targetFile = File(targetDir, fileName)
+        cachedFile.copyTo(targetFile, overwrite = true)
+        return targetFile
+    }
+
     private fun File.getOrCreate(filename: String): File {
         val file = File(this, filename)
-
         if (!this.exists()) this.mkdirs()
         if (!file.exists()) file.createNewFile()
         return file

@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -30,6 +30,8 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:paddingStart="@dimen/keyline_4"
         android:paddingTop="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_4"
@@ -42,6 +44,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ellipsize="end"
+        app:layout_constraintStart_toStartOf="@id/downloadMessage"
+        app:layout_constraintTop_toBottomOf="@id/downloadMessage"
         android:maxLines="1"
         android:paddingStart="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_4"
@@ -54,6 +58,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/keyline_4"
+        app:layout_constraintStart_toStartOf="@id/downloadMessage"
+        app:layout_constraintTop_toBottomOf="@id/downloadMessageSubtitle"
         app:leadingIcon="@drawable/ic_downloads_24"
         app:primaryText="@string/downloadConfirmationContinue" />
 
@@ -61,6 +67,8 @@
         android:id="@+id/downloadLocationPicker"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/downloadMessage"
+        app:layout_constraintTop_toBottomOf="@id/continueDownload"
         app:leadingIcon="@drawable/ic_folder_24"
         app:primaryText="@string/downloadLocationPickerTitle" />
 
@@ -68,15 +76,22 @@
         android:id="@+id/rememberLocationCheckbox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="12sp"
+        app:layout_constraintStart_toStartOf="@id/downloadMessage"
+        app:layout_constraintTop_toBottomOf="@id/downloadLocationPicker"
         android:layout_marginStart="@dimen/keyline_4"
         android:layout_marginEnd="@dimen/keyline_4"
         android:text="@string/downloadRememberSelection" />
 
-    <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+    <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/cancel"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:leadingIcon="@drawable/ic_close_24"
-        app:primaryText="@string/downloadsCancel" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:tint="@color/gray60"
+        android:layout_marginTop="@dimen/keyline_4"
+        android:layout_marginEnd="@dimen/keyline_4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_close_24" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

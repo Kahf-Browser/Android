@@ -16,6 +16,7 @@
 
 package com.duckduckgo.downloads.impl
 
+import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadFailReason
 import com.duckduckgo.downloads.api.FileDownloader
@@ -36,6 +37,7 @@ class UrlFileDownloaderTest {
     @Suppress("unused")
     val coroutineRule = CoroutineTestRule()
 
+    private val mockContext: Context = mock()
     private val downloadFileService: DownloadFileService = mock()
     private val call: Call<ResponseBody> = mock()
     private lateinit var realFileDownloadManager: RealUrlFileDownloadCallManager
@@ -47,7 +49,12 @@ class UrlFileDownloaderTest {
         realFileDownloadManager = RealUrlFileDownloadCallManager()
         whenever(downloadFileService.downloadFile(anyString(), anyString())).thenReturn(call)
 
+        val cacheDir = File(System.getProperty("java.io.tmpdir"), "test-cache")
+        cacheDir.mkdirs()
+        whenever(mockContext.cacheDir).thenReturn(cacheDir)
+
         urlFileDownloader = UrlFileDownloader(
+            mockContext,
             downloadFileService,
             realFileDownloadManager,
             FakeCookieManagerWrapper(),
