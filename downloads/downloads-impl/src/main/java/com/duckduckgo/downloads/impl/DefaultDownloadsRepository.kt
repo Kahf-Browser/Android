@@ -44,8 +44,8 @@ class DefaultDownloadsRepository @Inject constructor(
         downloadsDatabase.downloadsDao().insertAll(downloadItems.mapToDownloadEntities())
     }
 
-    override suspend fun update(downloadId: Long, downloadStatus: Int, contentLength: Long) {
-        downloadsDatabase.downloadsDao().update(downloadId, downloadStatus, contentLength)
+    override suspend fun update(downloadId: Long, downloadStatus: Int, contentLength: Long, contentUri: String?) {
+        downloadsDatabase.downloadsDao().update(downloadId, downloadStatus, contentLength, contentUri)
         if (downloadStatus != DownloadStatus.STARTED) {
             urlFileDownloadCallManager.remove(downloadId)
         }
@@ -92,6 +92,7 @@ class DefaultDownloadsRepository @Inject constructor(
             contentLength = this.contentLength,
             filePath = this.filePath,
             createdAt = this.createdAt,
+            contentUri = this.contentUri,
         )
 
     private fun List<DownloadEntity>.mapToDownloadItems(): List<DownloadItem> =
@@ -105,6 +106,7 @@ class DefaultDownloadsRepository @Inject constructor(
             contentLength = this.contentLength,
             filePath = this.filePath,
             createdAt = this.createdAt,
+            contentUri = this.contentUri,
         )
 
     private fun List<DownloadItem>.mapToDownloadEntities(): List<DownloadEntity> =

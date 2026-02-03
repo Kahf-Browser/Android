@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
 interface DownloadsRepository {
     suspend fun insert(downloadItem: DownloadItem): Long
     suspend fun insertAll(downloadItems: List<DownloadItem>)
-    suspend fun update(downloadId: Long, downloadStatus: Int, contentLength: Long)
+    suspend fun update(downloadId: Long, downloadStatus: Int, contentLength: Long, contentUri: String? = null)
     suspend fun update(fileName: String, downloadStatus: Int, contentLength: Long)
     suspend fun delete(downloadId: Long)
     suspend fun delete(downloadIdList: List<Long>)

@@ -128,7 +128,7 @@ class FileDownloadCallback @Inject constructor(
             contentUri = contentUri,
         )
         appCoroutineScope.launch(dispatchers.io()) {
-            downloadsRepository.update(downloadId = downloadId, downloadStatus = FINISHED, contentLength = contentLength)
+            downloadsRepository.update(downloadId = downloadId, downloadStatus = FINISHED, contentLength = contentLength, contentUri = contentUri?.toString())
             mediaScanner.scan(file)
             downloadsRepository.getDownloadItem(downloadId)?.let {
                 command.send(

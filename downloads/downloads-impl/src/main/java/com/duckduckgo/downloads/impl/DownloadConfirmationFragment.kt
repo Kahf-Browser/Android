@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -86,7 +87,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupDownload() {
-        selectedDirectory = downloadLocationPreferences.getDownloadDirectory()
+        selectedDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         file = if (!pendingDownload.isDataUrl) {
             when (val filenameExtraction = filenameExtractor.extract(pendingDownload)) {
                 is FilenameExtractor.FilenameExtractionResult.Guess -> null
@@ -118,11 +119,12 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         binding.continueDownload.setOnClickListener {
             val remember = binding.rememberLocationCheckbox.isChecked
             downloadLocationPreferences.setRememberLocation(remember)
-            selectedDirectory?.let { dir ->
-                downloadLocationPreferences.setDownloadDirectory(dir.absolutePath)
-            }
+            // "Save to Downloads" always uses the default public Downloads directory
+            val defaultDownloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            downloadLocationPreferences.setDownloadDirectory(defaultDownloadsDir.absolutePath)
+            downloadLocationPreferences.setDownloadDirectoryTreeUri(null)
             val updatedDownload = pendingDownload.copy(
-                directory = selectedDirectory ?: pendingDownload.directory,
+                directory = defaultDownloadsDir,
             )
             listener.continueDownload(updatedDownload)
             dismiss()

@@ -45,6 +45,8 @@ import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import android.net.Uri
+import android.webkit.MimeTypeMap
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.flow.collectLatest
@@ -127,15 +129,29 @@ class DownloadsActivity : DuckDuckGoActivity() {
     }
 
     private fun showOpen(command: OpenFile) {
-        val file = File(command.item.filePath)
-        if (file.exists()) {
-            val result = downloadsFileActions.openFile(this@DownloadsActivity, file)
+        val storedUri = command.item.contentUri?.let { Uri.parse(it) }
+        if (storedUri != null) {
+            val mimeType = getMimeTypeFromFileName(command.item.fileName)
+            val result = downloadsFileActions.openFile(this@DownloadsActivity, storedUri, mimeType)
             if (!result) {
                 showSnackbar(R.string.downloadsCannotOpenFileErrorMessage)
             }
         } else {
-            viewModel.delete(command.item)
+            val file = File(command.item.filePath)
+            if (file.exists()) {
+                val result = downloadsFileActions.openFile(this@DownloadsActivity, file)
+                if (!result) {
+                    showSnackbar(R.string.downloadsCannotOpenFileErrorMessage)
+                }
+            } else {
+                viewModel.delete(command.item)
+            }
         }
+    }
+
+    private fun getMimeTypeFromFileName(fileName: String): String? {
+        val extension = fileName.substringAfterLast('.', "").lowercase()
+        return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
     }
 
     private fun showShare(command: ShareFile) {
