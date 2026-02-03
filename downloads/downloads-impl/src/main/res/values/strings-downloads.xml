@@ -44,4 +44,7 @@
     <string name="settingsDownloadLocation">Download location</string>
     <string name="settingsDownloadLocationSubtitle" instruction="Placeholder is the current download folder">Currently: %1$s</string>
     <string name="downloadLocationPickerTitle">Choose another location</string>
+    <string name="downloadLocationDialogTitle">Download Location</string>
+    <string name="downloadLocationUseDefault">Use Default Downloads Folder</string>
+    <string name="downloadLocationChooseCustom">Choose Custom Folder</string>
 </resources>

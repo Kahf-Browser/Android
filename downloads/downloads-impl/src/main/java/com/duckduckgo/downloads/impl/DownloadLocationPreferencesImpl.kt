@@ -75,6 +75,13 @@ class DownloadLocationPreferencesImpl @Inject constructor(
         prefs.edit { putString(KEY_DOWNLOAD_DIRECTORY_TREE_URI, uri) }
     }
 
+    override fun resetToDefault() {
+        prefs.edit {
+            remove(KEY_DOWNLOAD_DIRECTORY)
+            remove(KEY_DOWNLOAD_DIRECTORY_TREE_URI)
+        }
+    }
+
     companion object {
         private const val PREFS_NAME = "com.duckduckgo.downloads.location"
         private const val KEY_DOWNLOAD_DIRECTORY = "download_directory"

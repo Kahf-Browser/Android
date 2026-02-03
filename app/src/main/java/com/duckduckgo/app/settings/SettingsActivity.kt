@@ -466,8 +466,32 @@ class SettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun launchDownloadLocationPicker() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-        downloadLocationPicker.launch(intent)
+        showDownloadLocationOptionsDialog()
+    }
+
+    private fun showDownloadLocationOptionsDialog() {
+        val options = arrayOf(
+            getString(com.duckduckgo.downloads.impl.R.string.downloadLocationUseDefault),
+            getString(com.duckduckgo.downloads.impl.R.string.downloadLocationChooseCustom),
+        )
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle(getString(com.duckduckgo.downloads.impl.R.string.downloadLocationDialogTitle))
+            .setItems(options) { _, which ->
+                when (which) {
+                    0 -> {
+                        // Use Default Downloads Folder
+                        downloadLocationPreferences.resetToDefault()
+                        updateDownloadLocationSubtitle()
+                    }
+                    1 -> {
+                        // Choose Custom Folder
+                        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                        downloadLocationPicker.launch(intent)
+                    }
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 
     private fun updateDownloadLocationSubtitle() {

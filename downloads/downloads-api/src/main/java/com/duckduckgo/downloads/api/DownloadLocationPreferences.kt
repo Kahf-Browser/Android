@@ -27,4 +27,5 @@ interface DownloadLocationPreferences {
     fun getDownloadDirectoryPath(): String
     fun getDownloadDirectoryTreeUri(): String?
     fun setDownloadDirectoryTreeUri(uri: String?)
+    fun resetToDefault()
 }
