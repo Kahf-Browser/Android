@@ -87,11 +87,18 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     }
 
     private fun setupDownload() {
-        selectedDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        // Use the user's previously selected directory for the label display, otherwise default to Downloads
+        selectedDirectory = if (downloadLocationPreferences.hasCustomDownloadDirectory()) {
+            downloadLocationPreferences.getDownloadDirectory()
+        } else {
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        }
+        // File preview always uses the default Downloads folder
+        val defaultDownloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         file = if (!pendingDownload.isDataUrl) {
             when (val filenameExtraction = filenameExtractor.extract(pendingDownload)) {
                 is FilenameExtractor.FilenameExtractionResult.Guess -> null
-                is FilenameExtractor.FilenameExtractionResult.Extracted -> File(selectedDirectory, filenameExtraction.filename)
+                is FilenameExtractor.FilenameExtractionResult.Extracted -> File(defaultDownloadsDir, filenameExtraction.filename)
             }
         } else {
             null
@@ -119,10 +126,9 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         binding.continueDownload.setOnClickListener {
             val remember = binding.rememberLocationCheckbox.isChecked
             downloadLocationPreferences.setRememberLocation(remember)
-            // "Save to Downloads" always uses the default public Downloads directory
+            // "Save to Downloads" downloads to the default public Downloads directory for this download only
+            // without changing the user's saved download location preference
             val defaultDownloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            downloadLocationPreferences.setDownloadDirectory(defaultDownloadsDir.absolutePath)
-            downloadLocationPreferences.setDownloadDirectoryTreeUri(null)
             val updatedDownload = pendingDownload.copy(
                 directory = defaultDownloadsDir,
             )

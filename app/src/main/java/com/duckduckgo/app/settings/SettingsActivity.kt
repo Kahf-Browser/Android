@@ -130,6 +130,7 @@ class SettingsActivity : DuckDuckGoActivity() {
                 )
                 getPathFromTreeUri(uri)?.let { path ->
                     downloadLocationPreferences.setDownloadDirectory(path)
+                    downloadLocationPreferences.setDownloadDirectoryTreeUri(uri.toString())
                     updateDownloadLocationSubtitle()
                 }
             }
