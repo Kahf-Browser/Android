@@ -21,6 +21,7 @@ import android.graphics.Bitmap.Config.ARGB_8888
 import android.graphics.Color
 import android.net.Uri
 import android.os.Message
+import android.util.Log
 import android.view.View
 import android.webkit.ConsoleMessage
 import android.webkit.GeolocationPermissions
@@ -31,12 +32,21 @@ import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.site.permissions.api.SitePermissionsManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import timber.log.Timber
 
 class BrowserChromeClient @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val coroutineDispatcher: DispatcherProvider = DefaultDispatcherProvider(),
+    private val sitePermissionsManager: SitePermissionsManager,
 ) : WebChromeClient() {
 
     var webViewClientListener: WebViewClientListener? = null
@@ -142,7 +152,16 @@ class BrowserChromeClient @Inject constructor(
     }
 
     override fun onPermissionRequest(request: PermissionRequest) {
-        request.grant(request.resources)
+        Log.d("BrowserChromeClient","Permissions: permission requested ${request.resources.asList()}")
+        webViewClientListener?.getCurrentTabId()?.let { tabId ->
+            appCoroutineScope.launch(coroutineDispatcher.io()) {
+                val permissionsAllowedToAsk = sitePermissionsManager.getSitePermissions(tabId, request)
+                if (permissionsAllowedToAsk.userHandled.isNotEmpty()) {
+                    Log.d("BrowserChromeClient","Permissions: permission requested not user handled")
+                    webViewClientListener?.onSitePermissionRequested(request, permissionsAllowedToAsk)
+                }
+            }
+        }
     }
 
     override fun onCloseWindow(window: WebView?) {
