@@ -26,12 +26,12 @@
         android:id="@+id/removeFromHistory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/removeFromRecent" />
+        app:primaryText="Remove from recent" />
 
     <com.duckduckgo.common.ui.view.PopupMenuItemView
         android:id="@+id/delete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:primaryText="@string/clearAllRecent" />
+        app:primaryText="Delete" />
 
 </LinearLayout>
