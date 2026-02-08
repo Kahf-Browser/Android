@@ -242,6 +242,8 @@ class NsfwDetector(val context: Context) {
 
                 isInitialized = false
                 isGpuEnabled = false
+                // Reset isInitializing so initializeEagerly() can reinitialize after dispose
+                isInitializing.set(false)
 
                 Timber.d("kLog NSFW model disposed")
             } catch (e: Exception) {

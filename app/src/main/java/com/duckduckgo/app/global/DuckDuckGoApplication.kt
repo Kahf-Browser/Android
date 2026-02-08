@@ -37,6 +37,7 @@ import com.duckduckgo.app.di.DaggerAppComponent
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.VpnProcessLifecycleObserver
 import com.duckduckgo.app.referral.AppInstallationReferrerStateListener
+import com.duckduckgo.app.safegaze.lifecycle.SafeGazeModelLifecycleManager
 import com.duckduckgo.app.safegaze.nsfwdetection.NsfwDetector
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FALLBACK_PUBLISHER_ID
@@ -134,6 +135,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         return object : dagger.Lazy<ImageProcessor> {
             override fun get(): ImageProcessor {
                 imageProcessorInitialized = true
+                safeGazeModelLifecycleManager.markImageProcessorAccessed()
                 return imageProcessorLazy.get()
             }
         }
@@ -143,6 +145,7 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         return object : dagger.Lazy<VideoFrameProcessor> {
             override fun get(): VideoFrameProcessor {
                 videoFrameProcessorInitialized = true
+                safeGazeModelLifecycleManager.markVideoFrameProcessorAccessed()
                 return videoFrameProcessorLazy.get()
             }
         }
@@ -163,6 +166,9 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
 
     @Inject
     lateinit var nsfwDetector: NsfwDetector
+
+    @Inject
+    lateinit var safeGazeModelLifecycleManager: SafeGazeModelLifecycleManager
 
     @Inject
     lateinit var youtubeAdblockUpdateManager: com.duckduckgo.app.browser.youtube.YoutubeAdblockUpdateManager
@@ -244,14 +250,22 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
                     val hasData = intent?.data != null
                     val isViewAction = intent?.action == Intent.ACTION_VIEW
 
-                    val detectedAsLinkLaunch = hasData || isViewAction
+                    // Warm restore: savedInstanceState != null means Android killed the process
+                    // and is restoring the activity. The user had content open, so load aggressively.
+                    val isWarmRestore = savedInstanceState != null
+
+                    val detectedAsLinkLaunch = hasData || isViewAction || isWarmRestore
 
                     isLinkLaunch.set(detectedAsLinkLaunch)
 
-                    val launchType = if (detectedAsLinkLaunch) "link" else "icon"
-                    Timber.d("kLog Launch type detected: $launchType (data=${intent?.data}, action=${intent?.action})")
+                    val launchType = when {
+                        isWarmRestore -> "warm-restore"
+                        hasData || isViewAction -> "link"
+                        else -> "icon"
+                    }
+                    Timber.d("kLog Launch type detected: $launchType (data=${intent?.data}, action=${intent?.action}, savedState=${savedInstanceState != null})")
 
-                    // If link launch detected, trigger immediate model loading
+                    // If link launch or warm restore detected, trigger immediate model loading
                     if (detectedAsLinkLaunch) {
                         triggerAggressiveModelLoading()
                     }
@@ -780,6 +794,18 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
             }
         }
         return dir
+    }
+
+    /**
+     * Forward memory pressure signals to SafeGazeModelLifecycleManager.
+     * On TRIM_MEMORY_MODERATE or higher, ML models are released immediately
+     * to reduce the probability of the process being killed by Android's LMK.
+     */
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        if (::safeGazeModelLifecycleManager.isInitialized) {
+            safeGazeModelLifecycleManager.onTrimMemory(level)
+        }
     }
 
     /**

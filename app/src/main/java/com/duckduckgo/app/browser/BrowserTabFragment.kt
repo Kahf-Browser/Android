@@ -252,6 +252,7 @@ import com.duckduckgo.app.prayers.landing.PrayersTimeFragment
 import com.duckduckgo.app.privatesearch.PrivateSearchScreenNoParams
 import com.duckduckgo.app.safegaze.enums.PrivateDnsLevel
 import com.duckduckgo.app.safegaze.enums.SafeGazeLevel
+import com.duckduckgo.app.safegaze.lifecycle.SafeGazeModelLifecycleManager
 import com.duckduckgo.app.safegaze.popup.SafeGazePopupHandler
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -3149,6 +3150,7 @@ class BrowserTabFragment :
                 videoBlurMode = SafeGazeLevel.getVideoBlurLevel(sharedPreferences, "configureWebView"),
                 imageDetectorLazy = app.createImageProcessorLazyWrapper(),
                 videoDetectorLazy = app.createVideoFrameProcessorLazyWrapper(),
+                isAppInBackground = app.safeGazeModelLifecycleManager.isAppInBackground,
             )
 
             it.webViewClient = webViewClient

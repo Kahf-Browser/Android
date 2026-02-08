@@ -50,6 +50,8 @@ class SafeGazeJsInterface(
     // Models are only loaded when first accessed (when SafeGaze actually processes an image/video)
     private val imageDetectorLazy: dagger.Lazy<ImageProcessor>,
     private val videoDetectorLazy: dagger.Lazy<VideoFrameProcessor>,
+    // Background flag from SafeGazeModelLifecycleManager — skip downloads while app is backgrounded
+    private val isAppInBackground: AtomicBoolean = AtomicBoolean(false),
 ) {
     // Lazy accessor - ML model initialized only on first actual use
     private val imageDetector: ImageProcessor get() = imageDetectorLazy.get()
@@ -154,6 +156,11 @@ class SafeGazeJsInterface(
 
     private fun addTaskToQueue(input: InputImage?) {
         Log.d("SafegazeLog", "safegazeMode: $safeGazeMode")
+        // Skip processing while app is backgrounded to save battery and CPU
+        if (isAppInBackground.get()) {
+            Timber.d("kLog imgLog: Skipping image processing while app is in background")
+            return
+        }
         if (input == null || isInvalidImageUrl(input.src) || safeGazeMode == SafeGazeLevel.Off) {
             Timber.d("kLog imgLog: 1. imageId: ${input?.id}")
             onImageClassified("detectionResult", OutputImage(
