@@ -330,14 +330,6 @@ class BrowserWebViewClient @Inject constructor(
         }
     }
 
-    @WorkerThread
-    private suspend fun loadLocalJs(webView: WebView) {
-        val jsCode = readAssetFile(context.assets, "safe_gaze_v2.js")
-        withContext(dispatcherProvider.main()) {
-            webView.evaluateJavascript("javascript:(function() { $jsCode })()", null)
-        }
-    }
-
     private fun loadPordaJs(
         webView: WebView,
         url: String?
