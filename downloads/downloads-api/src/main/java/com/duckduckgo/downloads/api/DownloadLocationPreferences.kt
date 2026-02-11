@@ -24,6 +24,7 @@ interface DownloadLocationPreferences {
     fun shouldRememberLocation(): Boolean
     fun setRememberLocation(remember: Boolean)
     fun hasCustomDownloadDirectory(): Boolean
+    fun isDownloadDirectoryValid(): Boolean
     fun getDownloadDirectoryPath(): String
     fun getDownloadDirectoryTreeUri(): String?
     fun setDownloadDirectoryTreeUri(uri: String?)

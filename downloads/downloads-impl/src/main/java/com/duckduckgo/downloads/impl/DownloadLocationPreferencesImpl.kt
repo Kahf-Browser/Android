@@ -62,6 +62,13 @@ class DownloadLocationPreferencesImpl @Inject constructor(
         return prefs.getString(KEY_DOWNLOAD_DIRECTORY, null) != null
     }
 
+    override fun isDownloadDirectoryValid(): Boolean {
+        val customPath = prefs.getString(KEY_DOWNLOAD_DIRECTORY, null)
+            ?: return true // No custom directory set; default Downloads is always valid
+        val dir = File(customPath)
+        return dir.exists() && dir.isDirectory
+    }
+
     override fun getDownloadDirectoryPath(): String {
         return prefs.getString(KEY_DOWNLOAD_DIRECTORY, null)
             ?: Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).absolutePath

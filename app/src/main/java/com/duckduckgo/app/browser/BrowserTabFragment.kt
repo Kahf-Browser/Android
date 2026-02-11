@@ -3988,6 +3988,16 @@ class BrowserTabFragment :
         if (hasWriteStoragePermission()) {
             // Skip confirmation if user chose to remember location, unless it's a data URL
             val shouldConfirm = requestUserConfirmation && !URLUtil.isDataUrl(url)
+
+            // If the remembered custom directory was deleted, reset preferences and show the dialog
+            if (downloadLocationPreferences.shouldRememberLocation() && !downloadLocationPreferences.isDownloadDirectoryValid()) {
+                downloadLocationPreferences.setRememberLocation(false)
+                downloadLocationPreferences.resetToDefault()
+                pendingFileDownload = pendingFileDownload?.copy(
+                    directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                )
+            }
+
             val skipDialog = shouldConfirm && downloadLocationPreferences.shouldRememberLocation()
             downloadFile(requestUserConfirmation = shouldConfirm && !skipDialog)
         } else {
@@ -4006,6 +4016,15 @@ class BrowserTabFragment :
         )
 
         if (hasWriteStoragePermission()) {
+            // If the remembered custom directory was deleted, reset preferences and show the dialog
+            if (downloadLocationPreferences.shouldRememberLocation() && !downloadLocationPreferences.isDownloadDirectoryValid()) {
+                downloadLocationPreferences.setRememberLocation(false)
+                downloadLocationPreferences.resetToDefault()
+                pendingFileDownload = pendingFileDownload?.copy(
+                    directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                )
+            }
+
             val skipDialog = requestUserConfirmation && downloadLocationPreferences.shouldRememberLocation()
             downloadFile(requestUserConfirmation && !skipDialog)
         } else {
