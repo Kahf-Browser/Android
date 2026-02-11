@@ -25,6 +25,9 @@
     @android.webkit.JavascriptInterface <methods>;
 }
 
+# Keep YouTube ad blocker classes (used with WebView JS injection)
+-keep class com.duckduckgo.app.browser.youtube.** { *; }
+
 # Keep coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}

@@ -68,14 +68,10 @@
       ".*youtube\\.com.*/ptracking.*",
       ".*youtube\\.com.*/pagead/.*",
       ".*youtube\\.com.*/get_midroll_.*",
-      ".*youtube\\.com.*/ad_.*",
       ".*youtube\\.com.*/adunit/.*",
       ".*youtube\\.com.*/youtubei/v1/player/ad_.*",
-      ".*youtube\\.com.*/api/stats/qoe.*",
       ".*googlevideo\\.com.*[&?]aclk=.*",
-      ".*googlevideo\\.com.*[&?]ad=.*",
       ".*googlevideo\\.com.*/pcs/activeview.*",
-      ".*youtube\\.com.*/api/stats/watchtime.*",
       ".*google\\.com.*/pagead/.*"
     ],
     "ios": [
@@ -85,14 +81,10 @@
       ".*youtube\\\\.com.*/ptracking.*",
       ".*youtube\\\\.com.*/pagead/.*",
       ".*youtube\\\\.com.*/get_midroll_.*",
-      ".*youtube\\\\.com.*/ad_.*",
       ".*youtube\\\\.com.*/adunit/.*",
       ".*youtube\\\\.com.*/youtubei/v1/player/ad_.*",
-      ".*youtube\\\\.com.*/api/stats/qoe.*",
       ".*googlevideo\\\\.com.*[&?]aclk=.*",
-      ".*googlevideo\\\\.com.*[&?]ad=.*",
       ".*googlevideo\\\\.com.*/pcs/activeview.*",
-      ".*youtube\\\\.com.*/api/stats/watchtime.*",
       ".*google\\\\.com.*/pagead/.*"
     ]
   }

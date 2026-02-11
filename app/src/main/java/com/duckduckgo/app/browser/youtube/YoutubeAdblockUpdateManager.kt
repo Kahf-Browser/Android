@@ -88,7 +88,7 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
     companion object {
         // Remote version.json URL
         private const val VERSION_JSON_URL =
-            "https://raw.githubusercontent.com/AnisRafid/safegaze-yt-ads-blocker/main/version.json"
+            "https://gitlab.kahf.co.uk/kahf-browser-scripts/safegaze-scripts/-/raw/main/youtube-ads-blocker/version.json"
 
         // Local filename for the downloaded script
         private const val LOCAL_SCRIPT_FILENAME = "youtube-ads-blocker-remote.js"
@@ -216,6 +216,7 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
     private fun parseVersionInfo(jsonString: String): AdBlockerVersionInfo? {
         return try {
             val json = JSONObject(jsonString)
+            Timber.d("YouTubeAdblock: Parsed version info: $json")
 
             AdBlockerVersionInfo(
                 version = json.getString("version"),

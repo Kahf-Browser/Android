@@ -1,17 +1,22 @@
 /**
- * SafeGaze YouTube Ads Blocker - Standalone Script
+ * SafeGaze YouTube Ads Blocker
+ * Version: 2.4.0
+ * Updated: 2026-01-21
  *
- * Cross-platform compatible script for blocking YouTube ads.
- * Can be used in:
+ * CROSS-PLATFORM VERSION - Desktop + Mobile support
+ * - Layer 1: Player data interception (video ads)
+ * - Layer 2: Network rules (ad domains)
+ * - Layer 3: Video player DOM fallback (skip buttons)
+ * - Layer 4: Feed ad blocking (Desktop ytd-* + Mobile ytm-*)
+ *
+ * Supported platforms:
  * - Browser Extensions (Chrome, Firefox, Edge)
  * - Android WebView
  * - iOS WKWebView
  *
- * This script combines three layers of ad blocking:
- * - Layer 1: Player data interception (ytInitialPlayerResponse, fetch, XHR hooks)
- * - Layer 2: Blocked URL patterns (for mobile network-level blocking)
- * - Layer 3: DOM-based fallback (ad detection, skip buttons, overlay removal)
+ * Use --local flag when building to preserve these changes
  */
+
 (function() {
   'use strict';
 
@@ -22,95 +27,42 @@
   window.__SAFEGAZE_YT_AD_BLOCKER_INITIALIZED__ = true;
 
   // =============================================================================
-  // LAYER 2: BLOCKED URL PATTERNS
-  // These patterns can be used by mobile apps for network-level blocking
-  // Access via: window.SAFEGAZE_BLOCKED_AD_PATTERNS
+  // LAYER 2: BLOCKED URL PATTERNS (for reference - used by manifest/network rules)
   // =============================================================================
   var BLOCKED_AD_PATTERNS = [
-    // Ad serving domains
     '*://*.googlesyndication.com/*',
     '*://*.doubleclick.net/*',
-    '*://googleads.g.doubleclick.net/*',
-    '*://static.doubleclick.net/*',
-
-    // YouTube ad endpoints (classic)
     '*://youtube.com/api/stats/ads*',
-    '*://youtube.com/ptracking*',
     '*://youtube.com/pagead/*',
-    '*://youtube.com/get_midroll_*',
-    '*://youtube.com/ad_*',
-    '*://youtube.com/adunit/*',
     '*://*.youtube.com/api/stats/ads*',
-    '*://*.youtube.com/ptracking*',
     '*://*.youtube.com/pagead/*',
-    '*://*.youtube.com/get_midroll_*',
-    '*://*.youtube.com/ad_*',
-
-    // YouTube API v1 ad endpoints
-    '*://youtube.com/youtubei/v1/player/ad_*',
-    '*://*.youtube.com/youtubei/v1/player/ad_*',
-    '*://youtube.com/api/stats/qoe*',
-    '*://*.youtube.com/api/stats/qoe*',
-
-    // Video ad segments (googlevideo.com with ad parameters)
-    '*://googlevideo.com/videoplayback*&aclk=*',
-    '*://googlevideo.com/videoplayback*&ad=*',
-    '*://googlevideo.com/videoplayback*ad_*',
-    '*://googlevideo.com/pcs/activeview*',
-    '*://*.googlevideo.com/videoplayback*&aclk=*',
-    '*://*.googlevideo.com/videoplayback*&ad=*',
-    '*://*.googlevideo.com/videoplayback*ad_*',
-    '*://*.googlevideo.com/pcs/activeview*',
-
-    // Ad tracking and analytics
-    '*://youtube.com/api/stats/watchtime*',
-    '*://*.youtube.com/api/stats/watchtime*',
-    '*://google.com/pagead/*',
-    '*://*.google.com/pagead/*',
-    '*://youtube.com/pagead/interaction/*',
-    '*://*.youtube.com/pagead/interaction/*'
+    '*://m.youtube.com/api/stats/ads*',
+    '*://m.youtube.com/pagead/*'
   ];
-
-  // Expose blocked patterns for mobile apps
   window.SAFEGAZE_BLOCKED_AD_PATTERNS = BLOCKED_AD_PATTERNS;
 
   // =============================================================================
-  // LAYER 1: PLAYER DATA INTERCEPTION
-  // Intercepts YouTube's player data to remove ads before they load
+  // LAYER 1: PLAYER DATA INTERCEPTION (Primary ad blocking - zero performance cost)
+  // Works on both desktop and mobile
   // =============================================================================
 
   /**
    * Remove ad-related properties from YouTube player data
-   * Modifies objects in-place to preserve object types and avoid cloning overhead
-   * @param {Object} data - The data object to clean
-   * @returns {Object} The cleaned data object
    */
   function removeAdData(data) {
-    if (!data || typeof data !== 'object') {
-      return data;
-    }
+    if (!data || typeof data !== 'object') return data;
 
-    // Only remove confirmed ad-related properties
-    var adProps = [
-      'playerAds',
-      'adPlacements',
-      'adSlots',
-      'ads',
-      'adBreakParams',
-      'companions'
-    ];
+    var adProps = ['playerAds', 'adPlacements', 'adSlots', 'ads', 'adBreakParams', 'companions'];
 
     function cleanObject(obj) {
       if (!obj || typeof obj !== 'object') return;
 
-      // Remove ad properties directly (no cloning)
       for (var i = 0; i < adProps.length; i++) {
         if (obj.hasOwnProperty(adProps[i])) {
           delete obj[adProps[i]];
         }
       }
 
-      // Recursively clean nested objects
       var keys = Object.keys(obj);
       for (var j = 0; j < keys.length; j++) {
         var key = keys[j];
@@ -124,438 +76,595 @@
     return data;
   }
 
-  // Layer 1A: Intercept ytInitialPlayerResponse (page load)
+  // Layer 1A: Intercept ytInitialPlayerResponse
   try {
     var _ytInitialPlayerResponse;
-
     Object.defineProperty(window, 'ytInitialPlayerResponse', {
-      set: function(value) {
-        _ytInitialPlayerResponse = removeAdData(value);
-      },
-      get: function() {
-        return _ytInitialPlayerResponse;
-      },
+      set: function(value) { _ytInitialPlayerResponse = removeAdData(value); },
+      get: function() { return _ytInitialPlayerResponse; },
       configurable: true,
       enumerable: true
     });
-  } catch (error) {
-    console.error('[SafeGaze] Failed to hook ytInitialPlayerResponse:', error);
-  }
+  } catch (e) {}
 
-  // Layer 1B: Intercept fetch() API (dynamic requests)
+  // Layer 1B: Intercept fetch() - ONLY player API
   try {
     var originalFetch = window.fetch;
-
     window.fetch = function(input, init) {
-      var url = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
+      var url = typeof input === 'string' ? input : (input instanceof URL ? input.toString() : (input && input.url));
 
-      // PERFORMANCE: Skip video CDN entirely (never intercept video segments)
-      if (url && url.indexOf('googlevideo.com') !== -1) {
+      // Skip ALL video/media requests entirely
+      if (!url || url.indexOf('googlevideo.com') !== -1 || url.indexOf('.jpg') !== -1 ||
+          url.indexOf('.png') !== -1 || url.indexOf('.webp') !== -1) {
         return originalFetch.call(this, input, init);
       }
 
-      // Call original fetch
-      return originalFetch.call(this, input, init).then(function(response) {
-        // PERFORMANCE: Only process JSON responses (skip binary video/images)
-        var contentType = response.headers.get('content-type');
-        if (!contentType || contentType.indexOf('application/json') === -1) {
-          return response;
-        }
+      // Only intercept /youtubei/v1/player (not /next, /search, /browse, etc.)
+      if (url.indexOf('/youtubei/v1/player') !== -1 && url.indexOf('/next') === -1) {
+        return originalFetch.call(this, input, init).then(function(response) {
+          var contentType = response.headers.get('content-type');
+          if (!contentType || contentType.indexOf('application/json') === -1) {
+            return response;
+          }
 
-        // Only intercept player API, NOT comments (/next) or navigation
-        if (url && url.indexOf('/youtubei/v1/player') !== -1 && url.indexOf('/next') === -1) {
-          // Clone response to read it
           var cloned = response.clone();
           return cloned.text().then(function(text) {
-            // Try to parse as JSON
-            var data;
             try {
-              data = JSON.parse(text);
+              var data = JSON.parse(text);
+              removeAdData(data);
+              return new Response(JSON.stringify(data), {
+                status: response.status,
+                statusText: response.statusText,
+                headers: response.headers
+              });
             } catch (e) {
-              // Not JSON, return original
               return response;
             }
+          }).catch(function() { return response; });
+        });
+      }
 
-            // Remove ad data (modifies in place)
-            removeAdData(data);
-
-            // Reconstruct response with proper headers
-            var modifiedText = JSON.stringify(data);
-            var modifiedHeaders = new Headers(response.headers);
-            modifiedHeaders.set('content-length', modifiedText.length.toString());
-
-            return new Response(modifiedText, {
-              status: response.status,
-              statusText: response.statusText,
-              headers: modifiedHeaders
-            });
-          }).catch(function() {
-            return response;
-          });
-        }
-
-        return response;
-      });
+      return originalFetch.call(this, input, init);
     };
-  } catch (error) {
-    console.error('[SafeGaze] Failed to hook fetch():', error);
-  }
+  } catch (e) {}
 
-  // Layer 1C: Intercept XMLHttpRequest (legacy support)
+  // Layer 1C: Intercept XMLHttpRequest - ONLY player API
   try {
     var originalOpen = XMLHttpRequest.prototype.open;
     var originalSend = XMLHttpRequest.prototype.send;
 
-    XMLHttpRequest.prototype.open = function(method, url, async, user, password) {
+    XMLHttpRequest.prototype.open = function(method, url) {
       this._sgUrl = url ? url.toString() : '';
-      return originalOpen.call(this, method, url, async !== false, user, password);
+      return originalOpen.apply(this, arguments);
     };
 
     XMLHttpRequest.prototype.send = function() {
       var self = this;
       var url = this._sgUrl || '';
-      var args = arguments;
 
-      // CRITICAL: Only intercept player API, NOT comments (/next) or navigation
       if (url.indexOf('/youtubei/v1/player') !== -1 && url.indexOf('/next') === -1) {
         this.addEventListener('readystatechange', function() {
           if (self.readyState === 4 && self.responseText) {
             try {
               var data = JSON.parse(self.responseText);
               removeAdData(data);
-
-              // Override responseText getter
               Object.defineProperty(self, 'responseText', {
                 writable: false,
                 configurable: true,
                 value: JSON.stringify(data)
               });
-            } catch (e) {
-              // Not JSON or parsing failed, ignore
-            }
+            } catch (e) {}
           }
         });
       }
 
-      return originalSend.apply(this, args);
+      return originalSend.apply(this, arguments);
     };
-  } catch (error) {
-    console.error('[SafeGaze] Failed to hook XMLHttpRequest:', error);
+  } catch (e) {}
+
+  // =============================================================================
+  // LAYER 4: FEED AD BLOCKING UTILITIES (Desktop + Mobile)
+  // =============================================================================
+
+  /**
+   * Check if element contains legitimate video content (not an ad)
+   * Works for both desktop (ytd-*) and mobile (ytm-*) elements
+   */
+  function isLegitimateVideo(element) {
+    if (!element) return false;
+
+    // Check for video renderers (legitimate content) - Desktop + Mobile
+    var hasVideo = element.querySelector(
+      // Desktop
+      'ytd-video-renderer, ytd-grid-video-renderer, ' +
+      'ytd-compact-video-renderer, ytd-playlist-video-renderer, ' +
+      'ytd-rich-grid-media, ' +
+      // Mobile
+      'ytm-video-with-context-renderer, ytm-compact-video-renderer, ' +
+      'ytm-media-item, ytm-rich-grid-media'
+    );
+
+    // Check for ad renderers - Desktop + Mobile
+    var hasAd = element.querySelector(
+      // Desktop
+      'ytd-ad-slot-renderer, ytd-in-feed-ad-layout-renderer, ' +
+      'ytd-display-ad-renderer, ytd-promoted-video-renderer, ' +
+      'ytd-promoted-sparkles-web-renderer, ' +
+      // Mobile
+      'ytm-ad-slot-renderer, ytm-promoted-video-renderer, ' +
+      'ytm-companion-ad-renderer, ytm-in-feed-ad-layout-renderer'
+    );
+
+    // Legitimate if has video AND no ad
+    return hasVideo && !hasAd;
+  }
+
+  /**
+   * One-time cleanup of ad containers
+   * Removes parent elements to eliminate black boxes
+   * Supports both Desktop (ytd-*) and Mobile (ytm-*) selectors
+   */
+  function cleanupAdContainers() {
+    // Desktop ad selectors
+    var desktopAdSelectors = [
+      'ytd-ad-slot-renderer',
+      'ytd-in-feed-ad-layout-renderer',
+      'ytd-promoted-video-renderer',
+      'ytd-display-ad-renderer',
+      'ytd-promoted-sparkles-web-renderer',
+      'ytd-video-masthead-ad-v3-renderer',
+      'ytd-video-masthead-ad-primary-video-renderer',
+      'ytd-statement-banner-renderer',
+      'ytd-banner-promo-renderer',
+      'ytd-primetime-promo-renderer',
+      'ytd-search-pyv-renderer',
+      'ytd-compact-promoted-video-renderer'
+    ];
+
+    // Mobile ad selectors
+    var mobileAdSelectors = [
+      'ytm-ad-slot-renderer',
+      'ytm-promoted-video-renderer',
+      'ytm-companion-ad-renderer',
+      'ytm-in-feed-ad-layout-renderer',
+      'ytm-statement-banner-renderer',
+      'ytm-primetime-promo-renderer',
+      'ytm-display-ad-renderer',
+      'ytm-rich-item-renderer[is-ad]',
+      'ytm-video-with-context-renderer[is-ad]'
+    ];
+
+    var allSelectors = desktopAdSelectors.concat(mobileAdSelectors);
+    var removedCount = 0;
+
+    allSelectors.forEach(function(selector) {
+      try {
+        var ads = document.querySelectorAll(selector);
+        ads.forEach(function(ad) {
+          // Desktop parent containers
+          var richItem = ad.closest('ytd-rich-item-renderer');
+          if (richItem && !isLegitimateVideo(richItem)) {
+            richItem.remove();
+            removedCount++;
+            return;
+          }
+
+          var itemSection = ad.closest('ytd-item-section-renderer');
+          if (itemSection && !itemSection.querySelector('ytd-video-renderer')) {
+            itemSection.remove();
+            removedCount++;
+            return;
+          }
+
+          var richSection = ad.closest('ytd-rich-section-renderer');
+          if (richSection && !isLegitimateVideo(richSection)) {
+            richSection.remove();
+            removedCount++;
+            return;
+          }
+
+          // Mobile parent containers
+          var mobileItemSection = ad.closest('ytm-item-section-renderer');
+          if (mobileItemSection && !mobileItemSection.querySelector('ytm-video-with-context-renderer')) {
+            mobileItemSection.remove();
+            removedCount++;
+            return;
+          }
+
+          var mobileRichItem = ad.closest('ytm-rich-item-renderer');
+          if (mobileRichItem && !isLegitimateVideo(mobileRichItem)) {
+            mobileRichItem.remove();
+            removedCount++;
+            return;
+          }
+
+          // Fallback: remove the ad element itself
+          ad.remove();
+          removedCount++;
+        });
+      } catch (e) {}
+    });
+
+    return removedCount;
   }
 
   // =============================================================================
-  // LAYER 3: DOM-BASED FALLBACK
-  // Detects and skips ads that slip through Layer 1-2
+  // LAYER 3 & 4: DOM-BASED AD HANDLING (Desktop + Mobile)
   // =============================================================================
 
-  var YouTubeAdSkipper = {
+  var YouTubeAdBlocker = {
     observer: null,
-    checkInterval: null,
-    isInitialized: false,
-    lastAdState: false,
+    isHandlingAd: false,
     userWasMuted: false,
+    initialized: false,
+    scrollTimeout: null,
+    cleanupPending: false,
 
-    /**
-     * Initialize ad skipper
-     */
     init: function() {
+      if (this.initialized) return;
+      this.initialized = true;
+
       var self = this;
-      if (this.isInitialized) return;
 
-      // Inject CSS for ad hiding
-      this.injectAdBlockingCSS();
+      // Inject comprehensive CSS (includes mobile selectors)
+      this.injectCSS();
 
-      // Wait for player then start detection
-      this.waitForPlayer().then(function() {
-        self.setupAdDetection();
-        self.isInitialized = true;
-      });
+      // Initial ad cleanup (runs once)
+      this.scheduleCleanup();
 
-      // Handle YouTube SPA navigation
-      this.observeYouTubeNavigation();
-    },
-
-    /**
-     * Wait for YouTube player to be ready
-     */
-    waitForPlayer: function() {
-      return new Promise(function(resolve) {
-        function checkPlayer() {
-          var moviePlayer = document.getElementById('movie_player');
-          var video = document.querySelector('.video-stream');
-
-          if (moviePlayer && video) {
-            resolve();
-          } else {
-            setTimeout(checkPlayer, 100);
-          }
-        }
-
-        checkPlayer();
-      });
-    },
-
-    /**
-     * Setup ad detection - Simple and fast
-     */
-    setupAdDetection: function() {
-      var self = this;
-      var moviePlayer = document.getElementById('movie_player');
-      if (!moviePlayer) return;
-
-      // MutationObserver for class changes
-      this.observer = new MutationObserver(function() {
-        self.handleAdDetection();
-      });
-
-      if (moviePlayer instanceof Node) {
-        this.observer.observe(moviePlayer, {
-          attributes: true,
-          attributeFilter: ['class']
+      // Setup video player monitoring on watch pages
+      if (this.isWatchPage()) {
+        this.waitForPlayer(function(moviePlayer) {
+          if (!moviePlayer) return;
+          self.setupPlayerObserver(moviePlayer);
         });
       }
 
-      // Backup polling every 100ms for reliability
-      this.checkInterval = setInterval(function() {
-        self.handleAdDetection();
-      }, 100);
+      // Handle YouTube SPA navigation (works on both desktop and mobile)
+      window.addEventListener('yt-navigate-finish', function() {
+        self.scheduleCleanup();
+
+        if (self.isWatchPage()) {
+          self.cleanupPlayerObserver();
+          self.waitForPlayer(function(moviePlayer) {
+            if (moviePlayer) self.setupPlayerObserver(moviePlayer);
+          });
+        }
+      });
+
+      // Debounced scroll handler for lazy-loaded content
+      window.addEventListener('scroll', function() {
+        if (self.scrollTimeout) clearTimeout(self.scrollTimeout);
+        self.scrollTimeout = setTimeout(function() {
+          self.scheduleCleanup();
+        }, 500);
+      }, { passive: true });
+
+      // Touch scroll for mobile
+      window.addEventListener('touchend', function() {
+        if (self.scrollTimeout) clearTimeout(self.scrollTimeout);
+        self.scrollTimeout = setTimeout(function() {
+          self.scheduleCleanup();
+        }, 500);
+      }, { passive: true });
     },
 
     /**
-     * Layer 3: Fallback ad detection and skipping
-     * Only triggers if ads slip through Layers 1-2 (should be rare)
-     * More aggressive detection and immediate skipping
+     * Schedule ad cleanup using requestIdleCallback
      */
-    handleAdDetection: function() {
-      var video = document.querySelector('.video-stream');
-      var moviePlayer = document.getElementById('movie_player');
+    scheduleCleanup: function() {
+      if (this.cleanupPending) return;
+      this.cleanupPending = true;
 
-      if (!video || !moviePlayer) return;
+      var self = this;
+      var doCleanup = function() {
+        cleanupAdContainers();
+        self.cleanupPending = false;
+      };
 
-      // Multi-signal ad detection (more comprehensive)
-      var isNowInAd = (moviePlayer && (
-          moviePlayer.classList.contains('ad-showing') ||
-          moviePlayer.classList.contains('ad-interrupting')
-        )) ||
-        document.querySelector('.ytp-ad-player-overlay') !== null ||
-        document.querySelector('.video-ads.ytp-ad-module') !== null ||
-        document.querySelector('.ytp-ad-text') !== null;
-
-      var wasInAd = this.lastAdState;
-
-      // STATE TRANSITION: Entering ad state (fallback - should be rare with MAIN world script)
-      if (isNowInAd && !wasInAd) {
-        // Save user's mute preference
-        this.userWasMuted = video.muted;
-
-        // Mute immediately
-        video.muted = true;
-
-        // Skip to end IMMEDIATELY (most aggressive)
-        if (video.duration && !isNaN(video.duration)) {
-          video.currentTime = video.duration;
-        }
-
-        // Also try speed-up as backup
-        video.playbackRate = 16;
-
-        // Click skip buttons
-        this.clickSkipButton();
-        this.removeAdOverlays();
+      if (window.requestIdleCallback) {
+        requestIdleCallback(doCleanup, { timeout: 1000 });
+      } else {
+        setTimeout(doCleanup, 100);
       }
+    },
 
-      // STATE TRANSITION: Exiting ad state
-      if (!isNowInAd && wasInAd) {
-        // Restore user's original mute preference
-        video.muted = this.userWasMuted;
-
-        // Reset playback speed
-        video.playbackRate = 1;
-
-        // Auto-resume playback
-        setTimeout(function() {
-          if (video.paused) {
-            video.play().catch(function() {
-              // Ignore autoplay errors
-            });
-          }
-        }, 50);
-      }
-
-      // When STAYING in ad state, continuously try to skip
-      if (isNowInAd && wasInAd) {
-        // Keep jumping to end
-        if (video.duration && !isNaN(video.duration)) {
-          if (video.currentTime < video.duration - 0.3) {
-            video.currentTime = video.duration;
-          }
-        }
-        this.clickSkipButton();
-        this.removeAdOverlays();
-      }
-
-      // When STAYING in content state - DO NOTHING (respect user controls)
-
-      // Update state for next check
-      this.lastAdState = isNowInAd;
+    isWatchPage: function() {
+      return window.location.pathname === '/watch' ||
+             window.location.pathname.indexOf('/watch') === 0;
     },
 
     /**
-     * Click skip ad button
+     * Wait for YouTube player - supports both desktop and mobile players
      */
-    clickSkipButton: function() {
-      var skipSelectors = [
-        '.ytp-ad-skip-button',
-        '.ytp-ad-skip-button-modern',
-        '.ytp-skip-ad-button'
-      ];
+    waitForPlayer: function(callback) {
+      var attempts = 0;
+      function check() {
+        // Desktop player
+        var player = document.getElementById('movie_player');
 
-      for (var i = 0; i < skipSelectors.length; i++) {
-        var button = document.querySelector(skipSelectors[i]);
-        if (button && button.offsetParent !== null) {
-          button.click();
-          break;
+        // Mobile player fallbacks
+        if (!player) player = document.querySelector('.html5-video-player');
+        if (!player) player = document.querySelector('ytm-player');
+        if (!player) player = document.querySelector('#player-container .html5-video-player');
+
+        if (player) {
+          callback(player);
+        } else if (attempts < 30) {
+          attempts++;
+          setTimeout(check, 200);
         }
       }
+      check();
     },
 
-    /**
-     * Remove ad overlay elements from DOM
-     */
-    removeAdOverlays: function() {
-      var adOverlaySelectors = [
-        '.ytp-ad-overlay-container',
-        '.ytp-ad-text-overlay',
-        '.ytp-ad-image-overlay',
-        '.ytp-ad-player-overlay-flyout-cta',
-        '.ytp-ad-overlay-close-container'
-      ];
-
-      for (var i = 0; i < adOverlaySelectors.length; i++) {
-        var elements = document.querySelectorAll(adOverlaySelectors[i]);
-        for (var j = 0; j < elements.length; j++) {
-          elements[j].remove();
-        }
-      }
-    },
-
-    /**
-     * Inject CSS for ad hiding
-     */
-    injectAdBlockingCSS: function() {
-      var existingStyle = document.getElementById('sg-youtube-ad-skipper-styles');
-      if (existingStyle) return;
-
-      var style = document.createElement('style');
-      style.id = 'sg-youtube-ad-skipper-styles';
-      style.textContent =
-        '/* Hide ad-related elements */\n' +
-        '.ad-showing .video-ads,\n' +
-        '.ad-showing .ytp-ad-module,\n' +
-        '.ad-showing .ytp-ad-player-overlay,\n' +
-        '.ad-interrupting .video-ads,\n' +
-        '.ad-interrupting .ytp-ad-module,\n' +
-        '.ad-interrupting .ytp-ad-player-overlay {\n' +
-        '  display: none !important;\n' +
-        '  visibility: hidden !important;\n' +
-        '}\n' +
-        '\n' +
-        '/* Hide YouTube ad renderers */\n' +
-        'ytd-display-ad-renderer,\n' +
-        'ytd-video-masthead-ad-v3-renderer,\n' +
-        'ytd-promoted-sparkles-web-renderer,\n' +
-        'ytd-compact-promoted-video-renderer,\n' +
-        'ytd-promoted-video-renderer,\n' +
-        'ytd-banner-promo-renderer,\n' +
-        'ytd-action-companion-ad-renderer {\n' +
-        '  display: none !important;\n' +
-        '}\n' +
-        '\n' +
-        '/* Hide skip ad button container */\n' +
-        '.ytp-ad-skip-button-container {\n' +
-        '  display: none !important;\n' +
-        '}';
-
-      // Append to head or documentElement (for early injection)
-      var target = document.head || document.documentElement;
-      if (target) {
-        target.appendChild(style);
-      }
-    },
-
-    /**
-     * Observe YouTube SPA navigation
-     */
-    observeYouTubeNavigation: function() {
+    setupPlayerObserver: function(moviePlayer) {
       var self = this;
 
-      window.addEventListener('yt-navigate-finish', function() {
-        if (self.isWatchPage()) {
-          self.cleanup();
-          self.isInitialized = false;
-          self.lastAdState = false; // Reset state for new video
-          self.init();
+      // Single observer - only watches for ad-showing class
+      this.observer = new MutationObserver(function(mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          if (mutations[i].attributeName === 'class') {
+            var hasAd = moviePlayer.classList.contains('ad-showing') ||
+                        moviePlayer.classList.contains('ad-interrupting');
+
+            if (hasAd && !self.isHandlingAd) {
+              self.handleAdStart();
+            } else if (!hasAd && self.isHandlingAd) {
+              self.handleAdEnd();
+            }
+          }
         }
       });
 
-      window.addEventListener('popstate', function() {
-        if (self.isWatchPage()) {
-          self.cleanup();
-          self.isInitialized = false;
-          self.lastAdState = false; // Reset state for new video
-          self.init();
-        }
+      this.observer.observe(moviePlayer, {
+        attributes: true,
+        attributeFilter: ['class']
       });
     },
 
-    /**
-     * Check if current page is a YouTube watch page
-     */
-    isWatchPage: function() {
-      return window.location.pathname === '/watch' && window.location.search.indexOf('v=') !== -1;
-    },
-
-    /**
-     * Cleanup observers and intervals
-     */
-    cleanup: function() {
+    cleanupPlayerObserver: function() {
       if (this.observer) {
         this.observer.disconnect();
         this.observer = null;
       }
+      this.isHandlingAd = false;
+    },
 
-      if (this.checkInterval !== null) {
-        clearInterval(this.checkInterval);
-        this.checkInterval = null;
+    handleAdStart: function() {
+      this.isHandlingAd = true;
+
+      var video = document.querySelector('.video-stream') ||
+                  document.querySelector('video');
+      if (!video) return;
+
+      // Save mute state
+      this.userWasMuted = video.muted;
+
+      // Mute and skip to end
+      video.muted = true;
+      if (video.duration && !isNaN(video.duration)) {
+        video.currentTime = video.duration;
+      }
+      video.playbackRate = 16;
+
+      // Click skip button
+      this.clickSkipButton();
+    },
+
+    handleAdEnd: function() {
+      this.isHandlingAd = false;
+
+      var video = document.querySelector('.video-stream') ||
+                  document.querySelector('video');
+      if (!video) return;
+
+      // Restore state
+      video.muted = this.userWasMuted;
+      video.playbackRate = 1;
+
+      // Auto-resume
+      if (video.paused) {
+        video.play().catch(function() {});
       }
     },
 
     /**
-     * Destroy the ad skipper
+     * Click skip button - supports both desktop and mobile selectors
      */
-    destroy: function() {
-      this.cleanup();
-      this.isInitialized = false;
+    clickSkipButton: function() {
+      var selectors = [
+        // Desktop
+        '.ytp-ad-skip-button',
+        '.ytp-ad-skip-button-modern',
+        '.ytp-skip-ad-button',
+        // Mobile
+        '.ytp-ad-skip-button-slot',
+        '.skipButton',
+        'button[class*="skip"]'
+      ];
+
+      for (var i = 0; i < selectors.length; i++) {
+        var btn = document.querySelector(selectors[i]);
+        if (btn && btn.offsetParent !== null) {
+          btn.click();
+          return;
+        }
+      }
+
+      // Retry if still in ad
+      var self = this;
+      if (this.isHandlingAd) {
+        setTimeout(function() {
+          if (self.isHandlingAd) self.clickSkipButton();
+        }, 500);
+      }
+    },
+
+    /**
+     * Inject comprehensive CSS for ad hiding
+     * Includes both desktop (ytd-*) and mobile (ytm-*) selectors
+     * Uses :has() where supported, direct selectors as fallback
+     */
+    injectCSS: function() {
+      if (document.getElementById('sg-yt-ad-blocker-css')) return;
+
+      var style = document.createElement('style');
+      style.id = 'sg-yt-ad-blocker-css';
+      style.textContent = [
+        // ===== VIDEO PLAYER ADS (Desktop + Mobile) =====
+        '.ad-showing .video-ads,',
+        '.ad-showing .ytp-ad-module,',
+        '.ad-showing .ytp-ad-player-overlay,',
+        '.ad-showing .ytp-ad-overlay-container,',
+        '.ad-interrupting .video-ads,',
+        '.ad-interrupting .ytp-ad-module,',
+        '.html5-video-player.ad-showing .video-ads,',
+        '.html5-video-player.ad-interrupting .video-ads {',
+        '  display: none !important;',
+        '  visibility: hidden !important;',
+        '}',
+
+        // ===== DESKTOP FEED ADS - PARENT CONTAINER COLLAPSE (using :has()) =====
+        'ytd-rich-item-renderer:has(> #content > ytd-ad-slot-renderer),',
+        'ytd-rich-item-renderer:has(> #content > ytd-in-feed-ad-layout-renderer),',
+        'ytd-rich-item-renderer:has(ytd-display-ad-renderer),',
+        'ytd-rich-item-renderer:has(ytd-promoted-video-renderer),',
+        'ytd-rich-item-renderer:has(ytd-promoted-sparkles-web-renderer) {',
+        '  display: none !important;',
+        '  height: 0 !important;',
+        '  min-height: 0 !important;',
+        '  max-height: 0 !important;',
+        '  margin: 0 !important;',
+        '  padding: 0 !important;',
+        '  overflow: hidden !important;',
+        '}',
+
+        // ===== DESKTOP SECTION CONTAINERS =====
+        'ytd-item-section-renderer:has(ytd-ad-slot-renderer),',
+        'ytd-item-section-renderer:has(ytd-in-feed-ad-layout-renderer) {',
+        '  display: none !important;',
+        '  height: 0 !important;',
+        '  margin: 0 !important;',
+        '  padding: 0 !important;',
+        '}',
+
+        // ===== DESKTOP RICH SECTION CONTAINERS =====
+        'ytd-rich-section-renderer:has(ytd-ad-slot-renderer):not(:has(ytd-rich-grid-media)),',
+        'ytd-rich-section-renderer:has(ytd-statement-banner-renderer) {',
+        '  display: none !important;',
+        '  height: 0 !important;',
+        '}',
+
+        // ===== MOBILE AD ELEMENTS (ytm-*) - Direct selectors, no :has() needed =====
+        'ytm-ad-slot-renderer,',
+        'ytm-promoted-video-renderer,',
+        'ytm-companion-ad-renderer,',
+        'ytm-in-feed-ad-layout-renderer,',
+        'ytm-statement-banner-renderer,',
+        'ytm-primetime-promo-renderer,',
+        'ytm-display-ad-renderer,',
+        'ytm-rich-item-renderer[is-ad],',
+        'ytm-video-with-context-renderer[is-ad] {',
+        '  display: none !important;',
+        '  height: 0 !important;',
+        '  min-height: 0 !important;',
+        '  margin: 0 !important;',
+        '  padding: 0 !important;',
+        '  overflow: hidden !important;',
+        '}',
+
+        // ===== MOBILE SECTION CONTAINERS =====
+        'ytm-item-section-renderer:has(ytm-ad-slot-renderer),',
+        'ytm-item-section-renderer:has(ytm-promoted-video-renderer) {',
+        '  display: none !important;',
+        '  height: 0 !important;',
+        '}',
+
+        // ===== DESKTOP MASTHEAD / BANNER ADS =====
+        'ytd-video-masthead-ad-v3-renderer,',
+        'ytd-video-masthead-ad-primary-video-renderer,',
+        'ytd-primetime-promo-renderer,',
+        'ytd-statement-banner-renderer,',
+        'ytd-banner-promo-renderer {',
+        '  display: none !important;',
+        '  height: 0 !important;',
+        '}',
+
+        // ===== DESKTOP SEARCH RESULT ADS =====
+        'ytd-search-pyv-renderer,',
+        'ytd-promoted-sparkles-text-search-renderer {',
+        '  display: none !important;',
+        '}',
+
+        // ===== DESKTOP SIDEBAR / RELATED ADS =====
+        'ytd-compact-promoted-video-renderer,',
+        '#related ytd-promoted-sparkles-web-renderer,',
+        'ytd-action-companion-ad-renderer {',
+        '  display: none !important;',
+        '}',
+
+        // ===== DIRECT AD ELEMENT HIDING (fallback for both desktop & mobile) =====
+        'ytd-ad-slot-renderer,',
+        'ytd-in-feed-ad-layout-renderer,',
+        'ytd-display-ad-renderer,',
+        'ytd-promoted-video-renderer,',
+        'ytd-promoted-sparkles-web-renderer,',
+        'ad-badge-view-model {',
+        '  display: none !important;',
+        '  visibility: hidden !important;',
+        '}',
+
+        // ===== MISC AD ELEMENTS (Desktop + Mobile) =====
+        '.ytd-merch-shelf-renderer,',
+        '.ytd-single-option-survey-renderer,',
+        '#player-ads,',
+        '.ytp-ad-overlay-container,',
+        '.companion-ad,',
+        '.iv-promo,',
+        // Mobile specific
+        '.ytm-promoted-sparkles-web-renderer,',
+        '.ytm-ad-renderer,',
+        'ytm-player-microformat-renderer[has-ads] {',
+        '  display: none !important;',
+        '}',
+
+        // ===== GRID COLLAPSE FIX (Desktop) =====
+        'ytd-rich-grid-renderer {',
+        '  grid-auto-rows: minmax(0, auto) !important;',
+        '}',
+
+        // ===== EMPTY SECTION CLEANUP =====
+        'ytd-rich-section-renderer:empty,',
+        'ytd-rich-section-renderer:has(> #content:empty),',
+        'ytm-item-section-renderer:empty {',
+        '  display: none !important;',
+        '  height: 0 !important;',
+        '}'
+      ].join('\n');
+
+      (document.head || document.documentElement).appendChild(style);
     }
   };
 
   // =============================================================================
-  // AUTO-INITIALIZATION
+  // INITIALIZATION
   // =============================================================================
 
-  // Only run on YouTube domains
-  if (window.location.hostname.indexOf('youtube.com') !== -1) {
-    // Initialize Layer 3 (DOM-based fallback)
+  // Support both desktop and mobile YouTube domains
+  var hostname = window.location.hostname;
+  if (hostname.indexOf('youtube.com') !== -1 ||
+      hostname.indexOf('m.youtube.com') !== -1) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', function() {
-        YouTubeAdSkipper.init();
+        YouTubeAdBlocker.init();
       });
     } else {
-      YouTubeAdSkipper.init();
+      YouTubeAdBlocker.init();
     }
   }
 
-  // Expose for debugging (optional - remove in production if desired)
-  window.__SAFEGAZE_YT_AD_SKIPPER__ = YouTubeAdSkipper;
+  // Expose for debugging
+  window.__SAFEGAZE_YT_AD_SKIPPER__ = YouTubeAdBlocker;
 
 })();
