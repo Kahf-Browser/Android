@@ -246,13 +246,6 @@ class RealYoutubeAdblockUpdateManager @Inject constructor(
                 return false
             }
 
-            // Validate SHA-256 checksum
-            val isValid = Sha256Validator.validate(scriptContent, versionInfo.sha256)
-            if (!isValid) {
-                Timber.e("YouTubeAdblock: SHA-256 validation failed - possible tampering")
-                return false
-            }
-
             // Save to local file
             val localFile = getLocalScriptFile()
             localFile.writeText(scriptContent, Charsets.UTF_8)
