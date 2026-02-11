@@ -624,7 +624,7 @@
     <string name="downloadsActivityNoItemsDescription">No files downloaded yet</string>
     <string name="downloadsShareTitle">Share with…</string>
     <string name="downloadsDownloadFinishedActionName">Open</string>
-    <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file. Check for compatible app.</string>
+    <string name="downloadsCannotOpenFileErrorMessage">Can\'t open file.</string>
     <string name="downloadsFileNotFoundErrorMessage">File no longer exists</string>
     <string name="downloadsItemMenuShare">Share</string>
     <string name="downloadsItemMenuDelete">Delete</string>

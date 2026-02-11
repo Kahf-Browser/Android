@@ -77,6 +77,9 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
         } catch (error: ActivityNotFoundException) {
             Timber.e("No suitable activity found to satisfy intent $intent")
             false
+        } catch (error: SecurityException) {
+            Timber.e(error, "No permission to access content URI, file may have been deleted externally")
+            false
         }
     }
 
