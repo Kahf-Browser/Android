@@ -46,6 +46,7 @@ import com.duckduckgo.downloads.api.model.DownloadItem
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import android.net.Uri
+import android.util.Log
 import android.webkit.MimeTypeMap
 import java.io.File
 import javax.inject.Inject
@@ -155,7 +156,24 @@ class DownloadsActivity : DuckDuckGoActivity() {
     }
 
     private fun showShare(command: ShareFile) {
-        downloadsFileActions.shareFile(this@DownloadsActivity, File(command.item.filePath))
+        val storedUri = command.item.contentUri?.let { Uri.parse(it) }
+        if (storedUri != null) {
+            val mimeType = getMimeTypeFromFileName(command.item.fileName)
+            val result = downloadsFileActions.shareFile(this@DownloadsActivity, storedUri, mimeType)
+            if (!result) {
+                showSnackbar(R.string.downloadsCannotOpenFileErrorMessage)
+            }
+        } else {
+            val file = File(command.item.filePath)
+            if (file.exists()) {
+                val result = downloadsFileActions.shareFile(this@DownloadsActivity, file)
+                if (!result) {
+                    showSnackbar(R.string.downloadsCannotOpenFileErrorMessage)
+                }
+            } else {
+                viewModel.delete(command.item)
+            }
+        }
     }
 
     private fun showUndo(command: DisplayUndoMessage) {

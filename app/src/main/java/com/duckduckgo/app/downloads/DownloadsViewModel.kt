@@ -194,6 +194,10 @@ class DownloadsViewModel @Inject constructor(
         }
     }
 
+    override fun onFileNotFound(item: DownloadItem) {
+        delete(item)
+    }
+
     override fun onItemVisibilityChanged(visible: Boolean) {
         viewModelScope.launch {
             showNotifyMe.emit(visible)

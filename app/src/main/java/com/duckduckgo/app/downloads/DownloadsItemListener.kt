@@ -29,4 +29,6 @@ interface DownloadsItemListener {
     fun onCancelItemClicked(item: DownloadItem)
 
     fun onItemVisibilityChanged(visible: Boolean)
+
+    fun onFileNotFound(item: DownloadItem)
 }

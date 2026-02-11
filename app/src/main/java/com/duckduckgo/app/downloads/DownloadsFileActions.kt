@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.core.content.FileProvider
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
@@ -70,6 +71,26 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
         return if (intent != null) startActivity(applicationContext, intent) else false
     }
 
+    override fun shareFile(applicationContext: Context, contentUri: Uri, mimeType: String?): Boolean {
+        val resolvedMimeType = mimeType ?: applicationContext.contentResolver?.getType(contentUri)
+        val intent = Intent().apply {
+            setDataAndType(contentUri, resolvedMimeType)
+            action = Intent.ACTION_SEND
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            putExtra(Intent.EXTRA_STREAM, contentUri)
+        }
+        val chooser = Intent.createChooser(
+            intent,
+            applicationContext.getString(R.string.downloadsShareTitle),
+        ).apply {
+            if (appBuildConfig.sdkInt >= Build.VERSION_CODES.Q) {
+                clipData = ClipData.newRawUri(contentUri.toString(), contentUri)
+            }
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+        return startActivity(applicationContext, chooser)
+    }
+
     private fun startActivity(applicationContext: Context, intent: Intent): Boolean {
         return try {
             applicationContext.startActivity(intent)
@@ -98,6 +119,7 @@ class RealDownloadsFileActions @Inject constructor(private val appBuildConfig: A
 
     private fun createShareIntent(applicationContext: Context, file: File): Intent? {
         val fileUri = getFilePathUri(applicationContext, file)
+        Log.d("DownloadsFileActions", "createShareIntent: $fileUri")
         val intent =
             Intent().apply {
                 setDataAndType(fileUri, applicationContext.contentResolver?.getType(fileUri))

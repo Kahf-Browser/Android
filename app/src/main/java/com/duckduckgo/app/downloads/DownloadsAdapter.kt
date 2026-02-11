@@ -31,6 +31,7 @@ import com.duckduckgo.app.downloads.DownloadViewItem.Empty
 import com.duckduckgo.app.downloads.DownloadViewItem.Header
 import com.duckduckgo.app.downloads.DownloadViewItem.Item
 import com.duckduckgo.app.downloads.DownloadViewItem.NotifyMe
+import android.net.Uri
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.notifyme.NotifyMeView
 import com.duckduckgo.common.ui.view.gone
@@ -38,6 +39,7 @@ import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.formatters.data.DataSizeFormatter
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
+import java.io.File
 import javax.inject.Inject
 
 class DownloadsAdapter @Inject constructor(
@@ -144,7 +146,11 @@ class DownloadsAdapter @Inject constructor(
 
             twoListItem.setClickListener {
                 if (item.downloadItem.contentLength > 0) {
-                    listener.onItemClicked(item.downloadItem)
+                    if (item.downloadItem.downloadStatus == FINISHED && !isFileAvailable(item)) {
+                        listener.onFileNotFound(item.downloadItem)
+                    } else {
+                        listener.onItemClicked(item.downloadItem)
+                    }
                 }
             }
 
@@ -158,6 +164,11 @@ class DownloadsAdapter @Inject constructor(
             anchor: View,
             item: Item,
         ) {
+            if (item.downloadItem.downloadStatus == FINISHED && !isFileAvailable(item)) {
+                listener.onFileNotFound(item.downloadItem)
+                return
+            }
+
             val popupMenu = PopupMenu(layoutInflater, layout.popup_window_download_item_menu)
             val view = popupMenu.contentView
             val shareItemView = view.findViewById<View>(R.id.share)
@@ -175,6 +186,20 @@ class DownloadsAdapter @Inject constructor(
                 onMenuItemClicked(cancelItemView) { listener.onCancelItemClicked(item.downloadItem) }
             }
             popupMenu.show(binding.root, anchor)
+        }
+
+        private fun isFileAvailable(item: Item): Boolean {
+            val contentUri = item.downloadItem.contentUri
+            if (contentUri != null) {
+                return try {
+                    context.contentResolver.query(Uri.parse(contentUri), null, null, null, null)?.use {
+                        it.count > 0
+                    } ?: false
+                } catch (e: SecurityException) {
+                    false
+                }
+            }
+            return File(item.downloadItem.filePath).exists()
         }
     }
 

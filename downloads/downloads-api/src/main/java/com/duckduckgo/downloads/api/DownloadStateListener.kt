@@ -44,4 +44,5 @@ interface DownloadsFileActions {
     fun openFile(applicationContext: Context, file: File): Boolean
     fun openFile(applicationContext: Context, contentUri: Uri, mimeType: String?): Boolean
     fun shareFile(applicationContext: Context, file: File): Boolean
+    fun shareFile(applicationContext: Context, contentUri: Uri, mimeType: String?): Boolean
 }
