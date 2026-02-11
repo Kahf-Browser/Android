@@ -99,16 +99,13 @@ class FocusedLegacyViewModel @Inject constructor(
                 .combine(historyRepository.getHistoryFlow()) { favorites, history ->
 
                     val sponsoredList = listOf(
-                        Favorite(title = "Facebook", url = "https://facebook.com/", id = "", lastModified = "", position = -1),
-                        Favorite(title = "X", url = "https://x.com/", id = "", lastModified = "", position = -1),
-                        Favorite(title = "Youtube", url = "https://youtube.com/", id = "", lastModified = "", position = -1),
-                        Favorite(title = "LinkedIn", url = "https://linkedin.com/", id = "", lastModified = "", position = -1),
-                        Favorite(title = "Hikmah", url = "https://hikmah.net", id = "", lastModified = "", position = -1),
-                        Favorite(title = "Mahfil", url = "https://mahfil.net", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Kahf Guard", url = "https://kahfguard.com", id = "", lastModified = "", position = -1),
                         Favorite(title = "Kahf Kids", url = "https://kahfkids.com", id = "", lastModified = "", position = -1),
                         Favorite(title = "Muslims Day", url = "https://muslimsday.com/", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Hikmah", url = "https://hikmah.net", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Mahfil", url = "https://mahfil.net", id = "", lastModified = "", position = -1),
                         Favorite(title = "Al Quran", url = "https://quran.com/", id = "", lastModified = "", position = -1),
-                        Favorite(title = "Hadith", url = "https://sunnah.com/", id = "", lastModified = "", position = -1),
+                        Favorite(title = "Hadith", url = "https://sunnah.com/", id = "", lastModified = "", position = -1)
                     )
                     // ✅ Favorites first, then history
                     sponsoredList /*+ convertMostVisitedToToFavorites(mostVisited)*/
