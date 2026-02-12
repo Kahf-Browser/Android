@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="20dp"
     android:background="@drawable/social_media_bar_bg"
     android:padding="20dp">
 
@@ -12,7 +11,7 @@
         android:id="@+id/dialogTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="@string/select_social_media"
+        android:text="@string/kahf_select_apps"
         android:textColor="@android:color/white"
         android:textSize="18sp"
         android:textStyle="bold"

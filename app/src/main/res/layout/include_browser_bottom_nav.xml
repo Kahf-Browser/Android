@@ -60,7 +60,7 @@
                 app:tint="?attr/kahfBottomNavIcon"
                 android:layout_weight="1"
                 android:background="@drawable/ripple_bottom_oval"
-                android:src="@drawable/ic_social_media_24"
+                android:src="@drawable/outline_apps_24"
                 android:padding="16dp"
                 android:contentDescription="@string/social_media"
                 tools:ignore="ContentDescription"/>

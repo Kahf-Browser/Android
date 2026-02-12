@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.WindowManager
 import com.duckduckgo.app.browser.R
@@ -29,6 +30,10 @@ class SocialMediaDialog(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT
             )
+            val horizontalMargin = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 16F, context.resources.displayMetrics
+            ).toInt()
+            window?.decorView?.setPadding(horizontalMargin, 0, horizontalMargin, 0)
             setCancelable(true)
         }
 
