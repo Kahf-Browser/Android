@@ -32,6 +32,7 @@ import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
+import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.PriorityBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -44,8 +45,8 @@ class SafeGazeJsInterface(
     private val dispatcher: DispatcherProvider,
     private val analytics: AnalyticsService,
     private val onImageClassified: (type: String, result: OutputImage?) -> Unit,
-    private var safeGazeMode: SafeGazeLevel = SafeGazeLevel.SolidWithoutFaceBlur,
-    private var videoBlurMode: SafeGazeLevel = SafeGazeLevel.SolidWithoutFaceBlur,
+    safeGazeMode: SafeGazeLevel = SafeGazeLevel.SolidWithoutFaceBlur,
+    videoBlurMode: SafeGazeLevel = SafeGazeLevel.SolidWithoutFaceBlur,
     // PERFORMANCE FIX: Accept lazy references to defer heavy ML model initialization
     // Models are only loaded when first accessed (when SafeGaze actually processes an image/video)
     private val imageDetectorLazy: dagger.Lazy<ImageProcessor>,
@@ -53,15 +54,21 @@ class SafeGazeJsInterface(
     // Background flag from SafeGazeModelLifecycleManager — skip downloads while app is backgrounded
     private val isAppInBackground: AtomicBoolean = AtomicBoolean(false),
 ) {
+    // A1 FIX: @Volatile ensures cross-thread visibility (written from main, read from IO)
+    @Volatile private var safeGazeMode: SafeGazeLevel = safeGazeMode
+    @Volatile private var videoBlurMode: SafeGazeLevel = videoBlurMode
+
     // Lazy accessor - ML model initialized only on first actual use
     private val imageDetector: ImageProcessor get() = imageDetectorLazy.get()
     private val videoDetector: VideoFrameProcessor get() = videoDetectorLazy.get()
-    private val inferenceTimes = mutableListOf<Long>()
-    private val nsfwProcessingTimes = mutableListOf<Long>()
-    private val coreInferenceTimes = mutableListOf<Long>()
-    private val maskingTimes = mutableListOf<Long>()
-    private val pixelationTimes = mutableListOf<Long>()
-    private val waitingTimes = mutableListOf<Long>()
+
+    // A5 FIX: Use synchronized lists to prevent ConcurrentModificationException
+    private val inferenceTimes = Collections.synchronizedList(mutableListOf<Long>())
+    private val nsfwProcessingTimes = Collections.synchronizedList(mutableListOf<Long>())
+    private val coreInferenceTimes = Collections.synchronizedList(mutableListOf<Long>())
+    private val maskingTimes = Collections.synchronizedList(mutableListOf<Long>())
+    private val pixelationTimes = Collections.synchronizedList(mutableListOf<Long>())
+    private val waitingTimes = Collections.synchronizedList(mutableListOf<Long>())
 
     private val urlQueue: PriorityBlockingQueue<InputImage> = PriorityBlockingQueue(20, compareBy { it.order })
     private var processingJob: Job? = null
@@ -72,13 +79,13 @@ class SafeGazeJsInterface(
 
     private val downloadTracker = ConcurrentHashMap<String?, DownloadStatus>()
     private val downloadSemaphore = Semaphore(5)
+    // Track when each download was initiated to detect stale Pending entries
+    private val downloadStartTimes = ConcurrentHashMap<String?, Long>()
+    // Guard against double-launch of processQueue consumer
+    private val processingActive = AtomicBoolean(false)
 
     // CRITICAL FIX: Track bitmaps for cleanup
     private val activeBitmaps = ConcurrentHashMap<String?, Bitmap>()
-
-    // CRITICAL FIX: Synchronize ImageDownloader access to prevent native crashes (SIGSEGV)
-    // ImageDownloader uses Glide's .submit().get() which is not thread-safe from multiple coroutines
-    private val downloaderLock = Any()
 
     // PERFORMANCE FIX: Track whether detector settings have been initialized
     // Defer ML model initialization until first actual image processing request
@@ -173,7 +180,8 @@ class SafeGazeJsInterface(
             return
         }
 
-        if (urlQueue.any { it.id == input.id } || downloadTracker.containsKey(input.id)) {
+        // Use downloadTracker (ConcurrentHashMap) as sole dedup — urlQueue.any is racey
+        if (downloadTracker.containsKey(input.id)) {
             return
         }
 
@@ -196,9 +204,9 @@ class SafeGazeJsInterface(
                     from = "cache-early"
                 ))
             } else {
-                // Cache miss - proceed with download
-                startImageDownload(input)
+                // Cache miss - add to queue BEFORE starting download (A4 fix: atomic ordering)
                 urlQueue.add(input)
+                startImageDownload(input)
                 processQueue()
             }
         }
@@ -206,10 +214,11 @@ class SafeGazeJsInterface(
 
     private fun startImageDownload(input: InputImage) {
         downloadTracker[input.id] = DownloadStatus.Pending
-        var acquired = false
+        downloadStartTimes[input.id] = System.currentTimeMillis()
 
         scope.launch {
             var downloadedBitmap: Bitmap? = null
+            var acquired = false
             try {
                 // CRITICAL FIX: Validate inputs before attempting download to prevent native crashes
                 if (!isValidDownloadInput(input)) {
@@ -218,27 +227,31 @@ class SafeGazeJsInterface(
                     return@launch
                 }
 
-                downloadSemaphore.acquire()
+                // Wrap semaphore acquire in timeout to prevent indefinite blocking
+                val semaphoreAcquired = withTimeoutOrNull(DOWNLOAD_TIMEOUT_MS) {
+                    downloadSemaphore.acquire()
+                    true
+                }
+                if (semaphoreAcquired == null) {
+                    Timber.w("kLog Semaphore acquire timeout for ${input.id}")
+                    downloadTracker[input.id] = DownloadStatus.Failed
+                    return@launch
+                }
                 acquired = true
 
                 val downloadTime = measureTimeMillis {
                     val startTime = System.currentTimeMillis()
 
                     try {
-                        // CRITICAL FIX: Properly handle timeout and exceptions
-                        downloadedBitmap = withTimeout(5000) {
+                        // B1 FIX: Glide is thread-safe — Semaphore(5) limits concurrency, no Mutex needed
+                        downloadedBitmap = withTimeout(DOWNLOAD_TIMEOUT_MS) {
                             try {
-                                // CRITICAL FIX: Synchronize access to ImageDownloader to prevent SIGSEGV
-                                // Multiple coroutines calling Glide's .submit().get() simultaneously
-                                // can cause native memory corruption and crashes
-                                synchronized(downloaderLock) {
-                                    imageDownloader.downloadImageWithAspectRatio(
-                                        context, input.src, input.baseImg, input.width, input.height
-                                    )
-                                }
+                                imageDownloader.downloadImageWithAspectRatio(
+                                    context, input.src, input.baseImg, input.width, input.height
+                                )
                             } catch (e: OutOfMemoryError) {
                                 Timber.e("kLog OOM during download for ${input.id}")
-                                System.gc() // Suggest garbage collection
+                                System.gc()
                                 null
                             } catch (e: IllegalArgumentException) {
                                 Timber.e("kLog Invalid argument in Glide download for ${input.id}: ${e.message}")
@@ -298,15 +311,7 @@ class SafeGazeJsInterface(
                 if (acquired) {
                     downloadSemaphore.release()
                 }
-
-                // If processing is idle, kick-start processing
-                if (!paused.get() && processingJob?.isActive != true) {
-                    urlQueue.peek()?.let {
-                        if (it.id == input.id) {
-                            processQueue()
-                        }
-                    }
-                }
+                downloadStartTimes.remove(input.id)
             }
         }
     }
@@ -385,10 +390,29 @@ class SafeGazeJsInterface(
     }
 
     private fun processQueue() {
-        if (!paused.get() && processingJob?.isActive != true) {
-            processingJob = scope.launch {
+        // A2 FIX: Use AtomicBoolean guard to prevent double-launch race
+        if (paused.get() || !processingActive.compareAndSet(false, true)) {
+            return
+        }
+
+        processingJob = scope.launch {
+            try {
                 while (urlQueue.isNotEmpty()) {
                     try {
+                        // Force-fail stale Pending downloads (D1/E fix: prevents infinite loop)
+                        val now = System.currentTimeMillis()
+                        urlQueue.forEach { task ->
+                            val status = downloadTracker[task.id]
+                            if (status is DownloadStatus.Pending) {
+                                val startTime = downloadStartTimes[task.id] ?: now
+                                if (now - startTime > STALE_DOWNLOAD_TIMEOUT_MS) {
+                                    Timber.w("kLog Force-failing stale download for ${task.id}")
+                                    downloadTracker[task.id] = DownloadStatus.Failed
+                                    downloadStartTimes.remove(task.id)
+                                }
+                            }
+                        }
+
                         // Find the first task that's ready to process
                         val readyTask = urlQueue.find { task ->
                             val status = downloadTracker[task.id]
@@ -407,7 +431,7 @@ class SafeGazeJsInterface(
                                 continue
                             }
                             is DownloadStatus.Failed -> {
-                                // Clean up and notify
+                                // Clean up and notify JS to unhide the image
                                 cleanupBitmap(readyTask.id)
                                 downloadTracker.remove(readyTask.id)
                                 Timber.d("kLog imgLog: 2. imageId: ${readyTask.id}")
@@ -429,9 +453,11 @@ class SafeGazeJsInterface(
                         }
                     } catch (e: Exception) {
                         Timber.e("kLog Error in processQueue loop: ${e.message}", e)
-                        delay(100) // Back off on errors
+                        delay(50) // Back off on errors
                     }
                 }
+            } finally {
+                processingActive.set(false)
             }
         }
     }
@@ -465,14 +491,16 @@ class SafeGazeJsInterface(
 
             // Track waiting time
             val waitingTime = System.currentTimeMillis() - task.insertedAt
-            waitingTimes.add(waitingTime)
-            if (waitingTimes.size >= 30) {
-                val avg = waitingTimes.average().toLong()
-                analytics.logEvent(
-                    AnalyticsEvent.AvgQueueTime,
-                    mapOf(AnalyticsParam.AvgQueueTimeMs to avg.toString())
-                )
-                waitingTimes.clear()
+            synchronized(waitingTimes) {
+                waitingTimes.add(waitingTime)
+                if (waitingTimes.size >= 30) {
+                    val avg = waitingTimes.average().toLong()
+                    analytics.logEvent(
+                        AnalyticsEvent.AvgQueueTime,
+                        mapOf(AnalyticsParam.AvgQueueTimeMs to avg.toString())
+                    )
+                    waitingTimes.clear()
+                }
             }
 
             Timber.d("kLog Using bitmap: ${bitmap.width}x${bitmap.height}, config: ${bitmap.config}")
@@ -500,6 +528,20 @@ class SafeGazeJsInterface(
                     isManipulated = true,
                     from = "nsfw"
                 ))
+
+                // Cache NSFW result so revisits don't re-download and re-process
+                kahfImageBlockedDao.insert(
+                    KahfImageBlocked(
+                        imageUrl = cacheKey,
+                        responseStr = "nsfw",
+                        isIndecent = true,
+                        imageWidth = task.width?.toFloat() ?: 0f,
+                        imageHeight = task.height?.toFloat() ?: 0f,
+                        modifiedAt = System.currentTimeMillis(),
+                        maskType = maskType,
+                    )
+                )
+
                 cleanupTask(task.id)
             } else {
                 // Segmentation
@@ -555,19 +597,19 @@ class SafeGazeJsInterface(
 
     private fun cleanupTask(taskId: String?, result: String? = null, from: String? = null) {
         downloadTracker.remove(taskId)
+        downloadStartTimes.remove(taskId)
         cleanupBitmap(taskId)
 
         if (result != null && taskId != null) {
-            // Notify failure
-            urlQueue.find { it.id == taskId }?.let { task ->
-                onImageClassified("detectionResult", OutputImage(
-                    result = result,
-                    id = taskId,
-                    width = task.width ?: 0,
-                    height = task.height ?: 0,
-                    from = from ?: "cleanup"
-                ))
-            }
+            // D2 FIX: Send notification unconditionally — don't rely on finding task in urlQueue
+            // (it may have been removed already by processQueue, leaving the image stuck invisible)
+            onImageClassified("detectionResult", OutputImage(
+                result = result,
+                id = taskId,
+                width = 0,
+                height = 0,
+                from = from ?: "cleanup"
+            ))
         }
     }
 
@@ -584,51 +626,24 @@ class SafeGazeJsInterface(
         }
     }
 
+    // A5 FIX: Synchronized compound read-sort-clear operations on analytics lists
+    private fun logAnalyticsForList(list: MutableList<Long>, event: AnalyticsEvent, param: AnalyticsParam) {
+        synchronized(list) {
+            if (list.size >= 30) {
+                val p90 = list.sorted()[list.size * 90 / 100]
+                analytics.logEvent(event, mapOf(param to p90.toString()))
+                list.clear()
+            }
+        }
+    }
+
     private fun logAnalytics() {
-        if (nsfwProcessingTimes.size >= 30) {
-            val p90NSFW = nsfwProcessingTimes.sorted()[nsfwProcessingTimes.size * 90 / 100]
-            analytics.logEvent(
-                AnalyticsEvent.P90NSFWProcessing,
-                mapOf(AnalyticsParam.NSFWProcessingTime to p90NSFW.toString())
-            )
-            nsfwProcessingTimes.clear()
-        }
+        logAnalyticsForList(nsfwProcessingTimes, AnalyticsEvent.P90NSFWProcessing, AnalyticsParam.NSFWProcessingTime)
+        logAnalyticsForList(coreInferenceTimes, AnalyticsEvent.P90CoreInference, AnalyticsParam.CoreInferenceTime)
+        logAnalyticsForList(maskingTimes, AnalyticsEvent.P90ApplySolidMask, AnalyticsParam.ApplySolidMaskTime)
+        logAnalyticsForList(pixelationTimes, AnalyticsEvent.P90ApplyPixelationMask, AnalyticsParam.ApplyPixelationMaskTime)
 
-        if (coreInferenceTimes.size >= 30) {
-            val p90CoreInference = coreInferenceTimes.sorted()[coreInferenceTimes.size * 90 / 100]
-            analytics.logEvent(
-                AnalyticsEvent.P90CoreInference,
-                mapOf(AnalyticsParam.CoreInferenceTime to p90CoreInference.toString())
-            )
-            coreInferenceTimes.clear()
-        }
-
-        if (maskingTimes.size >= 30) {
-            val p90Masking = maskingTimes.sorted()[maskingTimes.size * 90 / 100]
-            analytics.logEvent(
-                AnalyticsEvent.P90ApplySolidMask,
-                mapOf(AnalyticsParam.ApplySolidMaskTime to p90Masking.toString())
-            )
-            maskingTimes.clear()
-        }
-
-        if (pixelationTimes.size >= 30) {
-            val p90Pixelation = pixelationTimes.sorted()[pixelationTimes.size * 90 / 100]
-            analytics.logEvent(
-                AnalyticsEvent.P90ApplyPixelationMask,
-                mapOf(AnalyticsParam.ApplyPixelationMaskTime to p90Pixelation.toString())
-            )
-            pixelationTimes.clear()
-        }
-
-        if (inferenceTimes.size >= 30) {
-            val p90 = inferenceTimes.sorted()[inferenceTimes.size * 90 / 100]
-            analytics.logEvent(
-                AnalyticsEvent.P90ImageProcessing,
-                mapOf(AnalyticsParam.ImageProcessingTime to p90.toString())
-            )
-            inferenceTimes.clear()
-        }
+        logAnalyticsForList(inferenceTimes, AnalyticsEvent.P90ImageProcessing, AnalyticsParam.ImageProcessingTime)
     }
 
     private fun getMaskType(): Int {
@@ -646,6 +661,7 @@ class SafeGazeJsInterface(
     fun resetProcessingQueue() {
         urlQueue.clear()
         downloadTracker.clear()
+        downloadStartTimes.clear()
 
         // CRITICAL FIX: Clean up all active bitmaps
         activeBitmaps.keys.toList().forEach { key ->
@@ -806,4 +822,10 @@ class SafeGazeJsInterface(
         "image/gif", "image/svg", "/assets/thesun/images/teaser", "grey-placeholder"
     )
     private val listOfEndsWith = listOf(".svg", ".gif")
+
+    companion object {
+        private const val DOWNLOAD_TIMEOUT_MS = 5000L
+        // Force-fail downloads stuck in Pending for longer than this
+        private const val STALE_DOWNLOAD_TIMEOUT_MS = 15_000L
+    }
 }

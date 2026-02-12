@@ -196,6 +196,7 @@ import com.duckduckgo.app.browser.print.SinglePrintSafeguardFeature
 import com.duckduckgo.app.browser.remotemessage.SharePromoLinkRMFBroadCastReceiver
 import com.duckduckgo.app.browser.safe_gaze.DeviceLockAuthenticator
 import com.duckduckgo.app.browser.safe_gaze.SafeGazeJsInterface
+import com.duckduckgo.app.browser.safe_gaze.SafeGazeResultBatcher
 import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.socialmedia.SocialMediaDialog
 import com.duckduckgo.app.browser.socialmedia.SocialMediaManager
@@ -679,6 +680,8 @@ class BrowserTabFragment :
     private val downloadMessagesJob = ConflatedJob()
 
     private lateinit var safeGazeInterface: SafeGazeJsInterface
+    // C1 FIX: Batch evaluateJavascript calls to prevent ANR from rapid-fire large base64 payloads
+    private var safeGazeResultBatcher: SafeGazeResultBatcher? = null
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -1015,6 +1018,8 @@ class BrowserTabFragment :
 
     override fun onDetach() {
         super.onDetach()
+        // C1 FIX: Clear pending batched results before canceling processing
+        safeGazeResultBatcher?.clear()
         if (::safeGazeInterface.isInitialized) {
             safeGazeInterface.cancelOngoingImageProcessing()
         }
@@ -1231,6 +1236,7 @@ class BrowserTabFragment :
                     Log.d("SafeGazeLog", "Cancelled in-flight processing tasks")
 
                     // CRITICAL FIX: Reset the processing queue to clear any pending tasks
+                    safeGazeResultBatcher?.clear()
                     safeGazeInterface.resetProcessingQueue()
 
                     // CRITICAL FIX: Always update SharedPreferences for persistence
@@ -1628,7 +1634,10 @@ class BrowserTabFragment :
         )
 
         viewModel.pageUpdatedLiveData.observe(viewLifecycleOwner) {
-            it?.let { safeGazeInterface.resetProcessingQueue() }
+            it?.let {
+                safeGazeResultBatcher?.clear()
+                safeGazeInterface.resetProcessingQueue()
+            }
         }
 
         viewModel.safeBrowsingViewState.observe(viewLifecycleOwner) { state ->
@@ -3122,14 +3131,19 @@ class BrowserTabFragment :
             // PERFORMANCE FIX: Pass lazy references to defer heavy ML model initialization
             // Models will only be loaded when SafeGaze actually processes an image/video
             val app = activity?.application as DuckDuckGoApplication
+            // C1 FIX: Create batcher before SafeGazeJsInterface so the callback can use it
+            safeGazeResultBatcher = SafeGazeResultBatcher(webViewProvider = { webView })
+
             safeGazeInterface = SafeGazeJsInterface(
                 requireContext(), app.nsfwDetector, kahfImageBlockedDao, dispatchers, analyticsService,
                 onImageClassified = { type, data ->
-                    Timber.d("kLog: imgLog Send to WebView from Kotlin: type: $type, from: ${data?.from}, src: ${data?.result}, id: ${data?.id}")
-                    webView?.post {
-                        val jsScript = "javascript:receiveMessageFromKotlin('$type', '${gson.toJson(data)}')"
-                        webView?.evaluateJavascript(jsScript, null)
-                    }
+                    Timber.d("kLog: imgLog Send to WebView from Kotlin: type: $type, from: ${data?.from}, id: ${data?.id}")
+                    // C1 FIX: Pre-serialize JSON on the calling thread (IO) instead of the main thread.
+                    // OutputImage.result can contain large base64 data URIs (100KB+), and
+                    // gson.toJson() on the main thread causes ANR on image-heavy pages.
+                    // The batcher coalesces rapid-fire results into single evaluateJavascript calls.
+                    val jsonData = gson.toJson(data)
+                    safeGazeResultBatcher?.enqueue(type, jsonData)
 
                     if (data?.isManipulated == true) {
                         imageBlockCountDao.incrementCount()
