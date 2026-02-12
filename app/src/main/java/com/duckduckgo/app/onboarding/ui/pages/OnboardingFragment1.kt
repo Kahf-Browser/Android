@@ -83,9 +83,10 @@ class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
         // Apply immediately
         LanguageManager.setLocale(requireContext(), lang)
 
-        // Restart app (so all Activities update)
+        // Restart app (so all Activities update), skipping past this fragment
         val intent = Intent(requireActivity(), KahfOnboardingActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        intent.putExtra(KahfOnboardingActivity.EXTRA_START_PAGE, 1)
         startActivity(intent)
     }
 

@@ -29,17 +29,11 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 class OnboardingAdapter(
     fragmentManager: FragmentManager,
     lifecycle: Lifecycle,
-    private val showDefaultBrowserPage: Boolean
 ) : FragmentStateAdapter(fragmentManager, lifecycle) {
     val pages = mutableListOf<Fragment>()
 
     init {
         pages.add(OnboardingFragment1())
-        if (showDefaultBrowserPage) {
-            pages.add(OnboardingFragment2())
-        }
-
-        pages.add(OnboardingBookmarkFragment())
         pages.add(OnboardingSafeGazeFragment())
     }
 

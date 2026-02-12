@@ -47,6 +47,11 @@ class KahfOnboardingActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         configurePager()
+
+        val startPage = intent.getIntExtra(EXTRA_START_PAGE, 0)
+        if (startPage > 0 && startPage < viewPageAdapter.itemCount) {
+            viewPager.setCurrentItem(startPage, false)
+        }
     }
 
     fun onContinueClicked() {
@@ -65,13 +70,12 @@ class KahfOnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun configurePager() {
-        val showDefaultBrowserPage =
-            defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration() && !defaultWebBrowserCapability.isDefaultBrowser()
+        /*val showDefaultBrowserPage =
+            defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration() && !defaultWebBrowserCapability.isDefaultBrowser()*/
 
         viewPageAdapter = OnboardingAdapter(
             supportFragmentManager,
-            lifecycle,
-            showDefaultBrowserPage
+            lifecycle
         )
         viewPager.offscreenPageLimit = 1
         viewPager.adapter = viewPageAdapter
@@ -89,6 +93,8 @@ class KahfOnboardingActivity : DuckDuckGoActivity() {
     }
 
     companion object {
+        const val EXTRA_START_PAGE = "EXTRA_START_PAGE"
+
         fun intent(context: Context): Intent {
             return Intent(context, KahfOnboardingActivity::class.java)
         }
