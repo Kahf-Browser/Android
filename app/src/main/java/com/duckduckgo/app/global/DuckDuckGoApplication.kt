@@ -45,6 +45,8 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.DaggerMap
 import com.facebook.FacebookSdk
 import com.google.firebase.FirebaseApp
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 // import com.kahfads.sdk.GoogleAdManagerConfig
@@ -436,6 +438,14 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
                 Timber.d("Firebase: Starting manual initialization")
                 FirebaseApp.initializeApp(this@DuckDuckGoApplication)
                 Timber.d("Firebase: Manual initialization completed")
+
+                // Re-enable Crashlytics and Analytics collection.
+                // Auto-init is disabled in AndroidManifest.xml to prevent ~276ms ANR on main thread,
+                // so we must explicitly re-enable collection after deferred initialization.
+                FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
+                FirebaseAnalytics.getInstance(this@DuckDuckGoApplication).setAnalyticsCollectionEnabled(true)
+                Timber.d("Firebase: Crashlytics and Analytics collection re-enabled")
+
                 // Now safe to initialize Remote Config
                 configRemoteConfig()
                 Timber.d("Firebase Remote Config initialized")
