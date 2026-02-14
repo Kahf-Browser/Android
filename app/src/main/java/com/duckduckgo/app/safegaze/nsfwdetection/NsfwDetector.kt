@@ -42,13 +42,16 @@ class NsfwDetector(val context: Context) {
     var isGpuEnabled = false
         private set
 
+    @Volatile
     var isInitialized = false
         private set
 
     var numThreadsConfigured = 0
         private set
 
+    @Volatile
     private var interpreter: Interpreter? = null
+    @Volatile
     private var gpuDelegate: GpuDelegate? = null
 
     // ✅ OPTIMIZATION 2: Pre-allocated buffers (reused across inferences)
@@ -184,47 +187,39 @@ class NsfwDetector(val context: Context) {
      * @return NsfwPrediction with classification results, or null on error
      */
     fun isNsfw(bitmap: Bitmap): NsfwPrediction? {
-        // ✅ OPTIMIZATION 3: Lazy initialization with first use (maintains backward compatibility)
-        if (!isInitialized && !isInitializing.get()) {
-            Timber.d("kLog NSFW model not initialized, initializing now (lazy)")
-            initializeModel()
-        }
-
-        // Wait for initialization if in progress
-        if (isInitializing.get()) {
-            synchronized(initializationLock) {
-                // Double-check after acquiring lock
-                if (!isInitialized) {
-                    Timber.w("kLog Model initialization in progress, waiting...")
-                }
+        // Hold initializationLock during entire inference to prevent use-after-close race
+        // with dispose(). Also protects shared pre-allocated buffers from concurrent corruption.
+        // Java synchronized is reentrant, so nested initializeModel() call is safe.
+        synchronized(initializationLock) {
+            if (!isInitialized && !isInitializing.get()) {
+                Timber.d("kLog NSFW model not initialized, initializing now (lazy)")
+                initializeModel()
             }
-        }
 
-        val currentInterpreter = interpreter
-        if (currentInterpreter == null) {
-            Timber.e("kLog NSFW model not initialized")
-            return null
-        }
+            val currentInterpreter = interpreter
+            if (currentInterpreter == null) {
+                Timber.e("kLog NSFW model not initialized")
+                return null
+            }
 
-        return try {
-            // Process image through preprocessing pipeline
-            val buffer = TensorImage(FLOAT32).let {
-                it.load(bitmap)
-                imageProcessor.process(it)
-            }.tensorBuffer.buffer
+            return try {
+                // Process image through preprocessing pipeline
+                val buffer = TensorImage(FLOAT32).let {
+                    it.load(bitmap)
+                    imageProcessor.process(it)
+                }.tensorBuffer.buffer
 
-            // ✅ OPTIMIZATION 2: Reuse pre-allocated input buffer (no GC)
-            inputBuffer.loadBuffer(buffer)
+                inputBuffer.loadBuffer(buffer)
 
-            // Run inference (GPU or optimized CPU)
-            currentInterpreter.run(inputBuffer.buffer, outputBuffer.buffer)
+                // Run inference under lock — prevents use-after-close race with dispose()
+                currentInterpreter.run(inputBuffer.buffer, outputBuffer.buffer)
 
-            // ✅ OPTIMIZATION 2: Reuse pre-allocated output buffer
-            val prediction = NsfwPrediction(outputBuffer.floatArray.clone())
-            prediction
-        } catch (e: Exception) {
-            Timber.e("kLog NSFW inference error: ${e.message}", e)
-            null
+                val prediction = NsfwPrediction(outputBuffer.floatArray.clone())
+                prediction
+            } catch (e: Exception) {
+                Timber.e("kLog NSFW inference error: ${e.message}", e)
+                null
+            }
         }
     }
 
