@@ -445,7 +445,6 @@ class SafeGazeJsInterface(
                                 continue
                             }
                             is DownloadStatus.Success -> {
-                                delay(10)
                                 Timber.d("kLog imgLog: 3. imageId: ${readyTask.id}")
 
                                 processImageTask(readyTask, downloadStatus.bitmap)
