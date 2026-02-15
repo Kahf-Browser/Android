@@ -27,3 +27,8 @@ target_link_libraries(
        # Links the target library to the log library
        # included in the NDK.
        ${log-lib} )
+
+# 16 KB page size alignment for Android 15+ compatibility
+target_link_options(crash-ndk PRIVATE
+        "-Wl,-z,common-page-size=16384"
+        "-Wl,-z,max-page-size=16384")

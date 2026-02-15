@@ -65,6 +65,9 @@ allprojects {
                     password = System.getenv("GITHUB_TOKEN")
                 }
             }
+            content {
+                includeGroup "com.github.KahfAds"
+            }
         }
     }
     configurations.configureEach {

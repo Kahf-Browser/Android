@@ -528,9 +528,7 @@ dependencies {
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
     implementation 'androidx.core:core-splashscreen:1.0.1'
 
-    // Flipper
-    internalImplementation "com.facebook.flipper:flipper:_"
-    internalImplementation "com.facebook.soloader:soloader:_"
+    // Flipper removed: archived project with no 16 KB page size support (Android 15+)
     implementation "com.github.KahfAds:android:0.0.99-k1"
 
     // Testing dependencies

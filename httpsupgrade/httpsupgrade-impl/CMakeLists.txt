@@ -33,3 +33,8 @@ find_library( # Sets the name of the path variable.
         # Specifies the name of the NDK library that
         # you want CMake to locate.
         log)
+
+# 16 KB page size alignment for Android 15+ compatibility
+target_link_options(https-bloom-lib PRIVATE
+        "-Wl,-z,common-page-size=16384"
+        "-Wl,-z,max-page-size=16384")
