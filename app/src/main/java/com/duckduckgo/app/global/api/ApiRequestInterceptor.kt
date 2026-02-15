@@ -36,14 +36,25 @@ class ApiRequestInterceptor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
 
-        val url = chain.request().url
-        if (url.toString().startsWith("${AppUrl.Url.PIXEL}/t/rq_")) {
+        val url = chain.request().url.toString()
+        if (url.startsWith("${AppUrl.Url.PIXEL}/t/rq_")) {
             // user agent for re-query pixels needs to be the same for the webview
             request.addHeader(Header.USER_AGENT, userAgentProvider.userAgent())
-        } else {
+        } else if (isInternalUrl(url)) {
             request.addHeader(Header.USER_AGENT, userAgent)
+        } else {
+            // For external URLs (e.g. file downloads from CDNs), use a proper browser
+            // User-Agent so that bot-protection / anti-hotlink systems accept the request.
+            request.addHeader(Header.USER_AGENT, userAgentProvider.userAgent(url))
         }
 
         return chain.proceed(request.build())
+    }
+
+    private fun isInternalUrl(url: String): Boolean {
+        return url.startsWith(AppUrl.Url.API) ||
+            url.startsWith(AppUrl.Url.PIXEL) ||
+            url.contains("duckduckgo.com") ||
+            url.contains("kahfbrowser.com")
     }
 }

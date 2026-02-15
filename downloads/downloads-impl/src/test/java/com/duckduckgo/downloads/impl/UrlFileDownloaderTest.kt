@@ -19,8 +19,8 @@ package com.duckduckgo.downloads.impl
 import android.content.Context
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.DownloadFailReason
-import com.duckduckgo.downloads.api.DownloadLocationPreferences
 import com.duckduckgo.downloads.api.FileDownloader
+import com.duckduckgo.downloads.impl.DownloadFileCopier
 import java.io.File
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
@@ -41,7 +41,7 @@ class UrlFileDownloaderTest {
     private val mockContext: Context = mock()
     private val downloadFileService: DownloadFileService = mock()
     private val call: Call<ResponseBody> = mock()
-    private val downloadLocationPreferences: DownloadLocationPreferences = mock()
+    private val mockDownloadFileCopier: DownloadFileCopier = mock()
     private lateinit var realFileDownloadManager: RealUrlFileDownloadCallManager
 
     private lateinit var urlFileDownloader: UrlFileDownloader
@@ -49,7 +49,7 @@ class UrlFileDownloaderTest {
     @Before
     fun setup() {
         realFileDownloadManager = RealUrlFileDownloadCallManager()
-        whenever(downloadFileService.downloadFile(anyString(), anyString())).thenReturn(call)
+        whenever(downloadFileService.downloadFile(anyString(), anyString(), anyString())).thenReturn(call)
 
         val cacheDir = File(System.getProperty("java.io.tmpdir"), "test-cache")
         cacheDir.mkdirs()
@@ -60,7 +60,7 @@ class UrlFileDownloaderTest {
             downloadFileService,
             realFileDownloadManager,
             FakeCookieManagerWrapper(),
-            downloadLocationPreferences,
+            mockDownloadFileCopier,
         )
     }
 
@@ -69,14 +69,17 @@ class UrlFileDownloaderTest {
         val pendingFileDownload = buildPendingDownload("https://example.com/file.txt")
         val filename = "file.txt"
         val downloadCallback = mock<DownloadCallback>()
+        val targetFile = File(pendingFileDownload.directory, filename)
 
         whenever(call.execute()).thenReturn(Response.success("success".toResponseBody()))
+        whenever(mockDownloadFileCopier.copyToTargetDirectory(any(), eq(filename), any(), anyOrNull()))
+            .thenReturn(DownloadFileCopier.CopyResult.WithFile(targetFile))
 
         urlFileDownloader.downloadFile(pendingFileDownload, filename, downloadCallback)
 
         verify(downloadCallback).onStart(any())
         verify(downloadCallback).onProgress(any(), eq(filename), eq(100))
-        verify(downloadCallback).onSuccess(any(), eq("success".length.toLong()), eq(File(pendingFileDownload.directory, filename)), anyOrNull(), anyOrNull())
+        verify(downloadCallback).onSuccess(any(), eq("success".length.toLong()), eq(targetFile), anyOrNull(), anyOrNull())
     }
 
     @Test

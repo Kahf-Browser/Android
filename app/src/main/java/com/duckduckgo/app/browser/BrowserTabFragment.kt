@@ -71,6 +71,7 @@ import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
 import android.webkit.PermissionRequest
 import android.webkit.SslErrorHandler
+import android.webkit.JavascriptInterface
 import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient.FileChooserParams
@@ -345,6 +346,11 @@ import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadsFileActions
 import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
+import com.duckduckgo.downloads.impl.DownloadCallback
+import com.duckduckgo.downloads.impl.FilenameExtractor
+import com.duckduckgo.downloads.impl.ServiceWorkerStreamingDownloader
+import com.duckduckgo.downloads.impl.StreamingDownloadSession
+import com.duckduckgo.downloads.impl.UrlFileDownloadCallManager
 import com.duckduckgo.history.impl.RealNavigationHistory
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.JsMessageCallback
@@ -382,8 +388,10 @@ import com.kahfads.sdk.FallbackAdImpressionListener
 import com.kahfads.sdk.KahfAdsError
 import com.kahfads.sdk.KahfAdsViewConfig
 import com.kahfads.sdk.PlacementId
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
@@ -394,6 +402,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.json.JSONObject
 import timber.log.Timber
 import java.io.BufferedReader
@@ -578,6 +587,18 @@ class BrowserTabFragment :
     lateinit var downloadLocationPreferences: com.duckduckgo.downloads.api.DownloadLocationPreferences
 
     @Inject
+    lateinit var swStreamingDownloader: ServiceWorkerStreamingDownloader
+
+    @Inject
+    lateinit var filenameExtractor: FilenameExtractor
+
+    @Inject
+    lateinit var downloadCallback: DownloadCallback
+
+    @Inject
+    lateinit var urlFileDownloadCallManager: UrlFileDownloadCallManager
+
+    @Inject
     lateinit var privacyProtectionsPopupFactory: PrivacyProtectionsPopupFactory
 
     @Inject
@@ -682,6 +703,15 @@ class BrowserTabFragment :
     private lateinit var safeGazeInterface: SafeGazeJsInterface
     // C1 FIX: Batch evaluateJavascript calls to prevent ANR from rapid-fire large base64 payloads
     private var safeGazeResultBatcher: SafeGazeResultBatcher? = null
+    private val serviceWorkerDownloadBridge = ServiceWorkerDownloadBridge()
+    // Holds the probe result from a Service Worker download (size + mime type from the blob).
+    // Non-null means the user confirmed the dialog and we should use streaming download.
+    private var swProbeResult: SwProbeResult? = null
+    private var swStreamingSession: StreamingDownloadSession? = null
+    private var swStreamingJob: Job? = null
+    private var swPauseMonitorJob: Job? = null
+
+    private data class SwProbeResult(val totalSize: Long, val mimeType: String)
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -1550,6 +1580,14 @@ class BrowserTabFragment :
         webView?.stopLoading()
         smallBannerAdJobForSuggestionList?.cancel()
         smallBannerAdJobForSuggestionList = null
+        // Clean up any active SW streaming download
+        swPauseMonitorJob?.cancel()
+        swPauseMonitorJob = null
+        swStreamingJob?.cancel()
+        swStreamingJob = null
+        swStreamingSession?.cancel()
+        swStreamingSession = null
+        swProbeResult = null
         super.onDestroyView()
     }
 
@@ -3173,6 +3211,7 @@ class BrowserTabFragment :
             webViewClient.activity = requireActivity()
 
             it.addJavascriptInterface(safeGazeInterface, SAFE_GAZE_INTERFACE)
+            it.addJavascriptInterface(serviceWorkerDownloadBridge, SERVICE_WORKER_DOWNLOAD_BRIDGE)
 
             it.settings.apply {
                 clientBrandHintProvider.setDefault(this)
@@ -3197,6 +3236,19 @@ class BrowserTabFragment :
 
             it.setDownloadListener { url, _, contentDisposition, mimeType, _ ->
                 lifecycleScope.launch(dispatchers.main()) {
+                    // For non-blob, non-data network URLs, probe via JS fetch first.
+                    // This handles Service Worker-intercepted URLs (e.g. WeTransfer's local-bartender)
+                    // that return 404 when fetched directly via Retrofit.
+                    if (!url.startsWith("blob:") && !URLUtil.isDataUrl(url) && URLUtil.isNetworkUrl(url)) {
+                        val probe = probeServiceWorkerDownload(it, url)
+                        if (probe != null) {
+                            // The Response is held in JS (window.__swDownloadResponse) with body unconsumed.
+                            // Store probe result; streaming starts after user confirms dialog.
+                            swProbeResult = probe
+                            requestFileDownload(url, contentDisposition, probe.mimeType.ifEmpty { mimeType ?: "" }, true)
+                            return@launch
+                        }
+                    }
                     viewModel.requestFileDownload(url, contentDisposition, mimeType, true, isBlobDownloadWebViewFeatureEnabled(it))
                 }
             }
@@ -4270,6 +4322,11 @@ class BrowserTabFragment :
     }
 
     companion object {
+        private const val SERVICE_WORKER_DOWNLOAD_BRIDGE = "ServiceWorkerDownloadBridge"
+        private const val SW_PROBE_TIMEOUT_MS = 15_000L
+        private const val STALE_CHECK_INTERVAL_MS = 10_000L
+        private const val MAX_STALE_CHECKS = 6 // 60s of no progress
+        private const val PAUSE_CHECK_INTERVAL_MS = 200L
         private const val CUSTOM_TAB_TOOLBAR_COLOR_ARG = "CUSTOM_TAB_TOOLBAR_COLOR_ARG"
         private const val TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG = "TAB_DISPLAYED_IN_CUSTOM_TAB_SCREEN_ARG"
         private const val TAB_ID_ARG = "TAB_ID_ARG"
@@ -5283,10 +5340,28 @@ class BrowserTabFragment :
 
     override fun continueDownload(pendingFileDownload: PendingFileDownload) {
         Timber.i("Continuing to download %s", pendingFileDownload)
-        viewModel.download(pendingFileDownload)
+        val probe = swProbeResult
+        if (probe != null) {
+            swProbeResult = null
+            startServiceWorkerStreamingDownload(pendingFileDownload, probe)
+        } else {
+            viewModel.download(pendingFileDownload)
+        }
     }
 
     override fun cancelDownload() {
+        swProbeResult = null
+        // Cancel any active streaming download
+        swPauseMonitorJob?.cancel()
+        swPauseMonitorJob = null
+        swStreamingSession?.cancel()
+        swStreamingSession = null
+        swStreamingJob?.cancel()
+        swStreamingJob = null
+        // Release JS references — guard against destroyed WebView
+        runCatching {
+            webView?.evaluateJavascript("window.__swDownloadPaused = false; window.__swDownloadResponse = null; window.__swDownloadUrl = null;", null)
+        }
         viewModel.closeAndReturnToSourceIfBlankTab()
     }
 
@@ -5301,6 +5376,334 @@ class BrowserTabFragment :
     override fun permissionsGrantedOnWhereby() {
         val roomParameters = "?skipMediaPermissionPrompt"
         webView?.loadUrl("${webView?.url.orEmpty()}$roomParameters")
+    }
+
+    /**
+     * Bridge for Service Worker downloads using chunked streaming.
+     * Phase 1 (probe): JS fetch() → blob() → report size/type via onBlobReady.
+     * Phase 2 (stream): JS slices blob into 512KB chunks → onDownloadChunk × N → onDownloadComplete.
+     */
+    private inner class ServiceWorkerDownloadBridge {
+        @Volatile
+        var probeDeferred: CompletableDeferred<SwProbeResult?>? = null
+
+        @JavascriptInterface
+        fun onBlobReady(totalSize: Long, mimeType: String) {
+            Timber.d("SW probe: blob ready, size=%d, type=%s", totalSize, mimeType)
+            probeDeferred?.complete(SwProbeResult(totalSize, mimeType))
+        }
+
+        @JavascriptInterface
+        fun onProbeFailed(reason: String) {
+            Timber.d("SW probe failed: %s", reason)
+            probeDeferred?.complete(null)
+        }
+
+        @JavascriptInterface
+        fun onDownloadChunk(base64Chunk: String) {
+            swStreamingSession?.onChunk(base64Chunk)
+        }
+
+        @JavascriptInterface
+        fun onDownloadComplete() {
+            Timber.d("SW streaming download complete")
+            swStreamingSession?.onComplete()
+        }
+
+        @JavascriptInterface
+        fun onDownloadFailed(reason: String) {
+            Timber.d("SW streaming download failed: %s", reason)
+            swStreamingSession?.onFailed(reason)
+        }
+    }
+
+    /**
+     * Probes a URL via JavaScript fetch() within the WebView context to check if
+     * a Service Worker intercepts it. Reads only the response headers (Content-Length,
+     * Content-Type) and stores the unconsumed Response object for later streaming.
+     * Returns SwProbeResult on success, null on failure (caller should fall back to Retrofit).
+     */
+    @Suppress("MaxLineLength")
+    private suspend fun probeServiceWorkerDownload(webView: WebView, url: String): SwProbeResult? {
+        val deferred = CompletableDeferred<SwProbeResult?>()
+        serviceWorkerDownloadBridge.probeDeferred = deferred
+
+        val escapedUrl = url.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")
+        val js = """
+            (function() {
+                try {
+                    fetch('$escapedUrl', { credentials: 'include' })
+                        .then(function(response) {
+                            if (!response.ok) throw new Error('HTTP ' + response.status);
+                            var size = parseInt(response.headers.get('content-length') || '0', 10) || 0;
+                            var type = response.headers.get('content-type') || '';
+                            // Store the Response object with its body unconsumed for later streaming
+                            window.__swDownloadResponse = response;
+                            window.__swDownloadUrl = '$escapedUrl';
+                            $SERVICE_WORKER_DOWNLOAD_BRIDGE.onBlobReady(size, type);
+                        })
+                        .catch(function(e) {
+                            $SERVICE_WORKER_DOWNLOAD_BRIDGE.onProbeFailed(e.message || 'fetch failed');
+                        });
+                } catch(e) {
+                    $SERVICE_WORKER_DOWNLOAD_BRIDGE.onProbeFailed(e.message || 'JS error');
+                }
+            })();
+        """.trimIndent()
+
+        withContext(dispatchers.main()) {
+            webView.evaluateJavascript(js, null)
+        }
+
+        return withTimeoutOrNull(SW_PROBE_TIMEOUT_MS) {
+            deferred.await()
+        }.also {
+            serviceWorkerDownloadBridge.probeDeferred = null
+        }
+    }
+
+    /**
+     * Starts a streaming download from the JS Response stored during probing.
+     * Extracts filename, creates a streaming session, injects chunk-reading JS
+     * that reads the response body via ReadableStream at real network speed,
+     * monitors for stale progress, and finalizes on completion.
+     */
+    private fun startServiceWorkerStreamingDownload(
+        pendingDownload: PendingFileDownload,
+        probe: SwProbeResult,
+    ) {
+        val wv = webView ?: return
+
+        // C5: Cancel any existing streaming download before starting a new one
+        swPauseMonitorJob?.cancel()
+        swPauseMonitorJob = null
+        swStreamingSession?.cancel()
+        swStreamingSession = null
+        swStreamingJob?.cancel()
+        swStreamingJob = null
+
+        val result = filenameExtractor.extract(pendingDownload)
+        val fileName = when (result) {
+            is FilenameExtractor.FilenameExtractionResult.Extracted -> result.filename
+            is FilenameExtractor.FilenameExtractionResult.Guess -> result.bestGuess
+        }
+
+        // Override mimeType from the probe if present
+        val effectiveDownload = if (probe.mimeType.isNotEmpty()) {
+            pendingDownload.copy(mimeType = probe.mimeType)
+        } else {
+            pendingDownload
+        }
+
+        val session = swStreamingDownloader.createSession(
+            pendingDownload = effectiveDownload,
+            fileName = fileName,
+            totalSize = probe.totalSize,
+            callback = downloadCallback,
+        )
+        swStreamingSession = session
+
+        // H5: Register cancel action so notification cancel button can stop the SW session
+        urlFileDownloadCallManager.registerCancelAction(session.downloadId) {
+            session.cancel()
+        }
+
+        // Launch pause monitor — polls UrlFileDownloadCallManager every 200ms
+        // and injects JS to pause/resume the ReadableStream pump accordingly.
+        swPauseMonitorJob = lifecycleScope.launch(dispatchers.io()) {
+            monitorPauseState(session.downloadId, wv)
+        }
+
+        swStreamingJob = lifecycleScope.launch(dispatchers.io()) {
+            try {
+                // Inject the chunk-reading JavaScript
+                withContext(dispatchers.main()) {
+                    injectChunkReadingJs(wv)
+                }
+
+                // Monitor for stale progress (no data flowing)
+                monitorStreamingDownload(session)
+
+                // Wait for JS to finish sending chunks
+                val success = session.completionDeferred.await()
+
+                if (success) {
+                    // H2: Use NonCancellable to prevent interrupting file copy mid-way
+                    withContext(NonCancellable) {
+                        swStreamingDownloader.finalizeDownload(session, effectiveDownload)
+                    }
+                }
+            } finally {
+                // C4: Guaranteed cleanup even on CancellationException (e.g. fragment destroy)
+                withContext(NonCancellable) {
+                    swPauseMonitorJob?.cancel()
+                    swPauseMonitorJob = null
+                    // C3: Guard evaluateJavascript against destroyed WebView
+                    runCatching {
+                        withContext(dispatchers.main()) {
+                            wv.evaluateJavascript("window.__swDownloadPaused = false; window.__swDownloadResponse = null; window.__swDownloadUrl = null;", null)
+                        }
+                    }
+                    swStreamingSession = null
+                    swStreamingJob = null
+                }
+            }
+        }
+    }
+
+    /**
+     * Injects JavaScript that reads the stored Response body via ReadableStream,
+     * accumulates network chunks into ~512KB buffers, base64-encodes them, and
+     * sends each buffer to Kotlin via the bridge. This streams at real network
+     * speed, giving accurate download progress.
+     */
+    @Suppress("MaxLineLength")
+    private fun injectChunkReadingJs(webView: WebView) {
+        val js = """
+            (function() {
+                var response = window.__swDownloadResponse;
+                var downloadUrl = window.__swDownloadUrl;
+                window.__swDownloadResponse = null;
+                window.__swDownloadUrl = null;
+
+                function startStreaming(resp) {
+                    if (!resp || !resp.body) {
+                        $SERVICE_WORKER_DOWNLOAD_BRIDGE.onDownloadFailed('No response body available');
+                        return;
+                    }
+                    var reader = resp.body.getReader();
+                    var buffer = [];
+                    var bufferSize = 0;
+                    var CHUNK_SIZE = 512 * 1024;
+
+                    function uint8ToBase64(arr) {
+                        var BLOCK = 0x2000;
+                        var parts = [];
+                        for (var i = 0; i < arr.length; i += BLOCK) {
+                            parts.push(String.fromCharCode.apply(null, arr.subarray(i, i + BLOCK)));
+                        }
+                        return btoa(parts.join(''));
+                    }
+
+                    function flushBuffer() {
+                        if (bufferSize === 0) return;
+                        var merged = new Uint8Array(bufferSize);
+                        var offset = 0;
+                        for (var i = 0; i < buffer.length; i++) {
+                            merged.set(buffer[i], offset);
+                            offset += buffer[i].length;
+                        }
+                        $SERVICE_WORKER_DOWNLOAD_BRIDGE.onDownloadChunk(uint8ToBase64(merged));
+                        buffer = [];
+                        bufferSize = 0;
+                    }
+
+                    window.__swDownloadPaused = false;
+                    function pump() {
+                        if (window.__swDownloadPaused) {
+                            setTimeout(pump, 200);
+                            return;
+                        }
+                        reader.read().then(function(result) {
+                            if (result.done) {
+                                flushBuffer();
+                                $SERVICE_WORKER_DOWNLOAD_BRIDGE.onDownloadComplete();
+                                return;
+                            }
+                            buffer.push(result.value);
+                            bufferSize += result.value.length;
+                            if (bufferSize >= CHUNK_SIZE) {
+                                flushBuffer();
+                            }
+                            setTimeout(pump, 0);
+                        }).catch(function(e) {
+                            $SERVICE_WORKER_DOWNLOAD_BRIDGE.onDownloadFailed(e.message || 'stream read error');
+                        });
+                    }
+                    pump();
+                }
+
+                if (!response || !response.body) {
+                    // H1: Stored response is stale or unavailable — re-fetch the URL
+                    if (downloadUrl) {
+                        fetch(downloadUrl, { credentials: 'include' })
+                            .then(function(resp) {
+                                if (!resp.ok) throw new Error('Re-fetch HTTP ' + resp.status);
+                                startStreaming(resp);
+                            })
+                            .catch(function(e) {
+                                $SERVICE_WORKER_DOWNLOAD_BRIDGE.onDownloadFailed('Re-fetch failed: ' + (e.message || 'unknown'));
+                            });
+                    } else {
+                        $SERVICE_WORKER_DOWNLOAD_BRIDGE.onDownloadFailed('No response available and no URL for re-fetch');
+                    }
+                } else {
+                    startStreaming(response);
+                }
+            })();
+        """.trimIndent()
+        webView.evaluateJavascript(js, null)
+    }
+
+    /**
+     * Monitors a streaming download session for stale progress.
+     * If no bytes are written for [MAX_STALE_CHECKS] consecutive checks
+     * (each [STALE_CHECK_INTERVAL_MS] apart), cancels the download.
+     * Paused downloads are not counted as stale.
+     * No absolute timeout — large files on slow connections are OK as long as data flows.
+     */
+    private suspend fun monitorStreamingDownload(session: StreamingDownloadSession) {
+        var lastBytesWritten = session.bytesWritten
+        var staleChecks = 0
+
+        while (!session.isComplete && !session.isFailed) {
+            delay(STALE_CHECK_INTERVAL_MS)
+            if (session.isComplete || session.isFailed) break
+
+            // Don't count paused time as stale; M1: reset lastBytesWritten on resume
+            // so first check after unpause doesn't false-trigger
+            if (urlFileDownloadCallManager.isPaused(session.downloadId)) {
+                staleChecks = 0
+                lastBytesWritten = session.bytesWritten
+                continue
+            }
+
+            val currentBytes = session.bytesWritten
+            if (currentBytes == lastBytesWritten) {
+                staleChecks++
+                if (staleChecks >= MAX_STALE_CHECKS) {
+                    Timber.w("SW streaming download stale for ${staleChecks * STALE_CHECK_INTERVAL_MS}ms, cancelling")
+                    session.onFailed("Download stalled — no data received for ${MAX_STALE_CHECKS * STALE_CHECK_INTERVAL_MS / 1000}s")
+                    return
+                }
+            } else {
+                staleChecks = 0
+                lastBytesWritten = currentBytes
+            }
+        }
+    }
+
+    /**
+     * Polls [UrlFileDownloadCallManager.isPaused] every 200ms and relays pause/resume
+     * state to the JS ReadableStream pump via window.__swDownloadPaused.
+     */
+    private suspend fun monitorPauseState(downloadId: Long, wv: WebView) {
+        var wasPaused = false
+        while (true) {
+            delay(PAUSE_CHECK_INTERVAL_MS)
+            val isPaused = urlFileDownloadCallManager.isPaused(downloadId)
+            if (isPaused != wasPaused) {
+                wasPaused = isPaused
+                // C3: Guard against destroyed WebView
+                runCatching {
+                    withContext(dispatchers.main()) {
+                        if (isAdded) {
+                            wv.evaluateJavascript("window.__swDownloadPaused = $isPaused;", null)
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

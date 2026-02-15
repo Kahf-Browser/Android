@@ -17,6 +17,7 @@
 package com.duckduckgo.downloads.impl
 
 import android.util.Base64
+import android.webkit.URLUtil
 import androidx.annotation.WorkerThread
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.downloads.api.DownloadFailReason
@@ -49,7 +50,7 @@ class DataUriDownloader @Inject constructor(
                     return
                 }
                 is ParseResult.ParsedDataUri -> {
-                    val file = initialiseFilesOnDisk(pending, parsedDataUri.filename)
+                    val file = initialiseFilesOnDisk(pending, parsedDataUri.filename, parsedDataUri.mimeType)
 
                     callback.onStart(
                         DownloadItem(
@@ -92,12 +93,27 @@ class DataUriDownloader @Inject constructor(
     private fun initialiseFilesOnDisk(
         pending: PendingFileDownload,
         generatedFilename: GeneratedFilename,
+        mimeType: String?,
     ): File {
         val downloadDirectory = pending.directory
-        val file = File(downloadDirectory, generatedFilename.toString())
+
+        // Use filename from contentDisposition if available (e.g. for Service Worker downloads
+        // where the original filename is in the Content-Disposition header but the URL is a data URI)
+        val fileName = extractFilenameFromContentDisposition(pending.contentDisposition, mimeType)
+            ?: generatedFilename.toString()
+
+        val file = File(downloadDirectory, fileName)
 
         if (!downloadDirectory.exists()) downloadDirectory.mkdirs()
         if (!file.exists()) file.createNewFile()
         return file
+    }
+
+    private fun extractFilenameFromContentDisposition(contentDisposition: String?, mimeType: String?): String? {
+        if (contentDisposition.isNullOrBlank()) return null
+        val guessed = URLUtil.guessFileName("", contentDisposition, mimeType)
+        // URLUtil.guessFileName returns "downloadfile" or "downloadfile.bin" as default fallback
+        if (guessed.isNullOrBlank() || guessed == "downloadfile" || guessed == "downloadfile.bin") return null
+        return guessed
     }
 }

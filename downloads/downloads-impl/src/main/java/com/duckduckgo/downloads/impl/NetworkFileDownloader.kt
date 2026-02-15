@@ -25,6 +25,7 @@ class NetworkFileDownloader @Inject constructor(
     private val filenameExtractor: FilenameExtractor,
     private val fileService: DownloadFileService,
     private val urlFileDownloader: UrlFileDownloader,
+    private val cookieManagerWrapper: CookieManagerWrapper,
 ) {
 
     fun download(pendingDownload: PendingFileDownload, callback: DownloadCallback) {
@@ -46,7 +47,8 @@ class NetworkFileDownloader @Inject constructor(
         logcat { "Make a HEAD request for ${pendingDownload.url} as there are no values for Content-Disposition or Content-Type." }
 
         runCatching {
-            fileService.getFileDetails(pendingDownload.url)?.execute()?.let { response ->
+            val cookie = cookieManagerWrapper.getCookie(pendingDownload.url).orEmpty()
+            fileService.getFileDetails(cookie, pendingDownload.url)?.execute()?.let { response ->
                 var updatedPendingDownload = pendingDownload.copy()
 
                 if (response.isSuccessful) {

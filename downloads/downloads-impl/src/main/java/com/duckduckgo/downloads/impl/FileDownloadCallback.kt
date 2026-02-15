@@ -204,7 +204,10 @@ class FileDownloadCallback @Inject constructor(
             Other, UnsupportedUrlType, DataUriParseException -> R.string.downloadsDownloadGenericErrorMessage
         }
         val downloadFailedMessage = DownloadCommand.ShowDownloadFailedMessage(messageId = messageId)
-        fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, url)
+        // Data URIs can be huge (100MB+) and must not be put into Intent extras
+        // (Binder transaction limit is ~1MB). They also can't be retried, so pass null.
+        val notificationUrl = url?.takeUnless { it.startsWith("data:", ignoreCase = true) }
+        fileDownloadNotificationManager.showDownloadFailedNotification(downloadId, notificationUrl)
         appCoroutineScope.launch(dispatchers.io()) {
             command.send(downloadFailedMessage)
         }

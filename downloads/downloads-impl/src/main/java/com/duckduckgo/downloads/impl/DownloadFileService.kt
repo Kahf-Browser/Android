@@ -30,12 +30,16 @@ import retrofit2.http.Url
 interface DownloadFileService {
 
     @HEAD
-    fun getFileDetails(@Url urlString: String): Call<Void>?
+    fun getFileDetails(
+        @Header("Cookie") cookie: String,
+        @Url urlString: String,
+    ): Call<Void>?
 
     @Streaming
     @GET
     fun downloadFile(
         @Header("Cookie") cookie: String,
+        @Header("Referer") referer: String,
         @Url urlString: String,
     ): Call<ResponseBody>
 }

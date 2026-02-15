@@ -31,6 +31,7 @@ interface UrlFileDownloadCallManager {
     fun pause(downloadId: Long)
     fun resume(downloadId: Long)
     fun isPaused(downloadId: Long): Boolean
+    fun registerCancelAction(downloadId: Long, action: () -> Unit)
 }
 
 @ContributesBinding(
@@ -41,12 +42,14 @@ interface UrlFileDownloadCallManager {
 class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCallManager {
     private val callsMap = ConcurrentHashMap<Long, Call<ResponseBody>>()
     private val pausedSet = ConcurrentHashMap.newKeySet<Long>()
+    private val cancelActions = ConcurrentHashMap<Long, () -> Unit>()
 
     override fun remove(downloadId: Long) {
         logcat { "Removing download $downloadId" }
         callsMap[downloadId]?.cancel()
         callsMap.remove(downloadId)
         pausedSet.remove(downloadId)
+        runCatching { cancelActions.remove(downloadId)?.invoke() }
     }
 
     override fun add(downloadId: Long, call: Call<ResponseBody>) {
@@ -66,5 +69,9 @@ class RealUrlFileDownloadCallManager @Inject constructor() : UrlFileDownloadCall
 
     override fun isPaused(downloadId: Long): Boolean {
         return pausedSet.contains(downloadId)
+    }
+
+    override fun registerCancelAction(downloadId: Long, action: () -> Unit) {
+        cancelActions[downloadId] = action
     }
 }
