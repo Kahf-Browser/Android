@@ -31,4 +31,8 @@ interface DownloadsItemListener {
     fun onItemVisibilityChanged(visible: Boolean)
 
     fun onFileNotFound(item: DownloadItem)
+
+    fun onRetryItemClicked(item: DownloadItem)
+
+    fun onDeleteFailedItemClicked(item: DownloadItem)
 }

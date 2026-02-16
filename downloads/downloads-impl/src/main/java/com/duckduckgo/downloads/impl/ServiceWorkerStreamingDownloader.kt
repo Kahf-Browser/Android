@@ -67,6 +67,7 @@ class ServiceWorkerStreamingDownloader @Inject constructor(
                 contentLength = totalSize,
                 filePath = pendingDownload.directory.path + File.separatorChar + fileName,
                 createdAt = DatabaseDateFormatter.timestamp(),
+                downloadUrl = pendingDownload.url,
             ),
         )
 
@@ -154,6 +155,12 @@ class StreamingDownloadSession internal constructor(
     private val terminalLock = Any()
     private var terminated = false
 
+    // Throttle progress updates so Android's notification system can display intermediate values.
+    // Without throttling, rapid chunk processing floods NotificationManager and only the last
+    // update (100%) is visible.
+    @Volatile
+    private var lastProgressUpdateMs = 0L
+
     @Volatile
     var isComplete = false
         private set
@@ -168,6 +175,9 @@ class StreamingDownloadSession internal constructor(
     /**
      * Called from WebView thread for each base64-encoded chunk.
      * Decodes and writes on a background IO executor to avoid blocking the WebView thread.
+     *
+     * Progress is throttled to one update per [PROGRESS_THROTTLE_MS] to prevent flooding
+     * Android's NotificationManager, which would cause intermediate values to be skipped.
      */
     fun onChunk(base64Chunk: String) {
         if (terminated) return
@@ -177,12 +187,17 @@ class StreamingDownloadSession internal constructor(
                 val bytes = Base64.decode(base64Chunk, Base64.DEFAULT)
                 outputStream.write(bytes)
                 val written = _bytesWritten.addAndGet(bytes.size.toLong())
-                val progress = if (totalSize > 0) {
-                    ((written * 100) / totalSize).toInt().coerceIn(0, 100)
-                } else {
-                    -1 // Signal indeterminate progress
+                // Throttle progress updates to allow notification system to display intermediate values
+                val now = System.currentTimeMillis()
+                if (now - lastProgressUpdateMs >= PROGRESS_THROTTLE_MS) {
+                    lastProgressUpdateMs = now
+                    val progress = if (totalSize > 0) {
+                        ((written * 100) / totalSize).toInt().coerceIn(0, 99)
+                    } else {
+                        0
+                    }
+                    callback.onProgress(downloadId, fileName, progress)
                 }
-                callback.onProgress(downloadId, fileName, progress)
             } catch (e: Exception) {
                 logcat { "Error writing SW download chunk to temp file: ${e.message}" }
                 onFailed("IO error: ${e.message}")
@@ -202,6 +217,8 @@ class StreamingDownloadSession internal constructor(
                 terminated = true
             }
             runCatching { outputStream.flush(); outputStream.close() }
+            // Send final 100% progress before signaling completion
+            callback.onProgress(downloadId, fileName, 100)
             ioExecutor.shutdown()
             isComplete = true
             completionDeferred.complete(true)
@@ -243,5 +260,6 @@ class StreamingDownloadSession internal constructor(
 
     companion object {
         private const val IO_BUFFER_SIZE = 8192
+        private const val PROGRESS_THROTTLE_MS = 300L
     }
 }

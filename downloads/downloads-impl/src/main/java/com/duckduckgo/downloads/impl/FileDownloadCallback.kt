@@ -31,6 +31,7 @@ import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_FAILED
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_STARTED
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED
+import com.duckduckgo.downloads.store.DownloadStatus.FAILED
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
@@ -171,7 +172,7 @@ class FileDownloadCallback @Inject constructor(
         handleFailedDownload(downloadId = downloadId ?: 0, url = url, reason = reason)
         downloadId?.let {
             appCoroutineScope.launch(dispatchers.io()) {
-                downloadsRepository.delete(listOf(downloadId))
+                downloadsRepository.update(downloadId = downloadId, downloadStatus = FAILED, contentLength = 0)
             }
         }
     }

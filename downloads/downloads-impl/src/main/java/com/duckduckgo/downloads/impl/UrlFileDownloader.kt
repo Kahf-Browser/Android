@@ -74,8 +74,8 @@ class UrlFileDownloader @Inject constructor(
                 contentLength = 0,
                 filePath = directory.path + File.separatorChar + fileName,
                 createdAt = DatabaseDateFormatter.timestamp(),
+                downloadUrl = url,
             ),
-
         )
 
         // Use app cache as temp directory to avoid scoped storage restrictions

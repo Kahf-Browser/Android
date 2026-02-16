@@ -18,12 +18,22 @@ package com.duckduckgo.downloads.store
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 @Database(
     exportSchema = true,
-    version = 2,
+    version = 3,
     entities = [DownloadEntity::class],
 )
 abstract class DownloadsDatabase : RoomDatabase() {
     abstract fun downloadsDao(): DownloadsDao
+
+    companion object {
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("ALTER TABLE downloads ADD COLUMN downloadUrl TEXT")
+            }
+        }
+    }
 }

@@ -141,15 +141,17 @@ class FileDownloadCallbackTest {
     }
 
     @Test
-    fun whenOnErrorCalledForDownloadIdAndConnectionRefusedThenPixelFiredAndItemDeleted() = runTest {
+    fun whenOnErrorCalledForDownloadIdAndConnectionRefusedThenPixelFiredAndItemMarkedAsFailed() = runTest {
         val downloadId = 1L
         val failReason = DownloadFailReason.ConnectionRefused
 
         callback.onError(downloadId = downloadId, reason = failReason)
 
         verify(mockPixel).fire(DownloadsPixelName.DOWNLOAD_REQUEST_FAILED)
-        verify(mockDownloadsRepository).delete(
-            downloadIdList = listOf(downloadId),
+        verify(mockDownloadsRepository).update(
+            downloadId = downloadId,
+            downloadStatus = com.duckduckgo.downloads.store.DownloadStatus.FAILED,
+            contentLength = 0,
         )
     }
 

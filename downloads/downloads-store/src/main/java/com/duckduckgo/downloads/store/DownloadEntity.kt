@@ -31,4 +31,5 @@ data class DownloadEntity(
     val filePath: String,
     val createdAt: String = DatabaseDateFormatter.timestamp(),
     val contentUri: String? = null,
+    val downloadUrl: String? = null,
 )

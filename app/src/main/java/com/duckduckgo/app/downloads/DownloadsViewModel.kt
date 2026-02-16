@@ -29,6 +29,7 @@ import com.duckduckgo.app.downloads.DownloadsViewModel.Command.CancelDownload
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.DisplayUndoMessage
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.OpenFile
+import com.duckduckgo.app.downloads.DownloadsViewModel.Command.RetryDownload
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command.ShareFile
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
@@ -70,6 +71,7 @@ class DownloadsViewModel @Inject constructor(
         data class OpenFile(val item: DownloadItem) : Command()
         data class ShareFile(val item: DownloadItem) : Command()
         data class CancelDownload(val item: DownloadItem) : Command()
+        data class RetryDownload(val item: DownloadItem) : Command()
     }
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -127,7 +129,7 @@ class DownloadsViewModel @Inject constructor(
             File(it.filePath).delete()
         }
 
-        // Remove all unfinished downloads from DownloadManager.
+        // Remove all non-finished downloads (STARTED and FAILED) from repository.
         items.filter { it.downloadStatus != DownloadStatus.FINISHED }.forEach { removeFromDownloadManager(it.downloadId) }
     }
 
@@ -196,6 +198,28 @@ class DownloadsViewModel @Inject constructor(
 
     override fun onFileNotFound(item: DownloadItem) {
         delete(item)
+    }
+
+    override fun onRetryItemClicked(item: DownloadItem) {
+        if (item.downloadUrl == null) return
+        viewModelScope.launch(dispatcher.io()) {
+            downloadsRepository.delete(item.downloadId)
+            val partialFile = File(item.filePath)
+            if (partialFile.exists()) {
+                partialFile.delete()
+            }
+            command.send(RetryDownload(item))
+        }
+    }
+
+    override fun onDeleteFailedItemClicked(item: DownloadItem) {
+        viewModelScope.launch(dispatcher.io()) {
+            downloadsRepository.delete(item.downloadId)
+            val partialFile = File(item.filePath)
+            if (partialFile.exists()) {
+                partialFile.delete()
+            }
+        }
     }
 
     override fun onItemVisibilityChanged(visible: Boolean) {

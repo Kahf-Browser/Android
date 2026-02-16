@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.R.layout
 import com.duckduckgo.app.browser.databinding.ViewItemDownloadsEmptyBinding
+import com.duckduckgo.app.browser.databinding.ViewItemDownloadsFailedBinding
 import com.duckduckgo.app.browser.databinding.ViewItemDownloadsHeaderBinding
 import com.duckduckgo.app.browser.databinding.ViewItemDownloadsNotifyMeBinding
 import com.duckduckgo.app.downloads.DownloadViewItem.Empty
@@ -37,6 +38,7 @@ import com.duckduckgo.common.ui.notifyme.NotifyMeView
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.utils.formatters.data.DataSizeFormatter
+import com.duckduckgo.downloads.store.DownloadStatus.FAILED
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
 import com.duckduckgo.mobile.android.databinding.RowTwoLineItemBinding
 import java.io.File
@@ -63,6 +65,10 @@ class DownloadsAdapter @Inject constructor(
                 listener = downloadsItemListener,
                 formatter = dataSizeFormatter,
             )
+            VIEW_TYPE_FAILED_ITEM -> FailedItemViewHolder(
+                binding = ViewItemDownloadsFailedBinding.inflate(inflater, parent, false),
+                listener = downloadsItemListener,
+            )
             VIEW_TYPE_NOTIFY_ME -> NotifyMeViewHolder(
                 binding = ViewItemDownloadsNotifyMeBinding.inflate(inflater, parent, false),
                 listener = downloadsItemListener,
@@ -80,15 +86,16 @@ class DownloadsAdapter @Inject constructor(
             VIEW_TYPE_EMPTY -> (holder as EmptyViewHolder)
             VIEW_TYPE_HEADER -> (holder as HeaderViewHolder).bind(items[position] as Header)
             VIEW_TYPE_ITEM -> (holder as ItemViewHolder).bind(items[position] as Item)
+            VIEW_TYPE_FAILED_ITEM -> (holder as FailedItemViewHolder).bind(items[position] as Item)
             VIEW_TYPE_NOTIFY_ME -> (holder as NotifyMeViewHolder)
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (items[position]) {
+        return when (val item = items[position]) {
             is Empty -> VIEW_TYPE_EMPTY
             is Header -> VIEW_TYPE_HEADER
-            is Item -> VIEW_TYPE_ITEM
+            is Item -> if (item.downloadItem.downloadStatus == FAILED) VIEW_TYPE_FAILED_ITEM else VIEW_TYPE_ITEM
             is NotifyMe -> VIEW_TYPE_NOTIFY_ME
         }
     }
@@ -220,6 +227,25 @@ class DownloadsAdapter @Inject constructor(
         }
     }
 
+    class FailedItemViewHolder(
+        val binding: ViewItemDownloadsFailedBinding,
+        val listener: DownloadsItemListener,
+    ) : RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: Item) {
+            binding.primaryText.text = item.downloadItem.fileName
+            binding.secondaryText.text = binding.root.context.getString(R.string.downloadsStateFailed)
+
+            binding.retryButton.setOnClickListener {
+                listener.onRetryItemClicked(item.downloadItem)
+            }
+
+            binding.deleteButton.setOnClickListener {
+                listener.onDeleteFailedItemClicked(item.downloadItem)
+            }
+        }
+    }
+
     class DiffCallback(
         private val old: List<DownloadViewItem>,
         private val new: List<DownloadViewItem>,
@@ -229,7 +255,12 @@ class DownloadsAdapter @Inject constructor(
             oldItemPosition: Int,
             newItemPosition: Int,
         ): Boolean {
-            return old[oldItemPosition] == new[newItemPosition]
+            val oldItem = old[oldItemPosition]
+            val newItem = new[newItemPosition]
+            if (oldItem is Item && newItem is Item) {
+                return oldItem.downloadItem.downloadId == newItem.downloadItem.downloadId
+            }
+            return oldItem == newItem
         }
 
         override fun getOldListSize(): Int {
@@ -253,5 +284,6 @@ class DownloadsAdapter @Inject constructor(
         const val VIEW_TYPE_HEADER = 1
         const val VIEW_TYPE_ITEM = 2
         const val VIEW_TYPE_NOTIFY_ME = 3
+        const val VIEW_TYPE_FAILED_ITEM = 4
     }
 }

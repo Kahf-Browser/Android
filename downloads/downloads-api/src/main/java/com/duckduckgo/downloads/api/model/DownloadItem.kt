@@ -25,4 +25,5 @@ data class DownloadItem(
     val createdAt: String,
     val filePath: String,
     val contentUri: String? = null,
+    val downloadUrl: String? = null,
 )

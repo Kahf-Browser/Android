@@ -711,7 +711,12 @@ class BrowserTabFragment :
     private var swStreamingJob: Job? = null
     private var swPauseMonitorJob: Job? = null
 
-    private data class SwProbeResult(val totalSize: Long, val mimeType: String)
+    private data class SwProbeResult(
+        val totalSize: Long,
+        val mimeType: String,
+        val downloadUrl: String,
+        val resolvedUrl: String,
+    )
 
     private val viewModel: BrowserTabViewModel by lazy {
         val viewModel = ViewModelProvider(this, viewModelFactory).get(BrowserTabViewModel::class.java)
@@ -3242,8 +3247,6 @@ class BrowserTabFragment :
                     if (!url.startsWith("blob:") && !URLUtil.isDataUrl(url) && URLUtil.isNetworkUrl(url)) {
                         val probe = probeServiceWorkerDownload(it, url)
                         if (probe != null) {
-                            // The Response is held in JS (window.__swDownloadResponse) with body unconsumed.
-                            // Store probe result; streaming starts after user confirms dialog.
                             swProbeResult = probe
                             requestFileDownload(url, contentDisposition, probe.mimeType.ifEmpty { mimeType ?: "" }, true)
                             return@launch
@@ -5343,7 +5346,20 @@ class BrowserTabFragment :
         val probe = swProbeResult
         if (probe != null) {
             swProbeResult = null
-            startServiceWorkerStreamingDownload(pendingFileDownload, probe)
+
+            // If the SW resolved to a different URL (e.g. CDN), download directly via OkHttp
+            // for real-time progress based on actual bytes downloaded.
+            val resolvedUrl = probe.resolvedUrl
+            if (resolvedUrl.isNotEmpty() && resolvedUrl != probe.downloadUrl && URLUtil.isNetworkUrl(resolvedUrl)) {
+                val directDownload = if (probe.mimeType.isNotEmpty()) {
+                    pendingFileDownload.copy(url = resolvedUrl, mimeType = probe.mimeType)
+                } else {
+                    pendingFileDownload.copy(url = resolvedUrl)
+                }
+                viewModel.download(directDownload)
+            } else {
+                startServiceWorkerStreamingDownload(pendingFileDownload, probe)
+            }
         } else {
             viewModel.download(pendingFileDownload)
         }
@@ -5380,17 +5396,17 @@ class BrowserTabFragment :
 
     /**
      * Bridge for Service Worker downloads using chunked streaming.
-     * Phase 1 (probe): JS fetch() → blob() → report size/type via onBlobReady.
-     * Phase 2 (stream): JS slices blob into 512KB chunks → onDownloadChunk × N → onDownloadComplete.
+     * Phase 1 (probe): JS fetch() → read headers → cancel body → report size/type via onBlobReady.
+     * Phase 2 (stream): Fresh fetch() → ReadableStream → 512KB chunks → onDownloadChunk × N → onDownloadComplete.
      */
     private inner class ServiceWorkerDownloadBridge {
         @Volatile
         var probeDeferred: CompletableDeferred<SwProbeResult?>? = null
 
         @JavascriptInterface
-        fun onBlobReady(totalSize: Long, mimeType: String) {
-            Timber.d("SW probe: blob ready, size=%d, type=%s", totalSize, mimeType)
-            probeDeferred?.complete(SwProbeResult(totalSize, mimeType))
+        fun onBlobReady(totalSize: Long, mimeType: String, downloadUrl: String, resolvedUrl: String) {
+            Timber.d("SW probe: blob ready, size=%d, type=%s, url=%s, resolved=%s", totalSize, mimeType, downloadUrl, resolvedUrl)
+            probeDeferred?.complete(SwProbeResult(totalSize, mimeType, downloadUrl, resolvedUrl))
         }
 
         @JavascriptInterface
@@ -5419,8 +5435,10 @@ class BrowserTabFragment :
 
     /**
      * Probes a URL via JavaScript fetch() within the WebView context to check if
-     * a Service Worker intercepts it. Reads only the response headers (Content-Length,
-     * Content-Type) and stores the unconsumed Response object for later streaming.
+     * a Service Worker intercepts it. Reads the response headers (Content-Length,
+     * Content-Type) and immediately cancels the response body to prevent the browser
+     * from buffering the entire file during the confirmation dialog delay.
+     * The download URL is stored for a fresh fetch during the streaming phase.
      * Returns SwProbeResult on success, null on failure (caller should fall back to Retrofit).
      */
     @Suppress("MaxLineLength")
@@ -5437,10 +5455,16 @@ class BrowserTabFragment :
                             if (!response.ok) throw new Error('HTTP ' + response.status);
                             var size = parseInt(response.headers.get('content-length') || '0', 10) || 0;
                             var type = response.headers.get('content-type') || '';
-                            // Store the Response object with its body unconsumed for later streaming
-                            window.__swDownloadResponse = response;
+                            // Extract the resolved URL — if the SW fetched from a CDN,
+                            // response.url will be the real CDN URL we can download directly via OkHttp.
+                            var resolvedUrl = response.url || '';
+                            // Cancel the response body immediately to prevent the browser from
+                            // buffering the entire file while the user confirms the download dialog.
+                            if (response.body) {
+                                response.body.cancel().catch(function() {});
+                            }
                             window.__swDownloadUrl = '$escapedUrl';
-                            $SERVICE_WORKER_DOWNLOAD_BRIDGE.onBlobReady(size, type);
+                            $SERVICE_WORKER_DOWNLOAD_BRIDGE.onBlobReady(size, type, '$escapedUrl', resolvedUrl);
                         })
                         .catch(function(e) {
                             $SERVICE_WORKER_DOWNLOAD_BRIDGE.onProbeFailed(e.message || 'fetch failed');
@@ -5488,6 +5512,8 @@ class BrowserTabFragment :
             is FilenameExtractor.FilenameExtractionResult.Guess -> result.bestGuess
         }
 
+        val downloadUrl = probe.downloadUrl
+
         // Override mimeType from the probe if present
         val effectiveDownload = if (probe.mimeType.isNotEmpty()) {
             pendingDownload.copy(mimeType = probe.mimeType)
@@ -5516,9 +5542,9 @@ class BrowserTabFragment :
 
         swStreamingJob = lifecycleScope.launch(dispatchers.io()) {
             try {
-                // Inject the chunk-reading JavaScript
+                // Inject the chunk-reading JavaScript with a fresh fetch URL
                 withContext(dispatchers.main()) {
-                    injectChunkReadingJs(wv)
+                    injectChunkReadingJs(wv, downloadUrl)
                 }
 
                 // Monitor for stale progress (no data flowing)
@@ -5552,17 +5578,18 @@ class BrowserTabFragment :
     }
 
     /**
-     * Injects JavaScript that reads the stored Response body via ReadableStream,
-     * accumulates network chunks into ~512KB buffers, base64-encodes them, and
-     * sends each buffer to Kotlin via the bridge. This streams at real network
+     * Injects JavaScript that does a fresh fetch() and reads the response body via
+     * ReadableStream, accumulating network chunks into ~512KB buffers, base64-encoding
+     * them, and sending each buffer to Kotlin via the bridge. A fresh fetch is used
+     * (instead of the probe's stored response) to ensure data streams at real network
      * speed, giving accurate download progress.
      */
     @Suppress("MaxLineLength")
-    private fun injectChunkReadingJs(webView: WebView) {
+    private fun injectChunkReadingJs(webView: WebView, downloadUrl: String) {
+        val escapedUrl = downloadUrl.replace("\\", "\\\\").replace("'", "\\'").replace("\n", "\\n")
         val js = """
             (function() {
-                var response = window.__swDownloadResponse;
-                var downloadUrl = window.__swDownloadUrl;
+                var downloadUrl = '$escapedUrl';
                 window.__swDownloadResponse = null;
                 window.__swDownloadUrl = null;
 
@@ -5574,7 +5601,7 @@ class BrowserTabFragment :
                     var reader = resp.body.getReader();
                     var buffer = [];
                     var bufferSize = 0;
-                    var CHUNK_SIZE = 512 * 1024;
+                    var CHUNK_SIZE = 64 * 1024;
 
                     function uint8ToBase64(arr) {
                         var BLOCK = 0x2000;
@@ -5623,23 +5650,17 @@ class BrowserTabFragment :
                     pump();
                 }
 
-                if (!response || !response.body) {
-                    // H1: Stored response is stale or unavailable — re-fetch the URL
-                    if (downloadUrl) {
-                        fetch(downloadUrl, { credentials: 'include' })
-                            .then(function(resp) {
-                                if (!resp.ok) throw new Error('Re-fetch HTTP ' + resp.status);
-                                startStreaming(resp);
-                            })
-                            .catch(function(e) {
-                                $SERVICE_WORKER_DOWNLOAD_BRIDGE.onDownloadFailed('Re-fetch failed: ' + (e.message || 'unknown'));
-                            });
-                    } else {
-                        $SERVICE_WORKER_DOWNLOAD_BRIDGE.onDownloadFailed('No response available and no URL for re-fetch');
-                    }
-                } else {
-                    startStreaming(response);
-                }
+                // Always do a fresh fetch to get real-time streaming progress.
+                // The probe's response body was cancelled to prevent pre-buffering,
+                // so we must re-fetch here to stream at actual network speed.
+                fetch(downloadUrl, { credentials: 'include' })
+                    .then(function(resp) {
+                        if (!resp.ok) throw new Error('Fetch HTTP ' + resp.status);
+                        startStreaming(resp);
+                    })
+                    .catch(function(e) {
+                        $SERVICE_WORKER_DOWNLOAD_BRIDGE.onDownloadFailed('Fetch failed: ' + (e.message || 'unknown'));
+                    });
             })();
         """.trimIndent()
         webView.evaluateJavascript(js, null)

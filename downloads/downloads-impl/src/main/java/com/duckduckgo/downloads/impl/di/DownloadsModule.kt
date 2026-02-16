@@ -33,6 +33,7 @@ class DownloadsModule {
     @SingleInstanceIn(AppScope::class)
     fun provideDownloadsDatabase(context: Context): DownloadsDatabase {
         return Room.databaseBuilder(context, DownloadsDatabase::class.java, "downloads.db")
+            .addMigrations(DownloadsDatabase.MIGRATION_2_3)
             .fallbackToDestructiveMigration()
             .build()
     }

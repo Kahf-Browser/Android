@@ -93,6 +93,7 @@ class DefaultDownloadsRepository @Inject constructor(
             filePath = this.filePath,
             createdAt = this.createdAt,
             contentUri = this.contentUri,
+            downloadUrl = this.downloadUrl,
         )
 
     private fun List<DownloadEntity>.mapToDownloadItems(): List<DownloadItem> =
@@ -107,6 +108,7 @@ class DefaultDownloadsRepository @Inject constructor(
             filePath = this.filePath,
             createdAt = this.createdAt,
             contentUri = this.contentUri,
+            downloadUrl = this.downloadUrl,
         )
 
     private fun List<DownloadItem>.mapToDownloadEntities(): List<DownloadEntity> =

@@ -42,10 +42,12 @@ import com.duckduckgo.common.ui.view.showKeyboard
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.downloads.api.DownloadsFileActions
+import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.model.DownloadItem
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import android.net.Uri
+import android.os.Environment
 import android.util.Log
 import android.webkit.MimeTypeMap
 import java.io.File
@@ -64,6 +66,9 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var downloadsFileActions: DownloadsFileActions
+
+    @Inject
+    lateinit var fileDownloader: FileDownloader
 
     private val toolbar
         get() = binding.toolbar
@@ -126,6 +131,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
             is DisplayMessage -> showSnackbar(command.messageId, command.arg)
             is DisplayUndoMessage -> showUndo(command)
             is CancelDownload -> cancelDownload(command)
+            is Command.RetryDownload -> retryDownload(command)
         }
     }
 
@@ -209,6 +215,18 @@ class DownloadsActivity : DuckDuckGoActivity() {
 
     private fun cancelDownload(command: CancelDownload) {
         viewModel.removeFromDownloadManager(command.item.downloadId)
+    }
+
+    private fun retryDownload(command: Command.RetryDownload) {
+        command.item.downloadUrl?.let { url ->
+            fileDownloader.enqueueDownload(
+                FileDownloader.PendingFileDownload(
+                    url = url,
+                    subfolder = Environment.DIRECTORY_DOWNLOADS,
+                ),
+            )
+        }
+        showSnackbar(R.string.downloadsRetryingMessage, command.item.fileName)
     }
 
     private fun showSnackbar(@StringRes messageId: Int, arg: String = "") {
