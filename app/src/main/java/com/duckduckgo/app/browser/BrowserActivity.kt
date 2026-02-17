@@ -235,7 +235,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         val isLaunchedFromOnboarding = intent?.getBooleanExtra(LAUNCH_FROM_ONBOARDING, false)
         Log.d(TAG, "isFromOnboarding: $isLaunchedFromOnboarding")
         if (isLaunchedFromOnboarding == true) {
-            analyticsService.logEvent(AnalyticsEvent.IntroductoryScreenShown)
+            analyticsService.logEvent(AnalyticsEvent.NewTabScreenShown)
         }
     }
 
