@@ -26,6 +26,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewTreeObserver
@@ -62,6 +63,7 @@ import com.duckduckgo.app.global.view.ClearDataAction
 import com.duckduckgo.app.global.view.FireDialog
 import com.duckduckgo.app.global.view.renderIfChanged
 import com.duckduckgo.app.isMyBrowserDefault
+import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
 import com.duckduckgo.app.onboarding.ui.page.DefaultBrowserPage
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.FIRE_DIALOG_CANCEL
@@ -230,6 +232,11 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         }*/
         handleNotificationIntent(intent = intent)
+        val isLaunchedFromOnboarding = intent?.getBooleanExtra(LAUNCH_FROM_ONBOARDING, false)
+        Log.d(TAG, "isFromOnboarding: $isLaunchedFromOnboarding")
+        if (isLaunchedFromOnboarding == true) {
+            analyticsService.logEvent(AnalyticsEvent.IntroductoryScreenShown)
+        }
     }
 
     override fun onNewIntent(
@@ -790,16 +797,21 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(NEW_SEARCH_EXTRA, newSearch)
             intent.putExtra(NOTIFY_DATA_CLEARED_EXTRA, notifyDataCleared)
             intent.putExtra(OPEN_IN_CURRENT_TAB_EXTRA, openInCurrentTab)
+            if (context is KahfOnboardingActivity) {
+                intent.putExtra(LAUNCH_FROM_ONBOARDING, true)
+            }
             return intent
         }
 
         const val NEW_SEARCH_EXTRA = "NEW_SEARCH_EXTRA"
+        private const val TAG = "BrowserActivity"
         const val PERFORM_FIRE_ON_ENTRY_EXTRA = "PERFORM_FIRE_ON_ENTRY_EXTRA"
         const val NOTIFY_DATA_CLEARED_EXTRA = "NOTIFY_DATA_CLEARED_EXTRA"
         const val LAUNCH_FROM_DEFAULT_BROWSER_DIALOG = "LAUNCH_FROM_DEFAULT_BROWSER_DIALOG"
         const val LAUNCH_FROM_FAVORITES_WIDGET = "LAUNCH_FROM_FAVORITES_WIDGET"
         const val LAUNCH_FROM_NOTIFICATION_PIXEL_NAME = "LAUNCH_FROM_NOTIFICATION_PIXEL_NAME"
         const val OPEN_IN_CURRENT_TAB_EXTRA = "OPEN_IN_CURRENT_TAB_EXTRA"
+        const val LAUNCH_FROM_ONBOARDING = "LAUNCH_FROM_ONBOARDING"
 
         private const val APP_ENJOYMENT_DIALOG_TAG = "AppEnjoyment"
 

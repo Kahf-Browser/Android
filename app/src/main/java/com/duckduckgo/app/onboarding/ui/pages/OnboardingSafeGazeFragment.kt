@@ -60,6 +60,8 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
 
         val isZikrTab = isZikrTab()
 
+        analytics.logEvent(AnalyticsEvent.BlurConsentScreenShown)
+
         binding.btnSkip.isVisible = isZikrTab.not()
         binding.btnSkip.setOnClickListener {
             if (hardwareCompatibilityChecked) {

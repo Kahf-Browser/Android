@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboarding1Binding
 import com.duckduckgo.app.languages.Language
@@ -34,6 +36,9 @@ class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
 
     lateinit var binding: FragmentOnboarding1Binding
 
+    @Inject
+    lateinit var analyticsService: AnalyticsService
+
     private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     override fun onCreateView(
@@ -51,6 +56,8 @@ class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
             }
         }
 
+        analyticsService.logEvent(AnalyticsEvent.IntroductoryScreenShown)
+
         return binding.root
     }
 
@@ -62,6 +69,7 @@ class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
     private fun showLanguageSelectionBottomSheet() {
         LanguageSelectionBottomSheetDialogFragment
             .builder()
+            .setAnalyticsService(analyticsService)
             .setListener(
                 object : OnLanguageClickedListener {
                     override fun onLanguageClicked(language: Language) {

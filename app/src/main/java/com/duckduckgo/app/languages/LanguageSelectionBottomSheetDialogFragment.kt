@@ -25,6 +25,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.LanguageBottomSheetDialogFragmentBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -32,6 +34,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
 class LanguageSelectionBottomSheetDialogFragment: BottomSheetDialogFragment() {
     var onLanguageClicked: OnLanguageClickedListener? = null
+    var analyticsService: AnalyticsService? = null
 
     // Language list
     val supportedLanguages = listOf(
@@ -84,6 +87,7 @@ class LanguageSelectionBottomSheetDialogFragment: BottomSheetDialogFragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
         initView()
+        analyticsService?.logEvent(AnalyticsEvent.LanguageScreenShown)
     }
 
     private fun initView() {
@@ -115,6 +119,7 @@ class LanguageSelectionBottomSheetDialogFragment: BottomSheetDialogFragment() {
     class Builder {
         private val fragment = LanguageSelectionBottomSheetDialogFragment()
         private var onLanguageClicked: OnLanguageClickedListener? = null
+        private var analyticsService: AnalyticsService? = null
 
         fun setListener(
             onLanguageClicked: OnLanguageClickedListener
@@ -123,8 +128,14 @@ class LanguageSelectionBottomSheetDialogFragment: BottomSheetDialogFragment() {
             return this
         }
 
+        fun setAnalyticsService(analyticsService: AnalyticsService): Builder {
+            this.analyticsService = analyticsService
+            return this
+        }
+
         fun build(): LanguageSelectionBottomSheetDialogFragment {
             fragment.onLanguageClicked = onLanguageClicked
+            fragment.analyticsService = analyticsService
             return fragment
         }
     }

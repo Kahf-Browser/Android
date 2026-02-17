@@ -39,6 +39,7 @@ import com.duckduckgo.app.browser.databinding.ActivitySettingsBinding
 import com.duckduckgo.app.email.ui.EmailProtectionUnsupportedScreenNoParams
 import com.duckduckgo.app.firebutton.FireButtonScreenNoParams
 import com.duckduckgo.app.global.view.launchDefaultAppActivity
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.languages.Language
 import com.duckduckgo.app.languages.LanguageSelectionBottomSheetDialogFragment
 import com.duckduckgo.app.languages.OnLanguageClickedListener
@@ -103,6 +104,9 @@ class SettingsActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var downloadLocationPreferences: DownloadLocationPreferences
+
+    @Inject
+    lateinit var analyticsService: AnalyticsService
 
     @Inject
     lateinit var _proSettingsPlugin: PluginPoint<ProSettingsPlugin>
@@ -197,6 +201,7 @@ class SettingsActivity : DuckDuckGoActivity() {
     private fun showLanguageSelectionBottomSheet() {
         LanguageSelectionBottomSheetDialogFragment
             .builder()
+            .setAnalyticsService(analyticsService)
             .setListener(
                 object : OnLanguageClickedListener {
                     override fun onLanguageClicked(language: Language) {

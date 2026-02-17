@@ -22,6 +22,10 @@ sealed class AnalyticsEvent(val name: String) {
     data object SettingsClicked : AnalyticsEvent("settings_clicked")
     data object PrayerTimeOpened : AnalyticsEvent("prayer_time_opened")
     data object SocialMediaMenuOpened : AnalyticsEvent("social_media_menu_opened")
+    data object IntroductoryScreenShown : AnalyticsEvent("introductory_screen_shown")
+    data object LanguageScreenShown : AnalyticsEvent("language_screen_shown")
+    data object BlurConsentScreenShown : AnalyticsEvent("blur_consent_screen_shown")
+    data object NewTabScreenShown : AnalyticsEvent("new_tab_screen_shown")
     data object InactiveFor7Days : AnalyticsEvent("inactive_for_7_days")
 
     // Private DNS (Safe Internet)
