@@ -209,7 +209,7 @@
                         android:scaleType="centerCrop"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        android:src="@drawable/pixelation_without_face_blur"
+                        android:src="@drawable/iv_pixelation_without_face_blur"
                         app:shapeAppearanceOverlay="@style/roundedImageView" />
                     <ImageView
                         android:id="@+id/ivCheckPixelationWithoutFaceBlur"
@@ -242,7 +242,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/pixelation_without_head_blur"
+                        android:src="@drawable/iv_pixelation_without_head_blur"
                         app:shapeAppearanceOverlay="@style/roundedImageView" />
 
                     <ImageView
@@ -277,7 +277,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/solid_with_face_blur"
+                        android:src="@drawable/iv_solid_with_face_blur"
                         app:shapeAppearanceOverlay="@style/roundedImageView" />
 
                     <ImageView
@@ -312,7 +312,7 @@
                         android:scaleType="centerCrop"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        android:src="@drawable/solid_without_face_blur"
+                        android:src="@drawable/iv_solid_without_face_blur"
                         app:shapeAppearanceOverlay="@style/roundedImageView" />
 
                     <ImageView
