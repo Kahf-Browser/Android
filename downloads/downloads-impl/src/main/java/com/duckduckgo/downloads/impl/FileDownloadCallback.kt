@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadAnalyticsListener
 import com.duckduckgo.downloads.api.*
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadStartedMessage
 import com.duckduckgo.downloads.api.DownloadCommand.ShowDownloadSuccessMessage
@@ -33,7 +34,6 @@ import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED
 import com.duckduckgo.downloads.store.DownloadStatus.FAILED
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
-import com.squareup.anvil.annotations.ContributesBinding
 import dagger.SingleInstanceIn
 import java.io.File
 import javax.inject.Inject
@@ -81,14 +81,6 @@ interface DownloadCallback {
     fun onCancel(downloadId: Long)
 }
 
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = DownloadCallback::class,
-)
-@ContributesBinding(
-    scope = AppScope::class,
-    boundType = DownloadStateListener::class,
-)
 @SingleInstanceIn(AppScope::class)
 class FileDownloadCallback @Inject constructor(
     private val fileDownloadNotificationManager: FileDownloadNotificationManager,
@@ -97,6 +89,7 @@ class FileDownloadCallback @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val mediaScanner: MediaScanner,
+    private val downloadAnalyticsListener: DownloadAnalyticsListener,
 ) : DownloadCallback, DownloadStateListener {
 
     private val command = Channel<DownloadCommand>(1, BufferOverflow.DROP_OLDEST)
@@ -104,6 +97,7 @@ class FileDownloadCallback @Inject constructor(
     override fun onStart(downloadItem: DownloadItem) {
         logcat { "Download started for file ${downloadItem.fileName}" }
         pixel.fire(DOWNLOAD_REQUEST_STARTED)
+        downloadAnalyticsListener.onDownloadStarted(downloadItem.fileName)
         val downloadStartedMessage = ShowDownloadStartedMessage(
             messageId = string.downloadsDownloadStartedMessage,
             fileName = downloadItem.fileName,
@@ -122,6 +116,7 @@ class FileDownloadCallback @Inject constructor(
     override fun onSuccess(downloadId: Long, contentLength: Long, file: File, mimeType: String?, contentUri: Uri?) {
         logcat { "Download succeeded for file ${file.name} / $mimeType / $contentLength / contentUri=$contentUri" }
         pixel.fire(DOWNLOAD_REQUEST_SUCCEEDED)
+        downloadAnalyticsListener.onDownloadCompleted(file.name)
         fileDownloadNotificationManager.showDownloadFinishedNotification(
             downloadId = downloadId,
             file = file,
@@ -147,6 +142,7 @@ class FileDownloadCallback @Inject constructor(
     override fun onSuccess(file: File, mimeType: String?) {
         logcat { "Download succeeded for file with name ${file.name} / $mimeType" }
         pixel.fire(DOWNLOAD_REQUEST_SUCCEEDED)
+        downloadAnalyticsListener.onDownloadCompleted(file.name)
         fileDownloadNotificationManager.showDownloadFinishedNotification(
             downloadId = 0,
             file = file,
@@ -169,6 +165,7 @@ class FileDownloadCallback @Inject constructor(
     override fun onError(url: String?, downloadId: Long?, reason: DownloadFailReason) {
         logcat { "Failed to download file with url $url (id = $downloadId) and reason $reason." }
         pixel.fire(DOWNLOAD_REQUEST_FAILED)
+        downloadAnalyticsListener.onDownloadFailed(reason.toString())
         handleFailedDownload(downloadId = downloadId ?: 0, url = url, reason = reason)
         downloadId?.let {
             appCoroutineScope.launch(dispatchers.io()) {

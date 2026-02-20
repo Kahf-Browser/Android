@@ -96,6 +96,33 @@ sealed class AnalyticsEvent(val name: String) {
     data object LightTheme : AnalyticsEvent("light_theme_enabled")
     data object DarkTheme : AnalyticsEvent("dark_theme_enabled")
     data object SystemDefaultTheme : AnalyticsEvent("system_theme_enabled")
+
+    // Downloads - Lifecycle
+    data object DownloadStarted : AnalyticsEvent("download_started")
+    data object DownloadCompleted : AnalyticsEvent("download_completed")
+    data object DownloadFailed : AnalyticsEvent("download_failed")
+
+    // Downloads - Notification Actions
+    data object DownloadPaused : AnalyticsEvent("download_paused")
+    data object DownloadResumed : AnalyticsEvent("download_resumed")
+    data object DownloadCancelledFromNotification : AnalyticsEvent("download_cancelled_notification")
+    data object DownloadRetriedFromNotification : AnalyticsEvent("download_retried_notification")
+
+    // Downloads - Confirmation Dialog
+    data object DownloadConfirmationShown : AnalyticsEvent("download_confirmation_shown")
+    data object DownloadConfirmationAccepted : AnalyticsEvent("download_confirmation_accepted")
+    data object DownloadConfirmationCancelled : AnalyticsEvent("download_confirmation_cancelled")
+    data object DownloadLocationChanged : AnalyticsEvent("download_location_changed")
+
+    // Downloads - List Screen
+    data object DownloadsScreenOpened : AnalyticsEvent("downloads_screen_opened")
+    data object DownloadOpenedFromList : AnalyticsEvent("download_opened_from_list")
+    data object DownloadSharedFromList : AnalyticsEvent("download_shared_from_list")
+    data object DownloadDeletedFromList : AnalyticsEvent("download_deleted_from_list")
+    data object DownloadDeletedAll : AnalyticsEvent("download_deleted_all")
+    data object DownloadRetriedFromList : AnalyticsEvent("download_retried_from_list")
+    data object DownloadCancelledFromList : AnalyticsEvent("download_cancelled_from_list")
+    data object DownloadFailedDeletedFromList : AnalyticsEvent("download_failed_deleted_from_list")
 }
 
 sealed class AnalyticsParam(val name: String) {
@@ -124,4 +151,8 @@ sealed class AnalyticsParam(val name: String) {
     data object QuerySearchEngine : AnalyticsParam("query_enter_search_engine")
     data object ExtSearchEngine : AnalyticsParam("external_search_engine")
     data object ResultClickSearchEngine : AnalyticsParam("search_result_link_click_search_engine")
+
+    // Downloads
+    data object DownloadFileName : AnalyticsParam("download_file_name")
+    data object DownloadFailReason : AnalyticsParam("download_fail_reason")
 }

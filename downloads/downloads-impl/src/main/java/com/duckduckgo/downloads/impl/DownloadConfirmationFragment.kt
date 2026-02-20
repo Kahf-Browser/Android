@@ -29,6 +29,7 @@ import androidx.core.view.isVisible
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.downloads.api.DownloadAnalyticsListener
 import com.duckduckgo.downloads.api.DownloadConfirmationDialogListener
 import com.duckduckgo.downloads.api.DownloadLocationPreferences
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
@@ -63,6 +64,9 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
     @Inject
     lateinit var downloadLocationPreferences: DownloadLocationPreferences
 
+    @Inject
+    lateinit var downloadAnalyticsListener: DownloadAnalyticsListener
+
     private var file: File? = null
     private var selectedDirectory: File? = null
 
@@ -81,6 +85,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?,
     ): View {
         val binding = DownloadConfirmationBinding.inflate(inflater, container, false)
+        downloadAnalyticsListener.onDownloadConfirmationShown()
         setupDownload()
         setupViews(binding)
         return binding.root
@@ -124,6 +129,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         binding.rememberLocationCheckbox.isChecked = downloadLocationPreferences.shouldRememberLocation()
 
         binding.continueDownload.setOnClickListener {
+            downloadAnalyticsListener.onDownloadConfirmationAccepted()
             val remember = binding.rememberLocationCheckbox.isChecked
             downloadLocationPreferences.setRememberLocation(remember)
             // "Save to Downloads" downloads to the default public Downloads directory for this download only
@@ -136,6 +142,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
             dismiss()
         }
         binding.cancel.setOnClickListener {
+            downloadAnalyticsListener.onDownloadConfirmationCancelled()
             logcat { "Cancelled download for url ${pendingDownload.url}" }
             listener.cancelDownload()
             dismiss()
@@ -173,6 +180,7 @@ class DownloadConfirmationFragment : BottomSheetDialogFragment() {
         )
         val path = getPathFromTreeUri(uri)
         if (path != null) {
+            downloadAnalyticsListener.onDownloadLocationChanged()
             selectedDirectory = File(path)
             // Save preference and start download immediately after folder selection
             downloadLocationPreferences.setDownloadDirectory(path)

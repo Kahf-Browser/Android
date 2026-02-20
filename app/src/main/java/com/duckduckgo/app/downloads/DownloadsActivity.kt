@@ -28,6 +28,8 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDownloadsBinding
 import com.duckduckgo.app.downloads.DownloadsViewModel.Command
@@ -70,6 +72,9 @@ class DownloadsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var fileDownloader: FileDownloader
 
+    @Inject
+    lateinit var analyticsService: AnalyticsService
+
     private val toolbar
         get() = binding.toolbar
 
@@ -81,6 +86,7 @@ class DownloadsActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
+        analyticsService.logEvent(AnalyticsEvent.DownloadsScreenOpened)
         setupToolbar(toolbar)
         setupRecyclerView()
 

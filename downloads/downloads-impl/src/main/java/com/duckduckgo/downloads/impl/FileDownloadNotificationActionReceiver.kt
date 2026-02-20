@@ -28,6 +28,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.registerNotExportedReceiver
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.downloads.api.DownloadAnalyticsListener
 import com.duckduckgo.downloads.api.*
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_CANCELLED_BY_USER
@@ -55,6 +56,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val pixel: Pixel,
+    private val downloadAnalyticsListener: DownloadAnalyticsListener,
 ) : BroadcastReceiver(), MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -94,6 +96,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     private fun handleCancel(downloadId: Long) {
         logcat { "Received cancel download intent for download id $downloadId" }
         pixel.fire(DOWNLOAD_REQUEST_CANCELLED_BY_USER)
+        downloadAnalyticsListener.onDownloadCancelledFromNotification()
 
         // Mark cancelled FIRST so in-flight progress callbacks are suppressed
         (fileDownloadNotificationManager as? DefaultFileDownloadNotificationManager)?.markDownloadCancelled(downloadId)
@@ -116,6 +119,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
     private fun handleRetry(intent: Intent, downloadId: Long) {
         logcat { "Received retry download intent for download id $downloadId" }
         pixel.fire(DOWNLOAD_REQUEST_RETRIED)
+        downloadAnalyticsListener.onDownloadRetriedFromNotification()
 
         // Cancel the failed notification before enqueuing the retry
         fileDownloadNotificationManager.cancelDownloadFileNotification(downloadId)
@@ -135,6 +139,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
 
     private fun handlePause(downloadId: Long) {
         logcat { "Received pause download intent for download id $downloadId" }
+        downloadAnalyticsListener.onDownloadPaused()
         // Mark paused FIRST so any in-flight progress callback sees paused state
         // markDownloadPaused also immediately refreshes the notification with stored progress
         (fileDownloadNotificationManager as? DefaultFileDownloadNotificationManager)?.markDownloadPaused(downloadId)
@@ -143,6 +148,7 @@ class FileDownloadNotificationActionReceiver @Inject constructor(
 
     private fun handleResume(downloadId: Long) {
         logcat { "Received resume download intent for download id $downloadId" }
+        downloadAnalyticsListener.onDownloadResumed()
         // markDownloadResumed also immediately refreshes the notification
         (fileDownloadNotificationManager as? DefaultFileDownloadNotificationManager)?.markDownloadResumed(downloadId)
         urlFileDownloadCallManager.resume(downloadId)

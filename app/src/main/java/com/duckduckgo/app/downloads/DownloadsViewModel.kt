@@ -18,6 +18,8 @@ package com.duckduckgo.app.downloads
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.R
@@ -57,6 +59,7 @@ class DownloadsViewModel @Inject constructor(
     private val timeDiffFormatter: TimeDiffFormatter,
     private val downloadsRepository: DownloadsRepository,
     private val dispatcher: DispatcherProvider,
+    private val analyticsService: AnalyticsService,
 ) : ViewModel(), DownloadsItemListener {
 
     data class ViewState(
@@ -102,6 +105,7 @@ class DownloadsViewModel @Inject constructor(
     }
 
     fun deleteAllDownloadedItems() {
+        analyticsService.logEvent(AnalyticsEvent.DownloadDeletedAll)
         viewModelScope.launch(dispatcher.io()) {
             val itemsToDelete = downloadsRepository.getDownloads()
             if (itemsToDelete.isNotEmpty()) {
@@ -175,14 +179,17 @@ class DownloadsViewModel @Inject constructor(
     }
 
     override fun onItemClicked(item: DownloadItem) {
+        analyticsService.logEvent(AnalyticsEvent.DownloadOpenedFromList)
         viewModelScope.launch { command.send(OpenFile(item)) }
     }
 
     override fun onShareItemClicked(item: DownloadItem) {
+        analyticsService.logEvent(AnalyticsEvent.DownloadSharedFromList)
         viewModelScope.launch { command.send(ShareFile(item)) }
     }
 
     override fun onDeleteItemClicked(item: DownloadItem) {
+        analyticsService.logEvent(AnalyticsEvent.DownloadDeletedFromList)
         viewModelScope.launch(dispatcher.io()) {
             downloadsRepository.delete(item.downloadId)
             command.send(DisplayUndoMessage(messageId = R.string.downloadsFileDeletedMessage, arg = item.fileName, items = listOf(item)))
@@ -190,6 +197,7 @@ class DownloadsViewModel @Inject constructor(
     }
 
     override fun onCancelItemClicked(item: DownloadItem) {
+        analyticsService.logEvent(AnalyticsEvent.DownloadCancelledFromList)
         viewModelScope.launch(dispatcher.io()) {
             downloadsRepository.delete(item.downloadId)
             command.send(CancelDownload(item))
@@ -202,6 +210,7 @@ class DownloadsViewModel @Inject constructor(
 
     override fun onRetryItemClicked(item: DownloadItem) {
         if (item.downloadUrl == null) return
+        analyticsService.logEvent(AnalyticsEvent.DownloadRetriedFromList)
         viewModelScope.launch(dispatcher.io()) {
             downloadsRepository.delete(item.downloadId)
             val partialFile = File(item.filePath)
@@ -213,6 +222,7 @@ class DownloadsViewModel @Inject constructor(
     }
 
     override fun onDeleteFailedItemClicked(item: DownloadItem) {
+        analyticsService.logEvent(AnalyticsEvent.DownloadFailedDeletedFromList)
         viewModelScope.launch(dispatcher.io()) {
             downloadsRepository.delete(item.downloadId)
             val partialFile = File(item.filePath)
