@@ -1215,11 +1215,16 @@ class BrowserTabFragment :
                         popupWindow.dismiss()
                         // Just reloading the WebView doesn't work. Relaunch the tab is required.
                         webView?.url?.let { url ->
-                            val uri = url.toUri().buildUpon().clearQuery().apply {
-                                url.toUri().queryParameterNames.filter { it != ParamKey.SAFE }.forEach {
-                                    appendQueryParameter(it, url.toUri().getQueryParameter(it))
-                                }
-                            }.build()
+                            val parsedUri = url.toUri()
+                            val uri = if (parsedUri.isHierarchical) {
+                                parsedUri.buildUpon().clearQuery().apply {
+                                    parsedUri.queryParameterNames.filter { it != ParamKey.SAFE }.forEach {
+                                        appendQueryParameter(it, parsedUri.getQueryParameter(it))
+                                    }
+                                }.build()
+                            } else {
+                                parsedUri
+                            }
 
                             if (requireActivity() is BrowserActivity) {
                                 (requireActivity() as BrowserActivity).relaunchCurrentTab(uri.toString())
