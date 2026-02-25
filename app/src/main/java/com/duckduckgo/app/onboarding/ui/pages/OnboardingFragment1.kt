@@ -1,7 +1,5 @@
 package com.duckduckgo.app.onboarding.ui.pages
 
-import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
@@ -9,10 +7,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.edit
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboarding1Binding
@@ -20,7 +18,6 @@ import com.duckduckgo.app.languages.Language
 import com.duckduckgo.app.languages.LanguageSelectionBottomSheetDialogFragment
 import com.duckduckgo.app.languages.OnLanguageClickedListener
 import com.duckduckgo.app.onboarding.ui.KahfOnboardingActivity
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.LanguageManager
 import com.duckduckgo.di.scopes.FragmentScope
@@ -31,15 +28,10 @@ import javax.inject.Inject
 @InjectWith(FragmentScope::class)
 class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
 
-    @Inject
-    lateinit var appBuildConfig: AppBuildConfig
-
     lateinit var binding: FragmentOnboarding1Binding
 
     @Inject
     lateinit var analyticsService: AnalyticsService
-
-    private val requestPermission = registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,6 +40,7 @@ class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
         binding = FragmentOnboarding1Binding.inflate(inflater, container, false)
 
         binding.btnContinue.setOnClickListener {
+            analyticsService.logEvent(AnalyticsEvent.OnboardContinueClicked)
             Timber.d("saved Lang: ${getSavedLanguage(requireContext())}")
             if (getSavedLanguage(requireContext()) == "xx") {
                 showLanguageSelectionBottomSheet()
@@ -73,6 +66,13 @@ class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
             .setListener(
                 object : OnLanguageClickedListener {
                     override fun onLanguageClicked(language: Language) {
+                        analyticsService.logEvent(
+                            AnalyticsEvent.OnboardLanguageSelected,
+                            mapOf(
+                                AnalyticsParam.LanguageCode to language.code,
+                                AnalyticsParam.LanguageName to language.name,
+                            ),
+                        )
                         switchLanguage(language.code)
                         (parentFragmentManager.findFragmentByTag("langBs") as BottomSheetDialogFragment).dismiss()
                     }
@@ -96,21 +96,5 @@ class OnboardingFragment1 : DuckDuckGoFragment(R.layout.fragment_onboarding1) {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         intent.putExtra(KahfOnboardingActivity.EXTRA_START_PAGE, 1)
         startActivity(intent)
-    }
-
-
-    override fun onViewCreated(
-        view: View,
-        savedInstanceState: Bundle?
-    ) {
-        super.onViewCreated(view, savedInstanceState)
-        requestNotificationsPermissions()
-    }
-
-    @SuppressLint("InlinedApi")
-    private fun requestNotificationsPermissions() {
-        if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            requestPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
     }
 }

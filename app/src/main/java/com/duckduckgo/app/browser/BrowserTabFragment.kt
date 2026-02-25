@@ -89,6 +89,7 @@ import android.widget.PopupWindow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.annotation.AnyThread
 import androidx.annotation.StringRes
@@ -786,6 +787,13 @@ class BrowserTabFragment :
     // Social Media Integration
     private val socialMediaManager = SocialMediaManager()
     private var socialMediaDialog: SocialMediaDialog? = null
+
+    private val notificationPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        analyticsService.logEvent(
+            AnalyticsEvent.NotificationPermissionResult,
+            mapOf(AnalyticsParam.PermissionGranted to granted.toString()),
+        )
+    }
 
     private val activityResultHandlerEmailProtectionInContextSignup = registerForActivityResult(StartActivityForResult()) { result: ActivityResult ->
         when (result.resultCode) {
@@ -2208,6 +2216,8 @@ class BrowserTabFragment :
                 }
             }
 
+            is Command.RequestNotificationPermission -> requestDeferredNotificationPermission()
+
             else -> {
                 // NO OP
             }
@@ -2220,6 +2230,14 @@ class BrowserTabFragment :
     ) {
         context?.let {
             globalActivityStarter.start(it, DeeplinkActivityParams(screenName = screen, jsonArguments = payload), null)
+        }
+    }
+
+    @android.annotation.SuppressLint("InlinedApi")
+    private fun requestDeferredNotificationPermission() {
+        if (appBuildConfig.sdkInt >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            analyticsService.logEvent(AnalyticsEvent.NotificationPermissionPrompted)
+            notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 

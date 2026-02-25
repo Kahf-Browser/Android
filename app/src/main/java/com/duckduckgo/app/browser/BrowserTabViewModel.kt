@@ -1685,6 +1685,7 @@ class BrowserTabViewModel @Inject constructor(
         if (newProgress == 100) {
             command.value = RefreshUserAgent(url, currentBrowserViewState().isDesktopBrowsingMode)
             navigationAwareLoginDetector.onEvent(NavigationEvent.PageFinished)
+            checkAndRequestNotificationPermission()
         }
     }
 
@@ -1894,6 +1895,19 @@ class BrowserTabViewModel @Inject constructor(
     private fun registerSiteVisit() {
         Schedulers.io().scheduleDirect {
             networkLeaderboardDao.incrementSitesVisited()
+        }
+    }
+
+    private fun checkAndRequestNotificationPermission() {
+        val prefs = spProvider.getKahfSharedPreferences()
+        if (prefs.getBoolean(NOTIFICATION_PERMISSION_REQUESTED_KEY, false)) return
+
+        val visitCount = prefs.getInt(SITE_VISIT_COUNT_KEY, 0) + 1
+        prefs.edit().putInt(SITE_VISIT_COUNT_KEY, visitCount).apply()
+
+        if (visitCount >= SITE_VISITS_BEFORE_NOTIFICATION_PROMPT) {
+            prefs.edit().putBoolean(NOTIFICATION_PERMISSION_REQUESTED_KEY, true).apply()
+            command.value = Command.RequestNotificationPermission
         }
     }
 
@@ -3762,6 +3776,10 @@ class BrowserTabViewModel @Inject constructor(
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.
         private const val SHOW_CONTENT_MIN_PROGRESS = 50
+
+        private const val SITE_VISIT_COUNT_KEY = "site_visit_count"
+        private const val NOTIFICATION_PERMISSION_REQUESTED_KEY = "notification_permission_requested"
+        private const val SITE_VISITS_BEFORE_NOTIFICATION_PROMPT = 4
         private const val NEW_CONTENT_MAX_DELAY_MS = 1000L
         private const val ONE_HOUR_IN_MS = 3_600_000
 

@@ -232,4 +232,5 @@ sealed class Command {
         val payload: String,
     ) : Command()
     data class HideOnboardingDaxDialog(val onboardingCta: OnboardingDaxDialogCta) : Command()
+    object RequestNotificationPermission : Command()
 }

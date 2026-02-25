@@ -20,11 +20,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.duckduckgo.app.onboarding.ui.pages.OnboardingBookmarkFragment
 import com.duckduckgo.app.onboarding.ui.pages.OnboardingFragment1
-import com.duckduckgo.app.onboarding.ui.pages.OnboardingFragment2
 import com.duckduckgo.app.onboarding.ui.pages.OnboardingSafeGazeFragment
-import com.duckduckgo.common.ui.DuckDuckGoFragment
 
 class OnboardingAdapter(
     fragmentManager: FragmentManager,

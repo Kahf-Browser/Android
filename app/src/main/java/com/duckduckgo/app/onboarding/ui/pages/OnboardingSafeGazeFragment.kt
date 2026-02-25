@@ -1,6 +1,11 @@
 package com.duckduckgo.app.onboarding.ui.pages
 
+import android.app.ActivityManager
+import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.os.StatFs
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.FragmentOnboardingSafegazeBinding
@@ -118,6 +124,11 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
             lifecycleScope.launch(dispatcher.main()) {
                 if (!isAdded) return@launch
 
+                analytics.logEvent(
+                    AnalyticsEvent.OnboardHardwareCompatibility,
+                    buildHardwareCompatibilityParams("incompatible"),
+                )
+
                 binding.tvCompatibility.text = getString(R.string.kahf_onboarding_incompatible).also { text = it }
                 binding.progressLoader.visibility = View.GONE
                 binding.tvCompatibility.setTextColor(
@@ -133,6 +144,11 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
             isHardwareCompatible(requireContext(), nsfwDetector, imageProcessor) { result ->
                 viewLifecycleOwner.lifecycleScope.launch(dispatcher.main()) {
                     if (!isAdded) return@launch
+
+                    analytics.logEvent(
+                        AnalyticsEvent.OnboardHardwareCompatibility,
+                        buildHardwareCompatibilityParams(if (result) "compatible" else "slow"),
+                    )
 
                     binding.tvCompatibility.text = getString(
                         if (result) {
@@ -174,6 +190,25 @@ class OnboardingSafeGazeFragment : DuckDuckGoFragment(R.layout.fragment_onboardi
     private fun onEnableSafeGazeClicked() {
         SafeGazeLevel.updateImageBlurLevel(spProvider.getKahfSharedPreferences(), SafeGazeLevel.PixelationWithoutFaceBlur)
         (requireActivity() as KahfOnboardingActivity).onContinueClicked()
+    }
+
+    private fun buildHardwareCompatibilityParams(result: String): Map<AnalyticsParam, String> {
+        val activityManager = requireContext().getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val memInfo = ActivityManager.MemoryInfo()
+        activityManager.getMemoryInfo(memInfo)
+        val totalRamGb = String.format("%.1f", memInfo.totalMem / (1024.0 * 1024.0 * 1024.0))
+
+        val stat = StatFs(Environment.getDataDirectory().path)
+        val totalStorageGb = String.format("%.1f", stat.totalBytes / (1024.0 * 1024.0 * 1024.0))
+
+        return mapOf(
+            AnalyticsParam.HardwareCompatibilityResult to result,
+            AnalyticsParam.AndroidVersion to Build.VERSION.RELEASE,
+            AnalyticsParam.DeviceManufacturer to Build.MANUFACTURER,
+            AnalyticsParam.DeviceModel to Build.MODEL,
+            AnalyticsParam.DeviceRamGb to totalRamGb,
+            AnalyticsParam.DeviceStorageGb to totalStorageGb,
+        )
     }
 
     companion object {

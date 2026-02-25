@@ -20,9 +20,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.app.analytics.AnalyticsEvent
+import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.databinding.ActivityKahfOnboardingBinding
-import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope
@@ -32,7 +33,7 @@ import javax.inject.Inject
 class KahfOnboardingActivity : DuckDuckGoActivity() {
 
     @Inject
-    lateinit var defaultWebBrowserCapability: DefaultBrowserDetector
+    lateinit var analyticsService: AnalyticsService
 
     private lateinit var viewPageAdapter: OnboardingAdapter
 
@@ -64,15 +65,13 @@ class KahfOnboardingActivity : DuckDuckGoActivity() {
     }
 
     private fun onOnboardingDone() {
+        analyticsService.logEvent(AnalyticsEvent.OnboardCompleted)
         viewModel.onOnboardingDone()
         startActivity(BrowserActivity.intent(this@KahfOnboardingActivity))
         finish()
     }
 
     private fun configurePager() {
-        /*val showDefaultBrowserPage =
-            defaultWebBrowserCapability.deviceSupportsDefaultBrowserConfiguration() && !defaultWebBrowserCapability.isDefaultBrowser()*/
-
         viewPageAdapter = OnboardingAdapter(
             supportFragmentManager,
             lifecycle

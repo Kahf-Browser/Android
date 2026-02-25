@@ -63,6 +63,12 @@ sealed class AnalyticsEvent(val name: String) {
     data object OnboardSkipBookmarks : AnalyticsEvent("onboard_skip_bookmarks")
     data object OnboardEnabledDecentInternet : AnalyticsEvent("onboard_enable_decent_internet")
     data object OnboardSkipDecentInternet : AnalyticsEvent("onboard_skip_decent_internet")
+    data object OnboardContinueClicked : AnalyticsEvent("onboard_continue_clicked")
+    data object OnboardLanguageSelected : AnalyticsEvent("onboard_language_selected")
+    data object OnboardCompleted : AnalyticsEvent("onboard_completed")
+    data object OnboardHardwareCompatibility : AnalyticsEvent("onboard_hardware_compatibility_check")
+    data object NotificationPermissionPrompted : AnalyticsEvent("notification_permission_prompted")
+    data object NotificationPermissionResult : AnalyticsEvent("notification_permission_result")
 
     // Search
     data object AddressBarSuggestionSelection : AnalyticsEvent("address_bar_suggestion_selection")
@@ -155,4 +161,15 @@ sealed class AnalyticsParam(val name: String) {
     // Downloads
     data object DownloadFileName : AnalyticsParam("download_file_name")
     data object DownloadFailReason : AnalyticsParam("download_fail_reason")
+
+    // Onboarding
+    data object LanguageCode : AnalyticsParam("language_code")
+    data object LanguageName : AnalyticsParam("language_name")
+    data object HardwareCompatibilityResult : AnalyticsParam("hardware_compatibility_result")
+    data object PermissionGranted : AnalyticsParam("permission_granted")
+    data object AndroidVersion : AnalyticsParam("android_version")
+    data object DeviceManufacturer : AnalyticsParam("device_manufacturer")
+    data object DeviceModel : AnalyticsParam("device_model")
+    data object DeviceRamGb : AnalyticsParam("device_ram_gb")
+    data object DeviceStorageGb : AnalyticsParam("device_storage_gb")
 }
