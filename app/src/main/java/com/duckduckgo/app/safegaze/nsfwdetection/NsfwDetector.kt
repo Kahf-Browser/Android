@@ -64,8 +64,12 @@ class NsfwDetector(val context: Context) {
         FLOAT32
     )
 
-    private val imageProcessor = ImageProcessor.Builder()
+    // Split into separate processors for [PERF] timing (resize vs preprocess)
+    private val resizeProcessor = ImageProcessor.Builder()
         .add(ResizeOp(inputImageSize, inputImageSize, BILINEAR))
+        .build()
+
+    private val normalizeProcessor = ImageProcessor.Builder()
         .add(NormalizeOp(0f, 255f))
         .build()
 
@@ -113,6 +117,9 @@ class NsfwDetector(val context: Context) {
                 Timber.d(
                     "kLog NSFW model initialized in ${modelInitializationTime}ms " +
                         "(GPU: $isGpuEnabled, CPU threads: $numThreadsConfigured)"
+                )
+                Timber.tag("NsfwDetector").i(
+                    "[PERF] Model loaded: time=${modelInitializationTime}ms, delegate=${if (isGpuEnabled) "GPU" else "CPU"}, threads=$numThreadsConfigured"
                 )
             } catch (e: Exception) {
                 isInitializing.set(false)
@@ -203,16 +210,36 @@ class NsfwDetector(val context: Context) {
             }
 
             return try {
-                // Process image through preprocessing pipeline
-                val buffer = TensorImage(FLOAT32).let {
-                    it.load(bitmap)
-                    imageProcessor.process(it)
-                }.tensorBuffer.buffer
+                val totalStart = System.currentTimeMillis()
+                val inputW = bitmap.width
+                val inputH = bitmap.height
 
-                inputBuffer.loadBuffer(buffer)
+                // Phase 1: decode (N/A in native browser - bitmap already decoded from network)
+                val decodeMs = 0L
 
-                // Run inference under lock — prevents use-after-close race with dispose()
+                // Phase 2: Resize to model input size
+                val resizeStart = System.currentTimeMillis()
+                val tensorImage = TensorImage(FLOAT32)
+                tensorImage.load(bitmap)
+                val resizedImage = resizeProcessor.process(tensorImage)
+                val resizeMs = System.currentTimeMillis() - resizeStart
+
+                // Phase 3: Preprocess (normalize pixels to 0-1 range)
+                val preprocessStart = System.currentTimeMillis()
+                val processedImage = normalizeProcessor.process(resizedImage)
+                inputBuffer.loadBuffer(processedImage.tensorBuffer.buffer)
+                val preprocessMs = System.currentTimeMillis() - preprocessStart
+
+                // Phase 4: Run inference under lock — prevents use-after-close race with dispose()
+                val inferenceStart = System.currentTimeMillis()
                 currentInterpreter.run(inputBuffer.buffer, outputBuffer.buffer)
+                val inferenceMs = System.currentTimeMillis() - inferenceStart
+
+                val totalMs = System.currentTimeMillis() - totalStart
+                val delegate = if (isGpuEnabled) "GPU" else "CPU"
+                Timber.tag("NsfwDetector").i(
+                    "[PERF] NSFW classify: total=${totalMs}ms | decode=${decodeMs}ms, resize=${resizeMs}ms, preprocess=${preprocessMs}ms, inference=${inferenceMs}ms | input=${inputW}x${inputH}, delegate=$delegate"
+                )
 
                 val prediction = NsfwPrediction(outputBuffer.floatArray.clone())
                 prediction
