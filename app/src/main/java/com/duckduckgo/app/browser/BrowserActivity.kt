@@ -248,12 +248,12 @@ open class BrowserActivity : DuckDuckGoActivity() {
     }
 
     private fun handleNotificationIntent(intent: Intent) {
-        lifecycleScope.launch {
-            val tabId = viewModel.onNewTabRequested()
-            val redirectUrl = intent.getStringExtra("redirectUrl")
-            if (redirectUrl != null) {
+        val redirectUrl = intent.getStringExtra("redirectUrl")
+        Timber.d("kahfLog: redirectUrlInActivity: $redirectUrl")
+        if (!redirectUrl.isNullOrEmpty()) {
+            lifecycleScope.launch {
+                val tabId = viewModel.onNewTabRequested()
                 openNewTab(tabId = tabId, url = redirectUrl, skipHome = false, from = "handleNotificationIntent")
-                Timber.d("kahfLog: redirectUrlInActivity: ${intent.getStringExtra("redirectUrl")}")
             }
         }
     }
@@ -411,6 +411,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         Timber.i("onNewIntent: $intent")
 
         intent?.sanitize()
+
+        intent?.let { handleNotificationIntent(it) }
 
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
 
