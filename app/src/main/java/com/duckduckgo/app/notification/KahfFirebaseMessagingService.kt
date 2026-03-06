@@ -71,12 +71,13 @@ class KahfFirebaseMessagingService : FirebaseMessagingService() {
     private fun sendNotification(title: String, messageBody: String, redirectUrl: String?) {
         try {
             val intent = Intent(this, BrowserActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                 Timber.d("kahfLog: redirectUrl: $redirectUrl")
                 putExtra("redirectUrl", redirectUrl ?: "")
             }
+            val requestCode = System.currentTimeMillis().toInt()
             val pendingIntent = PendingIntent.getActivity(
-                this, 0, intent,
+                this, requestCode, intent,
                 PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
             )
 

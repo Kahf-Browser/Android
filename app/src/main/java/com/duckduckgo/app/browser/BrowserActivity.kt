@@ -231,7 +231,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 Timber.d("KahfLog: Device Token: $token")
             }
         }*/
-        handleNotificationIntent(intent = intent)
+        intent?.let { handleNotificationIntent(intent = it) }
         val isLaunchedFromOnboarding = intent?.getBooleanExtra(LAUNCH_FROM_ONBOARDING, false)
         Log.d(TAG, "isFromOnboarding: $isLaunchedFromOnboarding")
         if (isLaunchedFromOnboarding == true) {
@@ -244,11 +244,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
         caller: ComponentCaller
     ) {
         super.onNewIntent(intent, caller)
-        handleNotificationIntent(intent = intent)
     }
 
     private fun handleNotificationIntent(intent: Intent) {
-        val redirectUrl = intent.getStringExtra("redirectUrl")
+        val redirectUrl = intent.getStringExtra("redirectUrl") ?: intent.getStringExtra("url")
         Timber.d("kahfLog: redirectUrlInActivity: $redirectUrl")
         if (!redirectUrl.isNullOrEmpty()) {
             lifecycleScope.launch {

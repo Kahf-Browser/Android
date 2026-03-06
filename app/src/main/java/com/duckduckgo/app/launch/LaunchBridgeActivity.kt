@@ -67,7 +67,12 @@ class LaunchBridgeActivity : DuckDuckGoActivity() {
     }
 
     private fun showHome() {
-        startActivity(BrowserActivity.intent(this))
+        val browserIntent = BrowserActivity.intent(this)
+        // Forward FCM data extras (e.g. "url") from the launcher intent to BrowserActivity
+        intent?.getStringExtra("url")?.let { url ->
+            browserIntent.putExtra("redirectUrl", url)
+        }
+        startActivity(browserIntent)
         overridePendingTransition(0, 0)
         finish()
     }
