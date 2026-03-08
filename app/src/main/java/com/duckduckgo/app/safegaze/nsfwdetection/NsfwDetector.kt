@@ -6,6 +6,7 @@ import org.tensorflow.lite.DataType.FLOAT32
 import org.tensorflow.lite.Interpreter
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
+import org.tensorflow.lite.gpu.GpuDelegateFactory
 import org.tensorflow.lite.support.common.ops.NormalizeOp
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
@@ -22,15 +23,10 @@ import java.util.concurrent.atomic.AtomicBoolean
  * Optimized NSFW detector using TensorFlow Lite with GPU acceleration.
  *
  * Optimizations implemented:
- * 1. GPU delegate with automatic fallback to CPU
+ * 1. GPU delegate with FP16 precision and automatic fallback to CPU
  * 2. Pre-allocated buffer reuse (no GC pressure)
  * 3. Multi-threaded CPU execution (4 threads + XNNPACK)
  * 4. Eager initialization support
- *
- * Expected performance improvements:
- * - GPU devices: 2-4x faster inference
- * - CPU devices: 30-50% faster inference
- * - Memory: 15% less GC pressure
  */
 class NsfwDetector(val context: Context) {
     private val inputImageSize = 224
@@ -54,7 +50,7 @@ class NsfwDetector(val context: Context) {
     @Volatile
     private var gpuDelegate: GpuDelegate? = null
 
-    // ✅ OPTIMIZATION 2: Pre-allocated buffers (reused across inferences)
+    // Pre-allocated buffers (reused across inferences)
     private val inputBuffer = TensorBuffer.createFixedSize(
         intArrayOf(1, inputImageSize, inputImageSize, 3),
         FLOAT32
@@ -105,7 +101,6 @@ class NsfwDetector(val context: Context) {
             val t1 = System.currentTimeMillis()
 
             try {
-                // ✅ OPTIMIZATION 1 & 4: GPU delegate with CPU fallback + thread configuration
                 val options = createOptimizedInterpreterOptions()
                 val modelFile = loadModelFile(context, "nsfw.tflite")
                 interpreter = Interpreter(modelFile, options)
@@ -132,19 +127,27 @@ class NsfwDetector(val context: Context) {
 
     private fun createOptimizedInterpreterOptions(): Interpreter.Options {
         return Interpreter.Options().apply {
-            // ✅ OPTIMIZATION 1: Try GPU delegate first (2-4x speedup)
             try {
                 val compatList = CompatibilityList()
                 if (compatList.isDelegateSupportedOnThisDevice) {
-                    val gpuDelegateOptions = GpuDelegate.Options().apply {
-                        // Use default precision (FAST_SINGLE_PRECISION is default)
-                        // Can set to ACCURACY_BEST for higher accuracy if needed
+                    // Use bestOptionsForThisDevice to auto-tune GPU delegate for the device's
+                    // GPU (Adreno, Mali, PowerVR, etc.) instead of generic defaults.
+                    val gpuDelegateOptions = try {
+                        compatList.bestOptionsForThisDevice
+                    } catch (e: Exception) {
+                        Timber.w("bestOptionsForThisDevice failed, using manual options: ${e.message}")
+                        GpuDelegateFactory.Options()
+                    }.apply {
+                        setPrecisionLossAllowed(true)
+                        setInferencePreference(
+                            GpuDelegateFactory.Options.INFERENCE_PREFERENCE_FAST_SINGLE_ANSWER
+                        )
                     }
                     val delegate = GpuDelegate(gpuDelegateOptions)
                     addDelegate(delegate)
                     gpuDelegate = delegate
                     isGpuEnabled = true
-                    Timber.d("kLog GPU delegate enabled for NSFW model")
+                    Timber.d("kLog GPU delegate enabled for NSFW model (bestOptionsForThisDevice + FP16)")
                     return@apply
                 } else {
                     Timber.d("kLog GPU delegate not supported on this device")
@@ -153,9 +156,8 @@ class NsfwDetector(val context: Context) {
                 Timber.w("kLog GPU delegate initialization failed: ${e.message}")
             }
 
-            // ✅ OPTIMIZATION 4: CPU fallback with multi-threading
+            // CPU fallback with multi-threading
             try {
-                // Calculate optimal thread count: 25% of cores, min 1
                 val numCores = Runtime.getRuntime().availableProcessors()
                 val optimalThreads = maxOf(1, (numCores * 0.25).toInt())
 
