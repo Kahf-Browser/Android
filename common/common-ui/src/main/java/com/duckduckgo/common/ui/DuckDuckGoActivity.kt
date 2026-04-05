@@ -26,6 +26,7 @@ import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
 import android.provider.Settings
+import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -114,24 +115,33 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
     fun adjustWindowInsets(left: Int = -1, top: Int = -1, right: Int = -1, bottom: Int = -1) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
+        val statusBarColor = resolveThemeColor(R.attr.kahfStatusBarColor)
+        val navBarColor = resolveThemeColor(R.attr.kahfNavBarColor)
+
+        // Pre-API 35: tint the status/nav bar via the window scrim
+        @Suppress("DEPRECATION")
+        window.statusBarColor = statusBarColor
+        @Suppress("DEPRECATION")
+        window.navigationBarColor = navBarColor
+
         val contentView = findViewById<View>(android.R.id.content)
+
+        // API 35+: statusBarColor is ignored (always transparent).
+        // Set the content view background so the padded area behind the
+        // transparent status bar shows the correct theme color.
+        contentView.setBackgroundColor(statusBarColor)
 
         ViewCompat.setOnApplyWindowInsetsListener(contentView) { view, windowInsets ->
             val systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             val imeInsets = windowInsets.getInsets(WindowInsetsCompat.Type.ime())
             val imeVisible = windowInsets.isVisible(WindowInsetsCompat.Type.ime())
 
-            // If keyboard visible, set bottom margin to IME height
-            // If not, reset to your original bottom margin (e.g., ad space)
-
             view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                isDarkThemeEnabled()
                 bottomMargin = if (imeVisible) imeInsets.bottom else if (!isGestureNavigation(this@DuckDuckGoActivity)) resources.getDimensionPixelSize(
                     R.dimen.tabBottomNavHeight
                 ) else 0
             }
 
-            // Apply system bar insets as padding (avoid pushing up content manually)
             view.setPadding(
                 if (left != -1) left else systemBars.left,
                 if (top != -1) top else systemBars.top,
@@ -139,8 +149,16 @@ abstract class DuckDuckGoActivity : DaggerActivity() {
                 0
             )
 
-            // Return insets unconsumed
             WindowInsetsCompat.CONSUMED
+        }
+    }
+
+    private fun resolveThemeColor(attr: Int): Int {
+        val typedValue = TypedValue()
+        return if (theme.resolveAttribute(attr, typedValue, true)) {
+            typedValue.data
+        } else {
+            Color.BLACK
         }
     }
 
