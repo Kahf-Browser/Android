@@ -31,3 +31,7 @@
 # Keep coroutines
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+
+# OpenReplay
+-keep class com.openreplay.tracker.** { *; }
+-dontwarn com.openreplay.tracker.**

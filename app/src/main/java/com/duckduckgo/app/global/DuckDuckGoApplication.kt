@@ -22,6 +22,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
+import android.util.Log
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration
 import androidx.work.OneTimeWorkRequest
@@ -52,6 +53,8 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 // import com.kahfads.sdk.GoogleAdManagerConfig
 import com.kahfads.sdk.KahfAdsSdk
 import com.kahfads.sdk.KahfAdsSdkConfig
+import com.openreplay.tracker.OpenReplay
+import com.openreplay.tracker.models.OROptions
 import com.posthog.android.PostHogAndroid
 import com.posthog.android.PostHogAndroidConfig
 import dagger.android.AndroidInjector
@@ -229,6 +232,37 @@ open class DuckDuckGoApplication : HasDaggerInjector, MultiProcessApplication(),
         // PERFORMANCE FIX: Stagger all heavy background work to prevent CPU/GPU resource contention
         // Each operation is delayed to avoid all of them starting at once
         initializeBackgroundServicesStaggered()
+        initializeOpenReplay()
+    }
+
+    private fun initializeOpenReplay() {
+        try {
+            val projectKey = BuildConfig.OPENREPLAY_PROJECT_KEY.takeIf { it.isNotEmpty() } ?: ""
+            val ingestUrl = BuildConfig.OPENREPLAY_INGEST_URL.takeIf { it.isNotEmpty() } ?: ""
+
+            if (projectKey.isEmpty()) {
+                Log.w("OpenReplay", "OpenReplay project key not configured, skipping initialization")
+                return
+            }
+
+            OpenReplay.serverURL = ingestUrl
+
+            OpenReplay.start(
+                this,
+                projectKey,
+                OROptions(
+                    debugLogs = BuildConfig.DEBUG,
+                    screen = false,
+                ),
+                onStarted = {
+                    Log.d("OpenReplay" ,"OpenReplay SDK started successfully")
+                }
+            )
+
+            Log.i("OpenReplay", "OpenReplay SDK initialized")
+        } catch (e: Exception) {
+            Log.e( "OpenReplay", "Failed to initialize OpenReplay SDK, error: $e")
+        }
     }
 
     /**

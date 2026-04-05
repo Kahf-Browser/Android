@@ -42,6 +42,7 @@ import androidx.room.Room
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.app.OpenReplayAnalyticsService
 import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
@@ -476,7 +477,7 @@ class BrowserTabViewModelTest {
     private val mockUserBrowserProperties: UserBrowserProperties = mock()
     private val mockAutoCompleteRepository: AutoCompleteRepository = mock()
     private val commandActionMapper: CommandActionMapper = mock()
-    private val analyticsService: PostHogAnalyticsService = mock()
+    private val analyticsService: OpenReplayAnalyticsService = mock()
     private val dnsResolver: CustomDnsResolver = mock()
     private val harmfulSiteBlockedDao: HarmfulSiteBlockedDao = mock()
     private val spProvider: SharedPreferencesProvider = mock()

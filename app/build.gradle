@@ -16,6 +16,15 @@ ext {
     CI_HOME_DIR = "${System.getenv('HOME')}/jenkins_static/com.duckduckgo.mobile.android"
 }
 
+configurations.configureEach {
+    resolutionStrategy {
+        force "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+        force "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlin_version"
+    }
+}
+
 android {
     defaultConfig {
         applicationId "io.kahf.browser"
@@ -127,6 +136,17 @@ android {
                 buildConfigField "String", "POSTHOG_API_KEY", "--"
                 buildConfigField "String", "POSTHOG_HOST", "--"
             }
+
+            def openreplayPropertiesFile = project.rootProject.file('openreplay.properties')
+            if (openreplayPropertiesFile.exists()) {
+                def openReplayProps = new Properties()
+                openreplayPropertiesFile.withInputStream { openReplayProps.load(it) }
+                buildConfigField "String", "OPENREPLAY_PROJECT_KEY", "\"${openReplayProps.getProperty('openreplay.projectkey')}\""
+                buildConfigField "String", "OPENREPLAY_INGEST_URL", "\"${openReplayProps.getProperty('openreplay.ingestpoint')}\""
+            } else {
+                buildConfigField "String", "OPENREPLAY_PROJECT_KEY", "--"
+                buildConfigField "String", "OPENREPLAY_INGEST_URL", "--"
+            }
         }
         release {
             minifyEnabled false
@@ -147,6 +167,17 @@ android {
             } else {
                 buildConfigField "String", "POSTHOG_API_KEY", "--"
                 buildConfigField "String", "POSTHOG_HOST", "--"
+            }
+
+            def openreplayPropertiesFile = project.rootProject.file('openreplay.properties')
+            if (openreplayPropertiesFile.exists()) {
+                def openReplayProps = new Properties()
+                openreplayPropertiesFile.withInputStream { openReplayProps.load(it) }
+                buildConfigField "String", "OPENREPLAY_PROJECT_KEY", "\"${openReplayProps.getProperty('openreplay.projectkey')}\""
+                buildConfigField "String", "OPENREPLAY_INGEST_URL", "\"${openReplayProps.getProperty('openreplay.ingestpoint')}\""
+            } else {
+                buildConfigField "String", "OPENREPLAY_PROJECT_KEY", "--"
+                buildConfigField "String", "OPENREPLAY_INGEST_URL", "--"
             }
         }
     }
@@ -527,9 +558,12 @@ dependencies {
     implementation("com.posthog:posthog-android:3.28.1")
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
     implementation 'androidx.core:core-splashscreen:1.0.1'
+    implementation 'com.github.openreplay:android:1.1.8'
 
     // Flipper removed: archived project with no 16 KB page size support (Android 15+)
-    implementation "com.github.KahfAds:android:0.0.99-k1"
+    implementation("com.github.KahfAds:android:0.0.99-k1") {
+        exclude group: 'androidx.compose.material3', module: 'material3'
+    }
 
     // Testing dependencies
     androidTestUtil AndroidX.test.orchestrator

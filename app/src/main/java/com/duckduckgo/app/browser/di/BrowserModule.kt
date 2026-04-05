@@ -22,6 +22,7 @@ import android.content.pm.PackageManager
 import androidx.room.Room
 import androidx.work.WorkManager
 import com.duckduckgo.adclick.api.AdClickManager
+import com.duckduckgo.app.OpenReplayAnalyticsService
 import com.duckduckgo.app.analytics.AnalyticsService
 import com.duckduckgo.app.analytics.PostHogAnalyticsService
 import com.duckduckgo.app.browser.DuckDuckGoRequestRewriter
@@ -389,7 +390,7 @@ class BrowserModule {
     fun provideAnalyticsService(context: Context): AnalyticsService {
         // val f = FirebaseAnalytics.getInstance(context.applicationContext)
         // return FirebaseAnalyticsService(f)
-        return PostHogAnalyticsService()
+        return OpenReplayAnalyticsService()
     }
 
     @Provides
