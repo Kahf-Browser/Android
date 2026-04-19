@@ -537,9 +537,6 @@ dependencies {
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
     implementation 'androidx.core:core-splashscreen:1.0.1'
 
-    // Open Panel
-    implementation 'dev.openpanel:openpanel:0.0.1'
-
     // Flipper removed: archived project with no 16 KB page size support (Android 15+)
     implementation("com.github.KahfAds:android:0.0.99-k1") {
         exclude group: 'androidx.compose.material3', module: 'material3'
