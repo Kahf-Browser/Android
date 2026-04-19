@@ -20,7 +20,7 @@ import android.util.Log
 import com.duckduckgo.app.analytics.AnalyticsEvent
 import com.duckduckgo.app.analytics.AnalyticsParam
 import com.duckduckgo.app.analytics.AnalyticsService
-import com.openreplay.tracker.OpenReplay
+// import com.openreplay.tracker.OpenReplay
 import com.posthog.PostHog
 
 class OpenReplayAnalyticsService(): AnalyticsService {
@@ -29,7 +29,7 @@ class OpenReplayAnalyticsService(): AnalyticsService {
         event: AnalyticsEvent,
         params: Map<AnalyticsParam, String>?
     ) {
-        OpenReplay
+        /*OpenReplay
         try {
             OpenReplay.event(event.name, params?.mapKeys { it.key.name }?.mapValues {
                 val value = it.value
@@ -54,7 +54,7 @@ class OpenReplayAnalyticsService(): AnalyticsService {
             Log.d( "OpenReplay", "Event captured: ${event.name}")
         } catch (e: Exception) {
             Log.e("OpenReplay", "Failed to log event '${event.name} error: $e'")
-        }
+        }*/
     }
 
     override fun setUserProperty(

@@ -31,8 +31,8 @@ android {
         minSdk min_sdk
         targetSdk target_sdk
         compileSdk compile_sdk
-        versionCode 202604052
-        versionName "2.48.5"
+        versionCode 202604191
+        versionName "2.48.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         archivesBaseName = "kahf_browser_${versionName}_${versionCode}"
         vectorDrawables.useSupportLibrary = true
@@ -136,17 +136,6 @@ android {
                 buildConfigField "String", "POSTHOG_API_KEY", "--"
                 buildConfigField "String", "POSTHOG_HOST", "--"
             }
-
-            def openreplayPropertiesFile = project.rootProject.file('openreplay.properties')
-            if (openreplayPropertiesFile.exists()) {
-                def openReplayProps = new Properties()
-                openreplayPropertiesFile.withInputStream { openReplayProps.load(it) }
-                buildConfigField "String", "OPENREPLAY_PROJECT_KEY", "\"${openReplayProps.getProperty('openreplay.projectkey')}\""
-                buildConfigField "String", "OPENREPLAY_INGEST_URL", "\"${openReplayProps.getProperty('openreplay.ingestpoint')}\""
-            } else {
-                buildConfigField "String", "OPENREPLAY_PROJECT_KEY", "--"
-                buildConfigField "String", "OPENREPLAY_INGEST_URL", "--"
-            }
         }
         release {
             minifyEnabled false
@@ -167,17 +156,6 @@ android {
             } else {
                 buildConfigField "String", "POSTHOG_API_KEY", "--"
                 buildConfigField "String", "POSTHOG_HOST", "--"
-            }
-
-            def openreplayPropertiesFile = project.rootProject.file('openreplay.properties')
-            if (openreplayPropertiesFile.exists()) {
-                def openReplayProps = new Properties()
-                openreplayPropertiesFile.withInputStream { openReplayProps.load(it) }
-                buildConfigField "String", "OPENREPLAY_PROJECT_KEY", "\"${openReplayProps.getProperty('openreplay.projectkey')}\""
-                buildConfigField "String", "OPENREPLAY_INGEST_URL", "\"${openReplayProps.getProperty('openreplay.ingestpoint')}\""
-            } else {
-                buildConfigField "String", "OPENREPLAY_PROJECT_KEY", "--"
-                buildConfigField "String", "OPENREPLAY_INGEST_URL", "--"
             }
         }
     }
@@ -558,7 +536,9 @@ dependencies {
     implementation("com.posthog:posthog-android:3.28.1")
     implementation("com.facebook.android:facebook-android-sdk:latest.release")
     implementation 'androidx.core:core-splashscreen:1.0.1'
-    implementation 'com.github.openreplay:android:1.1.8'
+
+    // Open Panel
+    implementation 'dev.openpanel:openpanel:0.0.1'
 
     // Flipper removed: archived project with no 16 KB page size support (Android 15+)
     implementation("com.github.KahfAds:android:0.0.99-k1") {
