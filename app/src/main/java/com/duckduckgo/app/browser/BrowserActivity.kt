@@ -100,7 +100,6 @@ import com.google.android.play.core.install.model.UpdateAvailability
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.get
-import com.openreplay.tracker.OpenReplay
 import io.kahf.kahf_segmentation.ImageProcessor
 import io.kahf.video_filter.VideoFrameProcessor
 import kotlinx.coroutines.CoroutineScope
@@ -198,7 +197,6 @@ open class BrowserActivity : DuckDuckGoActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.daggerInject()
         intent?.sanitize()
-        OpenReplay.setupGestureDetectorForActivity(this)
         Timber.i("onCreate called. freshAppLaunch: ${dataClearer.isFreshAppLaunch}, savedInstanceState: $savedInstanceState")
         dataClearerForegroundAppRestartPixel.registerIntent(intent)
         renderer = BrowserStateRenderer()
